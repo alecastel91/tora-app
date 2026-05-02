@@ -55,8 +55,8 @@ const Header = ({ onOpenSettings, onOpenPremium, accountUser }) => {
         </button>
         <button
           className={`icon-btn premium-btn ${
-            accountUser?.subscriptionTier === 'YEARLY' ? 'is-yearly' :
-            accountUser?.subscriptionTier === 'MONTHLY' ? 'is-monthly' :
+            user?.subscriptionTier === 'YEARLY' ? 'is-yearly' :
+            user?.subscriptionTier === 'MONTHLY' ? 'is-monthly' :
             ''
           }`}
           onClick={handlePremiumClick}

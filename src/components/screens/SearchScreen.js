@@ -39,9 +39,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   // Dropdown states
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Helper function to check if user has global search access
+  // Helper function to check if user has global search access (per-profile)
   const hasGlobalSearch = () => {
-    const tier = accountUser?.subscriptionTier || 'FREE';
+    const tier = user?.subscriptionTier || 'FREE';
     return ['TRIAL', 'MONTHLY', 'YEARLY'].includes(tier);
   };
 
@@ -61,14 +61,14 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     setLoading(true);
     try {
       const apiStartTime = performance.now();
-      // Use the authenticated search endpoint with location restrictions
-      const response = await apiService.searchProfiles();
+      // Use the authenticated search endpoint with location restrictions (pass active profile for tier check)
+      const response = await apiService.searchProfiles({ activeProfileId: user?.id });
       const apiEndTime = performance.now();
 
       // Handle both response formats (old: array, new: object with profiles array)
       const profiles = response.profiles || response;
       console.log(`✅ [SearchScreen] API call completed in ${(apiEndTime - apiStartTime).toFixed(0)}ms, got ${profiles?.length || 0} profiles`);
-      console.log(`📍 [SearchScreen] User location restriction: ${response.userCity || 'N/A'}, tier: ${accountUser?.subscriptionTier || 'FREE'}`);
+      console.log(`📍 [SearchScreen] User location restriction: ${response.userCity || 'N/A'}, tier: ${user?.subscriptionTier || 'FREE'}`);
 
       // Filter out current user's profile
       const filteredProfiles = (profiles || []).filter(profile => {
@@ -108,7 +108,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       const hasLocationFilters = filters.zones.length > 0 || filters.countries.length > 0 || filters.cities.length > 0;
 
       if (hasLocationFilters) {
-        const tierName = accountUser?.subscriptionTier === 'TRIAL' ? 'Your 48h trial' : 'FREE tier';
+        const tierName = user?.subscriptionTier === 'TRIAL' ? 'Your 48h trial' : 'FREE tier';
         // Show alert and clear location filters
         alert(`Location filters require a paid subscription.\n\n${tierName} search is restricted to ${user.city} only.\n\nUpgrade to search worldwide!`);
 
@@ -129,6 +129,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     try {
       const params = {};
 
+      // Add active profile ID for per-profile subscription check
+      if (user?.id) params.activeProfileId = user.id;
       // Add filters to params - send all selected values as arrays for OR logic
       if (searchQuery) params.search = searchQuery;
       if (filters.roles.length > 0) params.roles = filters.roles.join(',');
@@ -471,7 +473,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           <div className="search-premium-notice">
             <span className="premium-icon">✨</span>
             <span>
-              {accountUser?.subscriptionTier === 'TRIAL' ? 'Searching worldwide with 48h trial' : 'Searching worldwide with Premium'}
+              {user?.subscriptionTier === 'TRIAL' ? 'Searching worldwide with 48h trial' : 'Searching worldwide with Premium'}
             </span>
           </div>
         )}

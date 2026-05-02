@@ -8981,6 +8981,17 @@
   margin-bottom: 16px;
 }
 
+.form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-row .form-group input[type="date"] {
+  width: 100%;
+  min-width: 0;
+  -webkit-min-logical-width: 0;
+}
+
 .form-group {
   flex: 1;
   display: flex;

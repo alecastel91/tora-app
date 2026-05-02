@@ -41,12 +41,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser }) => {
 
   // Helper function to calculate trial days/hours remaining
   const getTrialTimeRemaining = () => {
-    if (!accountUser || accountUser.subscriptionTier !== 'TRIAL' || !accountUser.trialEndDate) {
+    if (!user || user.subscriptionTier !== 'TRIAL' || !user.trialEndDate) {
       return null;
     }
 
     const now = new Date();
-    const endDate = new Date(accountUser.trialEndDate);
+    const endDate = new Date(user.trialEndDate);
     const diffTime = endDate - now;
 
     if (diffTime <= 0) return { expired: true };

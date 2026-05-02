@@ -23,6 +23,18 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 2, 2026)
+
+### Per-Profile Subscription Model (Frontend)
+- Subscription tier and usage stats now read from active profile (`user`) instead of account (`accountUser`)
+- **App.js**: Settings displays `user.subscriptionTier`, `user.likesSentToday`, `user.connectionsSentThisMonth`
+- **AppContext.js**: `accountSubscriptionTier` syncs from active profile on profile switch
+- **Header.js**: Premium badge reads `user.subscriptionTier`
+- **SearchScreen.js**: Passes `activeProfileId` to search API; tier check from `user`
+- **TourScreen.js, MatchesScreen.js**: Premium gates read from `user.subscriptionTier`
+- **ProfileScreen.js**: Trial countdown reads from `user.trialEndDate`
+- Switching profiles updates subscription UI immediately
+
 ## Recent Updates (April 11-12, 2026)
 
 ### Database Split Validated End-to-End

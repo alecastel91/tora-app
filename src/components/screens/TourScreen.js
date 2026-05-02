@@ -12,9 +12,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
   const { t } = useLanguage();
 
-  // Helper function to check if user has premium access (reads from accountUser)
+  // Helper function to check if user has premium access (per-profile subscription)
   const isPremiumUser = () => {
-    const tier = accountUser?.subscriptionTier || 'FREE';
+    const tier = user?.subscriptionTier || 'FREE';
     return ['TRIAL', 'MONTHLY', 'YEARLY'].includes(tier);
   };
 
@@ -863,25 +863,23 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               </div>
             )}
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Start Date *</label>
-                <input
-                  type="date"
-                  value={tourForm.startDate}
-                  onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })}
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label>End Date *</label>
-                <input
-                  type="date"
-                  value={tourForm.endDate}
-                  onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })}
-                  className="form-input"
-                />
-              </div>
+            <div className="form-group">
+              <label>Start Date *</label>
+              <input
+                type="date"
+                value={tourForm.startDate}
+                onChange={(e) => { setTourForm({ ...tourForm, startDate: e.target.value }); e.target.blur(); }}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>End Date *</label>
+              <input
+                type="date"
+                value={tourForm.endDate}
+                onChange={(e) => { setTourForm({ ...tourForm, endDate: e.target.value }); e.target.blur(); }}
+                className="form-input"
+              />
             </div>
 
             <div className="form-group">
@@ -1052,25 +1050,23 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               </div>
             )}
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Start Date *</label>
-                <input
-                  type="date"
-                  value={tourForm.startDate}
-                  onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })}
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label>End Date *</label>
-                <input
-                  type="date"
-                  value={tourForm.endDate}
-                  onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })}
-                  className="form-input"
-                />
-              </div>
+            <div className="form-group">
+              <label>Start Date *</label>
+              <input
+                type="date"
+                value={tourForm.startDate}
+                onChange={(e) => { setTourForm({ ...tourForm, startDate: e.target.value }); e.target.blur(); }}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>End Date *</label>
+              <input
+                type="date"
+                value={tourForm.endDate}
+                onChange={(e) => { setTourForm({ ...tourForm, endDate: e.target.value }); e.target.blur(); }}
+                className="form-input"
+              />
             </div>
 
             <div className="form-group">

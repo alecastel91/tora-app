@@ -30,11 +30,23 @@ export const AppProvider = ({ children }) => {
   // Account-level preferred currency (not profile-specific)
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
 
-  // Account-level subscription tier (set from App.js when accountUser loads)
+  // Subscription tier from active profile (per-profile, synced when user changes)
   const [accountSubscriptionTier, setAccountSubscriptionTier] = useState('FREE');
+
+  // Callback to refresh accountUser in App.js (registered by App.js on mount)
+  const [refreshAccountUserCallback, setRefreshAccountUserCallback] = useState(null);
 
   // Track loading state to prevent duplicate fetches
   const [isLoadingProfileData, setIsLoadingProfileData] = useState(false);
+
+  // Sync subscription tier from active profile whenever user changes
+  useEffect(() => {
+    if (user?.subscriptionTier) {
+      setAccountSubscriptionTier(user.subscriptionTier);
+    } else if (user) {
+      setAccountSubscriptionTier('FREE');
+    }
+  }, [user]);
 
   // Load profile-specific data when user/profile changes
   useEffect(() => {
@@ -222,12 +234,31 @@ export const AppProvider = ({ children }) => {
         // Update profiles array as well
         setUserProfiles(userData.profiles);
       }
+      // Also refresh accountUser in App.js (usage stats, subscription tier)
+      if (refreshAccountUserCallback) {
+        refreshAccountUserCallback();
+      }
     } catch (error) {
       console.error('Error reloading profile data:', error);
     } finally {
       setIsLoadingProfileData(false);
     }
   };
+
+  // Periodic polling: refresh profile data every 15 seconds to catch cross-user changes
+  // (e.g. when another user accepts your connection request)
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const pollInterval = setInterval(() => {
+      if (!isLoadingProfileData) {
+        reloadProfileData();
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(pollInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Calendar matching functionality
   const getCalendarMatches = () => {
@@ -608,7 +639,8 @@ export const AppProvider = ({ children }) => {
     preferredCurrency,
     setPreferredCurrency,
     accountSubscriptionTier,
-    setAccountSubscriptionTier
+    setAccountSubscriptionTier,
+    setRefreshAccountUserCallback
   };
 
   return (

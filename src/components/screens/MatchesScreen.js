@@ -116,8 +116,8 @@ const MatchesScreen = ({ onOpenChat, onNavigateToMessages, accountUser }) => {
     );
   }
 
-  // Show upgrade prompt for FREE users
-  const tier = accountUser?.subscriptionTier || 'FREE';
+  // Show upgrade prompt for FREE users (per-profile subscription)
+  const tier = user?.subscriptionTier || 'FREE';
   const hasPremiumAccess = ['TRIAL', 'MONTHLY', 'YEARLY'].includes(tier);
   if (!hasPremiumAccess) {
     return (
