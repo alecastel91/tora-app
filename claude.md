@@ -23,6 +23,12 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 6, 2026)
+
+### Phase 0 Cleanup
+- `.env.production` removed from git tracking (was containing only public URL — safe but messy). Added to `.gitignore`.
+- Legacy MongoDB working directories archived to `~/Desktop/ARCHIVE/` (`tora-backend`, `tora-app`).
+
 ## Recent Updates (May 2, 2026)
 
 ### Per-Profile Subscription Model (Frontend)
