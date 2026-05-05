@@ -4,6 +4,7 @@ build/
 dist/
 .env
 .env.local
+.env.production
 frontend.log
 .DS_Store
 *.log
