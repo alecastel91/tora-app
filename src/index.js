@@ -6,9 +6,7 @@ import App from './App';
 import { AppProvider } from './contexts/AppContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
-// Sentry — captures uncaught browser errors, unhandled promise rejections,
-// and any error bubbled to <Sentry.ErrorBoundary>. No-op when VITE_SENTRY_DSN
-// is unset (i.e. local dev) so test errors don't pollute the prod project.
+// No-op when VITE_SENTRY_DSN unset so dev errors stay out of the prod project.
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
