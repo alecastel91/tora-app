@@ -23,5 +23,7 @@ export default defineConfig({
   server: {
     port: 3002,
     host: '0.0.0.0',
+    // Accept any *.local hostname (mDNS) so phones can hit alessandro.local:3002
+    allowedHosts: ['localhost', '.local'],
   },
 });

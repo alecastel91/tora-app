@@ -144,24 +144,31 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
             {loading ? 'LOGGING IN...' : 'LOG IN'}
           </button>
 
-          {/* Sign Up Link */}
+          {/* Activate (with invitation code) */}
           <div className="text-center mt-5 text-[13px] font-normal">
-            <span className="text-gray-400">Don't have an account? </span>
+            <span className="text-gray-400">Have an invitation? </span>
             <button
               type="button"
               onClick={onSwitchToSignup}
               className="text-primary-pink hover:text-primary-pink-hover underline bg-transparent border-none cursor-pointer font-normal transition-colors duration-200"
             >
-              Sign Up
+              Activate your account
             </button>
           </div>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-white/5 rounded-lg text-center border border-white/10">
-            <p className="text-white text-[11px] font-semibold mb-2 tracking-wide">DEMO CREDENTIALS</p>
-            <p className="text-gray-400 text-[13px] leading-relaxed">Email: demo@tora.com</p>
-            <p className="text-gray-400 text-[13px] leading-relaxed">Password: demo123</p>
+          {/* Apply (no invitation yet) */}
+          <div className="text-center mt-2 text-[13px] font-normal">
+            <span className="text-gray-400">New to TORA? </span>
+            <a
+              href={import.meta.env.VITE_APPLY_URL || 'https://torahub.io/apply'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white underline cursor-pointer font-normal transition-colors duration-200"
+            >
+              Apply for membership
+            </a>
           </div>
+
         </motion.form>
       </div>
     </motion.div>
