@@ -23,6 +23,26 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 8, 2026)
+
+### Marketing Consent UI
+- **SignupScreen.js** — added optional marketing consent checkbox on Step 1 (visible to invitation-code signups too). Text: *"Send me product updates and tips for getting the most out of TORA (recommended — you can unsubscribe anytime)"*. Unchecked by default (GDPR opt-in). Plus a click-through Terms reaffirmation notice above the submit button (covers version drift between application stage and signup stage).
+- **App.js Settings** — new "Email Preferences" section. Two rows: a controlled toggle for product updates (calls `apiService.updateUserPreferences({ marketingConsent })`), and a locked, always-on transactional emails toggle (visually identical white text but `disabled readOnly`, signals required-for-service).
+- **Optimistic update pattern** with revert-on-error mirrors the existing `handleCurrencyChange` handler.
+- **Backend support**: requires `User.marketingConsent` + `User.marketingConsentDate` on schema (shipped to both Supabase projects). Backend signup + `/me` + `/update-preferences` endpoints all handle the field.
+
+### Login Page Overhaul
+- Single "Don't have an account? Sign Up" CTA replaced with two distinct paths:
+  - "Have an invitation? **Activate your account**" (primary, pink) — opens existing signup screen
+  - "New to TORA? **Apply for membership**" (secondary, gray) — opens apply page in new tab
+- Apply URL reads `VITE_APPLY_URL` env var with fallback `https://torahub.io/apply`. In dev: `http://alessandro.local:3000/apply`.
+- SignupScreen heading: `Create Account` → `Activate Your Account` (matches the new CTA copy and signals invitation-only).
+- SignupScreen footer: `Already have an account?` → `Already a member?` (member-language consistency).
+- Removed the leftover demo credentials box (`demo@tora.com` / `demo123`) — never wired to a real user, just decorative copy.
+
+### Vite Config: mDNS hostname support
+- Added `allowedHosts: ['localhost', '.local']` to `vite.config.js` so requests to `alessandro.local:3002` are accepted (was returning 403 by default). Required because dev `.env` now uses `alessandro.local` instead of LAN IP for stability across WiFi networks.
+
 ## Recent Updates (May 6, 2026)
 
 ### Phase 0 Cleanup
