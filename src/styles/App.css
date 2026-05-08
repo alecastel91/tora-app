@@ -173,6 +173,45 @@
   font-size: 14px;
 }
 
+.signup-terms-notice {
+  font-size: 12px;
+  color: var(--text-gray);
+  line-height: 1.5;
+  margin: 16px 0 12px;
+  text-align: left;
+}
+
+.signup-terms-notice a {
+  color: var(--primary-pink);
+  text-decoration: underline;
+}
+
+.signup-marketing-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.signup-marketing-consent input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--primary-pink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.signup-marketing-consent small {
+  display: block;
+  color: var(--text-gray);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
 .auth-footer {
   text-align: center;
   margin-top: 20px;
@@ -2039,6 +2078,19 @@
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* Locked toggle: visually identical to active toggle but cannot be changed.
+   Used for transactional emails (always on). */
+.settings-toggle-locked {
+  cursor: default;
+}
+.settings-toggle-locked input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+.settings-toggle-locked span {
+  color: var(--text-white);
 }
 
 .settings-section {

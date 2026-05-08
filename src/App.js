@@ -271,6 +271,23 @@ function App() {
     }
   };
 
+  const handleMarketingConsentChange = async (nextValue) => {
+    if (!accountUser) return;
+    const previousValue = accountUser.marketingConsent === true;
+    setAccountUser({ ...accountUser, marketingConsent: nextValue });
+    try {
+      const response = await apiService.updateUserPreferences({
+        marketingConsent: nextValue
+      });
+      if (response.user) {
+        setAccountUser(response.user);
+      }
+    } catch (error) {
+      console.error('Failed to update marketing consent:', error);
+      setAccountUser({ ...accountUser, marketingConsent: previousValue });
+    }
+  };
+
   const renderScreen = () => {
     switch(activeTab) {
       case 'profile':
@@ -622,7 +639,27 @@ function App() {
                 </label>
               </div>
             </div>
-            
+
+            <div className="settings-section">
+              <h3>Email Preferences</h3>
+              <div className="settings-item">
+                <label className="settings-toggle">
+                  <input
+                    type="checkbox"
+                    checked={accountUser?.marketingConsent === true}
+                    onChange={(e) => handleMarketingConsentChange(e.target.checked)}
+                  />
+                  <span>Product updates, new features, and tips for getting the most out of TORA</span>
+                </label>
+              </div>
+              <div className="settings-item">
+                <label className="settings-toggle settings-toggle-locked">
+                  <input type="checkbox" checked disabled readOnly />
+                  <span>Transactional emails (booking confirmations, security alerts, password resets) — required for the service to work</span>
+                </label>
+              </div>
+            </div>
+
             <div className="settings-section">
               <h3>{t('settings.about')}</h3>
               <div className="settings-item">

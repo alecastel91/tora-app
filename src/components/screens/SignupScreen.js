@@ -9,6 +9,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
     email: '',
     password: '',
     confirmPassword: '',
+    marketingConsent: false,
     // Step 2 - Profile
     name: '',
     role: 'ARTIST',
@@ -137,7 +138,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
         const signupData = {
           email: formData.email,
           password: formData.password,
-          invitationCode: invitationCode
+          invitationCode: invitationCode,
+          marketingConsent: formData.marketingConsent
         };
 
         const data = await apiService.signup(signupData);
@@ -193,7 +195,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
         {step === 1 ? (
           // Step 1: Account Info
           <form className="auth-form" onSubmit={handleNextStep}>
-            <h2>Create Account</h2>
+            <h2>Activate Your Account</h2>
             {!invitationData && <div className="step-indicator">Step 1 of 2</div>}
 
             {error && (
@@ -269,6 +271,27 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
               />
             </div>
 
+            <p className="signup-terms-notice">
+              By creating your account, you agree to our{' '}
+              <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+              {' '}and{' '}
+              <a href="https://torahub.io/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+              You agreed to a previous version when you applied — this confirms acceptance of any changes since then.
+            </p>
+
+            <label className="signup-marketing-consent">
+              <input
+                type="checkbox"
+                name="marketingConsent"
+                checked={formData.marketingConsent}
+                onChange={(e) => setFormData({ ...formData, marketingConsent: e.target.checked })}
+              />
+              <span>
+                Send me product updates and tips for getting the most out of TORA
+                <small> (recommended — you can unsubscribe anytime)</small>
+              </span>
+            </label>
+
             <button
               type="submit"
               className="btn btn-primary btn-full"
@@ -278,7 +301,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
             </button>
 
             <div className="auth-footer">
-              <p>Already have an account?</p>
+              <p>Already a member?</p>
               <button
                 type="button"
                 className="btn-link"
