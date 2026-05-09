@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+# Block commits that introduce secrets. Scans only staged changes (fast).
+# Bypass with `git commit --no-verify` if you must (e.g., editing
+# .gitleaksignore itself).
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "⚠️  gitleaks is not installed — skipping secret scan."
+  echo "   Install with: brew install gitleaks"
+  exit 0
+fi
+
+if ! gitleaks protect --staged --no-banner --redact; then
+  echo ""
+  echo "❌ Commit blocked: gitleaks detected secrets in staged changes."
+  echo "   Remove the secret OR if it is a known false positive, add its"
+  echo "   fingerprint to .gitleaksignore. To bypass intentionally:"
+  echo "   git commit --no-verify"
+  exit 1
+fi
