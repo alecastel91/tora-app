@@ -25,6 +25,13 @@ Local `.env` is for local dev only — it points at Project 1. The two stacks ar
 
 ## Recent Updates (May 9, 2026)
 
+### LoginScreen accessibility
+- Added `aria-label` and `autoComplete` attributes to email + password inputs in `src/components/screens/LoginScreen.js`. Lighthouse a11y was flagging "Form elements do not have associated labels" because the inputs only had a `placeholder`. `aria-label` keeps the placeholder-only visual look (no visible label added). `autoComplete="email"` and `autoComplete="current-password"` help password managers and is a Lighthouse best-practice item.
+- After deploy, mobile a11y went 89 → 93. SignupScreen has the same issue on its inputs but isn't reachable from the public entry, so Lighthouse doesn't score it — fix later for consistency.
+
+### Lighthouse measurement note
+- Single-run PageSpeed scores are noisy: same code, two consecutive runs, desktop perf swung 70 → 99 (±29). The measurement is TBT-bound and TBT is highly sensitive to lab CPU contention. Treat single runs as directional only — for a real baseline, run 3-5 times and take the median, or use Lighthouse CI.
+
 ### Sentry error monitoring (EU region)
 - `@sentry/react` initialized in `src/index.js`. `<Sentry.ErrorBoundary>` wraps the LanguageProvider so any unhandled render error shows a friendly fallback instead of a blank screen.
 - Reads `VITE_SENTRY_DSN` (Vite inlines it into the client bundle — Sentry DSNs are public-by-design)
