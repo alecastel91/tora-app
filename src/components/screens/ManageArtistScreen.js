@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, FileIcon, MailIcon, TrendingUpIcon, BriefcaseIcon, PlaneIcon, ListIcon, EditIcon, TrashIcon, ImageIcon, SlidersIcon, FileTextIcon } from '../../utils/icons';
+import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, BriefcaseIcon, PlaneIcon, ListIcon, EditIcon, TrashIcon, ImageIcon, SlidersIcon, FileTextIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
 import RAEventsModal from '../common/RAEventsModal';
 import AddContractModal from '../common/AddContractModal';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
+import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
 
-const ManageArtistScreen = ({ artist, onClose, onSwitchTab }) => {
+const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, events, info, documents
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
@@ -24,16 +25,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab }) => {
       .catch((err) => console.error('[ManageArtistScreen] action summary failed', err));
     return () => { cancelled = true; };
   }, [user?.id, artist?.id]);
-
-  const handleActionClick = (target) => {
-    if (target?.screen === 'BookingsScreen' && onSwitchTab) {
-      onSwitchTab('bookings');
-      onClose?.();
-    } else if (target?.screen === 'MessagesScreen' && onSwitchTab) {
-      onSwitchTab('messages');
-      onClose?.();
-    }
-  };
   const [expandedEventId, setExpandedEventId] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -909,21 +900,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab }) => {
     return symbols[currency] || '$';
   };
 
-  const getActionIcon = (type) => {
-    switch (type) {
-      case 'contract_to_send':
-      case 'contract_to_sign':
-        return <FileIcon />;
-      case 'payment_to_mark_sent':
-      case 'payment_to_confirm_received':
-        return <DollarIcon />;
-      case 'representation_request_received':
-        return <MailIcon />;
-      default:
-        return <AlertIcon />;
-    }
-  };
-
   const renderDashboardTab = () => (
     <div className="dashboard-tab">
       {/* Hero Metrics - 2x2 Grid */}
@@ -971,18 +947,21 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab }) => {
           {actionItems.length === 0 ? (
             <div className="action-empty">Nothing needs your attention for this artist right now.</div>
           ) : (
-            actionItems.map(item => (
-              <div key={item.id} className="action-item">
-                <div className="action-icon">{getActionIcon(item.type)}</div>
-                <div className="action-content">
-                  <div className="action-title">{item.title}</div>
-                  {item.subtitle && <div className="action-description">{item.subtitle}</div>}
+            actionItems.map(item => {
+              const Icon = getActionIcon(item.type);
+              return (
+                <div key={item.id} className="action-item">
+                  <div className="action-icon"><Icon /></div>
+                  <div className="action-content">
+                    <div className="action-title">{item.title}</div>
+                    {item.subtitle && <div className="action-description">{item.subtitle}</div>}
+                  </div>
+                  <button className="btn btn-outline btn-sm" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
+                    {item.actionLabel}
+                  </button>
                 </div>
-                <button className="btn btn-outline btn-sm" onClick={() => handleActionClick(item.target)}>
-                  {item.actionLabel}
-                </button>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

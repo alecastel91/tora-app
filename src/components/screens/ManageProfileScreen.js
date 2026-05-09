@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, HandshakeIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, MailIcon } from '../../utils/icons';
+import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import AddContractModal from '../common/AddContractModal';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
+import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
 
-const ACTION_ICONS = {
-  offer_received: HandshakeIcon,
-  counter_offer_pending: HandshakeIcon,
-  contract_to_send: FileIcon,
-  contract_to_sign: FileIcon,
-  payment_to_mark_sent: DollarIcon,
-  payment_to_confirm_received: DollarIcon,
-  representation_request_received: MailIcon,
-};
-
-const ManageProfileScreen = ({ onClose, onSwitchTab }) => {
+const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, calendar, documents
   const [upcomingGigs, setUpcomingGigs] = useState(null);
@@ -66,16 +57,6 @@ const ManageProfileScreen = ({ onClose, onSwitchTab }) => {
       .catch((err) => console.error('[ManageProfileScreen] action summary failed', err));
     return () => { cancelled = true; };
   }, [user?.id]);
-
-  const handleActionClick = (target) => {
-    if (target?.screen === 'BookingsScreen' && onSwitchTab) {
-      onSwitchTab('bookings');
-      onClose?.();
-    } else if (target?.screen === 'MessagesScreen' && onSwitchTab) {
-      onSwitchTab('messages');
-      onClose?.();
-    }
-  };
 
   // Currency conversion rates (mock - in production, fetch from API)
   const exchangeRates = {
@@ -536,7 +517,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab }) => {
             <div className="action-empty">Nothing needs your attention right now.</div>
           ) : (
             actionItems.map((item) => {
-              const Icon = ACTION_ICONS[item.type] || AlertIcon;
+              const Icon = getActionIcon(item.type);
               return (
                 <div key={item.id} className="action-item">
                   <div className="action-icon"><Icon /></div>
@@ -544,7 +525,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab }) => {
                     <div className="action-title">{item.title}</div>
                     {item.subtitle && <div className="action-subtitle">{item.subtitle}</div>}
                   </div>
-                  <button className="btn btn-sm btn-primary" onClick={() => handleActionClick(item.target)}>
+                  <button className="btn btn-sm btn-primary" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
                     {item.actionLabel}
                   </button>
                 </div>
