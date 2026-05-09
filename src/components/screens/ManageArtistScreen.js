@@ -7,12 +7,33 @@ import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
 
-const ManageArtistScreen = ({ artist, onClose }) => {
+const ManageArtistScreen = ({ artist, onClose, onSwitchTab }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, events, info, documents
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
   const [selectedDates, setSelectedDates] = useState(new Set(artist?.availableDates || []));
   const [travelSchedule, setTravelSchedule] = useState(artist.travelSchedule || []);
+  const [actionItems, setActionItems] = useState([]);
+
+  useEffect(() => {
+    if (!user?.id || !artist?.id) return;
+    let cancelled = false;
+    apiService
+      .getActionSummary(user.id, { artistProfileId: artist.id })
+      .then((res) => { if (!cancelled) setActionItems(res.items || []); })
+      .catch((err) => console.error('[ManageArtistScreen] action summary failed', err));
+    return () => { cancelled = true; };
+  }, [user?.id, artist?.id]);
+
+  const handleActionClick = (target) => {
+    if (target?.screen === 'BookingsScreen' && onSwitchTab) {
+      onSwitchTab('bookings');
+      onClose?.();
+    } else if (target?.screen === 'MessagesScreen' && onSwitchTab) {
+      onSwitchTab('messages');
+      onClose?.();
+    }
+  };
   const [expandedEventId, setExpandedEventId] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -843,19 +864,6 @@ const ManageArtistScreen = ({ artist, onClose }) => {
     return name ? name.charAt(0).toUpperCase() : 'A';
   };
 
-  // Placeholder data (will be populated from backend when Cluster 4 is migrated)
-  const mockData = {
-    metrics: {
-      upcomingGigs: 0,
-      ytdRevenue: 0,
-      avgRating: 0
-    },
-    actionItems: [],
-    revenueData: [],
-    pendingOffers: [],
-    upcomingEvents: []
-  };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -903,10 +911,16 @@ const ManageArtistScreen = ({ artist, onClose }) => {
 
   const getActionIcon = (type) => {
     switch (type) {
-      case 'contract': return <FileIcon />;
-      case 'payment': return <DollarIcon />;
-      case 'inquiry': return <MailIcon />;
-      default: return <AlertIcon />;
+      case 'contract_to_send':
+      case 'contract_to_sign':
+        return <FileIcon />;
+      case 'payment_to_mark_sent':
+      case 'payment_to_confirm_received':
+        return <DollarIcon />;
+      case 'representation_request_received':
+        return <MailIcon />;
+      default:
+        return <AlertIcon />;
     }
   };
 
@@ -951,19 +965,25 @@ const ManageArtistScreen = ({ artist, onClose }) => {
       <div className="dashboard-section">
         <div className="section-header">
           <h3><AlertIcon /> Actions Required</h3>
-          <span className="badge">{mockData.actionItems.length}</span>
+          <span className="badge">{actionItems.length}</span>
         </div>
         <div className="action-items">
-          {mockData.actionItems.map(item => (
-            <div key={item.id} className="action-item">
-              <div className="action-icon">{getActionIcon(item.type)}</div>
-              <div className="action-content">
-                <div className="action-title">{item.title}</div>
-                <div className="action-description">{item.description}</div>
+          {actionItems.length === 0 ? (
+            <div className="action-empty">Nothing needs your attention for this artist right now.</div>
+          ) : (
+            actionItems.map(item => (
+              <div key={item.id} className="action-item">
+                <div className="action-icon">{getActionIcon(item.type)}</div>
+                <div className="action-content">
+                  <div className="action-title">{item.title}</div>
+                  {item.subtitle && <div className="action-description">{item.subtitle}</div>}
+                </div>
+                <button className="btn btn-outline btn-sm" onClick={() => handleActionClick(item.target)}>
+                  {item.actionLabel}
+                </button>
               </div>
-              <button className="btn btn-outline btn-sm">{item.action}</button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 

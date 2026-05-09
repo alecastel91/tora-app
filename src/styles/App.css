@@ -13297,3 +13297,18 @@ textarea.form-textarea:focus {
 .action-item .btn {
   flex-shrink: 0;
 }
+
+.action-empty {
+  padding: 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+  font-style: italic;
+}
+
+.action-count {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+  margin-left: 6px;
+}

@@ -291,7 +291,7 @@ function App() {
   const renderScreen = () => {
     switch(activeTab) {
       case 'profile':
-        return <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />;
+        return <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={setActiveTab} />;
       case 'search':
         return <SearchScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => setActiveTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />;
       case 'tour':
@@ -301,7 +301,7 @@ function App() {
       case 'messages':
         return <MessagesScreen onOpenChat={setActiveChatUser} key={activeChatUser ? 'with-chat' : 'without-chat'} />;
       default:
-        return <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />;
+        return <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={setActiveTab} />;
     }
   };
 

@@ -15,7 +15,7 @@ import SearchAgentsModal from '../common/SearchAgentsModal';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 
-const ProfileScreen = ({ onOpenPremium, accountUser }) => {
+const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const { user, updateUser, userProfiles, switchProfile, addProfile, deleteProfile, likedProfiles, likedProfilesData, connectedUsers, connectedUsersData, likerProfilesData } = useAppContext();
   const { t } = useLanguage();
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -250,6 +250,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser }) => {
       <ManageArtistScreen
         artist={managingArtist}
         onClose={() => setManagingArtist(null)}
+        onSwitchTab={onSwitchTab}
       />
     );
   }
@@ -271,7 +272,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser }) => {
 
   // Show full-screen manage profile if requested
   if (showManageProfile) {
-    return <ManageProfileScreen onClose={() => setShowManageProfile(false)} />;
+    return <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} />;
   }
 
   // Show full-screen represented artists if requested

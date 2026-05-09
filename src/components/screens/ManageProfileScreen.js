@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, HandshakeIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon } from '../../utils/icons';
+import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, HandshakeIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, MailIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import AddContractModal from '../common/AddContractModal';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
 
-const ManageProfileScreen = ({ onClose }) => {
+const ACTION_ICONS = {
+  offer_received: HandshakeIcon,
+  counter_offer_pending: HandshakeIcon,
+  contract_to_send: FileIcon,
+  contract_to_sign: FileIcon,
+  payment_to_mark_sent: DollarIcon,
+  payment_to_confirm_received: DollarIcon,
+  representation_request_received: MailIcon,
+};
+
+const ManageProfileScreen = ({ onClose, onSwitchTab }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, calendar, documents
   const [upcomingGigs, setUpcomingGigs] = useState(null);
@@ -15,6 +25,7 @@ const ManageProfileScreen = ({ onClose }) => {
   const [thisYearGigs, setThisYearGigs] = useState(null);
   const [expectedRevenue, setExpectedRevenue] = useState(null);
   const [deals, setDeals] = useState([]);
+  const [actionItems, setActionItems] = useState([]);
 
   // Documents state - different for different roles
   const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
@@ -45,6 +56,26 @@ const ManageProfileScreen = ({ onClose }) => {
     };
     fetchFreshProfile();
   }, []); // Run once on mount
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    apiService
+      .getActionSummary(user.id)
+      .then((res) => { if (!cancelled) setActionItems(res.items || []); })
+      .catch((err) => console.error('[ManageProfileScreen] action summary failed', err));
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const handleActionClick = (target) => {
+    if (target?.screen === 'BookingsScreen' && onSwitchTab) {
+      onSwitchTab('bookings');
+      onClose?.();
+    } else if (target?.screen === 'MessagesScreen' && onSwitchTab) {
+      onSwitchTab('messages');
+      onClose?.();
+    }
+  };
 
   // Currency conversion rates (mock - in production, fetch from API)
   const exchangeRates = {
@@ -499,32 +530,27 @@ const ManageProfileScreen = ({ onClose }) => {
 
       {/* Actions Required Section */}
       <div className="dashboard-section actions-required-section">
-        <h3><AlertIcon /> Actions Required</h3>
+        <h3><AlertIcon /> Actions Required {actionItems.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
         <div className="action-items">
-          <div className="action-item">
-            <div className="action-icon"><FileIcon /></div>
-            <div className="action-content">
-              <div className="action-title">Contract Review Needed</div>
-              <div className="action-subtitle">Artist Booking - John Doe</div>
-            </div>
-            <button className="btn btn-sm btn-primary">Review</button>
-          </div>
-          <div className="action-item">
-            <div className="action-icon"><DollarIcon /></div>
-            <div className="action-content">
-              <div className="action-title">Payment Due</div>
-              <div className="action-subtitle">Event on Dec 15, 2026</div>
-            </div>
-            <button className="btn btn-sm btn-primary">Pay</button>
-          </div>
-          <div className="action-item">
-            <div className="action-icon"><CalendarIcon /></div>
-            <div className="action-content">
-              <div className="action-title">Confirm Event Details</div>
-              <div className="action-subtitle">New Year's Eve Show</div>
-            </div>
-            <button className="btn btn-sm btn-primary">Confirm</button>
-          </div>
+          {actionItems.length === 0 ? (
+            <div className="action-empty">Nothing needs your attention right now.</div>
+          ) : (
+            actionItems.map((item) => {
+              const Icon = ACTION_ICONS[item.type] || AlertIcon;
+              return (
+                <div key={item.id} className="action-item">
+                  <div className="action-icon"><Icon /></div>
+                  <div className="action-content">
+                    <div className="action-title">{item.title}</div>
+                    {item.subtitle && <div className="action-subtitle">{item.subtitle}</div>}
+                  </div>
+                  <button className="btn btn-sm btn-primary" onClick={() => handleActionClick(item.target)}>
+                    {item.actionLabel}
+                  </button>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

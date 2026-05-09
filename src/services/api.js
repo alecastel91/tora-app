@@ -225,6 +225,17 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async getActionSummary(profileId, { artistProfileId } = {}) {
+    const url = new URL(`${API_URL}/profiles/${profileId}/action-summary`);
+    if (artistProfileId) url.searchParams.set('artistProfileId', artistProfileId);
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: this.getHeaders()
+    });
+
+    return this.handleResponse(response);
+  }
+
   // CONNECTION ENDPOINTS
   async toggleLike(fromProfileId, toProfileId) {
     const response = await fetch(`${API_URL}/connections/like/${toProfileId}`, {
