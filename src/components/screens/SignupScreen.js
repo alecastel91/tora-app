@@ -210,6 +210,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 <input
                   type="text"
                   placeholder="Enter your invitation code"
+                  aria-label="Invitation code"
                   value={invitationCode}
                   onChange={(e) => setInvitationCode(e.target.value)}
                   onBlur={() => validateCode(invitationCode)}
@@ -239,6 +240,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 type="email"
                 name="email"
                 placeholder="Email"
+                aria-label="Email"
+                autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -252,6 +255,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 type="password"
                 name="password"
                 placeholder="Password (min 6 characters)"
+                aria-label="Password"
+                autoComplete="new-password"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -264,6 +269,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm Password"
+                aria-label="Confirm password"
+                autoComplete="new-password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
@@ -328,6 +335,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 type="text"
                 name="name"
                 placeholder="Your Name / Artist Name"
+                aria-label="Name or artist name"
+                autoComplete="name"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -409,6 +418,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                   value={customCity}
                   onChange={(e) => handleCustomCityChange(e.target.value)}
                   placeholder="Enter city name"
+                  aria-label="City name"
+                  autoComplete="address-level2"
                   required
                   className="form-input"
                 />
