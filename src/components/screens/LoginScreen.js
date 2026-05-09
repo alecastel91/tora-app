@@ -37,26 +37,10 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
     setError('');
     setLoading(true);
 
-    const loginStartTime = performance.now();
-
     try {
-      console.log('🔐 [Login] Starting login for:', formData.email);
-      const apiStartTime = performance.now();
       const data = await apiService.login(formData.email, formData.password);
-      const apiEndTime = performance.now();
-      console.log(`✅ [Login] API login completed in ${(apiEndTime - apiStartTime).toFixed(0)}ms`);
-      console.log('Login data received:', data);
-
-      // Save user data and redirect
-      const callbackStartTime = performance.now();
       onLoginSuccess(data);
-      const callbackEndTime = performance.now();
-      console.log(`✅ [Login] onLoginSuccess callback completed in ${(callbackEndTime - callbackStartTime).toFixed(0)}ms`);
-
-      const loginEndTime = performance.now();
-      console.log(`🎉 [Login] TOTAL LOGIN TIME: ${(loginEndTime - loginStartTime).toFixed(0)}ms`);
     } catch (err) {
-      console.error('❌ [Login] Login error:', err);
       setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
