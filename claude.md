@@ -23,6 +23,26 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 9, 2026)
+
+### Sentry error monitoring (EU region)
+- `@sentry/react` initialized in `src/index.js`. `<Sentry.ErrorBoundary>` wraps the LanguageProvider so any unhandled render error shows a friendly fallback instead of a blank screen.
+- Reads `VITE_SENTRY_DSN` (Vite inlines it into the client bundle — Sentry DSNs are public-by-design)
+- No-op when DSN unset (local dev). Production DSN set in Vercel `tora-app` project.
+
+### Content Security Policy + security headers (via vercel.json)
+- Added `headers` block to `vercel.json` setting CSP + X-Frame-Options DENY + X-Content-Type-Options + Referrer-Policy + Permissions-Policy
+- CSP includes Supabase REST + WSS (Realtime), Sentry direct ingestion (`*.ingest.de.sentry.io`), Railway backend, embedded widgets (SoundCloud, Spotify, DocuSign)
+- `img-src` permissive (`https:`) because user profile pictures could come from many sources
+
+### Favicon
+- New `public/tora_logo_square.png` — TORA wordmark in a 1015×1015 black square (centered, with black padding above/below) so the favicon doesn't get squeezed in browser tabs
+- `index.html` updated to use the square version for both `rel="icon"` and `apple-touch-icon`
+
+### Vercel + GitHub housekeeping
+- Old Vercel project `tora-app-visibility` deleted (was duplicate of the active `tora-app` project, deploying old commits)
+- GitHub repo renamed `tora-appVisibility` → `tora-app`. Local git remote updated. Vercel auto-detected the rename via stable internal repo ID. No code changes needed.
+
 ## Recent Updates (May 8, 2026)
 
 ### Marketing Consent UI
