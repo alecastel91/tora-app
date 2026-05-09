@@ -115,6 +115,8 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
               type="email"
               name="email"
               placeholder="Email"
+              aria-label="Email"
+              autoComplete="email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -128,6 +130,8 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
               type="password"
               name="password"
               placeholder="Password"
+              aria-label="Password"
+              autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
               required
