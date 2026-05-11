@@ -128,7 +128,7 @@ class RAService {
       const mockProfile = {
         name: artistName,
         slug: slug,
-        bio: 'Electronic music artist',
+        bio: 'Club music artist',
         location: 'Tokyo, Japan',
         raUrl: `https://ra.co/dj/${slug}`,
         followersCount: 12500,
