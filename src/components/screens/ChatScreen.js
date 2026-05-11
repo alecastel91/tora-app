@@ -44,6 +44,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [showOfferDetails, setShowOfferDetails] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [submittingCounter, setSubmittingCounter] = useState(false);
   const [showCounterOfferDetails, setShowCounterOfferDetails] = useState(false);
   const [counterOfferData, setCounterOfferData] = useState(null);
   const [counterOfferMessage, setCounterOfferMessage] = useState(null);
@@ -572,40 +573,31 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   };
 
   const handleSubmitReview = async () => {
-    console.log('[handleSubmitReview] selectedOffer:', selectedOffer);
-    console.log('[handleSubmitReview] reviewData:', reviewData);
-    console.log('[handleSubmitReview] counterOfferData:', counterOfferData);
+    if (submittingCounter) return;
 
-    // Resolve dealId — prefer selectedOffer (set by handleOpenReview/handleReviewCounterOffer)
-    // but fall back to counterOfferData.dealId in case selectedOffer wasn't set
     const dealId = selectedOffer?.id || counterOfferData?.dealId;
     if (!dealId) {
       alert('Deal information not found. Please close and try again.');
       return;
     }
 
-    // Validate fee
     const feeStr = String(reviewData.fee || '').trim();
     if (!feeStr || isNaN(parseFloat(feeStr)) || parseFloat(feeStr) <= 0) {
       alert('Please enter a valid fee amount');
       return;
     }
 
+    setSubmittingCounter(true);
     try {
-      // Round fee to 2 decimal places to avoid floating point precision errors
       const feeValue = Math.round(parseFloat(feeStr) * 100) / 100;
 
-      // Build extras object for API
       const extras = {};
       if (reviewData.extras && Object.keys(reviewData.extras).length > 0) {
         Object.entries(reviewData.extras).forEach(([key, value]) => {
-          if (value) {
-            extras[key] = value;
-          }
+          if (value) extras[key] = value;
         });
       }
 
-      // Call the counter-offer API endpoint (this updates the deal and creates a system message)
       await apiService.counterDeal(dealId, {
         profileId: currentUser.id,
         fee: feeValue,
@@ -618,11 +610,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       setShowOfferDetails(false);
       setReviewData({ fee: '', currency: 'USD', extras: {}, notes: '' });
 
-      // Refresh messages to show the counter-offer
       fetchMessages();
     } catch (error) {
       console.error('Error submitting counter-offer:', error);
       alert(error.message || 'Failed to submit counter-offer');
+    } finally {
+      setSubmittingCounter(false);
     }
   };
 
@@ -1930,8 +1923,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-primary btn-full-width" onClick={handleSubmitReview}>
-                Send Counter-Offer
+              <button className="btn btn-primary btn-full-width" onClick={handleSubmitReview} disabled={submittingCounter}>
+                {submittingCounter ? 'Sending...' : 'Send Counter-Offer'}
               </button>
             </div>
           </div>
