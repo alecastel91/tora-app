@@ -387,11 +387,11 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async cancelRepresentation(agentId) {
+  async cancelRepresentation(agentId, currentProfileId) {
     const response = await fetch(`${API_URL}/connections/cancel-representation`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ agentId })
+      body: JSON.stringify({ agentId, currentProfileId })
     });
 
     return this.handleResponse(response);

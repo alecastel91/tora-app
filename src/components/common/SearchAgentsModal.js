@@ -307,7 +307,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       console.log('[SearchAgentsModal] Cancelling representation with agent:', agentId);
 
       // Call API to cancel representation
-      await apiService.cancelRepresentation(agentId);
+      await apiService.cancelRepresentation(agentId, currentArtistId);
 
       console.log('[SearchAgentsModal] Representation cancelled successfully');
 

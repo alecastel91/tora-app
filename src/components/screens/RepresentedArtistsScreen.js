@@ -35,7 +35,7 @@ const RepresentedArtistsScreen = ({ onClose }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ artistId })
+        body: JSON.stringify({ artistId, currentProfileId: user?.id })
       });
       await reloadProfileData();
     } catch (error) {
