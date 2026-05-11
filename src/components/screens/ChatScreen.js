@@ -2123,20 +2123,26 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 )}
               </div>
               {selectedRepresentationRequest.status === 'PENDING' && (
-                <div className="modal-actions" style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={handleDeclineRepresentation}
-                  >
-                    Decline
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleAcceptRepresentation}
-                  >
-                    Accept
-                  </button>
-                </div>
+                selectedRepresentationRequest.toProfileId === currentUser?.id ? (
+                  <div className="modal-actions" style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={handleDeclineRepresentation}
+                    >
+                      Decline
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleAcceptRepresentation}
+                    >
+                      Accept
+                    </button>
+                  </div>
+                ) : (
+                  <div className="offer-status-message" style={{ justifyContent: 'center' }}>
+                    <span>Awaiting response from {selectedRepresentationRequest.to?.name || 'the other party'}</span>
+                  </div>
+                )
               )}
               {selectedRepresentationRequest.status === 'ACCEPTED' && (
                 <div className="offer-status-message accepted">
