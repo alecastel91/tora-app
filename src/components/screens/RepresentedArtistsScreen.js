@@ -218,7 +218,6 @@ const RepresentedArtistsScreen = ({ onClose }) => {
 
         {showSearchModal && (
           <SearchArtistsModal
-            key={Date.now()} // Force remount on each open to fetch fresh data
             onClose={() => setShowSearchModal(false)}
             onSelectArtist={handleSelectArtist}
             currentAgentId={user?.id}
