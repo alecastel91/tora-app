@@ -23,6 +23,26 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 10-12, 2026)
+
+### Phase 4b — Actions Required cards wired
+- ManageProfileScreen (used by all 4 roles for their own profile) and ManageArtistScreen (agent-per-artist) previously rendered three hardcoded placeholder rows. Both now fetch `GET /api/profiles/:id/action-summary` on mount and render real items.
+- New `apiService.getActionSummary(profileId, { artistProfileId })` — optional `artistProfileId` scopes to a represented artist; backend rejects without an accepted REPRESENTATION_REQUEST between the two profiles.
+- Six action types live: `offer_received` (incl. tour proposals via the auto-Deal at `tora-backend-sql/src/routes/tours.js:672`), `counter_offer_pending`, `contract_to_send`, `contract_to_sign`, `payment_to_mark_sent`, `representation_request_received`. `payment_to_confirm_received` was scoped but deferred until a receipt-confirmation endpoint + matching button exist (separate small PR).
+- New `src/utils/actionItems.js` exports `ACTION_ICONS` map + `getActionIcon(type)` + `handleActionTarget(target, deps)`. Both Manage screens use it. Fixed a copy-paste bug where `ManageArtistScreen` had a local switch missing `offer_received` and `counter_offer_pending`.
+- New `onSwitchTab` prop chain: App.js → ProfileScreen → Manage*. Action button clicks call `setActiveTab('bookings')` or `setActiveTab('messages')` then close the modal.
+
+### ChatScreen rep-request modal — sender view fix
+- Modal in `ChatScreen.js:~2125` used to show Accept/Decline whenever the request status was PENDING, regardless of whether the viewer was the recipient or the sender. Now only the recipient sees the buttons; the sender sees "Awaiting response from {name}". The underlying security gap is closed on the backend (see tora-backend-sql CLAUDE.md).
+- Bug found via the user's own testing of the production rep request flow. Backend was never verifying caller identity on accept/decline — any authenticated user holding a Connection id could mutate any pending request. Pre-launch this needed to land.
+
+### `/simplify` pass (post-Phase-4b)
+- Both Manage screens had near-duplicate icon-mapping logic; consolidated into `src/utils/actionItems.js`.
+- `onSwitchTab` now defaults to a no-op so the defensive `&&` guards in the click handler are no longer needed.
+
+### Brand framing — electronic → club music
+- `src/services/raService.js` stub bio updated. Marketing site has the bigger surface area for this change — see tora-application CLAUDE.md.
+
 ## Recent Updates (May 9, 2026)
 
 ### LoginScreen accessibility
