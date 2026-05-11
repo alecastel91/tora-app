@@ -16,15 +16,18 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const [travelSchedule, setTravelSchedule] = useState(artist.travelSchedule || []);
   const [actionItems, setActionItems] = useState([]);
 
+  // Cached representingArtists entries use `profileId`; full Profile objects use `id`. Accept either.
+  const artistProfileId = artist?.profileId || artist?.id;
+
   useEffect(() => {
-    if (!user?.id || !artist?.id) return;
+    if (!user?.id || !artistProfileId) return;
     let cancelled = false;
     apiService
-      .getActionSummary(user.id, { artistProfileId: artist.id })
+      .getActionSummary(user.id, { artistProfileId })
       .then((res) => { if (!cancelled) setActionItems(res.items || []); })
       .catch((err) => console.error('[ManageArtistScreen] action summary failed', err));
     return () => { cancelled = true; };
-  }, [user?.id, artist?.id]);
+  }, [user?.id, artistProfileId]);
   const [expandedEventId, setExpandedEventId] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
