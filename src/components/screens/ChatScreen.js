@@ -44,7 +44,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [showOfferDetails, setShowOfferDetails] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [submittingCounter, setSubmittingCounter] = useState(false);
+  // Single guard for any in-flight deal/representation action; gates buttons + handler early-returns.
+  const [actionBusy, setActionBusy] = useState(false);
   const [showCounterOfferDetails, setShowCounterOfferDetails] = useState(false);
   const [counterOfferData, setCounterOfferData] = useState(null);
   const [counterOfferMessage, setCounterOfferMessage] = useState(null);
@@ -319,8 +320,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   };
 
   const handleAcceptOffer = async () => {
-    if (!selectedOffer) return;
-
+    if (actionBusy || !selectedOffer) return;
+    setActionBusy(true);
     try {
       await apiService.acceptDeal(selectedOffer.id, currentUser.id);
       setShowOfferDetails(false);
@@ -330,17 +331,20 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     } catch (error) {
       console.error('Error accepting offer:', error);
       alert(error.message || 'Failed to accept offer');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleDeclineOffer = async () => {
-    if (!selectedOffer) return;
+    if (actionBusy || !selectedOffer) return;
 
     if (!offerDeclineComment.trim()) {
       alert('Please provide a reason for declining');
       return;
     }
 
+    setActionBusy(true);
     try {
       // Decline deal with reason - this will update the deal status
       await apiService.declineDeal(selectedOffer.id, currentUser.id, offerDeclineComment);
@@ -354,6 +358,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     } catch (error) {
       console.error('Error declining offer:', error);
       alert(error.message || 'Failed to decline offer');
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -441,49 +447,48 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   };
 
   const handleAcceptCounterOffer = async () => {
+    if (actionBusy) return;
     if (!counterOfferData?.dealId) {
       alert('Deal information not found');
       return;
     }
 
+    setActionBusy(true);
     try {
-      // Accept the deal in the backend (this updates status to ACCEPTED and creates system message)
       await apiService.acceptDeal(counterOfferData.dealId, currentUser.id);
-
       setShowCounterOfferDetails(false);
-
-      // Refresh messages to show the acceptance system message
       fetchMessages();
     } catch (error) {
       console.error('Error accepting counter-offer:', error);
       alert(error.message || 'Failed to accept counter-offer');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleDeclineCounterOffer = async () => {
+    if (actionBusy) return;
     if (!declineComment.trim()) {
       alert('Please provide a reason for declining');
       return;
     }
-
     if (!counterOfferData?.dealId) {
       alert('Deal information not found');
       return;
     }
 
+    setActionBusy(true);
     try {
-      // Decline the deal in the backend (this updates status to DECLINED and creates system message)
       await apiService.declineDeal(counterOfferData.dealId, currentUser.id, declineComment);
-
       setShowCounterOfferDetails(false);
       setShowDeclineComment(false);
       setDeclineComment('');
-
-      // Refresh messages to show the decline system message
       fetchMessages();
     } catch (error) {
       console.error('Error declining counter-offer:', error);
       alert(error.message || 'Failed to decline counter-offer');
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -520,47 +525,42 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   };
 
   const handleAcceptRepresentation = async () => {
-    if (!selectedRepresentationRequest) return;
-
+    if (actionBusy || !selectedRepresentationRequest) return;
+    setActionBusy(true);
     try {
       await apiService.acceptRepresentationRequest(selectedRepresentationRequest.id);
 
-      // Close modal
       setShowRepresentationDetails(false);
       setSelectedRepresentationRequest(null);
 
-      // Refresh messages to show updated status
       await fetchMessages();
 
-      // Update the connection request cache
       const updatedRequest = await apiService.getConnectionRequest(selectedRepresentationRequest.id);
       setConnectionRequests(prev => ({
         ...prev,
         [selectedRepresentationRequest.id]: updatedRequest
       }));
 
-      // Reload profile data to update representingArtists array
       await reloadProfileData();
     } catch (error) {
       console.error('Error accepting representation request:', error);
       alert(error.message || 'Failed to accept representation request');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleDeclineRepresentation = async () => {
-    if (!selectedRepresentationRequest) return;
-
+    if (actionBusy || !selectedRepresentationRequest) return;
+    setActionBusy(true);
     try {
       await apiService.declineRepresentationRequest(selectedRepresentationRequest.id);
 
-      // Close modal
       setShowRepresentationDetails(false);
       setSelectedRepresentationRequest(null);
 
-      // Refresh messages to show updated status
       await fetchMessages();
 
-      // Update the connection request cache
       const updatedRequest = await apiService.getConnectionRequest(selectedRepresentationRequest.id);
       setConnectionRequests(prev => ({
         ...prev,
@@ -569,11 +569,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     } catch (error) {
       console.error('Error declining representation request:', error);
       alert(error.message || 'Failed to decline representation request');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleSubmitReview = async () => {
-    if (submittingCounter) return;
+    if (actionBusy) return;
 
     const dealId = selectedOffer?.id || counterOfferData?.dealId;
     if (!dealId) {
@@ -587,7 +589,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       return;
     }
 
-    setSubmittingCounter(true);
+    setActionBusy(true);
     try {
       const feeValue = Math.round(parseFloat(feeStr) * 100) / 100;
 
@@ -615,7 +617,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       console.error('Error submitting counter-offer:', error);
       alert(error.message || 'Failed to submit counter-offer');
     } finally {
-      setSubmittingCounter(false);
+      setActionBusy(false);
     }
   };
 
@@ -1652,8 +1654,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       <button
                         className="btn btn-primary"
                         onClick={handleDeclineOffer}
+                        disabled={actionBusy}
                       >
-                        Submit
+                        {actionBusy ? '...' : 'Submit'}
                       </button>
                     </div>
                   </div>
@@ -1662,20 +1665,23 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <button
                       className="btn btn-outline"
                       onClick={() => setShowOfferDeclineComment(true)}
+                      disabled={actionBusy}
                     >
                       Decline
                     </button>
                     <button
                       className="btn btn-outline"
                       onClick={handleOpenReview}
+                      disabled={actionBusy}
                     >
                       Review
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={handleAcceptOffer}
+                      disabled={actionBusy}
                     >
-                      Accept
+                      {actionBusy ? '...' : 'Accept'}
                     </button>
                   </>
                 )
@@ -1923,8 +1929,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-primary btn-full-width" onClick={handleSubmitReview} disabled={submittingCounter}>
-                {submittingCounter ? 'Sending...' : 'Send Counter-Offer'}
+              <button className="btn btn-primary btn-full-width" onClick={handleSubmitReview} disabled={actionBusy}>
+                {actionBusy ? 'Sending...' : 'Send Counter-Offer'}
               </button>
             </div>
           </div>
@@ -2003,8 +2009,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       <button
                         className="btn btn-primary"
                         onClick={handleDeclineCounterOffer}
+                        disabled={actionBusy}
                       >
-                        Submit
+                        {actionBusy ? '...' : 'Submit'}
                       </button>
                     </div>
                   </div>
@@ -2013,20 +2020,23 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <button
                       className="btn btn-outline"
                       onClick={() => setShowDeclineComment(true)}
+                      disabled={actionBusy}
                     >
                       Decline
                     </button>
                     <button
                       className="btn btn-outline"
                       onClick={handleReviewCounterOffer}
+                      disabled={actionBusy}
                     >
                       Review
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={handleAcceptCounterOffer}
+                      disabled={actionBusy}
                     >
-                      Accept
+                      {actionBusy ? '...' : 'Accept'}
                     </button>
                   </>
                 )
@@ -2121,14 +2131,16 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <button
                       className="btn btn-secondary"
                       onClick={handleDeclineRepresentation}
+                      disabled={actionBusy}
                     >
-                      Decline
+                      {actionBusy ? '...' : 'Decline'}
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={handleAcceptRepresentation}
+                      disabled={actionBusy}
                     >
-                      Accept
+                      {actionBusy ? '...' : 'Accept'}
                     </button>
                   </div>
                 ) : (
