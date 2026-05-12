@@ -227,19 +227,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   };
 
   const handleSend = async () => {
-    if (inputMessage.trim()) {
-      try {
-        // Send message to backend
-        await sendMessage(user.id, inputMessage);
-
-        // Clear input
-        setInputMessage('');
-
-        // Refresh messages using the same logic as fetchMessages
-        await fetchMessages();
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+    if (actionBusy) return;
+    if (!inputMessage.trim()) return;
+    setActionBusy(true);
+    try {
+      await sendMessage(user.id, inputMessage);
+      setInputMessage('');
+      await fetchMessages();
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -1423,7 +1421,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   <button
                     className="send-btn"
                     onClick={handleSend}
-                    disabled={!inputMessage.trim()}
+                    disabled={!inputMessage.trim() || actionBusy}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

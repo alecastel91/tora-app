@@ -33,6 +33,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming', 'past', or 'declined'
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionBusy, setActionBusy] = useState(false);
   const [error, setError] = useState('');
   const [dealToDelete, setDealToDelete] = useState(null);
   const [expandedDealId, setExpandedDealId] = useState(null);
@@ -126,72 +127,75 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
   };
 
   const handleAcceptDeal = async (dealId) => {
+    if (actionBusy) return;
+    setActionBusy(true);
     try {
       await apiService.acceptDeal(dealId, currentUser.id);
-      // Refresh deals after accepting
       fetchDeals();
     } catch (err) {
       console.error('Error accepting deal:', err);
       alert(err.message || 'Failed to accept offer');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleDeclineDeal = async () => {
-    if (!dealToDecline) return;
+    if (actionBusy || !dealToDecline) return;
 
     if (!declineReason.trim()) {
       alert('Please provide a reason for declining');
       return;
     }
 
+    setActionBusy(true);
     try {
       await apiService.declineDeal(dealToDecline, currentUser.id, declineReason);
       setDealToDecline(null);
       setDeclineReason('');
-      // Refresh deals after declining
       fetchDeals();
     } catch (err) {
       console.error('Error declining deal:', err);
       alert(err.message || 'Failed to decline offer');
       setDealToDecline(null);
       setDeclineReason('');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleDeleteDeal = async () => {
-    if (!dealToDelete) return;
-
+    if (actionBusy || !dealToDelete) return;
+    setActionBusy(true);
     try {
       await apiService.deleteDeal(dealToDelete, currentUser.id);
       setDealToDelete(null);
-      // Refresh deals after deleting
       fetchDeals();
     } catch (err) {
       console.error('Error deleting deal:', err);
       alert(err.message || 'Failed to delete offer');
       setDealToDelete(null);
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleWithdrawContract = async () => {
-    if (!dealToWithdraw) return;
-
+    if (actionBusy || !dealToWithdraw) return;
+    setActionBusy(true);
     try {
-      // Call API to withdraw contract - resets contract status to NOT_SENT
       await apiService.withdrawContract(dealToWithdraw.id, currentUser.id);
-
       setDealToWithdraw(null);
       setShowWithdrawConfirmation(false);
-
-      // Refresh deals after withdrawing
       fetchDeals();
-
       alert('Contract withdrawn successfully. You can now send a new contract.');
     } catch (err) {
       console.error('Error withdrawing contract:', err);
       alert(err.message || 'Failed to withdraw contract');
       setDealToWithdraw(null);
       setShowWithdrawConfirmation(false);
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -518,7 +522,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   <>
                     <button
                       className="btn btn-outline"
+                      disabled={actionBusy}
                       onClick={async () => {
+                        if (actionBusy) return;
                         console.log('[Send Contract Button] Clicked for deal:', deal.eventName);
                         console.log('[Send Contract Button] Deal artistId:', deal.bookedArtistId || 'NOT SET');
                         console.log('[Send Contract Button] Deal artist.id:', deal.artist?.id);
@@ -555,13 +561,18 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                     </button>
                     <button
                       className="btn btn-secondary"
+                      disabled={actionBusy}
                       onClick={async () => {
+                        if (actionBusy) return;
                         if (window.confirm('Skip contract stage? You can still share documents and proceed with the booking.')) {
+                          setActionBusy(true);
                           try {
                             await apiService.skipContract(deal.id, currentUser.id);
                             fetchDeals();
                           } catch (err) {
                             alert(err.message || 'Failed to skip contract');
+                          } finally {
+                            setActionBusy(false);
                           }
                         }
                       }}
@@ -651,12 +662,17 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                     return (
                       <button
                         className="btn btn-primary"
+                        disabled={actionBusy}
                         onClick={async () => {
+                          if (actionBusy) return;
+                          setActionBusy(true);
                           try {
                             await apiService.signContract(deal.id, currentUser.id);
                             fetchDeals();
                           } catch (err) {
                             alert(err.message || 'Failed to sign contract');
+                          } finally {
+                            setActionBusy(false);
                           }
                         }}
                       >
@@ -757,8 +773,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 <button
                   className="btn btn-primary btn-accept"
                   onClick={() => handleAcceptDeal(deal.id)}
+                  disabled={actionBusy}
                 >
-                  Accept
+                  {actionBusy ? '...' : 'Accept'}
                 </button>
               </div>
             )}
@@ -923,8 +940,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               <button
                 className="btn btn-danger"
                 onClick={handleDeleteDeal}
+                disabled={actionBusy}
               >
-                Delete Offer
+                {actionBusy ? '...' : 'Delete Offer'}
               </button>
             </div>
           </div>
@@ -965,8 +983,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               <button
                 className="btn btn-danger"
                 onClick={handleDeclineDeal}
+                disabled={actionBusy}
               >
-                Decline Offer
+                {actionBusy ? '...' : 'Decline Offer'}
               </button>
             </div>
           </div>
@@ -1007,6 +1026,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                           transition: 'all 0.2s'
                         }}
                         onClick={async () => {
+                          if (actionBusy) return;
+                          setActionBusy(true);
                           try {
                             await apiService.sendContract(
                               selectedDealForWorkflow.id,
@@ -1018,6 +1039,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                             fetchDeals();
                           } catch (err) {
                             alert(err.message || 'Failed to send contract');
+                          } finally {
+                            setActionBusy(false);
                           }
                         }}
                         onMouseEnter={(e) => {
@@ -1086,6 +1109,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                           transition: 'all 0.2s'
                         }}
                         onClick={async () => {
+                          if (actionBusy) return;
+                          setActionBusy(true);
                           try {
                             await apiService.shareDocument(
                               selectedDealForWorkflow.id,
@@ -1099,6 +1124,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                             fetchDeals();
                           } catch (err) {
                             alert(err.message || 'Failed to share document');
+                          } finally {
+                            setActionBusy(false);
                           }
                         }}
                         onMouseEnter={(e) => {
@@ -1154,7 +1181,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 <button
                   className="btn btn-outline"
                   style={{ width: '100%', justifyContent: 'center' }}
+                  disabled={actionBusy}
                   onClick={async () => {
+                    if (actionBusy) return;
+                    setActionBusy(true);
                     try {
                       await apiService.updatePayment(
                         selectedDealForWorkflow.id,
@@ -1169,6 +1199,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                       fetchDeals();
                     } catch (err) {
                       alert(err.message || 'Failed to update payment');
+                    } finally {
+                      setActionBusy(false);
                     }
                   }}
                 >
@@ -1181,7 +1213,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 <button
                   className="btn btn-primary"
                   style={{ width: '100%', justifyContent: 'center' }}
+                  disabled={actionBusy}
                   onClick={async () => {
+                    if (actionBusy) return;
+                    setActionBusy(true);
                     try {
                       await apiService.updatePayment(
                         selectedDealForWorkflow.id,
@@ -1196,6 +1231,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                       fetchDeals();
                     } catch (err) {
                       alert(err.message || 'Failed to update payment');
+                    } finally {
+                      setActionBusy(false);
                     }
                   }}
                 >
@@ -1233,8 +1270,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             setSelectedDealForWorkflow(null);
           }}
           onSave={async (contractData) => {
+            if (actionBusy) return;
+            setActionBusy(true);
             try {
-              // Send the contract with the deal
               await apiService.sendContract(
                 selectedDealForWorkflow.id,
                 currentUser.id,
@@ -1252,6 +1290,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               alert('Contract sent successfully!');
             } catch (err) {
               alert(err.message || 'Failed to send contract');
+            } finally {
+              setActionBusy(false);
             }
           }}
         />
@@ -1299,6 +1339,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               <button
                 className="btn btn-primary"
                 onClick={handleWithdrawContract}
+                disabled={actionBusy}
                 style={{
                   backgroundColor: 'rgba(255, 165, 0, 0.8)',
                   borderColor: 'rgba(255, 165, 0, 1)'

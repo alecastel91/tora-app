@@ -15,6 +15,7 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
   const [likeLimitData, setLikeLimitData] = useState(null);
   const [showConnectionLimitModal, setShowConnectionLimitModal] = useState(false);
   const [connectionLimitData, setConnectionLimitData] = useState(null);
+  const [actionBusy, setActionBusy] = useState(false);
 
   if (!profile) {
     return null;
@@ -59,8 +60,10 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
   };
 
   const handleConnectionChoice = async (targetProfileId, type, artistContext = null, userMessage = '') => {
+    if (actionBusy) return;
     console.log('handleConnectionChoice called:', { targetProfileId, type, artistContext, userMessage });
 
+    setActionBusy(true);
     try {
       // Use the user's custom message
       console.log('Sending connection request...', { targetProfileId, message: userMessage });
@@ -99,6 +102,8 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
       // Only show alert for non-limit errors
       console.error('Connection request failed:', error);
       alert('Failed to send connection request. Please try again.');
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -132,10 +137,12 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
   };
 
   const handleSendMessage = async () => {
+    if (actionBusy) return;
     if (!message.trim()) {
       alert('Please write a message to introduce yourself');
       return;
     }
+    setActionBusy(true);
     try {
       await sendConnectionRequest(profileId, message.trim());
       setShowMessageModal(false);
@@ -166,10 +173,14 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
 
       // Only show alert for non-limit errors
       alert('Failed to send connection request. Please try again.');
+    } finally {
+      setActionBusy(false);
     }
   };
 
   const handleRemoveConnection = async () => {
+    if (actionBusy) return;
+    setActionBusy(true);
     try {
       await removeConnection(profileId);
       setShowRemoveModal(false);
@@ -181,6 +192,8 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
     } catch (error) {
       console.error('Error removing connection:', error);
       alert('Failed to remove connection');
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -398,9 +411,9 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
             <button
               className={`btn ${hasPendingRequest ? 'btn-disabled' : 'btn-primary'} btn-full-width`}
               onClick={handleConnect}
-              disabled={hasPendingRequest}
+              disabled={hasPendingRequest || actionBusy}
             >
-              {hasPendingRequest ? 'Pending' : 'Connect'}
+              {hasPendingRequest ? 'Pending' : (actionBusy ? '...' : 'Connect')}
             </button>
           )}
         </div>
@@ -459,8 +472,9 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
                 <button
                   className="btn btn-primary btn-modal-send"
                   onClick={handleSendMessage}
+                  disabled={actionBusy}
                 >
-                  Send
+                  {actionBusy ? '...' : 'Send'}
                 </button>
               </div>
             </div>
@@ -494,8 +508,9 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
               <button
                 className="btn btn-outline btn-remove-confirm"
                 onClick={handleRemoveConnection}
+                disabled={actionBusy}
               >
-                Remove
+                {actionBusy ? '...' : 'Remove'}
               </button>
             </div>
           </div>

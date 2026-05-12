@@ -62,6 +62,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showTourGigsModal, setShowTourGigsModal] = useState(false);
   const [tourGigs, setTourGigs] = useState([]);
   const [loadingTourGigs, setLoadingTourGigs] = useState(false);
+  const [tourBusy, setTourBusy] = useState(false);
 
   // Generate month/year options starting from current month for next 12 months
   const generateMonthOptions = () => {
@@ -582,6 +583,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Handle Create Tour form submission
   const handleCreateTour = async () => {
+    if (tourBusy) return;
     // Validation
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
       alert('Please fill in all required fields');
@@ -601,6 +603,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       ? `${tourForm.feeCurrency} ${tourForm.feeMin}-${tourForm.feeMax}`
       : '';
 
+    setTourBusy(true);
     try {
       // Save to backend
       const tourData = {
@@ -641,6 +644,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     } catch (error) {
       console.error('Error creating tour:', error);
       alert(error.message || 'Failed to create tour. Please try again.');
+    } finally {
+      setTourBusy(false);
     }
   };
 
@@ -671,6 +676,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Handle Update Tour form submission
   const handleUpdateTour = async () => {
+    if (tourBusy) return;
     // Validation
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
       alert('Please fill in all required fields');
@@ -690,6 +696,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       ? `${tourForm.feeCurrency} ${tourForm.feeMin}-${tourForm.feeMax}`
       : '';
 
+    setTourBusy(true);
     try {
       // Update tour via backend
       const tourData = {
@@ -730,6 +737,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     } catch (error) {
       console.error('Error updating tour:', error);
       alert('Failed to update tour. Please try again.');
+    } finally {
+      setTourBusy(false);
     }
   };
 
@@ -980,8 +989,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <button className="btn btn-secondary" onClick={() => setShowCreateTourModal(false)}>
                 Cancel
               </button>
-              <button className="btn btn-primary" onClick={handleCreateTour}>
-                Create Tour
+              <button className="btn btn-primary" onClick={handleCreateTour} disabled={tourBusy}>
+                {tourBusy ? 'Creating...' : 'Create Tour'}
               </button>
             </div>
           </div>
@@ -1157,8 +1166,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <button className="btn btn-secondary" onClick={() => setShowEditTourModal(false)}>
                 Cancel
               </button>
-              <button className="btn btn-primary" onClick={handleUpdateTour}>
-                Update Tour
+              <button className="btn btn-primary" onClick={handleUpdateTour} disabled={tourBusy}>
+                {tourBusy ? 'Updating...' : 'Update Tour'}
               </button>
             </div>
           </div>
