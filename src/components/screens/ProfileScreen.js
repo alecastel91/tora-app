@@ -280,6 +280,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     return (
       <RepresentedArtistsScreen
         onClose={() => setShowRepresentedArtists(false)}
+        onSwitchTab={onSwitchTab}
       />
     );
   }

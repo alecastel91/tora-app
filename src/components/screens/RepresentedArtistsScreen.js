@@ -7,7 +7,7 @@ import SearchArtistsModal from '../common/SearchArtistsModal';
 import { dummyProfiles } from '../../data/profiles';
 import apiService from '../../services/api';
 
-const RepresentedArtistsScreen = ({ onClose }) => {
+const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const { user, reloadProfileData } = useAppContext();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [viewingProfile, setViewingProfile] = useState(null);
@@ -114,6 +114,7 @@ const RepresentedArtistsScreen = ({ onClose }) => {
       <ManageArtistScreen
         artist={managingArtist}
         onClose={handleCloseManage}
+        onSwitchTab={onSwitchTab}
       />
     );
   }

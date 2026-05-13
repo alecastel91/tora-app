@@ -309,17 +309,26 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
     const isExpanded = expandedDealId === deal.id;
 
     // Check if this is a deal viewed by the artist who has an agent managing it
-    // Case 1: deal.bookedArtistId matches current user (booked through agent explicitly)
-    // Case 2: current user is the artist in the deal AND has a representedBy agent
-    // "via agent" when bookedArtistId is set — this means the offer was sent through the agent
-    // When bookedArtistId is null, the offer was sent directly to the artist
-    const isViaAgent = !!deal.bookedArtistId && currentUser.role === 'ARTIST';
-    // Get agent name for the "via agent" indicator
-    const agentName = isViaAgent ? (
-      Array.isArray(currentUser.representedBy)
-        ? (currentUser.representedBy.map(a => a.name || a.agentName).filter(Boolean).join(', ') || 'your agent')
-        : (currentUser.representedBy?.name || 'your agent')
-    ) : null;
+    // Two related flags:
+    //   isViaAgent — the deal involves an agent at all (show the "via agent" badge to both sides).
+    //   delegateToAgent — the current ARTIST viewer should not see workflow buttons because
+    //     their agent handles them. The booker still needs those buttons even when via-agent.
+    const artistRepresentedBy = Array.isArray(deal.artist?.representedBy)
+      ? deal.artist.representedBy
+      : (deal.artist?.representedBy ? [deal.artist.representedBy] : []);
+    const isArtistViewerViaAgent = !!deal.bookedArtistId && currentUser.role === 'ARTIST';
+    const isBookerViewerViaAgent =
+      (currentUser.role === 'PROMOTER' || currentUser.role === 'VENUE') &&
+      artistRepresentedBy.length > 0;
+    const isViaAgent = isArtistViewerViaAgent || isBookerViewerViaAgent;
+    const delegateToAgent = isArtistViewerViaAgent;
+    const agentName = !isViaAgent
+      ? null
+      : isArtistViewerViaAgent
+        ? (Array.isArray(currentUser.representedBy)
+            ? (currentUser.representedBy.map(a => a.name || a.agentName).filter(Boolean).join(', ') || 'agent')
+            : (currentUser.representedBy?.name || 'agent'))
+        : (artistRepresentedBy.map(a => a.name || a.agentName).filter(Boolean).join(', ') || 'agent');
 
     const dealDate = new Date(deal.date);
     const dayNumber = dealDate.getDate();
@@ -510,12 +519,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             </div>
 
             {/* Workflow Timeline for ACCEPTED deals */}
-            {deal.status === 'ACCEPTED' && !isViaAgent && (
+            {deal.status === 'ACCEPTED' && !delegateToAgent && (
               <WorkflowTimeline deal={deal} />
             )}
 
-            {/* Workflow Action Buttons for ACCEPTED deals - hidden for via-agent */}
-            {deal.status === 'ACCEPTED' && !isViaAgent && (
+            {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
+            {deal.status === 'ACCEPTED' && !delegateToAgent && (
               <div className="workflow-actions">
                 {/* Contract Actions */}
                 {(!deal.contract || deal.contract.status === 'NOT_SENT') && (
@@ -750,7 +759,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 ? lastOffer.offeredBy !== currentUser.id  // Counter-offer: other party can respond
                 : !isOutgoing;  // Initial offer: recipient can respond
               return canRespond;
-            })() && !isViaAgent && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING') && (
+            })() && !delegateToAgent && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING') && (
               <div className="booking-actions">
                 <button
                   className="btn btn-outline btn-decline"
@@ -780,8 +789,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               </div>
             )}
 
-            {/* Info message for artist viewing via agent */}
-            {isViaAgent && (
+            {/* Info message — first-person "your agent" so artist-only */}
+            {delegateToAgent && (
               <div className="via-agent-info">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <circle cx="12" cy="12" r="10"></circle>
@@ -792,8 +801,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               </div>
             )}
 
-            {/* Show chat button - hide for via-agent bookings */}
-            {!isViaAgent && (
+            {/* Show chat button — hidden for artist viewer when handled by agent */}
+            {!delegateToAgent && (
               <button
                 className="btn btn-outline btn-chat"
                 onClick={() => onOpenChat && onOpenChat(otherParty)}
@@ -805,8 +814,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               </button>
             )}
 
-            {/* Delete offer button (only for outgoing pending offers, not via-agent) */}
-            {isOutgoing && !isViaAgent && deal.status === 'PENDING' && (
+            {/* Delete offer button (only for outgoing pending offers, not when agent handles it) */}
+            {isOutgoing && !delegateToAgent && deal.status === 'PENDING' && (
               <button
                 className="btn btn-outline btn-delete-offer-expanded"
                 onClick={(e) => {
