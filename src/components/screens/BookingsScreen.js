@@ -330,6 +330,17 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             : (currentUser.representedBy?.name || 'agent'))
         : (artistRepresentedBy.map(a => a.name || a.agentName).filter(Boolean).join(', ') || 'agent');
 
+    // The booker's "Message" CTA should route to whoever is leading the
+    // negotiation. When the artist has an agent, that's the agent.
+    const primaryAgent = isBookerViewerViaAgent ? artistRepresentedBy[0] : null;
+    const messageTarget = primaryAgent
+      ? {
+          id: primaryAgent.profileId,
+          name: primaryAgent.name || agentName,
+          role: 'AGENT',
+        }
+      : otherParty;
+
     const dealDate = new Date(deal.date);
     const dayNumber = dealDate.getDate();
 
@@ -362,6 +373,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 {otherParty.role}
               </span>
             </div>
+            {isViaAgent && agentName && (
+              <p className="party-via-agent">via {agentName} · Agent</p>
+            )}
             <p className="party-location">
               {deal.city && deal.country ? `${deal.city}, ${deal.country}` : otherParty.location}
             </p>
@@ -369,11 +383,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               <span className={getStatusBadgeClass(deal.status)}>
                 {deal.status}
               </span>
-              {isViaAgent && (
-                <span className="via-agent-badge">
-                  via agent
-                </span>
-              )}
             </div>
           </div>
 
@@ -771,9 +780,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   className="btn btn-outline"
                   onClick={() => {
                     setExpandedDealId(null);
-                    // Open ChatScreen and trigger Review modal
+                    // Open ChatScreen and trigger Review modal — agent if leading.
                     if (onOpenChat) {
-                      onOpenChat(otherParty, deal);
+                      onOpenChat(messageTarget, deal);
                     }
                   }}
                 >
@@ -801,11 +810,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               </div>
             )}
 
-            {/* Show chat button — hidden for artist viewer when handled by agent */}
+            {/* Show chat button — hidden for artist viewer when handled by agent.
+                Booker chats with the agent (messageTarget) when applicable. */}
             {!delegateToAgent && (
               <button
                 className="btn btn-outline btn-chat"
-                onClick={() => onOpenChat && onOpenChat(otherParty)}
+                onClick={() => onOpenChat && onOpenChat(messageTarget)}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
