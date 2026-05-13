@@ -23,6 +23,50 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 13-14, 2026)
+
+### Agent ↔ artist deal dynamics — conceptual model
+End-to-end deal lifecycle testing surfaced that the system was treating the artist and their agent as two independent counter-parties. Refined to a coherent model:
+
+- **Agent-led vs artist-direct deals.** Signal is `deal.bookedArtistId`. When set, the booker routed the offer through the agent flow → agent is the negotiation lead. When `null`, the offer went directly to the artist → agent has no authority.
+- **Same side.** Artist + their accepted agents are a single side. An agent countering on behalf of the artist is treated as an outgoing action — the artist (and the agent-viewing-the-artist) do NOT see a pending response card; only the booker side does.
+- **Counter card title credits the actual offerer.** Reads `offerHistory[last].offeredBy` and resolves to: artist name, booker name, or `"{agent name} ({artist name}'s agent)"` for agent-side offerers. Backend batch-fetches offerer profiles only when needed.
+- **Booker view shows via-agent context.** `BookingsScreen` renders a sub-line under the artist name (`via Alessandro · Agent`) when the artist has an accepted agent. The booker's Message button + Review CTA now route to the agent profile when the agent is leading; the booker keeps all workflow buttons.
+- **Agent visibility-only on artist-direct deals.** When `bookedArtistId` is null and an agent views one of their represented artist's deals, `BookingsScreen` shows the card with a `via {Artist} · Artist-direct` sub-line, all workflow buttons hidden — visibility without intervention.
+
+### Two flag refactor in BookingsScreen
+The conflated `isViaAgent` was split:
+- `isViaAgent` — show the via sub-line on the card. Both artist viewer (agent-led deal) and booker viewer (artist has an agent) see it.
+- `delegateToAgent` — artist viewer whose deal is agent-led; their agent handles workflow buttons.
+- `agentReadOnly` — agent viewer of an artist-direct deal; visibility only.
+- `hideWorkflow = delegateToAgent || agentReadOnly` — composite gate for buttons.
+
+### CTA double-click guards (sweep #2)
+Added `actionBusy` / per-screen busy flags + `disabled={busy}` across roughly 20 CTAs that fire async API calls. The pattern is identical everywhere: handler early-returns if busy, try/finally to reset, button shows `...` placeholder while in flight. Files touched:
+- `ChatScreen.js` — handleSubmitReview, handleAcceptOffer, handleDeclineOffer, handleAcceptCounterOffer, handleDeclineCounterOffer, handleAcceptRepresentation, handleDeclineRepresentation, handleSend (regular text)
+- `BookingsScreen.js` — handleAcceptDeal, handleDeclineDeal, handleDeleteDeal, handleWithdrawContract + 7 inline async onClick CTAs (skip/sign contract, send/share document picker, deposit/full payment, AddContractModal onSave)
+- `TourScreen.js` — handleCreateTour, handleUpdateTour
+- `ViewProfileScreen.js` — handleConnectionChoice, handleSendMessage, handleRemoveConnection
+
+### Bugs found via testing and fixed
+- `cancel-representation` returned 400 because `findFirst({where: {userId}})` picked any of the user's profiles; multi-profile users got a non-AGENT row. Now accepts `currentProfileId` in the request body.
+- `SearchArtistsModal` had `key={Date.now()}` on the parent which remounted the modal on every render, wiping the search input. Removed the key.
+- `ManageArtistScreen` read `artist.id` from a representingArtists cache entry that uses `artist.profileId`; the useEffect early-returned and Actions Required was empty.
+- Connection accept/decline endpoints (4 of them) didn't verify the caller was the recipient — any authenticated user could mutate any pending request. Now checks `toProfileId → userId === req.userId`.
+- ChatScreen rep-request modal showed Accept/Decline to the sender too; now shows "Awaiting response from X" instead.
+- Counter-offer Send button had no disabled state; double-click sent two API calls and produced two duplicate cards. Plus a one-off duplicate was trimmed in prod via a direct DB delete.
+- `scripts/reset-representation.js` added for clearing rep request state between test runs (dry-run + real, direction-agnostic).
+- `representedBy` cleaned up in delete-user / cancel-representation cascade.
+- BookingsScreen "Extras:" section rendered twice after a counter offer (counter writes to `additionalTerms` but the original `deal.extras` was never updated). Now resolves a single `latestExtras` (additionalTerms when parseable JSON, else deal.extras).
+- Empty `contract = {}` (fresh ACCEPTED state) was making BookingsScreen show "Sign Contract" because `undefined !== 'NOT_SENT'`. Both blocks now treat `!contract.status` the same as `NOT_SENT`.
+- Skip Contract CTA was missing from the chat-thread offer footer (it existed in BookingsScreen). Added.
+
+### Brand framing — electronic → club
+The site copy was previously "electronic music industry"; replaced with "club music industry" across hero copy, terms (EN + JP), metadata title/description, and stub bio. See tora-application CLAUDE.md for the marketing-site surface.
+
+### Supreme font, selective
+Pangram Pangram Supreme self-hosted via `next/font/local`. Used on a small set of marketing elements (home tagline, Apply CTAs, subpage subtitles). Detail in tora-application CLAUDE.md. Frontend-only repo unaffected.
+
 ## Recent Updates (May 10-12, 2026)
 
 ### Phase 4b — Actions Required cards wired
