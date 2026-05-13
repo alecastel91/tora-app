@@ -308,11 +308,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
       : deal.initiator;
     const isExpanded = expandedDealId === deal.id;
 
-    // Check if this is a deal viewed by the artist who has an agent managing it
-    // Two related flags:
-    //   isViaAgent — the deal involves an agent at all (show the "via agent" badge to both sides).
-    //   delegateToAgent — the current ARTIST viewer should not see workflow buttons because
-    //     their agent handles them. The booker still needs those buttons even when via-agent.
+    // Visibility + write-access flags for the deal card.
+    //   isViaAgent — show the "via agent" sub-line (artist viewer + booker viewer when relevant).
+    //   delegateToAgent — ARTIST viewer of an agent-led deal: their agent handles it.
+    //   agentReadOnly — AGENT viewer of an ARTIST-DIRECT deal: see for visibility, but the
+    //     artist is in charge; hide all workflow controls.
+    //   hideWorkflow — either of the above hide-conditions applies.
     const artistRepresentedBy = Array.isArray(deal.artist?.representedBy)
       ? deal.artist.representedBy
       : (deal.artist?.representedBy ? [deal.artist.representedBy] : []);
@@ -322,6 +323,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
       artistRepresentedBy.length > 0;
     const isViaAgent = isArtistViewerViaAgent || isBookerViewerViaAgent;
     const delegateToAgent = isArtistViewerViaAgent;
+    const agentReadOnly =
+      currentUser.role === 'AGENT' &&
+      deal.artistId !== currentUser.id &&
+      deal.venueId !== currentUser.id &&
+      !deal.bookedArtistId;
+    const hideWorkflow = delegateToAgent || agentReadOnly;
     const agentName = !isViaAgent
       ? null
       : isArtistViewerViaAgent
@@ -375,6 +382,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             </div>
             {isViaAgent && agentName && (
               <p className="party-via-agent">via {agentName} · Agent</p>
+            )}
+            {agentReadOnly && (
+              <p className="party-via-agent">via {deal.artist?.name || 'the artist'} · Artist-direct</p>
             )}
             <p className="party-location">
               {deal.city && deal.country ? `${deal.city}, ${deal.country}` : otherParty.location}
@@ -528,12 +538,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             </div>
 
             {/* Workflow Timeline for ACCEPTED deals */}
-            {deal.status === 'ACCEPTED' && !delegateToAgent && (
+            {deal.status === 'ACCEPTED' && !hideWorkflow && (
               <WorkflowTimeline deal={deal} />
             )}
 
             {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
-            {deal.status === 'ACCEPTED' && !delegateToAgent && (
+            {deal.status === 'ACCEPTED' && !hideWorkflow && (
               <div className="workflow-actions">
                 {/* Contract Actions */}
                 {(!deal.contract || deal.contract.status === 'NOT_SENT') && (
@@ -768,7 +778,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 ? lastOffer.offeredBy !== currentUser.id  // Counter-offer: other party can respond
                 : !isOutgoing;  // Initial offer: recipient can respond
               return canRespond;
-            })() && !delegateToAgent && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING') && (
+            })() && !hideWorkflow && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING') && (
               <div className="booking-actions">
                 <button
                   className="btn btn-outline btn-decline"
@@ -812,7 +822,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
             {/* Show chat button — hidden for artist viewer when handled by agent.
                 Booker chats with the agent (messageTarget) when applicable. */}
-            {!delegateToAgent && (
+            {!hideWorkflow && (
               <button
                 className="btn btn-outline btn-chat"
                 onClick={() => onOpenChat && onOpenChat(messageTarget)}
@@ -825,7 +835,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             )}
 
             {/* Delete offer button (only for outgoing pending offers, not when agent handles it) */}
-            {isOutgoing && !delegateToAgent && deal.status === 'PENDING' && (
+            {isOutgoing && !hideWorkflow && deal.status === 'PENDING' && (
               <button
                 className="btn btn-outline btn-delete-offer-expanded"
                 onClick={(e) => {
