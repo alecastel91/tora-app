@@ -469,52 +469,50 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                     : deal.currentFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {deal.currency}
                 </span>
               </div>
-              {deal.extras && Object.keys(deal.extras).length > 0 && (
-                <div className="booking-detail-row full-width">
-                  <span className="detail-label">Extras:</span>
-                  <div className="detail-value extras-list">
-                    {Object.entries(deal.extras).map(([key, value]) => (
-                      <div key={key} className="extra-item">
-                        <div className="extra-content">
-                          <strong style={{ textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</strong>
-                          {value !== 'Included' && <span className="extra-note">: {value}</span>}
+              {(() => {
+                // Resolve the current extras: counter-offer additionalTerms (when JSON)
+                // takes precedence over the original deal.extras since counters never
+                // touch deal.extras. Without this, both render under "Extras:" and
+                // we see the section twice.
+                let latestExtras = null;
+                if (deal.additionalTerms) {
+                  try {
+                    const parsed = typeof deal.additionalTerms === 'string'
+                      ? JSON.parse(deal.additionalTerms)
+                      : deal.additionalTerms;
+                    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                      latestExtras = parsed;
+                    }
+                  } catch (e) { /* fall through to free-text rendering below */ }
+                }
+                if (!latestExtras && deal.extras && Object.keys(deal.extras).length > 0) {
+                  latestExtras = deal.extras;
+                }
+
+                return (
+                  <>
+                    {latestExtras && Object.keys(latestExtras).length > 0 && (
+                      <div className="booking-detail-row full-width">
+                        <span className="detail-label">Extras:</span>
+                        <div className="detail-value extras-list">
+                          {Object.entries(latestExtras).filter(([, v]) => v).map(([key, value]) => (
+                            <div key={key} className="extra-item">
+                              <div className="extra-content">
+                                <strong style={{ textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</strong>
+                                {value !== 'Included' && value !== true && <span className="extra-note">: {value}</span>}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {deal.additionalTerms && (() => {
-                // Try to parse additionalTerms as JSON and render like extras
-                let parsedTerms = null;
-                try {
-                  const parsed = typeof deal.additionalTerms === 'string'
-                    ? JSON.parse(deal.additionalTerms)
-                    : deal.additionalTerms;
-                  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-                    parsedTerms = parsed;
-                  }
-                } catch (e) { /* not JSON, render as text */ }
-
-                return parsedTerms ? (
-                  <div className="booking-detail-row full-width">
-                    <span className="detail-label">Extras:</span>
-                    <div className="detail-value extras-list">
-                      {Object.entries(parsedTerms).filter(([, v]) => v).map(([key, value]) => (
-                        <div key={key} className="extra-item">
-                          <div className="extra-content">
-                            <strong style={{ textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</strong>
-                            {value !== 'Included' && value !== true && <span className="extra-note">: {value}</span>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="booking-detail-row full-width">
-                    <span className="detail-label">Additional Terms:</span>
-                    <span className="detail-value">{deal.additionalTerms}</span>
-                  </div>
+                    )}
+                    {!latestExtras && deal.additionalTerms && (
+                      <div className="booking-detail-row full-width">
+                        <span className="detail-label">Additional Terms:</span>
+                        <span className="detail-value">{deal.additionalTerms}</span>
+                      </div>
+                    )}
+                  </>
                 );
               })()}
               {deal.technicalRequirements && (
