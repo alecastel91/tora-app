@@ -543,8 +543,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
             {deal.status === 'ACCEPTED' && !hideWorkflow && (
               <div className="workflow-actions">
-                {/* Contract Actions */}
-                {(!deal.contract || deal.contract.status === 'NOT_SENT') && (
+                {/* Contract Actions. An empty contract = {} (fresh ACCEPTED deal)
+                    has no .status set yet — treat it the same as NOT_SENT. */}
+                {(!deal.contract || !deal.contract.status || deal.contract.status === 'NOT_SENT') && (
                   <>
                     <button
                       className="btn btn-outline"
@@ -611,7 +612,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                     </button>
                   </>
                 )}
-                {deal.contract && deal.contract.status !== 'NOT_SENT' && deal.contract.status !== 'FULLY_SIGNED' && (() => {
+                {deal.contract && deal.contract.status && deal.contract.status !== 'NOT_SENT' && deal.contract.status !== 'FULLY_SIGNED' && (() => {
                   console.log('[BookingsScreen] Contract button debug:', {
                     dealId: deal.id,
                     eventName: deal.eventName,

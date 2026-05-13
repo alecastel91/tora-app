@@ -1684,7 +1684,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   </>
                 )
               ) : selectedOffer && selectedOffer.status === 'ACCEPTED' ? (
-                // Show Send Contract and Close for accepted offers
+                // Show Send Contract, Skip Contract, and Close for accepted offers
                 <>
                   <button
                     className="btn btn-outline"
@@ -1693,19 +1693,34 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     Close
                   </button>
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-secondary"
+                    disabled={actionBusy}
                     onClick={async () => {
-                      console.log('[ChatScreen Send Contract] selectedOffer:', selectedOffer);
-                      console.log('[ChatScreen Send Contract] artistId:', selectedOffer?.artistId);
-
-                      // If this is an agent booking (has artistId), fetch artist profile FIRST
-                      if (selectedOffer?.artistId) {
+                      if (actionBusy) return;
+                      if (!window.confirm('Skip contract stage? You can still share documents and proceed with the booking.')) return;
+                      setActionBusy(true);
+                      try {
+                        await apiService.skipContract(selectedOffer.id, currentUser.id);
+                        setShowOfferDetails(false);
+                        fetchMessages();
+                      } catch (err) {
+                        alert(err.message || 'Failed to skip contract');
+                      } finally {
+                        setActionBusy(false);
+                      }
+                    }}
+                  >
+                    Skip Contract
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    disabled={actionBusy}
+                    onClick={async () => {
+                      // If this is an agent booking (has bookedArtistId), fetch artist profile FIRST
+                      if (selectedOffer?.bookedArtistId) {
                         try {
-                          console.log('[ChatScreen] Fetching artist profile BEFORE opening modal:', selectedOffer.bookedArtistId);
                           const profile = await apiService.getProfile(selectedOffer.bookedArtistId);
-                          console.log('[ChatScreen] Artist profile fetched:', profile.name, 'Contracts:', profile.documents?.contracts?.length);
                           setSelectedArtistForDocs(profile);
-                          // NOW open the modal after profile is loaded
                           setShowAddContractModal(true);
                           setShowOfferDetails(false);
                         } catch (err) {
@@ -1713,7 +1728,6 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           alert('Failed to load artist profile. Please try again.');
                         }
                       } else {
-                        // Not an agent booking, open modal directly
                         setShowAddContractModal(true);
                         setShowOfferDetails(false);
                       }
