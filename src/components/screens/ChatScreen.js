@@ -923,7 +923,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     {!msg.isMe && (
                       <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
                         <a
-                          href={msg.documentAttachment.url}
+                          href={getFullUrl(msg.documentAttachment.url)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-outline"
