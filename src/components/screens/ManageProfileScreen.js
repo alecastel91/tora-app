@@ -29,6 +29,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
     return {
       pressKit: user?.documents?.pressKit || [],
       technicalRider: user?.documents?.technicalRider || [],
+      hospitalityRider: user?.documents?.hospitalityRider || [],
       contracts: user?.documents?.contracts || []
     };
   };
@@ -306,6 +307,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
       const categorizedDocs = {
         pressKit: user?.documents?.pressKit || [],
         technicalRider: user?.documents?.technicalRider || [],
+        hospitalityRider: user?.documents?.hospitalityRider || [],
         contracts: user?.documents?.contracts || []
       };
       console.log('[ManageProfileScreen] Setting Artist documents (object):', categorizedDocs);
@@ -450,6 +452,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
     const labels = {
       pressKit: 'Press Kit',
       technicalRider: 'Technical Rider',
+      hospitalityRider: 'Hospitality Rider',
       contracts: 'Contract'
     };
     return labels[category] || 'Document';
@@ -773,7 +776,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
     return (
       <div className="artist-info-tab">
         {renderDocCategory('pressKit', <ImageIcon />, 'Press Kit', 'Add press photos, bio, EPK, or music samples')}
-        {renderDocCategory('technicalRider', <SlidersIcon />, 'Technical Rider', 'Add tech rider, stage plot, or hospitality requirements')}
+        {renderDocCategory('technicalRider', <SlidersIcon />, 'Technical Rider', 'Add stage plot, sound + lighting requirements, equipment list')}
+        {renderDocCategory('hospitalityRider', <SlidersIcon />, 'Hospitality Rider', 'Add accommodation, meals, transport, dressing room requirements')}
         {renderDocCategory('contracts', <FileTextIcon />, 'Contracts', 'Add contract templates. These can be customized per booking.')}
       </div>
     );
@@ -841,6 +845,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
         initialUrl={editingDoc?.url || ''}
         initialType={editingDoc?.type || 'link'}
         existingFileName={editingDoc?.file?.name || editingDoc?.title || ''}
+        submitLabel={editingDoc ? 'Save' : 'Add'}
+        submittingLabel="Saving…"
         onClose={() => {
           setShowAddDocModal(false);
           setNewDoc({ title: '', url: '' });

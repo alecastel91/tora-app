@@ -592,6 +592,21 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async sendAndSignContract(dealId, profileId, documentData, signatureData) {
+    const response = await fetch(`${API_URL}/deals/${dealId}/send-and-sign-contract`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        profileId,
+        documentId: documentData.id,
+        documentUrl: documentData.url,
+        documentTitle: documentData.title,
+        ...signatureData,
+      }),
+    });
+    return this.handleResponse(response);
+  }
+
   async skipContract(dealId, profileId) {
     const response = await fetch(`${API_URL}/deals/${dealId}/skip-contract`, {
       method: 'PUT',
@@ -628,14 +643,43 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async updatePayment(dealId, profileId, paymentData) {
-    const response = await fetch(`${API_URL}/deals/${dealId}/update-payment`, {
+  async skipDocument(dealId, profileId, documentType) {
+    const response = await fetch(`${API_URL}/deals/${dealId}/skip-document`, {
       method: 'PUT',
       headers: this.getHeaders(),
-      body: JSON.stringify({
-        profileId,
-        ...paymentData
-      })
+      body: JSON.stringify({ profileId, documentType }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async confirmPaymentReceipt(dealId, profileId, type, index) {
+    const response = await fetch(`${API_URL}/deals/${dealId}/confirm-payment-receipt`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, type, index }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async updatePayment(dealId, profileId, paymentData) {
+    // Multipart upload — must include a proof file (PDF or image).
+    const form = new FormData();
+    form.append('profileId', profileId);
+    if (paymentData.depositAmount != null) form.append('depositAmount', String(paymentData.depositAmount));
+    if (paymentData.fullPayment) form.append('fullPayment', 'true');
+    if (paymentData.paymentMethod) form.append('paymentMethod', paymentData.paymentMethod);
+    if (paymentData.paymentNotes) form.append('paymentNotes', paymentData.paymentNotes);
+    if (paymentData.proofFile) form.append('proof', paymentData.proofFile);
+
+    // FormData sets its own Content-Type; let the browser handle it.
+    const headers = {};
+    const token = localStorage.getItem('token');
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const response = await fetch(`${API_URL}/deals/${dealId}/update-payment`, {
+      method: 'PUT',
+      headers,
+      body: form,
     });
 
     return this.handleResponse(response);

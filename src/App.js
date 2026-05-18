@@ -63,19 +63,28 @@ function App() {
       if (token) {
         try {
           const data = await apiService.getCurrentUser();
-          // Store account-level user data
           if (data.user) {
             setAccountUser(data.user);
             const currency = data.user.preferredCurrency || 'USD';
             setPreferredCurrency(currency);
-            setContextCurrency(currency); // Also update AppContext
+            setContextCurrency(currency);
           }
-          // Use profiles array if available, otherwise fallback to single profile
           updateUser(data.profiles || data.profile);
           setIsAuthenticated(true);
         } catch (error) {
-          console.error('Auth check failed:', error);
-          localStorage.removeItem('token');
+          // Only clear the token on a genuine auth failure. 429 (rate limit),
+          // 5xx, or network errors are transient — keep the user signed in
+          // and let them retry instead of bouncing them to the login screen.
+          const status = error?.response?.status;
+          if (status === 401 || status === 403) {
+            console.error('Auth check failed — token rejected:', error);
+            localStorage.removeItem('token');
+          } else {
+            console.warn(`Auth check transient error (status ${status ?? 'network'}); keeping session`, error);
+            // Optimistically authenticate based on token presence; downstream
+            // /me retries will recover once the rate window resets.
+            setIsAuthenticated(true);
+          }
         }
       }
       setLoading(false);
@@ -363,6 +372,7 @@ function App() {
           onOpenSettings={() => setShowSettings(true)}
           onOpenPremium={() => setShowPremium(true)}
           accountUser={accountUser}
+          onSwitchTab={setActiveTab}
         />
         <main className="app-content">
           {renderScreen()}

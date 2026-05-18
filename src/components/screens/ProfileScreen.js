@@ -30,6 +30,11 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const [showAllGenres, setShowAllGenres] = useState(false);
   const [showRAEvents, setShowRAEvents] = useState(false);
   const [showProfileSwitcher, setShowProfileSwitcher] = useState(false);
+  // Action-required dots next to Manage CTAs. `ownHasActions` is true when
+  // the active profile has at least one action item; `artistActionsMap`
+  // is keyed by artist profile id for the agent's represented-artist cards.
+  const [ownHasActions, setOwnHasActions] = useState(false);
+  const [artistActionsMap, setArtistActionsMap] = useState({});
   const [showAddProfile, setShowAddProfile] = useState(false);
   const [profileToDelete, setProfileToDelete] = useState(null);
   const [agentProfile, setAgentProfile] = useState(null); // For artists: their agent
@@ -116,6 +121,42 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     console.log('🔍 [ProfileScreen] userProfiles count:', userProfiles?.length || 0);
     console.log('🔍 [ProfileScreen] userProfiles:', userProfiles);
   }, [userProfiles]);
+
+  // Action-required dots: fetch own + each represented artist in one
+  // round-trip burst. Sequential awaiting would block on the rate limiter
+  // for agents with many artists.
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    const loadActionFlags = async () => {
+      const artists = user.role === 'AGENT' && Array.isArray(user.representingArtists)
+        ? user.representingArtists.filter((a) => a.profileId || a.id)
+        : [];
+      const tasks = [
+        apiService.getActionSummary(user.id).then((d) => ({ kind: 'own', d })).catch(() => ({ kind: 'own', d: null })),
+        ...artists.map((a) => {
+          const artistId = a.profileId || a.id;
+          return apiService.getActionSummary(user.id, { artistProfileId: artistId })
+            .then((d) => ({ kind: 'artist', artistId, d }))
+            .catch(() => ({ kind: 'artist', artistId, d: null }));
+        }),
+      ];
+      const results = await Promise.all(tasks);
+      if (cancelled) return;
+      const map = {};
+      let own = false;
+      for (const r of results) {
+        const has = Array.isArray(r.d?.items) && r.d.items.length > 0;
+        if (r.kind === 'own') own = has;
+        else map[r.artistId] = has;
+      }
+      setOwnHasActions(own);
+      setArtistActionsMap(map);
+    };
+    loadActionFlags();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.role, user?.representingArtists?.length]);
 
   // Fetch representation status for artists
   useEffect(() => {
@@ -437,6 +478,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
             <button
               className="btn btn-outline btn-full-width"
               onClick={() => setShowManageProfile(true)}
+              style={{ position: 'relative' }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}>
                 <rect x="3" y="3" width="7" height="7"></rect>
@@ -445,6 +487,21 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 <rect x="3" y="14" width="7" height="7"></rect>
               </svg>
               Manage
+              {ownHasActions && (
+                <span
+                  aria-label="Actions required"
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '10px',
+                    width: '8px',
+                    height: '8px',
+                    background: '#FF3366',
+                    borderRadius: '50%',
+                    boxShadow: '0 0 6px rgba(255, 51, 102, 0.6)',
+                  }}
+                />
+              )}
             </button>
             {user?.role === 'ARTIST' && (
               <button
@@ -504,8 +561,24 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                       e.stopPropagation();
                       setManagingArtist(artist);
                     }}
+                    style={{ position: 'relative' }}
                   >
                     Manage
+                    {artistActionsMap[artist.profileId || artist.id] && (
+                      <span
+                        aria-label="Actions required"
+                        style={{
+                          position: 'absolute',
+                          top: '4px',
+                          right: '6px',
+                          width: '7px',
+                          height: '7px',
+                          background: '#FF3366',
+                          borderRadius: '50%',
+                          boxShadow: '0 0 5px rgba(255, 51, 102, 0.7)',
+                        }}
+                      />
+                    )}
                   </button>
                 </div>
               </div>

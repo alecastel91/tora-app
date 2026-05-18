@@ -3,7 +3,7 @@ import NotificationDropdown from './NotificationDropdown';
 import { BellIcon, GearIcon, StarIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
 
-const Header = ({ onOpenSettings, onOpenPremium, accountUser }) => {
+const Header = ({ onOpenSettings, onOpenPremium, accountUser, onSwitchTab }) => {
   const { notifications, clearNotificationDot, user } = useAppContext();
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotificationDot, setHasNotificationDot] = useState(true);
@@ -70,9 +70,10 @@ const Header = ({ onOpenSettings, onOpenPremium, accountUser }) => {
           <GearIcon />
         </button>
         {showNotifications && (
-          <NotificationDropdown 
+          <NotificationDropdown
             onClose={() => setShowNotifications(false)}
             onClearNotifications={() => setHasNotificationDot(false)}
+            onSwitchTab={onSwitchTab}
           />
         )}
       </div>

@@ -23,6 +23,55 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 15-19, 2026)
+
+### Contract sign-and-send flow (replaces old "send then sign" two-step)
+The old `apiService.sendContract(...)` flow was replaced with a combined `sendAndSignContract(...)` so the sender pre-signs at delivery time. A second flow `confirmPaymentReceipt(...)` lets the artist side acknowledge incoming payments.
+
+- `SignContractModal.js` now supports both modes (`sign` for recipient, `sign-and-send` for sender) via a `mode` prop. Type tab dropped — the modal renders one signature canvas (`react-signature-canvas`) plus a required Full Legal Name field above. Type-as-signature was redundant since the legal name is the binding identifier.
+- View-required gate: the recipient must open the contract PDF at least once before they can sign. `viewConfirmedSignal` is bumped by the PdfViewer's `onLoaded` callback so closing the modal before the PDF actually loads does NOT count. The state persists across the chat-card open + sign-modal open via `deal.contract.viewedBy[]`.
+- Per-deal `signerCapacity` (`As Artist` / `As Venue/Promoter` / `As Agent on behalf of {artist}`) is computed by `utils/contractSigner.js#deriveSignerCapacity` and shown in the modal + included in every signature record.
+- After both parties sign (FULLY_SIGNED), backend generates a Certificate of Completion PDF + emails the signed contract + certificate to all parties (separately, one email per recipient — venue can't see the artist's email and vice versa).
+- Contract card in chat collapses sent/withdrawn/partial-signed/fully-signed into a single card whose icon + text + action buttons change based on `_withdrawn` / `_signedByOne` / `_fullySigned` flags computed in `getFilteredMessages`. No more separate withdrawal cards.
+
+### Documents — consolidated Share + Skip
+The four per-type Share/Skip Press Kit / Tech Rider buttons were replaced with a single **Share Documents** + single **Skip Documents** CTA. A unified modal shows three sections (Press Kit, Technical Rider, **Hospitality Rider** — new type). Each section shows status (`shared` / `skipped` / `pending`), the picker for pending categories, and an empty state pointing to **Profile > Manage > Documents**.
+
+- For agent-led deals the picker pulls from `artistProfile.documents.*` (fetched once when the modal opens), not the agent's own library. ManageProfileScreen + ManageArtistScreen both grew a Hospitality Rider category alongside Press Kit / Technical Rider.
+- Booking card recap pills show "✓ Press Kit shared · — Tech Rider skipped · · Hospitality Rider pending".
+- Sharing/skipping creates per-event chat system messages and routes via `getRecipientId` so agent-led deals reach the agent, not the artist.
+
+### Payment flow — proof, accumulation, confirmation
+- `apiService.updatePayment` is now multipart; **proof file required** (PDF or image, ≤10MB). Stored in Supabase Storage under `payment-proofs/{profileId}/...` (same bucket as contracts, separate prefix). Hashed with SHA-256.
+- Deposits accumulate: each `Mark Deposit Paid` appends to `deal.payment.depositHistory[]` with its own `{amount, date, proof, paidBy, confirmedAt}`. `depositAmount` is the running sum. Auto-promotes to FULLY_PAID when cumulative deposits reach the fee.
+- Custom deposit amount (was hardcoded 50%).
+- Each payment proof is auth-gated by `GET /api/deals/:dealId/payment-proof?type=deposit|full&index=N` which proxies the bytes (not redirect) — image tags can't follow cross-origin redirects without breaking.
+- Artist side has a **Confirm receipt** flow (`PUT /api/deals/:dealId/confirm-payment-receipt`) per installment + full payment. Step 4 of the WorkflowTimeline ticks ✓ only after confirmation; the progress bar has two layers (dark green = confirmed, light green = marked-but-pending).
+- New `payment_to_confirm_received` action item — Manage CTA dots on ProfileScreen (own + per-represented-artist) light up when there's anything to do.
+- `Update Payment` button on the venue side is gated to unlock once the artist has signed (`ARTIST_SIGNED` / `VENUE_SIGNED` / `FULLY_SIGNED` / skipped). Pre-launch industry workflow: booker pays deposit once artist commits, then both countersign.
+
+### PdfViewer + image proof viewer
+- New `components/common/PdfViewer.js` wraps `react-pdf` with zoom controls, all-pages stacked layout, dark theme.
+- Contract opens, payment-proof opens, contract-from-chat opens all go through one of two modals (PDF or image) rendered via `createPortal` to `document.body`. iOS Safari clips position:fixed children when their `.app-container` ancestor has `overflow:hidden + max-width`; portal escapes that. `100dvh` instead of `100vh` so the URL bar doesn't push the close X off-screen.
+- Backend Helmet config relaxed to `Cross-Origin-Resource-Policy: cross-origin` so `<img src>` works across dev's port:3002 → port:5002 boundary.
+
+### Other behavioural changes
+- Status badge on booking cards now reflects highest **voluntarily-completed** step: `PENDING → NEGOTIATING → ACCEPTED → CONTRACT SIGNED → DOCS SHARED → COMPLETED`. Skipping a step does NOT promote the label (skip is not "done"), but the action UI advances regardless.
+- "Via {agent} · Agent" sub-line on the booker's card now requires `deal.bookedArtistId` set — was incorrectly showing on direct bookings whenever the artist had any agent on file.
+- Artist side never sees "Sign Contract" — they only send. Side-based gate replaced fragile per-signature `signedBy === currentUser.id` matching that broke across profile switches.
+- 429 from `/auth/me` no longer logs the user out — only 401/403 clears the token. Dev rate limit raised 100 → 600 req/min; prod stays at 100.
+- Notifications now route to the relevant tab (bookings vs messages) when clicked. Manage CTAs show a pink dot when actions are pending for that profile.
+- Email pipeline: separate sends per recipient (no shared To-list — keeps the parties from emailing each other off-platform). TORA-branded HTML matching the application-received family, signed contract + Certificate of Completion both attached, links to `app.torahub.io`.
+
+### Simplify pass (cleanup, no behaviour change)
+- New shared utils: `src/utils/documentCategories.js`, `src/utils/paymentSummary.js`, `src/utils/urls.js`, `src/utils/contractSigner.js`. Backend mirror at `tora-backend-sql/src/utils/documentCategories.js`. Replaced ~6 inline string-array duplicates, 3 copies of payment math, and 2 copies of the URL builder.
+- `summarizeDealPayment(deal)` is now the single source for marked vs confirmed totals — previously WorkflowTimeline, BookingsScreen recap pill, and the deposit-history modal each had their own copy and drifted.
+- `isArtistSide` extracted in backend (`utils/dealParticipants.js`) — collapsed 5 inline copies in `routes/deals.js`.
+- `contractStorage._uploadToBucket` shared by `uploadContract` and `uploadPaymentProof`.
+- WorkflowTimeline derivations wrapped in `useMemo` keyed on the deal (avoids re-running reduces per Bookings card on every parent render).
+- ProfileScreen action-flags fetch now runs self + all represented artists in a single `Promise.all` (was sequential).
+- 41/41 backend tests still pass after the refactor.
+
 ## Recent Updates (May 13-14, 2026)
 
 ### Agent ↔ artist deal dynamics — conceptual model

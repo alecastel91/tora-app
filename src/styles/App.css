@@ -1633,7 +1633,9 @@
   border-radius: 12px;
   width: 90%;
   max-width: 428px;
-  max-height: 85vh;
+  /* dvh accounts for iOS Safari's URL bar — 85vh can push the close X
+     under the browser chrome on mobile. */
+  max-height: 85dvh;
   overflow-y: auto;
   margin: 20px;
   z-index: 1002;
@@ -5758,6 +5760,30 @@
   border-color: var(--primary-pink);
 }
 
+/* Frame-less link-style action — used for "Skip ..." options sitting
+   next to a primary CTA. Reads as the second, lower-weight option. */
+.btn-skip {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  padding: 6px 10px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-skip:hover:not(:disabled) {
+  color: #fff !important;
+  background: transparent !important;
+}
+
+.btn-skip:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 /* Fixed Profile Indicator */
 .fixed-profile-indicator {
   margin-top: 10px;
@@ -9846,7 +9872,7 @@ textarea.form-textarea:focus {
 
 .party-via-agent {
   font-size: 10px;
-  color: rgba(255, 51, 102, 0.65);
+  color: rgba(255, 255, 255, 0.45);
   margin: 2px 0 4px 0;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 500;
@@ -10028,10 +10054,19 @@ textarea.form-textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 12px !important;
-  font-size: 13px;
+  gap: 6px;
+  padding: 7px 12px !important;
+  font-size: 11px;
   line-height: 1.2;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.btn-chat svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
 }
 
 .btn-delete-offer-expanded {
@@ -10186,12 +10221,21 @@ textarea.form-textarea:focus {
   text-overflow: ellipsis;
 }
 
-.btn-view-offer {
+.btn-view-offer,
+.btn-card-action {
   white-space: nowrap;
-  padding: 8px 14px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
   flex-shrink: 0;
+}
+
+.btn-card-action svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
 }
 
 .offer-card-actions {
@@ -10810,6 +10854,10 @@ textarea.form-textarea:focus {
   justify-content: center;
   z-index: 10000;
   animation: fadeIn 0.2s ease;
+  /* Allow the overlay itself to scroll on small viewports so a tall
+     modal (with cap of 90dvh) never traps the close button off-screen. */
+  overflow-y: auto;
+  padding: 20px;
 }
 
 .delete-modal {
@@ -10818,6 +10866,10 @@ textarea.form-textarea:focus {
   border-radius: 16px;
   width: 90%;
   max-width: 400px;
+  /* dvh-based cap so iOS Safari's URL bar doesn't push the bottom under
+     the browser chrome. Inner sections handle their own scroll. */
+  max-height: 90dvh;
+  overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease;
 }

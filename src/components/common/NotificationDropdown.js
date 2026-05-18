@@ -2,11 +2,31 @@ import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAppContext } from '../../contexts/AppContext';
 
-const NotificationDropdown = ({ onClose, onClearNotifications }) => {
+// Notification type → which tab to navigate to when the user clicks the row.
+const TYPE_TO_TAB = {
+  // Booking workflow
+  OFFER_RECEIVED: 'bookings',
+  COUNTER_OFFER: 'bookings',
+  BOOKING_ACCEPTED: 'bookings',
+  BOOKING_DECLINED: 'bookings',
+  CONTRACT_SENT: 'bookings',
+  CONTRACT_SIGNED: 'bookings',
+  CONTRACT_FULLY_SIGNED: 'bookings',
+  CONTRACT_WITHDRAWN: 'bookings',
+  DOCUMENT_SHARED: 'bookings',
+  PAYMENT_RECEIVED: 'bookings',
+  // Connections / messaging
+  CONNECTION_REQUEST: 'messages',
+  CONNECTION_ACCEPTED: 'messages',
+  REPRESENTATION_REQUEST: 'messages',
+  REPRESENTATION_ACCEPTED: 'messages',
+  NEW_MESSAGE: 'messages',
+};
+
+const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) => {
   const { t } = useLanguage();
   const { notifications } = useAppContext();
 
-  // Helper to format time ago
   const getTimeAgo = (timestamp) => {
     const now = new Date();
     const notifTime = new Date(timestamp);
@@ -21,6 +41,14 @@ const NotificationDropdown = ({ onClose, onClearNotifications }) => {
     return `${diffDays} ${t('notifications.daysAgo') || 'd ago'}`;
   };
 
+  const handleNotificationClick = (notif) => {
+    const tab = TYPE_TO_TAB[notif.type];
+    if (tab && onSwitchTab) {
+      onSwitchTab(tab);
+    }
+    if (onClose) onClose();
+  };
+
   return (
     <div className="notifications-dropdown">
       <div className="notifications-header">
@@ -29,12 +57,23 @@ const NotificationDropdown = ({ onClose, onClearNotifications }) => {
       </div>
       <div className="notifications-list">
         {notifications && notifications.length > 0 ? (
-          notifications.map(notif => (
-            <div key={notif.id} className="notification-item">
-              <p>{notif.message || notif.text}</p>
-              <span className="notification-time">{getTimeAgo(notif.createdAt || notif.timestamp)}</span>
-            </div>
-          ))
+          notifications.map((notif) => {
+            const routable = !!TYPE_TO_TAB[notif.type];
+            return (
+              <div
+                key={notif.id}
+                className="notification-item"
+                onClick={() => handleNotificationClick(notif)}
+                style={{ cursor: routable ? 'pointer' : 'default' }}
+                role={routable ? 'button' : undefined}
+                tabIndex={routable ? 0 : undefined}
+                onKeyDown={(e) => { if (routable && (e.key === 'Enter' || e.key === ' ')) handleNotificationClick(notif); }}
+              >
+                <p>{notif.message || notif.text}</p>
+                <span className="notification-time">{getTimeAgo(notif.createdAt || notif.timestamp)}</span>
+              </div>
+            );
+          })
         ) : (
           <div className="notification-item empty">
             <p>{t('notifications.noNotifications') || 'No notifications'}</p>
