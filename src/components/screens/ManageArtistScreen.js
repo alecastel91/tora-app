@@ -3,10 +3,12 @@ import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, Briefca
 import Modal from '../common/Modal';
 import RAEventsModal from '../common/RAEventsModal';
 import AddContractModal from '../common/AddContractModal';
+import PdfViewerModal from '../common/PdfViewerModal';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
 import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
+import { getAuthedBackendUrl } from '../../utils/urls';
 
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -98,6 +100,17 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const [editingDoc, setEditingDoc] = useState(null);
   const [docCategory, setDocCategory] = useState(''); // pressKit, technicalRider, contracts
   const [newDoc, setNewDoc] = useState({ title: '', url: '' });
+  const [pdfViewerUrl, setPdfViewerUrl] = useState(null);
+
+  const openDocument = (doc) => {
+    if (!doc?.url) return;
+    const isBackendFile = doc.type === 'upload' || doc.url.startsWith('/api/') || doc.url.includes('/api/contracts/files/');
+    if (isBackendFile) {
+      setPdfViewerUrl(getAuthedBackendUrl(doc.url, user?.id));
+    } else {
+      window.open(doc.url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   // Fetch upcoming gigs and YTD revenue from backend
   useEffect(() => {
@@ -1582,7 +1595,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         updatedDocuments[docCategory][index] = {
           ...editingDoc,
           title: newDoc.title,
-          url: newDoc.url
+          url: newDoc.url,
+          addedDate: new Date().toISOString()
         };
       }
     } else {
@@ -1693,10 +1707,20 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           <h3>{icon} {title}</h3>
           {documents[category].length > 0 && (
             <button
-              className="btn btn-primary btn-sm"
               onClick={() => handleAddDocument(category)}
+              aria-label={`Add ${title}`}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#fff',
+                fontSize: '22px',
+                fontWeight: 700,
+                lineHeight: 1,
+                padding: '4px 8px',
+                cursor: 'pointer',
+              }}
             >
-              + Add
+              +
             </button>
           )}
         </div>
@@ -1719,8 +1743,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               className="btn btn-primary"
               onClick={() => handleAddDocument(category)}
               style={{
-                padding: '10px 20px',
-                fontSize: '14px'
+                padding: '8px 16px',
+                fontSize: '12px'
               }}
             >
               + Add
@@ -1733,22 +1757,24 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 <div className="doc-info" style={{ flex: 1, minWidth: 0 }}>
                   <div className="doc-name">{doc.title}</div>
                   <div className="doc-meta">
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: '#FF3366',
-                        textDecoration: 'none',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        display: 'block',
-                        marginBottom: '4px'
-                      }}
-                    >
-                      {doc.url}
-                    </a>
+                    {doc.url && (
+                      <button
+                        type="button"
+                        onClick={() => openDocument(doc)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          padding: 0,
+                          color: '#FF3366',
+                          textDecoration: 'none',
+                          marginBottom: '4px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {doc.type === 'upload' || doc.url.startsWith('/api/') ? 'View file' : 'Open link ↗'}
+                      </button>
+                    )}
                     {doc.addedDate && (
                       <div style={{
                         color: '#666',
@@ -1759,7 +1785,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                     )}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0 }}>
                   <button
                     className="btn btn-outline btn-sm"
                     onClick={() => handleEditDocument(category, doc)}
@@ -2847,15 +2873,20 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           const updatedDocuments = { ...documents };
 
           if (editingDoc) {
-            // Edit existing document
+            // Edit existing document. AddContractModal uploads the file
+            // first and returns documentData.url (backend proxy path) — we
+            // store that for both upload and link types so the doc is
+            // viewable later. If editing without changing the file, fall
+            // back to the previous url.
             const index = updatedDocuments[docCategory].findIndex(d => d.id === editingDoc.id);
             if (index !== -1) {
               updatedDocuments[docCategory][index] = {
                 ...editingDoc,
                 title: documentData.title,
-                url: documentData.type === 'link' ? documentData.url : null,
-                file: documentData.type === 'upload' ? (documentData.keepExistingFile ? editingDoc.file : documentData.file) : null,
-                type: documentData.type // 'upload' or 'link'
+                url: documentData.url || editingDoc.url || null,
+                storagePath: documentData.storagePath || editingDoc.storagePath || null,
+                type: documentData.type, // 'upload' or 'link'
+                addedDate: new Date().toISOString()
               };
             }
           } else {
@@ -2863,8 +2894,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             const newDocument = {
               id: Date.now().toString(),
               title: documentData.title,
-              url: documentData.type === 'link' ? documentData.url : null,
-              file: documentData.type === 'upload' ? documentData.file : null,
+              url: documentData.url || null,
+              storagePath: documentData.storagePath || null,
               type: documentData.type, // 'upload' or 'link'
               addedDate: new Date().toISOString()
             };
@@ -2893,6 +2924,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           setEditingDoc(null);
         }}
       />
+
+      <PdfViewerModal url={pdfViewerUrl} onClose={() => setPdfViewerUrl(null)} />
     </div>
   );
 };

@@ -8,8 +8,10 @@ import MakeOfferModal from '../common/MakeOfferModal';
 import SignContractModal from '../common/SignContractModal';
 import ContractViewer from '../common/ContractViewer';
 import AddContractModal from '../common/AddContractModal';
-import PdfViewer from '../common/PdfViewer';
+import ShareDocumentsModal from '../common/ShareDocumentsModal';
+import PdfViewerModal from '../common/PdfViewerModal';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
+import { DOC_CATEGORY_KEYS } from '../../utils/documentCategories';
 import { getAuthedBackendUrl } from '../../utils/urls';
 
 const ChatScreen = ({ user, onClose, onOpenProfile }) => {
@@ -60,6 +62,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   // Bumped when the PdfViewer reports a successful PDF load — used as a
   // "really viewed" signal to gate the sign modal's submit.
   const [viewConfirmedSignal, setViewConfirmedSignal] = useState(0);
+  // Deal IDs whose contract the user opened from a chat card during this
+  // session. Used to unlock the sign modal immediately without waiting for
+  // the async trackContractView round-trip to land in the DB.
+  const [locallyViewedDealIds, setLocallyViewedDealIds] = useState(() => new Set());
+  // Share-documents modal state — opened from the fully-signed contract
+  // card so the artist side can pick docs without leaving the chat.
+  const [shareDocsDeal, setShareDocsDeal] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -107,8 +116,23 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         documentAttachment: msg.documentAttachment || null
       }));
 
-      // Only update state when something actually changed — avoids
-      // unnecessary re-renders that fight with scroll position and input focus
+      // Backend now embeds the linked deal on each message, so we can
+      // build dealStatuses from the same response — no second round-trip.
+      const embeddedStatuses = {};
+      for (const msg of (response.messages || [])) {
+        if (msg.dealId && msg.deal && !embeddedStatuses[msg.dealId]) {
+          embeddedStatuses[msg.dealId] = {
+            status: msg.deal.status,
+            declineReason: msg.deal.declineReason,
+            declinedBy: msg.deal.declinedBy,
+            deal: msg.deal,
+          };
+        }
+      }
+
+      // Update messages + deal statuses in the same render so chat cards
+      // appear with their bottom-row CTAs already wired. React 18 batches
+      // adjacent setStates so this resolves in a single commit.
       setUserMessages(prev => {
         if (prev.length !== transformedMessages.length) return transformedMessages;
         const lastPrev = prev[prev.length - 1];
@@ -116,30 +140,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         if (lastPrev?.timestamp !== lastNew?.timestamp) return transformedMessages;
         return prev;
       });
-
-      // Fetch deal statuses for all messages with dealId
-      const dealIds = transformedMessages
-        .filter(msg => msg.dealId)
-        .map(msg => msg.dealId);
-
-      if (dealIds.length > 0) {
-        const statuses = {};
-        await Promise.all(
-          dealIds.map(async (dealId) => {
-            try {
-              const dealResponse = await apiService.getDeal(dealId, currentUser.id);
-              const deal = dealResponse.deal || dealResponse;
-              statuses[dealId] = {
-                status: deal.status,
-                declineReason: deal.declineReason,
-                declinedBy: deal.declinedBy
-              };
-            } catch (error) {
-              console.error(`Error fetching deal ${dealId}:`, error);
-            }
-          })
-        );
-        setDealStatuses(statuses);
+      if (Object.keys(embeddedStatuses).length > 0) {
+        setDealStatuses(embeddedStatuses);
       }
 
       // Fetch connection request details for all messages with connectionRequestId
@@ -930,18 +932,31 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               // Contract workflow card. If the contract was later withdrawn,
               // we render the same card in a muted "withdrawn" state with
               // the action buttons removed.
+              (() => {
+                const cachedDealForDocs = dealStatuses[msg.dealId]?.deal;
+                const pendingDocCategories = msg._fullySigned && cachedDealForDocs && isArtistSideForDeal(cachedDealForDocs, currentUser)
+                  ? DOC_CATEGORY_KEYS.filter((k) => {
+                      const entry = cachedDealForDocs.sharedDocuments?.[k];
+                      return !entry?.documentId && !entry?.skipped;
+                    })
+                  : [];
+                const showDocActions = pendingDocCategories.length > 0;
+                return (
               <div className="message-with-timestamp">
                 <div
                   className="offer-card-message"
-                  style={msg._withdrawn ? { borderLeft: '3px solid rgba(255, 165, 0, 0.6)', opacity: 0.85 } : {}}
+                  style={{
+                    ...(msg._withdrawn ? { borderLeft: '3px solid rgba(255, 165, 0, 0.6)', opacity: 0.85 } : {}),
+                    ...(showDocActions ? { flexDirection: 'column', alignItems: 'stretch' } : {}),
+                  }}
                 >
+                  <div style={showDocActions ? { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%' } : { display: 'contents' }}>
                   <div className="offer-card-content" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '6px', gap: '12px' }}>
                       <div
                         className="offer-card-icon"
                         style={{
-                          backgroundColor: msg._withdrawn ? 'rgba(255, 165, 0, 0.15)' : 'rgba(138, 43, 226, 0.15)',
-                          color: msg._withdrawn ? 'rgba(255, 165, 0, 1)' : undefined,
+                          color: msg._withdrawn ? 'rgba(255, 165, 0, 1)' : 'rgba(138, 43, 226, 1)',
                         }}
                       >
                         {msg._withdrawn ? (
@@ -978,6 +993,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             // Defer trackContractView until PdfViewer fires
                             // onLoaded — closing before load shouldn't count.
                             setPdfViewerTrackDealId(msg.dealId || null);
+                            if (msg.dealId) {
+                              setLocallyViewedDealIds((prev) => {
+                                if (prev.has(msg.dealId)) return prev;
+                                const next = new Set(prev);
+                                next.add(msg.dealId);
+                                return next;
+                              });
+                            }
                           }}
                           className="btn btn-outline btn-card-action"
                           style={{ flex: 1 }}
@@ -991,12 +1014,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             // Pre-check whether this profile has already viewed
                             // the contract anywhere — if so, the sign modal
                             // unlocks immediately without forcing a re-open.
-                            let initiallyViewed = false;
-                            try {
-                              const deal = await apiService.getDeal(msg.dealId);
-                              const viewedBy = deal?.contract?.viewedBy || [];
-                              initiallyViewed = viewedBy.some((v) => v.profile === currentUser.id);
-                            } catch (_) { /* default to false */ }
+                            // Trust the local "opened in this session" flag
+                            // first so the trackContractView race can't strand
+                            // a user who just clicked Open seconds ago.
+                            let initiallyViewed = locallyViewedDealIds.has(msg.dealId);
+                            if (!initiallyViewed) {
+                              try {
+                                const deal = await apiService.getDeal(msg.dealId);
+                                const viewedBy = deal?.contract?.viewedBy || [];
+                                initiallyViewed = viewedBy.some((v) => v.profile === currentUser.id);
+                              } catch (_) { /* default to false */ }
+                            }
                             setSelectedContractData({
                               dealId: msg.dealId,
                               contractUrl: msg.documentAttachment.url,
@@ -1053,9 +1081,52 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       View Contract
                     </button>
                   )}
+                  </div>
+                  {showDocActions && (
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      marginTop: '10px',
+                      paddingTop: '10px',
+                      borderTop: '1px solid rgba(255,255,255,0.08)',
+                    }}>
+                      <span style={{ fontSize: '11px', color: '#888', marginRight: 'auto' }}>
+                        Documents pending
+                      </span>
+                      <button
+                        className="btn btn-skip"
+                        onClick={async () => {
+                          const labels = { pressKit: 'Press Kit', technicalRider: 'Technical Rider', hospitalityRider: 'Hospitality Rider' };
+                          const list = pendingDocCategories.map((k) => labels[k]).join(', ');
+                          if (!window.confirm(`Skip ${list} for this booking?`)) return;
+                          try {
+                            for (const cat of pendingDocCategories) {
+                              // eslint-disable-next-line no-await-in-loop
+                              await apiService.skipDocument(msg.dealId, currentUser.id, cat);
+                            }
+                            await fetchMessages();
+                          } catch (err) {
+                            alert(err.message || 'Failed to skip documents');
+                          }
+                        }}
+                      >
+                        Skip
+                      </button>
+                      <button
+                        className="btn btn-primary btn-card-action"
+                        onClick={() => setShareDocsDeal(cachedDealForDocs)}
+                      >
+                        Share Documents
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <span className="message-timestamp">{formatMessageTime(msg.timestamp)}</span>
               </div>
+                );
+              })()
             ) : msg.isSystem && msg.dealId && msg.documentAttachment && ['pressKit','technicalRider','hospitalityRider'].includes(msg.documentAttachment.category) ? (
               (() => {
                 const labelByCategory = { pressKit: 'Press Kit', technicalRider: 'Technical Rider', hospitalityRider: 'Hospitality Rider' };
@@ -1063,7 +1134,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   <div className="message-with-timestamp">
                     <div className="offer-card-message">
                       <div className="offer-card-content">
-                        <div className="offer-card-icon" style={{ backgroundColor: 'rgba(80,200,120,0.15)', color: 'rgba(80,200,120,1)' }}>
+                        <div className="offer-card-icon" style={{ color: 'rgba(80,200,120,1)' }}>
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                           </svg>
@@ -1092,7 +1163,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   <div className="message-with-timestamp">
                     <div className="offer-card-message" style={{ borderLeft: '3px solid rgba(255, 255, 255, 0.15)', opacity: 0.9 }}>
                       <div className="offer-card-content">
-                        <div className="offer-card-icon" style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#888' }}>
+                        <div className="offer-card-icon" style={{ color: '#888' }}>
                           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                           </svg>
@@ -1114,7 +1185,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   <div className="message-with-timestamp">
                     <div className="offer-card-message" style={{ borderLeft: '3px solid rgba(80,200,120,0.5)' }}>
                       <div className="offer-card-content">
-                        <div className="offer-card-icon" style={{ backgroundColor: 'rgba(80,200,120,0.15)', color: 'rgba(80,200,120,1)' }}>
+                        <div className="offer-card-icon" style={{ color: 'rgba(80,200,120,1)' }}>
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="12" y1="1" x2="12" y2="23"></line>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -1143,51 +1214,108 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 // For decline/accept cards, sender of the message is the one who acted
                 const displayName = msg.isMe ? 'You' : user.name;
 
+                const cachedDeal = dealStatuses[msg.dealId]?.deal;
+                const showContractActions = isAccepted
+                  && cachedDeal
+                  && isArtistSideForDeal(cachedDeal, currentUser)
+                  && (!cachedDeal.contract?.status || cachedDeal.contract.status === 'NOT_SENT');
+
                 return (
                   <div className="message-with-timestamp">
-                    <div className="offer-card-message">
-                      <div className="offer-card-content">
-                        <div className={`offer-card-icon ${isDeclined ? 'declined-offer-icon' : isAccepted ? 'accepted-offer-icon' : ''}`}>
-                          {isDeclined ? (
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="15" y1="9" x2="9" y2="15"></line>
-                              <line x1="9" y1="9" x2="15" y2="15"></line>
-                            </svg>
-                          ) : isAccepted ? (
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <polyline points="9 12 11 14 15 10"></polyline>
-                            </svg>
-                          ) : (
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                              <line x1="16" y1="2" x2="16" y2="6"></line>
-                              <line x1="8" y1="2" x2="8" y2="6"></line>
-                              <line x1="3" y1="10" x2="21" y2="10"></line>
-                              <polygon points="12,11.5 13.2,14 15.8,14.3 13.9,16.1 14.4,18.7 12,17.4 9.6,18.7 10.1,16.1 8.2,14.3 10.8,14" fill="currentColor" stroke="none"></polygon>
-                            </svg>
-                          )}
+                    <div
+                      className="offer-card-message"
+                      style={showContractActions ? { flexDirection: 'column', alignItems: 'stretch' } : undefined}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%' }}>
+                        <div className="offer-card-content">
+                          <div className={`offer-card-icon ${isDeclined ? 'declined-offer-icon' : isAccepted ? 'accepted-offer-icon' : ''}`}>
+                            {isDeclined ? (
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                              </svg>
+                            ) : isAccepted ? (
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="9 12 11 14 15 10"></polyline>
+                              </svg>
+                            ) : (
+                              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                <polygon points="12,11.5 13.2,14 15.8,14.3 13.9,16.1 14.4,18.7 12,17.4 9.6,18.7 10.1,16.1 8.2,14.3 10.8,14" fill="currentColor" stroke="none"></polygon>
+                              </svg>
+                            )}
+                          </div>
+                          <div className="offer-card-text">
+                            <p className="offer-card-name">{displayName}</p>
+                            <p className="offer-card-action">
+                              {isDeclined ? 'declined offer' : isAccepted ? 'accepted offer' : 'sent an offer'}
+                            </p>
+                          </div>
                         </div>
-                        <div className="offer-card-text">
-                          <p className="offer-card-name">{displayName}</p>
-                          <p className="offer-card-action">
-                            {isDeclined ? 'declined offer' : isAccepted ? 'accepted offer' : 'sent an offer'}
-                          </p>
-                        </div>
+                        <button
+                          className="btn btn-outline btn-view-offer"
+                          onClick={() => {
+                            if (isDeclined) {
+                              handleViewDeclineReason(msg.dealId);
+                            } else {
+                              handleViewOffer(msg.dealId);
+                            }
+                          }}
+                        >
+                          {isDeclined ? 'View Reason' : 'View Details'}
+                        </button>
                       </div>
-                      <button
-                        className="btn btn-outline btn-view-offer"
-                        onClick={() => {
-                          if (isDeclined) {
-                            handleViewDeclineReason(msg.dealId);
-                          } else {
-                            handleViewOffer(msg.dealId);
-                          }
-                        }}
-                      >
-                        {isDeclined ? 'View Reason' : 'View Details'}
-                      </button>
+                      {showContractActions && (
+                        <div style={{
+                          display: 'flex',
+                          gap: '8px',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          marginTop: '10px',
+                          paddingTop: '10px',
+                          borderTop: '1px solid rgba(255,255,255,0.08)',
+                        }}>
+                          <span style={{ fontSize: '11px', color: '#888', marginRight: 'auto' }}>
+                            Contract pending
+                          </span>
+                          <button
+                            className="btn btn-skip"
+                            onClick={async () => {
+                              if (!window.confirm('Skip contract stage? You can still share documents and proceed.')) return;
+                              try {
+                                await apiService.skipContract(msg.dealId, currentUser.id);
+                                await fetchMessages();
+                              } catch (err) {
+                                alert(err.message || 'Failed to skip contract');
+                              }
+                            }}
+                          >
+                            Skip
+                          </button>
+                          <button
+                            className="btn btn-primary btn-card-action"
+                            onClick={async () => {
+                              try {
+                                setSelectedOffer(cachedDeal);
+                                if (cachedDeal.bookedArtistId) {
+                                  const profile = await apiService.getProfile(cachedDeal.bookedArtistId);
+                                  setSelectedArtistForDocs(profile);
+                                }
+                                setShowAddContractModal(true);
+                              } catch (err) {
+                                alert(err.message || 'Failed to open contract flow');
+                              }
+                            }}
+                          >
+                            Send Contract
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <span className="message-timestamp">{formatMessageTime(msg.timestamp)}</span>
                   </div>
@@ -2745,6 +2873,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         />
       )}
 
+      <ShareDocumentsModal
+        isOpen={!!shareDocsDeal}
+        deal={shareDocsDeal}
+        currentUser={currentUser}
+        onClose={() => setShareDocsDeal(null)}
+        onDealUpdated={() => { fetchMessages(); }}
+      />
+
       {pendingContractToSign && (
         <SignContractModal
           isOpen={true}
@@ -2773,142 +2909,24 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         />
       )}
 
-      {pdfViewerUrl && (() => {
-        const pathPart = decodeURIComponent(
-          pdfViewerUrl.split('/api/contracts/files/')[1]?.split('?')[0] || ''
-        );
-        const rawName = pathPart.split('/').pop() || 'document.pdf';
-        const filename = rawName.replace(/^\d+-[a-z0-9]+-/, '');
-        const iconBtnStyle = {
-          background: 'transparent',
-          border: 'none',
-          color: 'inherit',
-          width: '36px',
-          height: '36px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          borderRadius: '8px',
-          padding: 0,
-        };
-        return (
-        <div
-          className="modal-overlay"
-          onClick={() => { setPdfViewerUrl(null); setPdfViewerTrackDealId(null); }}
-          style={{ padding: 0 }}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              height: '100%',
-              maxWidth: '100vw',
-              maxHeight: '100vh',
-              padding: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              borderRadius: 0,
-            }}
-          >
-            <div
-              className="modal-header"
-              style={{ padding: '12px 16px', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '12px' }}
-            >
-              <h3
-                title={filename}
-                style={{
-                  margin: 0,
-                  flex: 1,
-                  minWidth: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                }}
-              >
-                {filename}
-              </h3>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
-                <button
-                  type="button"
-                  title="Download"
-                  aria-label="Download"
-                  style={iconBtnStyle}
-                  onClick={async () => {
-                    try {
-                      const response = await fetch(pdfViewerUrl);
-                      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                      const blob = await response.blob();
-                      const blobUrl = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = blobUrl;
-                      a.download = filename;
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(blobUrl);
-                    } catch (err) {
-                      alert('Download failed. Try "Open in new tab" and save from there.');
-                    }
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                </button>
-                <a
-                  href={pdfViewerUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Open in new tab"
-                  aria-label="Open in new tab"
-                  style={{ ...iconBtnStyle, textDecoration: 'none' }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-                <button
-                  type="button"
-                  title="Close"
-                  aria-label="Close"
-                  style={iconBtnStyle}
-                  onClick={() => { setPdfViewerUrl(null); setPdfViewerTrackDealId(null); }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <PdfViewer
-              url={pdfViewerUrl}
-              onLoaded={() => {
-                setViewConfirmedSignal((n) => n + 1);
-                // Chat-card path: parent owns the server-side tracking.
-                // Sign-modal path: pdfViewerTrackDealId is null and the
-                // sign modal's own onContractViewed callback handles tracking.
-                if (pdfViewerTrackDealId) {
-                  contractService.trackContractView(
-                    pdfViewerTrackDealId,
-                    currentUser.id,
-                    0,
-                    localStorage.getItem('token'),
-                  ).catch((err) => console.error('Failed to track view:', err));
-                }
-              }}
-            />
-          </div>
-        </div>
-        );
-      })()}
+      <PdfViewerModal
+        url={pdfViewerUrl}
+        onClose={() => { setPdfViewerUrl(null); setPdfViewerTrackDealId(null); }}
+        onLoaded={() => {
+          setViewConfirmedSignal((n) => n + 1);
+          // Chat-card path: parent owns the server-side tracking.
+          // Sign-modal path: pdfViewerTrackDealId is null and the
+          // sign modal's own onContractViewed callback handles tracking.
+          if (pdfViewerTrackDealId) {
+            contractService.trackContractView(
+              pdfViewerTrackDealId,
+              currentUser.id,
+              0,
+              localStorage.getItem('token'),
+            ).catch((err) => console.error('Failed to track view:', err));
+          }
+        }}
+      />
     </div>
   );
 };

@@ -652,6 +652,15 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async resetDocument(dealId, profileId, documentType) {
+    const response = await fetch(`${API_URL}/deals/${dealId}/reset-document`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, documentType }),
+    });
+    return this.handleResponse(response);
+  }
+
   async confirmPaymentReceipt(dealId, profileId, type, index) {
     const response = await fetch(`${API_URL}/deals/${dealId}/confirm-payment-receipt`, {
       method: 'PUT',

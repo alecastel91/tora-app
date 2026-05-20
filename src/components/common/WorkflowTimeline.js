@@ -6,7 +6,7 @@ import { summarizeDealPayment } from '../../utils/paymentSummary';
  * Step 3 (documents) completes when each category is shared or skipped.
  * Step 4 (payment) ticks only when the artist has confirmed receipt.
  */
-const WorkflowTimeline = ({ deal }) => {
+const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
   // Memo keyed on the JSONB blobs that drive every derivation. With many
   // deal cards on screen this avoids redoing reduces + date parsing on every
   // unrelated parent render.
@@ -104,12 +104,32 @@ const WorkflowTimeline = ({ deal }) => {
               transition: 'width 0.3s ease',
             }} />
           </div>
-          <div style={{ marginTop: '6px', fontSize: '11px', color: '#888', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ marginTop: '6px', fontSize: '11px', color: '#888', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
             {pendingConfirmation > 0 && (
               <span><strong style={{ color: 'rgba(80,200,120,0.85)' }}>{pendingConfirmation} {currency}</strong> awaiting confirmation</span>
             )}
             {remaining > 0 && (
               <span>· Remaining: <strong style={{ color: '#fff' }}>{remaining} {currency}</strong></span>
+            )}
+            {onViewPaymentDetails && (
+              <button
+                type="button"
+                onClick={onViewPaymentDetails}
+                style={{
+                  marginLeft: 'auto',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  fontStyle: 'italic',
+                  fontSize: '11px',
+                  color: 'rgba(255,255,255,0.55)',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '2px',
+                }}
+              >
+                view details
+              </button>
             )}
           </div>
         </div>

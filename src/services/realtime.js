@@ -45,4 +45,24 @@ export const subscribeToInbox = (profileId, onUpdate) => {
   };
 };
 
+// Channel name for a profile's bookings stream (deal mutations).
+// Must match backend dealsChannelName.
+export const dealsChannelName = (profileId) => `deals:${profileId}`;
+
+// Subscribe to deal-mutation events for a profile. Backend broadcasts here
+// from every deal-mutating endpoint, so BookingsScreen can re-fetch
+// instead of relying on manual refresh.
+export const subscribeToDeals = (profileId, onDealUpdate) => {
+  const channel = supabase
+    .channel(dealsChannelName(profileId))
+    .on('broadcast', { event: 'deal_update' }, (payload) => {
+      onDealUpdate(payload.payload);
+    })
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+};
+
 export default supabase;

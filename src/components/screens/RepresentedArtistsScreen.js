@@ -19,6 +19,31 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
 
   const representedArtists = user?.representingArtists || [];
   const [removingArtistId, setRemovingArtistId] = useState(null);
+  // Pink dot on Manage CTA when the represented artist has pending action
+  // items (same pattern as ProfileScreen — fetch per-artist in one burst).
+  const [artistActionsMap, setArtistActionsMap] = useState({});
+
+  useEffect(() => {
+    if (!user?.id || user.role !== 'AGENT' || representedArtists.length === 0) return undefined;
+    let cancelled = false;
+    Promise.all(
+      representedArtists.map((a) => {
+        const artistId = a.profileId || a.id;
+        return apiService.getActionSummary(user.id, { artistProfileId: artistId })
+          .then((d) => ({ artistId, d }))
+          .catch(() => ({ artistId, d: null }));
+      })
+    ).then((results) => {
+      if (cancelled) return;
+      const map = {};
+      for (const r of results) {
+        map[r.artistId] = Array.isArray(r.d?.items) && r.d.items.length > 0;
+      }
+      setArtistActionsMap(map);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.role, representedArtists.length, refreshKey]);
 
   const handleRemoveArtist = async (artist) => {
     const artistId = artist.profileId || artist.id;
@@ -189,8 +214,24 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                   <button
                     className="btn btn-primary btn-sm"
                     onClick={() => handleManageArtist(artist)}
+                    style={{ position: 'relative' }}
                   >
                     Manage
+                    {artistActionsMap[artist.profileId || artist.id] && (
+                      <span
+                        aria-label="Actions required"
+                        style={{
+                          position: 'absolute',
+                          top: '4px',
+                          right: '6px',
+                          width: '7px',
+                          height: '7px',
+                          background: '#FF3366',
+                          borderRadius: '50%',
+                          boxShadow: '0 0 5px rgba(255, 51, 102, 0.7)',
+                        }}
+                      />
+                    )}
                   </button>
                   <button
                     className="btn btn-outline btn-sm btn-remove-artist"

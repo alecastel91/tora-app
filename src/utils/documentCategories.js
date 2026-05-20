@@ -2,10 +2,16 @@
 // Backend mirror lives in tora-backend-sql/src/utils/documentCategories.js
 // (separate process, can't share runtime).
 
+// `uploadOnly: true` categories don't show the artist's pre-existing library
+// — the user picks a fresh file per booking (e.g. invoices change every time).
+// Mechanically the upload still lands in the same Supabase storage bucket
+// and the deal's sharedDocuments JSONB entry has the same shape as a library
+// share, so backend handlers stay identical.
 export const DOC_CATEGORIES = [
   { key: 'pressKit', label: 'Press Kit' },
   { key: 'technicalRider', label: 'Technical Rider' },
   { key: 'hospitalityRider', label: 'Hospitality Rider' },
+  { key: 'invoice', label: 'Invoice', uploadOnly: true },
 ];
 
 export const DOC_CATEGORY_KEYS = DOC_CATEGORIES.map((c) => c.key);

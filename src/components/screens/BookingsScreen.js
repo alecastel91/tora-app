@@ -6,11 +6,13 @@ import * as contractService from '../../services/contractService';
 import WorkflowTimeline from '../common/WorkflowTimeline';
 import AddContractModal from '../common/AddContractModal';
 import SignContractModal from '../common/SignContractModal';
-import PdfViewer from '../common/PdfViewer';
+import ShareDocumentsModal from '../common/ShareDocumentsModal';
+import PdfViewerModal from '../common/PdfViewerModal';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
+import { subscribeToDeals } from '../../services/realtime';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -24,6 +26,22 @@ function validatePaymentProof(file) {
 const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
   const { user: currentUser, reloadProfileData } = useAppContext();
   const getFullUrl = (url) => getAuthedBackendUrl(url, currentUser?.id);
+
+  // Resolve the viewable URL for a deal's contract — handles both legacy
+  // documentUrl strings and the documentId proxy path used by uploaded PDFs.
+  const openContractPdf = (deal) => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+    const backendBase = API_URL.replace('/api', '');
+    const token = localStorage.getItem('token');
+    const profileId = currentUser?.id;
+    let url = null;
+    if (deal?.contract?.documentUrl && deal.contract.documentUrl !== 'N/A') {
+      url = getFullUrl(deal.contract.documentUrl);
+    } else if (deal?.contract?.documentId) {
+      url = `${backendBase}/api/contracts/view/${deal.contract.documentId}?profileId=${profileId}&token=${token}`;
+    }
+    if (url) setPdfViewerUrl(url);
+  };
 
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming', 'past', or 'declined'
   const [deals, setDeals] = useState([]);
@@ -77,6 +95,17 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id]);
 
+  // Realtime: refetch deals when the backend broadcasts a deal_update
+  // touching this profile (their own deals OR any artist they represent).
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    const unsubscribe = subscribeToDeals(currentUser.id, () => {
+      fetchDeals();
+    });
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id]);
+
   useEffect(() => {
     if (showContractModal || showDocumentModal) {
       reloadProfileData();
@@ -89,7 +118,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
   // picker. Depend on stable ids to avoid rate-limit bursts.
   useEffect(() => {
     const fetchArtistProfile = async () => {
-      if ((showContractModal || showAddContractModal || showDocumentModal) && selectedDealForWorkflow?.artistId) {
+      if ((showContractModal || showAddContractModal) && selectedDealForWorkflow?.artistId) {
         try {
           const profile = await apiService.getProfile(selectedDealForWorkflow.artistId);
           setArtistProfile(profile);
@@ -103,7 +132,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
     };
     fetchArtistProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showContractModal, showAddContractModal, showDocumentModal, selectedDealForWorkflow?.artistId]);
+  }, [showContractModal, showAddContractModal, selectedDealForWorkflow?.artistId]);
 
   const fetchDeals = async () => {
     if (!currentUser || !currentUser.id) {
@@ -326,8 +355,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
           .reduce((s, e) => s + (e.confirmedAt ? (Number(e.amount) || 0) : 0), 0) >= (Number(deal.currentFee) || 0));
     if (fullyPaidAndConfirmed) return 'COMPLETED';
     const docs = deal.sharedDocuments || {};
-    const anyDocActivelyShared = ['pressKit', 'technicalRider', 'hospitalityRider']
-      .some((k) => docs[k]?.documentId);
+    const anyDocActivelyShared = DOC_CATEGORIES.some((c) => docs[c.key]?.documentId);
     if (anyDocActivelyShared) return 'DOCS SHARED';
     const contractActuallySigned = deal.contract?.status === 'FULLY_SIGNED' && !deal.contract?.skipped;
     if (contractActuallySigned) return 'CONTRACT SIGNED';
@@ -579,7 +607,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
             {/* Workflow Timeline for ACCEPTED deals */}
             {deal.status === 'ACCEPTED' && !hideWorkflow && (
-              <WorkflowTimeline deal={deal} />
+              <WorkflowTimeline deal={deal} onViewPaymentDetails={() => setDepositHistoryDeal(deal)} />
             )}
 
             {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
@@ -683,20 +711,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                           type="button"
                           className="btn btn-outline"
                           style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                          onClick={() => {
-                            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
-                            const backendBase = API_URL.replace('/api', '');
-                            const token = localStorage.getItem('token');
-                            const profileId = currentUser?.id;
-
-                            let url = null;
-                            if (deal.contract.documentUrl && deal.contract.documentUrl !== 'N/A') {
-                              url = getFullUrl(deal.contract.documentUrl);
-                            } else if (deal.contract.documentId) {
-                              url = `${backendBase}/api/contracts/view/${deal.contract.documentId}?profileId=${profileId}&token=${token}`;
-                            }
-                            if (url) setPdfViewerUrl(url);
-                          }}
+                          onClick={() => openContractPdf(deal)}
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -728,170 +743,206 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                       </div>
                     );
                   } else {
-                    // Other side hasn't signed yet — open the full sign modal
-                    // (draw signature + name + consent + view-required gate).
+                    // Other side hasn't signed yet — they can preview the
+                    // contract without committing, or jump into the full
+                    // sign modal (draw signature + name + consent +
+                    // view-required gate).
                     return (
-                      <button
-                        className="btn btn-primary"
-                        disabled={actionBusy}
-                        onClick={async () => {
-                          if (actionBusy) return;
-                          setActionBusy(true);
-                          try {
-                            let initiallyViewed = false;
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          className="btn btn-outline"
+                          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                          onClick={() => openContractPdf(deal)}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                          </svg>
+                          View Contract
+                        </button>
+                        <button
+                          className="btn btn-primary"
+                          disabled={actionBusy}
+                          onClick={async () => {
+                            if (actionBusy) return;
+                            setActionBusy(true);
                             try {
-                              const fresh = await apiService.getDeal(deal.id);
-                              const viewedBy = fresh?.contract?.viewedBy || [];
-                              initiallyViewed = viewedBy.some((v) => v.profile === currentUser.id);
-                            } catch (_) { /* default false */ }
-                            setRecipientSignData({
-                              deal,
-                              contractUrl: deal.contract.documentUrl,
-                              senderName: otherPartyName,
-                              initiallyViewed,
-                            });
-                          } finally {
-                            setActionBusy(false);
-                          }
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M3 17l6 6 13-13"></path>
-                        </svg>
-                        Sign Contract
-                      </button>
+                              let initiallyViewed = false;
+                              try {
+                                const fresh = await apiService.getDeal(deal.id);
+                                const viewedBy = fresh?.contract?.viewedBy || [];
+                                initiallyViewed = viewedBy.some((v) => v.profile === currentUser.id);
+                              } catch (_) { /* default false */ }
+                              setRecipientSignData({
+                                deal,
+                                contractUrl: deal.contract.documentUrl,
+                                senderName: otherPartyName,
+                                initiallyViewed,
+                              });
+                            } finally {
+                              setActionBusy(false);
+                            }
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 17l6 6 13-13"></path>
+                          </svg>
+                          Sign Contract
+                        </button>
+                      </div>
                     );
                   }
                 })()}
 
-                {/* Document Sharing — artist-side only. One Share Documents
-                    CTA opens a modal covering all 3 categories; one Skip
-                    Documents CTA marks any pending categories as skipped. */}
+                {/* Once both parties have signed, anyone in the deal can
+                    pull up the signed contract for reference. Surfaced
+                    first so it's the most prominent post-signing action. */}
+                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && (deal.contract.documentUrl || deal.contract.documentId) && (
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                    onClick={() => openContractPdf(deal)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    View Contract
+                  </button>
+                )}
+
+                {/* Document Sharing — artist-side only. The Documents CTA
+                    is always visible once the contract is fully signed so
+                    the artist can also go back and change/unshare previously
+                    sent documents. */}
                 {deal.contract && deal.contract.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (() => {
                   const pendingCategories = DOC_CATEGORIES.filter(c => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
-                  if (pendingCategories.length === 0) return null;
+                  const hasPending = pendingCategories.length > 0;
                   return (
-                    <>
-                      <button
-                        className="btn btn-outline"
-                        onClick={() => {
-                          setSelectedDealForWorkflow(deal);
-                          setShowDocumentModal(true);
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                        </svg>
-                        Share Documents
-                      </button>
-                      <button
-                        className="btn btn-skip"
-                        disabled={actionBusy}
-                        onClick={async () => {
-                          if (actionBusy) return;
-                          const labels = pendingCategories.map(c => c.label).join(', ');
-                          if (!window.confirm(`Skip the remaining document stages (${labels}) for this booking?`)) return;
-                          setActionBusy(true);
-                          try {
-                            // Sequential: each skipDocument re-reads/writes
-                            // the deal.sharedDocuments JSONB; running them
-                            // in parallel would clobber sibling writes.
-                            for (const cat of pendingCategories) {
-                              // eslint-disable-next-line no-await-in-loop
-                              await apiService.skipDocument(deal.id, currentUser.id, cat.key);
-                            }
-                            fetchDeals();
-                          } catch (err) {
-                            alert(err.message || 'Failed to skip documents');
-                          } finally {
-                            setActionBusy(false);
-                          }
-                        }}
-                      >
-                        Skip Documents
-                      </button>
-                    </>
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => {
+                        setSelectedDealForWorkflow(deal);
+                        setShowDocumentModal(true);
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                      </svg>
+                      {hasPending ? 'Share Documents' : 'Manage Documents'}
+                    </button>
                   );
                 })()}
 
                 {/* Documents recap — show what's been shared / skipped /
-                    pending for this booking. Visible to both sides. */}
+                    pending for this booking. Visible to both sides. Shared
+                    categories are clickable and open the document in the
+                    PDF viewer so the booker can actually review them. */}
                 {deal.contract && deal.contract.status === 'FULLY_SIGNED' && (
                   <div style={{ width: '100%', marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '11px' }}>
                     {DOC_CATEGORIES.map(cat => {
                       const status = categoryStatus(deal.sharedDocuments, cat.key);
+                      const entry = deal.sharedDocuments?.[cat.key];
                       const palette = status === 'shared'
                         ? { bg: 'rgba(80,200,120,0.15)', fg: 'rgba(80,200,120,1)', symbol: '✓' }
                         : status === 'skipped'
                           ? { bg: 'rgba(255,255,255,0.06)', fg: '#888', symbol: '—' }
                           : { bg: 'rgba(255,165,0,0.12)', fg: 'rgba(255,165,0,1)', symbol: '·' };
-                      return (
-                        <span key={cat.key} style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          padding: '3px 9px',
-                          background: palette.bg,
-                          color: palette.fg,
-                          borderRadius: '12px',
-                          fontWeight: 500,
-                        }}>
+                      const pillContent = (
+                        <>
                           <span aria-hidden="true">{palette.symbol}</span>
                           {cat.label}
                           {status === 'shared' ? ' shared' : status === 'skipped' ? ' skipped' : ' pending'}
+                        </>
+                      );
+                      const sharedStyle = {
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '3px 9px',
+                        background: palette.bg,
+                        color: palette.fg,
+                        borderRadius: '12px',
+                        fontWeight: 500,
+                      };
+                      if (status === 'shared' && entry?.documentUrl) {
+                        return (
+                          <button
+                            key={cat.key}
+                            type="button"
+                            onClick={() => setPdfViewerUrl(getFullUrl(entry.documentUrl))}
+                            style={{ ...sharedStyle, border: 'none', cursor: 'pointer', fontSize: '11px' }}
+                            title={`Open ${entry.documentTitle || cat.label}`}
+                          >
+                            {pillContent}
+                          </button>
+                        );
+                      }
+                      return (
+                        <span key={cat.key} style={sharedStyle}>
+                          {pillContent}
                         </span>
                       );
                     })}
                   </div>
                 )}
 
-                {/* Payment recap — a single combined pill summarising
-                    all deposits + full payment. Click it to open the
-                    Payments modal where each entry has its own proof +
-                    confirm CTA. Artist side also sees a separate
-                    "Confirm receipt" if anything is awaiting confirmation. */}
+                {/* Skip Documents — artist-side only, only while there are
+                    still pending categories. Placed below the recap pills
+                    so it reads as "and skip the rest" rather than a
+                    standalone choice next to Share Documents. */}
+                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (() => {
+                  const pendingCategories = DOC_CATEGORIES.filter(c => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
+                  if (pendingCategories.length === 0) return null;
+                  return (
+                    <button
+                      className="btn btn-skip"
+                      disabled={actionBusy}
+                      onClick={async () => {
+                        if (actionBusy) return;
+                        const labels = pendingCategories.map(c => c.label).join(', ');
+                        if (!window.confirm(`Skip the remaining document stages (${labels}) for this booking?`)) return;
+                        setActionBusy(true);
+                        try {
+                          for (const cat of pendingCategories) {
+                            // eslint-disable-next-line no-await-in-loop
+                            await apiService.skipDocument(deal.id, currentUser.id, cat.key);
+                          }
+                          fetchDeals();
+                        } catch (err) {
+                          alert(err.message || 'Failed to skip documents');
+                        } finally {
+                          setActionBusy(false);
+                        }
+                      }}
+                    >
+                      Skip Documents
+                    </button>
+                  );
+                })()}
+
+                {/* Confirm receipt — artist-side only, only when there's an
+                    unconfirmed payment entry. The compact payment summary
+                    pill is gone now that WorkflowTimeline's payment-progress
+                    block has an inline "view details" CTA. */}
                 {deal.payment && (deal.payment.status === 'DEPOSIT_PAID' || deal.payment.status === 'FULLY_PAID') && (() => {
                   const summary = summarizeDealPayment(deal);
-                  const { history, totalMarked, totalConfirmed, currency, totalFee, isFullyConfirmed: allConfirmed, fullPaymentMarked, fullPaymentConfirmed } = summary;
+                  const { history, fullPaymentMarked, fullPaymentConfirmed } = summary;
                   const onArtistSide = isArtistSideForDeal(deal, currentUser);
                   const unconfirmedDeposit = onArtistSide && history.some(e => !e.confirmedAt);
                   const unconfirmedFull = onArtistSide && fullPaymentMarked && !fullPaymentConfirmed;
+                  if (!unconfirmedDeposit && !unconfirmedFull) return null;
                   return (
-                  <div style={{ width: '100%', marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '11px' }}>
                     <button
                       type="button"
+                      className="btn btn-primary btn-card-action"
+                      disabled={actionBusy}
                       onClick={() => setDepositHistoryDeal(deal)}
-                      style={{
-                        display: 'inline-flex', alignItems: 'center', gap: '5px',
-                        padding: '3px 9px',
-                        background: allConfirmed ? 'rgba(80,200,120,0.15)' : 'rgba(80,200,120,0.10)',
-                        color: 'rgba(80,200,120,1)',
-                        borderRadius: '12px', fontWeight: 500, border: 'none',
-                        fontSize: '11px', cursor: 'pointer',
-                      }}
                     >
-                      <span aria-hidden="true">{allConfirmed ? '✓' : '·'}</span>
-                      Payments: {totalConfirmed} confirmed
-                      {totalMarked > totalConfirmed && ` (${totalMarked - totalConfirmed} pending)`}
-                      {totalFee ? ` of ${totalFee} ${currency}` : ` ${currency}`}
-                      <span style={{ opacity: 0.7, marginLeft: '4px' }}>· View details</span>
+                      Confirm receipt
                     </button>
-                    {(unconfirmedDeposit || unconfirmedFull) && (
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-card-action"
-                        disabled={actionBusy}
-                        onClick={() => {
-                          // Always open the details modal so the artist sees
-                          // each installment + full payment and can confirm
-                          // them one by one.
-                          setDepositHistoryDeal(deal);
-                        }}
-                      >
-                        Confirm receipt
-                      </button>
-                    )}
-                  </div>
                   );
                 })()}
 
@@ -908,7 +959,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   if (!contractCommitted) return null;
                   return (
                     <button
-                      className="btn btn-primary"
+                      className="btn btn-outline"
                       onClick={() => {
                         setSelectedDealForWorkflow(deal);
                         setShowPaymentModal(true);
@@ -922,6 +973,22 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                     </button>
                   );
                 })()}
+
+                {/* Message — kept inside workflow-actions when the deal is
+                    accepted so all the booking-card CTAs (View Contract,
+                    Share Documents, Update Payment, Message) sit in one
+                    visually-consistent row. */}
+                {!hideWorkflow && (
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => onOpenChat && onOpenChat(messageTarget)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Message
+                  </button>
+                )}
               </div>
             )}
 
@@ -977,9 +1044,22 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               </div>
             )}
 
-            {/* Show chat button — hidden for artist viewer when handled by agent.
-                Booker chats with the agent (messageTarget) when applicable. */}
-            {!hideWorkflow && (
+            {/* Standalone Message button — for ACCEPTED deals with an
+                active workflow row, Message renders inside .workflow-actions
+                so all CTAs sit in one row. We only render the standalone
+                fallback when the workflow row isn't on screen. */}
+            {!hideWorkflow && deal.status !== 'ACCEPTED' && (
+              <button
+                className="btn btn-outline btn-chat"
+                onClick={() => onOpenChat && onOpenChat(messageTarget)}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Message
+              </button>
+            )}
+            {hideWorkflow && (
               <button
                 className="btn btn-outline btn-chat"
                 onClick={() => onOpenChat && onOpenChat(messageTarget)}
@@ -1258,125 +1338,27 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
         </div>
       )}
 
-      {/* Share Documents Modal — consolidated (Press Kit, Technical Rider,
-          Hospitality Rider). Each category that's already shared/skipped
-          shows a status pill; pending categories show a doc picker, or an
-          empty-state pointer to Profile > Manage > Documents. */}
-      {showDocumentModal && selectedDealForWorkflow && (
-        <div className="delete-modal-overlay" onClick={() => {
+      <ShareDocumentsModal
+        isOpen={showDocumentModal && !!selectedDealForWorkflow}
+        deal={selectedDealForWorkflow}
+        currentUser={currentUser}
+        onClose={() => {
           setShowDocumentModal(false);
           setSelectedDealForWorkflow(null);
           setDocumentTypeToShare(null);
-        }}>
-          <div className="delete-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
-            <div className="delete-modal-header">
-              <h3>Share Documents</h3>
-            </div>
-            <div className="delete-modal-content">
-              <p style={{ marginBottom: '16px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
-                Pick which document to share for each category. You can come back to this any time before the booking.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '60vh', overflowY: 'auto' }}>
-                {DOC_CATEGORIES.map(cat => {
-                  const status = categoryStatus(selectedDealForWorkflow.sharedDocuments, cat.key);
-                  const docsSource = artistProfile?.documents?.[cat.key] || currentUser.documents?.[cat.key] || [];
-                  const sharedEntry = selectedDealForWorkflow.sharedDocuments?.[cat.key];
-
-                  return (
-                    <div key={cat.key} style={{
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '10px',
-                      padding: '14px',
-                      backgroundColor: 'rgba(255,255,255,0.02)',
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <strong style={{ fontSize: '14px' }}>{cat.label}</strong>
-                        {status !== 'pending' && (
-                          <span style={{
-                            fontSize: '10px',
-                            padding: '3px 8px',
-                            borderRadius: '12px',
-                            background: status === 'shared' ? 'rgba(80,200,120,0.15)' : 'rgba(255,255,255,0.06)',
-                            color: status === 'shared' ? 'rgba(80,200,120,1)' : '#888',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            fontWeight: 600,
-                          }}>
-                            {status === 'shared' ? `Shared · ${sharedEntry?.documentTitle || ''}` : 'Skipped'}
-                          </span>
-                        )}
-                      </div>
-
-                      {status === 'pending' && docsSource.length > 0 && docsSource.map(doc => (
-                        <div
-                          key={doc.id}
-                          style={{
-                            padding: '10px 12px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: '6px',
-                            marginBottom: '6px',
-                            cursor: actionBusy ? 'default' : 'pointer',
-                            opacity: actionBusy ? 0.6 : 1,
-                            transition: 'all 0.15s',
-                          }}
-                          onClick={async () => {
-                            if (actionBusy) return;
-                            setActionBusy(true);
-                            try {
-                              await apiService.shareDocument(
-                                selectedDealForWorkflow.id,
-                                currentUser.id,
-                                cat.key,
-                                doc,
-                              );
-                              fetchDeals();
-                              // Optimistically reflect the change so the modal
-                              // updates without closing — user can keep sharing.
-                              setSelectedDealForWorkflow(prev => prev ? ({
-                                ...prev,
-                                sharedDocuments: {
-                                  ...(prev.sharedDocuments || {}),
-                                  [cat.key]: { documentId: doc.id, documentUrl: doc.url, documentTitle: doc.title },
-                                },
-                              }) : prev);
-                            } catch (err) {
-                              alert(err.message || 'Failed to share document');
-                            } finally {
-                              setActionBusy(false);
-                            }
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,51,102,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,51,102,0.5)'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
-                        >
-                          <div style={{ fontSize: '13px', fontWeight: 500 }}>{doc.title}</div>
-                        </div>
-                      ))}
-
-                      {status === 'pending' && docsSource.length === 0 && (
-                        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.5 }}>
-                          No {cat.label.toLowerCase()} in your library. Add one in <strong>Profile &gt; Manage &gt; Documents</strong>, then come back here.
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="delete-modal-actions">
-              <button
-                className="btn btn-outline"
-                onClick={() => {
-                  setShowDocumentModal(false);
-                  setSelectedDealForWorkflow(null);
-                  setDocumentTypeToShare(null);
-                }}
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        }}
+        onDealUpdated={(updatedDeal) => {
+          // Optimistic: splice the latest deal payload back into the deals
+          // array right away so the booking-card status badge reflects
+          // share/unshare/skip changes the instant the user clicks them —
+          // no waiting on fetchDeals to round-trip. fetchDeals still runs
+          // afterwards to reconcile with the canonical server state.
+          if (updatedDeal?.id) {
+            setDeals((prev) => prev.map((d) => (d.id === updatedDeal.id ? { ...d, ...updatedDeal } : d)));
+          }
+          fetchDeals();
+        }}
+      />
 
       {/* Update Payment Modal */}
       {showPaymentModal && selectedDealForWorkflow && (
@@ -1672,26 +1654,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
         />
       )}
 
-      {pdfViewerUrl && createPortal(
-        <div className="modal-overlay" onClick={() => setPdfViewerUrl(null)} style={{ padding: 0, zIndex: 10001 }}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '100vw', height: '100dvh', maxHeight: '100dvh', padding: 0, display: 'flex', flexDirection: 'column', borderRadius: 0 }}
-          >
-            <div className="modal-header" style={{ padding: '12px 16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#1a1a1a', zIndex: 1 }}>
-              <h3 style={{ margin: 0, fontSize: '15px' }}>Document</h3>
-              <button className="modal-close" onClick={() => setPdfViewerUrl(null)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <PdfViewer url={pdfViewerUrl} onLoaded={() => setViewConfirmedSignal((n) => n + 1)} />
-          </div>
-        </div>,
-        document.body,
-      )}
+      <PdfViewerModal
+        url={pdfViewerUrl}
+        onClose={() => setPdfViewerUrl(null)}
+        onLoaded={() => setViewConfirmedSignal((n) => n + 1)}
+      />
 
       {/* Deposit history modal — one row per installment with its own
           proof link. Opens when the recap pill is clicked on a deal that
@@ -1723,9 +1690,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 </div>
               )}
             </div>
-            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, alignItems: 'stretch' }}>
               {proof?.storagePath && (
-                <button type="button" onClick={onViewProof} className="btn btn-outline btn-card-action">
+                <button type="button" onClick={onViewProof} className="btn btn-outline btn-card-action" style={{ whiteSpace: 'nowrap' }}>
                   View proof
                 </button>
               )}
@@ -1735,6 +1702,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   className="btn btn-primary btn-card-action"
                   disabled={actionBusy}
                   onClick={onConfirm}
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   Confirm receipt
                 </button>

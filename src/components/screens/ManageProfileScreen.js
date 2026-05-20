@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import AddContractModal from '../common/AddContractModal';
+import PdfViewerModal from '../common/PdfViewerModal';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
 import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
+import { getAuthedBackendUrl } from '../../utils/urls';
 
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -39,6 +41,20 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   const [editingDoc, setEditingDoc] = useState(null);
   const [docCategory, setDocCategory] = useState('');
   const [newDoc, setNewDoc] = useState({ title: '', url: '' });
+  const [pdfViewerUrl, setPdfViewerUrl] = useState(null);
+
+  // Decide where a doc.url should open. Backend-proxied files open in the
+  // in-app PdfViewer modal (so the auth token rides along). External links
+  // (Drive, Dropbox, etc.) open in a new tab.
+  const openDocument = (doc) => {
+    if (!doc?.url) return;
+    const isBackendFile = doc.type === 'upload' || doc.url.startsWith('/api/') || doc.url.includes('/api/contracts/files/');
+    if (isBackendFile) {
+      setPdfViewerUrl(getAuthedBackendUrl(doc.url, user?.id));
+    } else {
+      window.open(doc.url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   // Fetch fresh profile data on mount
   useEffect(() => {
@@ -360,7 +376,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
       if (editingDoc) {
         updatedDocuments = documents.map(d =>
           d.id === editingDoc.id
-            ? { ...editingDoc, title: newDoc.title, url: newDoc.url }
+            ? { ...editingDoc, title: newDoc.title, url: newDoc.url, addedDate: new Date().toISOString() }
             : d
         );
       } else {
@@ -381,7 +397,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           updatedDocuments[docCategory][index] = {
             ...editingDoc,
             title: newDoc.title,
-            url: newDoc.url
+            url: newDoc.url,
+            addedDate: new Date().toISOString()
           };
         }
       } else {
@@ -596,10 +613,20 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                 </p>
               </div>
               <button
-                className="btn btn-primary btn-sm"
                 onClick={() => handleAddDocument()}
+                aria-label="Add document"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  padding: '4px 8px',
+                  cursor: 'pointer',
+                }}
               >
-                + Add
+                +
               </button>
             </div>
 
@@ -625,22 +652,24 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                     <div className="doc-info" style={{ flex: 1, minWidth: 0 }}>
                       <div className="doc-name">{doc.title}</div>
                       <div className="doc-meta">
-                        <a
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            color: '#FF3366',
-                            textDecoration: 'none',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            display: 'block',
-                            marginBottom: '4px'
-                          }}
-                        >
-                          {doc.url}
-                        </a>
+                        {doc.url && (
+                          <button
+                            type="button"
+                            onClick={() => openDocument(doc)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              padding: 0,
+                              color: '#FF3366',
+                              textDecoration: 'none',
+                              marginBottom: '4px',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {doc.type === 'upload' || doc.url.startsWith('/api/') ? 'View file' : 'Open link ↗'}
+                          </button>
+                        )}
                         {doc.addedDate && (
                           <div style={{
                             color: '#666',
@@ -651,7 +680,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                         )}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0 }}>
                       <button
                         className="btn btn-outline btn-sm"
                         onClick={() => handleEditDocument(doc)}
@@ -684,10 +713,20 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           <h3>{icon} {title}</h3>
           {documents[category].length > 0 && (
             <button
-              className="btn btn-primary btn-sm"
               onClick={() => handleAddDocument(category)}
+              aria-label={`Add ${title}`}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#fff',
+                fontSize: '22px',
+                fontWeight: 700,
+                lineHeight: 1,
+                padding: '4px 8px',
+                cursor: 'pointer',
+              }}
             >
-              + Add
+              +
             </button>
           )}
         </div>
@@ -710,8 +749,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
               className="btn btn-primary"
               onClick={() => handleAddDocument(category)}
               style={{
-                padding: '10px 20px',
-                fontSize: '14px'
+                padding: '8px 16px',
+                fontSize: '12px'
               }}
             >
               + Add
@@ -724,22 +763,24 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                 <div className="doc-info" style={{ flex: 1, minWidth: 0 }}>
                   <div className="doc-name">{doc.title}</div>
                   <div className="doc-meta">
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: '#FF3366',
-                        textDecoration: 'none',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        display: 'block',
-                        marginBottom: '4px'
-                      }}
-                    >
-                      {doc.url}
-                    </a>
+                    {doc.url && (
+                      <button
+                        type="button"
+                        onClick={() => openDocument(doc)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          padding: 0,
+                          color: '#FF3366',
+                          textDecoration: 'none',
+                          marginBottom: '4px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {doc.type === 'upload' || doc.url.startsWith('/api/') ? 'View file' : 'Open link ↗'}
+                      </button>
+                    )}
                     {doc.addedDate && (
                       <div style={{
                         color: '#666',
@@ -875,7 +916,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                       ...editingDoc,
                       title: documentData.title,
                       url: documentData.url,
-                      type: documentData.type
+                      type: documentData.type,
+                      addedDate: new Date().toISOString()
                     }
                   : d
               );
@@ -903,7 +945,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                   ...editingDoc,
                   title: documentData.title,
                   url: documentData.url,
-                  type: documentData.type
+                  type: documentData.type,
+                  addedDate: new Date().toISOString()
                 };
               }
             } else {
@@ -956,6 +999,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           setEditingDoc(null);
         }}
       />
+
+      <PdfViewerModal url={pdfViewerUrl} onClose={() => setPdfViewerUrl(null)} />
     </div>
   );
 };
