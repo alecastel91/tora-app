@@ -445,6 +445,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 {otherParty.role}
               </span>
             </div>
+            {/* Artist label — shown whenever the deal is for a represented
+                artist and the viewer isn't that artist. Agents viewing their
+                roster need this to tell their bookings apart at a glance. */}
+            {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && (
+              <p className="party-via-agent" style={{ color: '#bbb' }}>for {deal.bookedArtistName}</p>
+            )}
             {isViaAgent && agentName && (
               <p className="party-via-agent">via {agentName} · Agent</p>
             )}
