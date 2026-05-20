@@ -7,7 +7,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
 import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
-import { getAuthedBackendUrl } from '../../utils/urls';
+import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -48,8 +48,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   // (Drive, Dropbox, etc.) open in a new tab.
   const openDocument = (doc) => {
     if (!doc?.url) return;
-    const isBackendFile = doc.type === 'upload' || doc.url.startsWith('/api/') || doc.url.includes('/api/contracts/files/');
-    if (isBackendFile) {
+    if (isBackendFileUrl(doc)) {
       setPdfViewerUrl(getAuthedBackendUrl(doc.url, user?.id));
     } else {
       window.open(doc.url, '_blank', 'noopener,noreferrer');
@@ -74,20 +73,6 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
       .catch((err) => console.error('[ManageProfileScreen] action summary failed', err));
     return () => { cancelled = true; };
   }, [user?.id]);
-
-  // Currency conversion rates (mock - in production, fetch from API)
-  const exchangeRates = {
-    USD: 1,
-    EUR: 0.92,
-    GBP: 0.79,
-    JPY: 149.50
-  };
-
-  const convertCurrency = (amount, fromCurrency, toCurrency) => {
-    if (!amount || !fromCurrency || !toCurrency) return 0;
-    const amountInUSD = amount / exchangeRates[fromCurrency];
-    return amountInUSD * exchangeRates[toCurrency];
-  };
 
   const getCurrencySymbol = (currency) => {
     const symbols = { USD: '$', EUR: '€', GBP: '£', JPY: '¥' };
@@ -894,22 +879,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           setEditingDoc(null);
         }}
         onSave={async (documentData) => {
-          console.log('=== DOCUMENT SAVE DEBUG START ===');
-          console.log('[ManageProfileScreen] Document data:', documentData);
-          console.log('[ManageProfileScreen] Current user:', {
-            id: user?.id,
-            name: user?.name,
-            role: user?.role
-          });
-          console.log('[ManageProfileScreen] isPromoterOrVenue:', isPromoterOrVenue);
-          console.log('[ManageProfileScreen] Current documents state:', documents);
-
           let updatedDocuments;
 
           if (isPromoterOrVenue) {
-            // Promoter/Venue: flat array
             if (editingDoc) {
-              // Edit existing document
               updatedDocuments = documents.map(d =>
                 d.id === editingDoc.id
                   ? {
@@ -922,23 +895,17 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                   : d
               );
             } else {
-              // Add new document
-              const newDocument = {
+              updatedDocuments = [...documents, {
                 id: Date.now().toString(),
                 title: documentData.title,
                 url: documentData.url,
                 type: documentData.type,
                 addedDate: new Date().toISOString()
-              };
-              console.log('[ManageProfileScreen] Creating new document:', newDocument);
-              updatedDocuments = [...documents, newDocument];
+              }];
             }
           } else {
-            // Artist: categorized object
             updatedDocuments = { ...documents };
-
             if (editingDoc) {
-              // Edit existing document
               const index = updatedDocuments[docCategory].findIndex(d => d.id === editingDoc.id);
               if (index !== -1) {
                 updatedDocuments[docCategory][index] = {
@@ -950,47 +917,26 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                 };
               }
             } else {
-              // Add new document
-              const newDocument = {
+              updatedDocuments[docCategory].push({
                 id: Date.now().toString(),
                 title: documentData.title,
                 url: documentData.url,
                 type: documentData.type,
                 addedDate: new Date().toISOString()
-              };
-              updatedDocuments[docCategory].push(newDocument);
+              });
             }
           }
 
-          console.log('[ManageProfileScreen] Updated documents array/object:', updatedDocuments);
-
-          // Save to backend
           try {
             const documentsToSave = isPromoterOrVenue
               ? { general: updatedDocuments }
               : updatedDocuments;
-            console.log('[ManageProfileScreen] Documents payload to save:', JSON.stringify(documentsToSave, null, 2));
-            console.log('[ManageProfileScreen] Calling apiService.updateProfile with profileId:', user.id);
-
-            const result = await apiService.updateProfile(user.id, { documents: documentsToSave });
-            console.log('[ManageProfileScreen] Backend response:', result);
-
-            // Update local state AFTER successful save
+            await apiService.updateProfile(user.id, { documents: documentsToSave });
             setDocuments(updatedDocuments);
-            console.log('[ManageProfileScreen] Local state updated');
-
-            // Reload profile data to get fresh data
-            console.log('[ManageProfileScreen] Reloading profile data...');
             await reloadProfileData();
-            console.log('[ManageProfileScreen] Profile data reloaded');
-
-            console.log('=== DOCUMENT SAVE DEBUG END (SUCCESS) ===');
             alert('Document added successfully!');
           } catch (error) {
-            console.error('=== DOCUMENT SAVE DEBUG END (ERROR) ===');
-            console.error('[ManageProfileScreen] Error type:', error.name);
-            console.error('[ManageProfileScreen] Error message:', error.message);
-            console.error('[ManageProfileScreen] Full error:', error);
+            console.error('[ManageProfileScreen] Failed to save document:', error);
             alert('Failed to save document. Please try again.');
           }
 

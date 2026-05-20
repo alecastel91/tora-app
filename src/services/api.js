@@ -387,13 +387,17 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async cancelRepresentation(agentId, currentProfileId) {
+  // Cancels an accepted representation in either direction. Pass agentId
+  // when called from the artist side (removing their agent) or artistId
+  // when called from the agent side (removing one of their artists). The
+  // backend routes to the same handler — it identifies who the caller is
+  // from currentProfileId and treats the other field as the counterparty.
+  async cancelRepresentation({ agentId, artistId, currentProfileId }) {
     const response = await fetch(`${API_URL}/connections/cancel-representation`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ agentId, currentProfileId })
+      body: JSON.stringify({ agentId, artistId, currentProfileId })
     });
-
     return this.handleResponse(response);
   }
 

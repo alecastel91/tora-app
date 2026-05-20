@@ -41,6 +41,14 @@ export function getAuthedBackendUrl(url, profileId) {
   return `${base}${url}${separator}profileId=${profileId}&token=${token}`;
 }
 
+// Backend-proxied files (uploads, contract files) need to open in the
+// in-app PdfViewer with auth on the URL. External links (Drive, Dropbox)
+// can open in a new tab as-is.
+export function isBackendFileUrl(doc) {
+  if (!doc?.url) return false;
+  return doc.type === 'upload' || doc.url.startsWith('/api/') || doc.url.includes('/api/contracts/files/');
+}
+
 /**
  * Compose `/api/deals/:dealId/payment-proof` with type + optional history index.
  */

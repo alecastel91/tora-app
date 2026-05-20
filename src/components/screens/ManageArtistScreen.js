@@ -8,7 +8,7 @@ import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
 import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
-import { getAuthedBackendUrl } from '../../utils/urls';
+import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -104,8 +104,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   const openDocument = (doc) => {
     if (!doc?.url) return;
-    const isBackendFile = doc.type === 'upload' || doc.url.startsWith('/api/') || doc.url.includes('/api/contracts/files/');
-    if (isBackendFile) {
+    if (isBackendFileUrl(doc)) {
       setPdfViewerUrl(getAuthedBackendUrl(doc.url, user?.id));
     } else {
       window.open(doc.url, '_blank', 'noopener,noreferrer');

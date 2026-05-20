@@ -52,16 +52,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
 
     setRemovingArtistId(artistId);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || '/api';
-      const token = localStorage.getItem('token');
-      await fetch(`${API_URL}/connections/cancel-representation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ artistId, currentProfileId: user?.id })
-      });
+      await apiService.cancelRepresentation({ artistId, currentProfileId: user?.id });
       await reloadProfileData();
     } catch (error) {
       console.error('Error removing artist:', error);

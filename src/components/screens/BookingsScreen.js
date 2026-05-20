@@ -27,18 +27,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
   const { user: currentUser, reloadProfileData } = useAppContext();
   const getFullUrl = (url) => getAuthedBackendUrl(url, currentUser?.id);
 
-  // Resolve the viewable URL for a deal's contract — handles both legacy
-  // documentUrl strings and the documentId proxy path used by uploaded PDFs.
   const openContractPdf = (deal) => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
-    const backendBase = API_URL.replace('/api', '');
-    const token = localStorage.getItem('token');
-    const profileId = currentUser?.id;
     let url = null;
     if (deal?.contract?.documentUrl && deal.contract.documentUrl !== 'N/A') {
       url = getFullUrl(deal.contract.documentUrl);
     } else if (deal?.contract?.documentId) {
-      url = `${backendBase}/api/contracts/view/${deal.contract.documentId}?profileId=${profileId}&token=${token}`;
+      url = getFullUrl(`/api/contracts/view/${deal.contract.documentId}`);
     }
     if (url) setPdfViewerUrl(url);
   };
@@ -415,6 +409,15 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
     const dealDate = new Date(deal.date);
     const dayNumber = dealDate.getDate();
+
+    // Pre-derive once: pending doc categories drive both the Share Documents
+    // CTA label and the Skip Documents button render. Used in two separate
+    // JSX blocks lower down — compute here so we don't run DOC_CATEGORIES
+    // .filter twice per card.
+    const pendingDocCategories = (deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser))
+      ? DOC_CATEGORIES.filter(c => categoryStatus(deal.sharedDocuments, c.key) === 'pending')
+      : [];
+    const hasPendingDocs = pendingDocCategories.length > 0;
 
     return (
       <div key={deal.id} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
@@ -819,28 +822,22 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   </button>
                 )}
 
-                {/* Document Sharing — artist-side only. The Documents CTA
-                    is always visible once the contract is fully signed so
-                    the artist can also go back and change/unshare previously
-                    sent documents. */}
-                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (() => {
-                  const pendingCategories = DOC_CATEGORIES.filter(c => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
-                  const hasPending = pendingCategories.length > 0;
-                  return (
-                    <button
-                      className="btn btn-outline"
-                      onClick={() => {
-                        setSelectedDealForWorkflow(deal);
-                        setShowDocumentModal(true);
-                      }}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                      </svg>
-                      {hasPending ? 'Share Documents' : 'Manage Documents'}
-                    </button>
-                  );
-                })()}
+                {/* Document Sharing — artist-side only. Stays visible after
+                    everything is shared/skipped so the artist can revisit. */}
+                {deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => {
+                      setSelectedDealForWorkflow(deal);
+                      setShowDocumentModal(true);
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    </svg>
+                    {hasPendingDocs ? 'Share Documents' : 'Manage Documents'}
+                  </button>
+                )}
 
                 {/* Documents recap — show what's been shared / skipped /
                     pending for this booking. Visible to both sides. Shared
@@ -895,39 +892,33 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   </div>
                 )}
 
-                {/* Skip Documents — artist-side only, only while there are
-                    still pending categories. Placed below the recap pills
-                    so it reads as "and skip the rest" rather than a
-                    standalone choice next to Share Documents. */}
-                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (() => {
-                  const pendingCategories = DOC_CATEGORIES.filter(c => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
-                  if (pendingCategories.length === 0) return null;
-                  return (
-                    <button
-                      className="btn btn-skip"
-                      disabled={actionBusy}
-                      onClick={async () => {
-                        if (actionBusy) return;
-                        const labels = pendingCategories.map(c => c.label).join(', ');
-                        if (!window.confirm(`Skip the remaining document stages (${labels}) for this booking?`)) return;
-                        setActionBusy(true);
-                        try {
-                          for (const cat of pendingCategories) {
-                            // eslint-disable-next-line no-await-in-loop
-                            await apiService.skipDocument(deal.id, currentUser.id, cat.key);
-                          }
-                          fetchDeals();
-                        } catch (err) {
-                          alert(err.message || 'Failed to skip documents');
-                        } finally {
-                          setActionBusy(false);
+                {/* Skip Documents — sits below the recap pills so it reads
+                    as "and skip the rest" rather than standalone. */}
+                {hasPendingDocs && (
+                  <button
+                    className="btn btn-skip"
+                    disabled={actionBusy}
+                    onClick={async () => {
+                      if (actionBusy) return;
+                      const labels = pendingDocCategories.map(c => c.label).join(', ');
+                      if (!window.confirm(`Skip the remaining document stages (${labels}) for this booking?`)) return;
+                      setActionBusy(true);
+                      try {
+                        for (const cat of pendingDocCategories) {
+                          // eslint-disable-next-line no-await-in-loop
+                          await apiService.skipDocument(deal.id, currentUser.id, cat.key);
                         }
-                      }}
-                    >
-                      Skip Documents
-                    </button>
-                  );
-                })()}
+                        fetchDeals();
+                      } catch (err) {
+                        alert(err.message || 'Failed to skip documents');
+                      } finally {
+                        setActionBusy(false);
+                      }
+                    }}
+                  >
+                    Skip Documents
+                  </button>
+                )}
 
                 {/* Confirm receipt — artist-side only, only when there's an
                     unconfirmed payment entry. The compact payment summary
@@ -1050,22 +1041,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
               </div>
             )}
 
-            {/* Standalone Message button — for ACCEPTED deals with an
-                active workflow row, Message renders inside .workflow-actions
-                so all CTAs sit in one row. We only render the standalone
-                fallback when the workflow row isn't on screen. */}
-            {!hideWorkflow && deal.status !== 'ACCEPTED' && (
-              <button
-                className="btn btn-outline btn-chat"
-                onClick={() => onOpenChat && onOpenChat(messageTarget)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                Message
-              </button>
-            )}
-            {hideWorkflow && (
+            {/* Standalone Message button — for ACCEPTED + workflow-visible
+                cards Message lives inside .workflow-actions instead, so this
+                only renders when that row isn't on screen. */}
+            {(hideWorkflow || deal.status !== 'ACCEPTED') && (
               <button
                 className="btn btn-outline btn-chat"
                 onClick={() => onOpenChat && onOpenChat(messageTarget)}

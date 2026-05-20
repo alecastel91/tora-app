@@ -8,8 +8,9 @@ TORA App SQL is the PostgreSQL-compatible React frontend for the TORA platform, 
 - **Database**: PostgreSQL via Prisma ORM
 - **Entity IDs**: UUIDs (never MongoDB ObjectIds)
 - **ID field**: Always `.id` (never `._id`)
-- **Production URL**: https://tora-app-five.vercel.app (will move to `app.torahub.io`)
-- **Realtime**: Supabase Broadcast channels (no Postgres Changes / no RLS setup)
+- **Production URL**: https://app.torahub.io (also reachable at https://tora-app-five.vercel.app — same Vercel deployment)
+- **Realtime**: Supabase Broadcast channels (no Postgres Changes). **RLS is now enabled on every public-schema table** (default-deny for `anon` role) — backend uses `service_role` which bypasses RLS, so the app keeps working unaffected. See `tora-backend-sql/scripts/enable-rls.js`.
+- **Production DB**: Supabase Project 2 on **Pro tier** (daily backups, 7-day retention, spend cap ON). PITR not enabled (extra $100+/mo, not justified pre-launch).
 
 ## Deployment Topology (as of April 12, 2026)
 
@@ -22,6 +23,63 @@ Vercel env vars (Production scope):
 - `VITE_SUPABASE_ANON_KEY` = Project 2 anon key
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
+
+## Recent Updates (May 20-21, 2026)
+
+### Production launch-ready: deal lifecycle shipped, security hardened, infra resilient
+
+End-to-end deal flow validated on `app.torahub.io`: offer → counter → accept → contract sign-and-send → countersign → fully signed → email delivered with signed contract + Certificate of Completion attached. Share Documents (Press Kit / Tech Rider / Hospitality Rider / **Invoice** new) + payment proof + confirm receipt all live.
+
+### Document sharing polish + Invoice category
+- New `components/common/ShareDocumentsModal.js` extracted as a shared component (was inline in BookingsScreen). Used by both BookingsScreen and the fully-signed contract card in ChatScreen.
+- **Change / Unskip** controls per category — artist can revert a previously shared or skipped entry via new `PUT /api/deals/:dealId/reset-document` backend endpoint (`apiService.resetDocument`). Mirrors the share/skip authorization model.
+- **Invoice** is a fourth `DOC_CATEGORIES` entry with `uploadOnly: true`. Unlike the others (picked from the artist's library), invoice is a fresh PDF upload per booking — modal renders an `UploadOnlyPicker` that hits `/api/contracts/upload-document`, then calls `shareDocument` with the resulting URL. Backend share/skip/reset routes accept it via the whitelist in `utils/documentCategories.js`.
+- Optimistic local update in `ShareDocumentsModal` propagates `updatedDeal` to parent's `onDealUpdated` so the booking-card status badge updates the instant the user shares/unshares/skips — no `fetchDeals` lag. The `useEffect` that syncs from `deal` prop now keys on `deal?.id` only (not full ref) so optimistic updates don't get clobbered.
+
+### New shared `PdfViewerModal` common component
+- `components/common/PdfViewerModal.js` — portals to `document.body` (iOS Safari fix), full-screen via `100dvh`, header with **filename + Download + Open-in-new-tab + Close** icons. Used by BookingsScreen, ChatScreen, ManageProfileScreen, ManageArtistScreen — replaced ~140 lines of duplicated inline modal markup.
+- `utils/urls.js#getAuthedBackendUrl` hardened to rewrite **absolute backend URLs with any host** (legacy `localhost`, current `alessandro.local`, prod Railway) onto the current backend base + append `?profileId&token`. External URLs (Supabase signed URLs) unchanged. Makes stored values portable across dev hosts.
+- New `isBackendFileUrl(doc)` helper in `urls.js` — used by ManageProfile/ManageArtist `openDocument` to decide between in-app PdfViewer vs new-tab.
+
+### Booking-card UX overhaul
+- **CTA reorder** in workflow-actions row: View Contract → Share / Manage Documents → recap pills → Skip Documents → payment chip → Update Payment → Message. All inside one `.workflow-actions` flex-wrap row so the four key CTAs sit visually-consistent.
+- **View Contract** button added for both sides when contract is FULLY_SIGNED (was previously hidden after signing — only the sign-state had it). Booker side also sees View Contract + Sign Contract side-by-side during sign-pending state (can preview without committing).
+- **Document recap pills** are clickable when `status === 'shared'` — opens the document in `PdfViewerModal`.
+- **Payment recap pill removed** — `WorkflowTimeline`'s payment-progress bar has an inline italic **view details** link at the right end of "Remaining: X EUR" that opens the deposit-history modal. Single source for payment review.
+- **Status badge palette** bumped from 15% → 55% opacity backgrounds with white text + 85% borders. Reads as fully-coloured chips instead of grey-with-thin-outline.
+- **`for {artist}` sub-line** on the booking card whenever `deal.bookedArtistId` is set and the viewer isn't that artist. Critical for agents scanning their roster — without it, agents couldn't distinguish bookings since `otherParty.name` shows the promoter, not the artist.
+
+### Manage section refinements
+- `RepresentedArtistsScreen` Manage CTA now shows the pink **action-required dot** (same pattern as ProfileScreen), fetched via `apiService.getActionSummary` per represented artist in a single `Promise.all`.
+- Per-row Edit / Delete stacked vertically; the `+ Add` section-header buttons reduced to a borderless white **`+`** glyph (22px, 700 weight). Empty-state `+ Add` buttons trimmed from 14px → 12px.
+- `.btn-sm` reduced from 12px → 10px font-size (was actually larger than the base `.btn` at 11px — bug).
+- Doc rows show **View file** (in-app PdfViewer for backend uploads) or **Open link ↗** (new tab for external links) instead of raw `/api/contracts/files/...` paths leaking to the UI.
+- Editing a doc refreshes its `addedDate` so the "Added DD/MM/YYYY" label reflects the most recent change.
+- `AddContractModal` already uploads the file and returns `documentData.url` — `ManageArtistScreen.onSave` now respects that URL on upload-type docs (was previously discarded with `url: null`, leaving uploaded docs unviewable forever).
+
+### Backend changes (May 20-21)
+- `PUT /api/deals/:dealId/reset-document` new endpoint — artist-side only, clears a sharedDocuments category entry + system message + broadcast.
+- `GET /api/messages/thread/...` embeds the full `deal` on each message via `include: { deal: true }`. Frontend builds `dealStatuses` from the response — eliminates the per-card getDeal round-trip and the visible flicker.
+- `GET /api/contracts/files/:storagePath` authorization extended:
+  - Now also matches the storagePath against `deal.sharedDocuments[pressKit|technicalRider|hospitalityRider|invoice].documentUrl` so venue/promoter participants can view docs the artist shared into the deal (was 403).
+  - Standalone (non-deal) library files now also allow accepted agents of the file's owner to view (Manage Artist screen needs this).
+  - Inlined agent-checks replaced with the existing `isAgentForArtist` helper in two places.
+
+### Infra hardening
+- **RLS enabled on every public-schema table** in both prod (Project 2) + dev (Project 1). Closed a real anon-readable data leak — verified Supabase auto-exposed `users` table with `email` column to anyone holding the public anon key. Service_role bypasses RLS so backend keeps working with default-deny (no policies).
+- New `tora-backend-sql/scripts/enable-rls.js` (idempotent, single batched ALTER TABLE statement). Wired into `npm run migrate:deploy` so future Prisma migrations auto-secure new tables. Also exposed as `npm run db:secure` for manual / one-off runs.
+- Supabase Project 2 upgraded to **Pro tier** ($25/mo). Daily backups + 7-day retention confirmed working. Spend cap ON by default — no overage billing.
+- `SUPABASE_SERVICE_ROLE_KEY` rotated, propagated to Railway. Payment-proof MIME whitelist applied to prod via `scripts/allow-payment-proof-mimes.js`.
+
+### Code quality (`/simplify` pass, no behaviour change)
+- Backend `contracts.js` agent-check inlined twice → replaced with `isAgentForArtist` helper.
+- Frontend `BookingsScreen.openContractPdf` rebuilt URL manually → uses `getAuthedBackendUrl`.
+- Duplicated `openDocument` helper in both Manage screens → extracted `isBackendFileUrl(doc)` predicate to `urls.js`.
+- `enable-rls.js` moved out of build step (wrong concern; slowed Railway deploys) → kept in `migrate:deploy`. Inner per-table check removed since `ALTER TABLE ENABLE RLS` is idempotent at the catalog level; statements batched into one query.
+- `BookingsScreen` `pendingDocCategories` was computed twice per card render (Share Documents + Skip Documents blocks) → hoisted once to card-scope.
+- `RepresentedArtistsScreen` raw `fetch` for cancel-representation → uses `apiService.cancelRepresentation` (signature changed to object param to support both directions; `SearchAgentsModal` caller updated).
+- Two mutually-exclusive Message buttons in BookingsScreen collapsed into one with combined condition.
+- Stripped `=== DOCUMENT SAVE DEBUG ===` block (~15 console.logs) + dead `convertCurrency` / `exchangeRates` locals from ManageProfileScreen.
 
 ## Recent Updates (May 15-19, 2026)
 
