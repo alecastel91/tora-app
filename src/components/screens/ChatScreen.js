@@ -239,7 +239,6 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
 
   const handleSendDocument = async (document, category) => {
     try {
-      // Send document as a special message
       const documentMessage = {
         from: currentUser.id,
         to: user.id,
@@ -252,15 +251,44 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
           category: category
         }
       };
-
       await apiService.sendDocumentMessage(documentMessage);
-
-      // Close modal and refresh messages
       setShowDocumentPicker(false);
       await fetchMessages();
     } catch (error) {
       console.error('Error sending document:', error);
       alert('Failed to send document. Please try again.');
+    }
+  };
+
+  // Ad-hoc file from device → upload → send as a chat-attachment
+  // message. Unlike the categorized library sends above, this carries
+  // no category, so the backend doesn't broadcast it into any deal's
+  // sharedDocuments — it's a pure conversational attachment.
+  const handleSendOtherFile = async (file) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File must be 10 MB or smaller.');
+      return;
+    }
+    try {
+      const uploaded = await apiService.uploadChatAttachment(file, currentUser.id);
+      await apiService.sendDocumentMessage({
+        from: currentUser.id,
+        to: user.id,
+        text: `📎 ${uploaded.originalName || file.name}`,
+        isSystemMessage: false,
+        documentAttachment: {
+          id: uploaded.storagePath,
+          title: uploaded.originalName || file.name,
+          url: uploaded.fileUrl,
+          category: 'attachment',
+        },
+      });
+      setShowDocumentPicker(false);
+      await fetchMessages();
+    } catch (error) {
+      console.error('Error uploading chat attachment:', error);
+      alert(error.message || 'Failed to upload file. Please try again.');
     }
   };
 
@@ -2441,329 +2469,169 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         </div>
       )}
 
-      {/* Document Picker Modal */}
-      {showDocumentPicker && (
-        <div className="modal-overlay" onClick={() => {
+      {/* Paperclip share modal — library docs (Press Kit / Tech Rider /
+          Hospitality Rider) auto-broadcast into active deals between the
+          two parties via the backend. "Other file" uploads an ad-hoc PDF
+          or image with no workflow binding. */}
+      {showDocumentPicker && (() => {
+        const docsOwner = currentUser.role === 'AGENT'
+          ? (selectedArtistForDocs || null)
+          : currentUser;
+        const needsArtistSelector = currentUser.role === 'AGENT' && !selectedArtistForDocs && !loadingArtistDocs;
+        const categories = [
+          { key: 'pressKit', label: 'Press Kit' },
+          { key: 'technicalRider', label: 'Technical Rider' },
+          { key: 'hospitalityRider', label: 'Hospitality Rider' },
+        ];
+        const closeModal = () => {
           setShowDocumentPicker(false);
           setSelectedArtistForDocs(null);
-        }}>
-          <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Send Document</h3>
-              <button className="modal-close" onClick={() => {
-                setShowDocumentPicker(false);
-                setSelectedArtistForDocs(null);
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
-            <div className="modal-body">
-              {/* Agent: Show Artist Selector First */}
-              {currentUser.role === 'AGENT' && !selectedArtistForDocs && !loadingArtistDocs && (
-                <div>
-                  <p style={{ fontSize: '14px', marginBottom: '16px', color: '#999' }}>
-                    Select an artist to send their documents:
-                  </p>
-                  {currentUser.representingArtists && currentUser.representingArtists.length > 0 ? (
-                    <div className="artist-selector-list">
-                      {currentUser.representingArtists.map((artist) => (
-                        <div
-                          key={artist.profileId || artist.id}
-                          className="artist-selector-item"
-                          onClick={() => handleSelectArtist(artist)}
-                          style={{
-                            padding: '14px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '8px',
-                            marginBottom: '10px',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(255, 51, 102, 0.1)';
-                            e.currentTarget.style.borderColor = 'rgba(255, 51, 102, 0.3)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                          }}
-                        >
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            backgroundColor: '#2a2a2a',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '18px',
-                            fontWeight: '600'
-                          }}>
-                            {artist.avatar ? (
-                              <img src={artist.avatar} alt={artist.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                            ) : (
-                              artist.name.charAt(0).toUpperCase()
-                            )}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '15px', fontWeight: '600', marginBottom: '2px' }}>{artist.name}</div>
+        };
+        return (
+          <div className="modal-overlay" onClick={closeModal}>
+            <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
+              <div className="modal-header">
+                <h3>Share with {user.name}</h3>
+                <button className="modal-close" onClick={closeModal}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="modal-body">
+                {needsArtistSelector && (
+                  <div>
+                    <p style={{ fontSize: '14px', marginBottom: '16px', color: '#999' }}>
+                      Select an artist to send their documents:
+                    </p>
+                    {(currentUser.representingArtists || []).length === 0 ? (
+                      <p style={{ fontSize: '13px', color: '#888' }}>
+                        You don't represent any artists yet. Add one in <strong>Profile &gt; Represented Artists</strong>.
+                      </p>
+                    ) : (
+                      <div>
+                        {currentUser.representingArtists.map((artist) => (
+                          <div
+                            key={artist.profileId || artist.id}
+                            onClick={() => handleSelectArtist(artist)}
+                            style={{
+                              padding: '14px',
+                              background: 'rgba(255,255,255,0.03)',
+                              border: '1px solid rgba(255,255,255,0.1)',
+                              borderRadius: '8px',
+                              marginBottom: '10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s',
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,51,102,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,51,102,0.5)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                          >
+                            <div style={{ fontSize: '15px', fontWeight: 600 }}>{artist.name}</div>
                             <div style={{ fontSize: '12px', color: '#888' }}>{artist.location}</div>
                           </div>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                          </svg>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="empty-state" style={{ textAlign: 'center', padding: '40px 20px' }}>
-                      <p style={{ fontSize: '14px', color: '#999' }}>No represented artists</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Loading state while fetching artist documents */}
-              {currentUser.role === 'AGENT' && loadingArtistDocs && (
-                <div className="empty-state" style={{ textAlign: 'center', padding: '40px 20px' }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    border: '3px solid rgba(255, 51, 102, 0.2)',
-                    borderTop: '3px solid #FF3366',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite',
-                    margin: '0 auto 16px'
-                  }}></div>
-                  <p style={{ fontSize: '14px', color: '#999' }}>Loading documents...</p>
-                </div>
-              )}
-
-              {/* Show Documents (for Artists OR Agents after selecting artist) */}
-              {(currentUser.role !== 'AGENT' || selectedArtistForDocs) && (() => {
-                // Determine which documents to show
-                const docsSource = currentUser.role === 'AGENT' ? selectedArtistForDocs : currentUser;
-
-                return (
-                  <>
-                    {/* Back button for agents */}
-                    {currentUser.role === 'AGENT' && selectedArtistForDocs && (
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => setSelectedArtistForDocs(null)}
-                        style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                        Back to Artists
-                      </button>
-                    )}
-
-                    {/* Artist name header for agents */}
-                    {currentUser.role === 'AGENT' && selectedArtistForDocs && (
-                      <div style={{
-                        padding: '12px',
-                        backgroundColor: 'rgba(255, 51, 102, 0.05)',
-                        border: '1px solid rgba(255, 51, 102, 0.2)',
-                        borderRadius: '8px',
-                        marginBottom: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px'
-                      }}>
-                        <div style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: '#2a2a2a',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
-                          {selectedArtistForDocs.avatar ? (
-                            <img src={selectedArtistForDocs.avatar} alt={selectedArtistForDocs.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                          ) : (
-                            selectedArtistForDocs.name.charAt(0).toUpperCase()
-                          )}
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '13px', fontWeight: '600' }}>{selectedArtistForDocs.name}'s Documents</div>
-                          <div style={{ fontSize: '11px', color: '#888' }}>{selectedArtistForDocs.location}</div>
-                        </div>
+                        ))}
                       </div>
                     )}
-              {/* Press Kit Documents */}
-              {docsSource.documents?.pressKit && docsSource.documents.pressKit.length > 0 && (
-                <div className="document-category-section">
-                  <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#FF3366' }}>
-                    Press Kit
-                  </h4>
-                  <div className="document-list">
-                    {docsSource.documents.pressKit.map((doc) => (
-                      <div key={doc.id} className="document-item" style={{
-                        padding: '12px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        marginBottom: '8px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                            <polyline points="13 2 13 9 20 9"></polyline>
-                          </svg>
-                          <span style={{ fontSize: '14px' }}>{doc.title}</span>
-                        </div>
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={() => handleSendDocument(doc, 'pressKit')}
-                        >
-                          Send
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Technical Rider Documents */}
-              {docsSource.documents?.technicalRider && docsSource.documents.technicalRider.length > 0 && (
-                <div className="document-category-section" style={{ marginTop: '20px' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#FF3366' }}>
-                    Technical Rider
-                  </h4>
-                  <div className="document-list">
-                    {docsSource.documents.technicalRider.map((doc) => (
-                      <div key={doc.id} className="document-item" style={{
-                        padding: '12px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        marginBottom: '8px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                            <polyline points="13 2 13 9 20 9"></polyline>
-                          </svg>
-                          <span style={{ fontSize: '14px' }}>{doc.title}</span>
-                        </div>
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={() => handleSendDocument(doc, 'technicalRider')}
-                        >
-                          Send
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Contract Documents */}
-              <div className="document-category-section" style={{ marginTop: '20px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#FF3366' }}>
-                  Contracts
-                </h4>
-                <p style={{ fontSize: '12px', color: '#999', marginBottom: '12px', lineHeight: '1.5' }}>
-                  Upload PDF contracts to be signed within TORA, or paste links to external signing platforms (DocuSign, HelloSign, Adobe Sign, etc.)
-                </p>
-
-                {docsSource.documents?.contracts && docsSource.documents.contracts.length > 0 && (
-                  <div className="document-list" style={{ marginBottom: '12px' }}>
-                    {docsSource.documents.contracts.map((doc) => (
-                      <div key={doc.id} className="document-item" style={{
-                        padding: '12px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        marginBottom: '8px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                            <polyline points="13 2 13 9 20 9"></polyline>
-                          </svg>
-                          <span style={{ fontSize: '14px' }}>{doc.title}</span>
-                        </div>
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={() => handleSendDocument(doc, 'contracts')}
-                        >
-                          Send
-                        </button>
-                      </div>
-                    ))}
                   </div>
                 )}
 
-                {/* Add New Contract Button */}
-                <button
-                  className="btn btn-outline"
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    fontSize: '13px',
-                    padding: '10px'
-                  }}
-                  onClick={() => setShowAddContractModal(true)}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="12" y1="11" x2="12" y2="17"></line>
-                    <line x1="9" y1="14" x2="15" y2="14"></line>
-                  </svg>
-                  Add Contract (PDF or Link)
-                </button>
-              </div>
+                {loadingArtistDocs && (
+                  <p style={{ fontSize: '13px', color: '#888', textAlign: 'center', padding: '20px' }}>Loading…</p>
+                )}
 
-              {/* No Documents Message */}
-              {(!docsSource.documents?.pressKit || docsSource.documents.pressKit.length === 0) &&
-               (!docsSource.documents?.technicalRider || docsSource.documents.technicalRider.length === 0) &&
-               (!docsSource.documents?.contracts || docsSource.documents.contracts.length === 0) && (
-                <div className="empty-state" style={{ textAlign: 'center', padding: '40px 20px' }}>
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ margin: '0 auto 16px', opacity: 0.3 }}>
-                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                    <polyline points="13 2 13 9 20 9"></polyline>
-                  </svg>
-                  <p style={{ fontSize: '14px', color: '#999' }}>No documents available</p>
-                  <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                    {currentUser.role === 'AGENT' ?
-                      'This artist has no documents added to their profile' :
-                      'Add documents to your profile to share them in chat'
-                    }
-                  </p>
-                </div>
-              )}
-                  </>
-                );
-              })()}
+                {!needsArtistSelector && !loadingArtistDocs && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    {currentUser.role === 'AGENT' && selectedArtistForDocs && (
+                      <div style={{ fontSize: '12px', color: '#888' }}>
+                        Sharing on behalf of <strong style={{ color: '#fff' }}>{selectedArtistForDocs.name}</strong> · <button onClick={() => setSelectedArtistForDocs(null)} style={{ background: 'transparent', border: 'none', color: '#FF3366', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>change</button>
+                      </div>
+                    )}
+                    {categories.map((cat) => {
+                      const docs = docsOwner?.documents?.[cat.key] || [];
+                      return (
+                        <div key={cat.key} style={{
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '10px',
+                          padding: '14px',
+                          background: 'rgba(255,255,255,0.02)',
+                        }}>
+                          <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>{cat.label}</strong>
+                          {docs.length === 0 ? (
+                            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                              No {cat.label.toLowerCase()} in {currentUser.role === 'AGENT' ? `${selectedArtistForDocs?.name || 'their'} library` : 'your library'}. Add one in <strong>Profile &gt; Manage &gt; Documents</strong>.
+                            </p>
+                          ) : (
+                            docs.map((doc) => (
+                              <div
+                                key={doc.id}
+                                onClick={() => handleSendDocument(doc, cat.key)}
+                                title={doc.title}
+                                style={{
+                                  padding: '10px 12px',
+                                  border: '1px solid rgba(255,255,255,0.08)',
+                                  borderRadius: '6px',
+                                  marginBottom: '6px',
+                                  cursor: 'pointer',
+                                  fontSize: '13px',
+                                  fontWeight: 500,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  transition: 'all 0.15s',
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,51,102,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,51,102,0.5)'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                              >
+                                {doc.title}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    <div style={{
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '10px',
+                      padding: '14px',
+                      background: 'rgba(255,255,255,0.02)',
+                    }}>
+                      <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>Other file</strong>
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        style={{ display: 'none' }}
+                        ref={(el) => { window.__chatOtherFileInput = el; }}
+                        onChange={(e) => handleSendOtherFile(e.target.files?.[0])}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => window.__chatOtherFileInput?.click()}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px dashed rgba(255,51,102,0.5)',
+                          borderRadius: '6px',
+                          background: 'rgba(255,51,102,0.05)',
+                          color: '#FF3366',
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Upload PDF or image
+                      </button>
+                      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', margin: '6px 0 0 0' }}>
+                        Ad-hoc file — sent only in this conversation. Max 10 MB.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Sign Contract Modal */}
       {showSignContractModal && selectedContractData && (

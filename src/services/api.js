@@ -449,6 +449,23 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Upload an ad-hoc file (PDF or image) for the chat paperclip's
+  // "Other file" slot. Returns { fileUrl, storagePath, fileSize,
+  // originalName, contentType } — pass fileUrl + originalName to
+  // sendDocumentMessage as documentAttachment.
+  async uploadChatAttachment(file, profileId) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('profileId', profileId);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/messages/upload-chat-attachment`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    return this.handleResponse(response);
+  }
+
   // Resolve short URLs to full URLs
   async resolveUrl(url) {
     const response = await fetch(`${API_URL}/resolve-url`, {
