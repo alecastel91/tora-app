@@ -24,6 +24,27 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 22-25, 2026)
+
+### Paperclip rework — modal mirrors Share Documents, auto-broadcasts to active deals
+The chat paperclip's old categorized library picker (~320 lines) was redundant once Share Documents (booking-card) + Send Contract + Invoice (per-deal) handled the workflow-bound flows. New design:
+
+- **Modal layout** mirrors `ShareDocumentsModal`: one section per category (Press Kit / Tech Rider / Hospitality Rider) showing the artist's library docs, plus a new **Other file** slot for ad-hoc PDF / image uploads (≤10 MB, multipart upload to `chat-attachments/{senderProfileId}/...` via new backend endpoint).
+- For agents, the artist-selector stays at the top (multi-artist agents pick which library to draw from).
+- **Auto-broadcast to active deals:** sending a categorized doc via paperclip now writes into `deal.sharedDocuments[category]` for every active deal (PENDING / NEGOTIATING / ACCEPTED) between sender and recipient. The booking card reads `sharedDocuments`, so the share appears in the workflow checklist with no extra action from the user. Override via the booking-card Share Documents modal still works (same field).
+- **Agent-aware:** when Alessandro (agent) sends on Al Jones's behalf, the deal lookup expands the sender's profile to include all artists they represent — so `artistId = AlJones` deals still match `senderId = Alessandro`. Same expansion on the recipient side.
+- **Seed on deal-accept:** newly accepted deals scan the last 200 doc-attachment messages between the parties and pre-fill any unset categories from the most recent share. Catches the "shared in chat before the deal existed" case.
+- **Visual unification:** paperclip-sent categorized docs now render with the same green "shared X" card as system-message shares (was rendering with the generic doc-attachment look). The render branch dropped the `isSystem` + `dealId` gates — same JSX serves both flavours.
+
+### Booking card `for {artist}` sub-line
+When `deal.bookedArtistId` is set and the viewer isn't the booked artist, the card shows a sub-line `for {bookedArtistName}` below `otherParty.name`. Critical for agents scanning their roster — without it, agents couldn't distinguish bookings since `otherParty.name` showed only the promoter.
+
+### Simplify pass — second wave
+- `otherFileInputRef = useRef(null)` replaces `window.__chatOtherFileInput` global mutation (race-on-remount fix).
+- `BROADCAST_DOC_CATEGORY_KEYS` exported from `utils/documentCategories.js` (via `broadcast: true` flag per entry). Replaces 4 inline copies of the same `['pressKit','technicalRider','hospitalityRider']` literal in ChatScreen.
+- `labelForCategory()` replaces the two inline `{pressKit: 'Press Kit', ...}` label maps in ChatScreen.
+- `isBackendFileUrl(doc)` (in `utils/urls.js`) used at the JSX label sites in both Manage screens — earlier simplify pass had caught the handler sites only.
+
 ## Recent Updates (May 20-21, 2026)
 
 ### Production launch-ready: deal lifecycle shipped, security hardened, infra resilient
