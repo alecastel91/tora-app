@@ -652,7 +652,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                               cursor: 'pointer',
                             }}
                           >
-                            {doc.type === 'upload' || doc.url.startsWith('/api/') ? 'View file' : 'Open link ↗'}
+                            {isBackendFileUrl(doc) ? 'View file' : 'Open link ↗'}
                           </button>
                         )}
                         {doc.addedDate && (

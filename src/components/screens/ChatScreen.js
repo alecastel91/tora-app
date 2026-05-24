@@ -11,7 +11,7 @@ import AddContractModal from '../common/AddContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
-import { DOC_CATEGORY_KEYS } from '../../utils/documentCategories';
+import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
 import { getAuthedBackendUrl } from '../../utils/urls';
 
 const ChatScreen = ({ user, onClose, onOpenProfile }) => {
@@ -71,6 +71,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const [shareDocsDeal, setShareDocsDeal] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const otherFileInputRef = useRef(null);
 
   // Fetch full artist profile when agent selects an artist
   const handleSelectArtist = async (artist) => {
@@ -752,7 +753,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       // chat history. Renderer recognises them by text prefix.
       messages.forEach(m => {
         if (!m.text) return;
-        const isShare = m.documentAttachment && (m.documentAttachment.category === 'pressKit' || m.documentAttachment.category === 'technicalRider' || m.documentAttachment.category === 'hospitalityRider');
+        const isShare = m.documentAttachment && BROADCAST_DOC_CATEGORY_KEYS.includes(m.documentAttachment.category);
         const isSkip = m.text.includes('marked Press Kit as not needed') || m.text.includes('marked Technical Rider as not needed') || m.text.includes('marked Hospitality Rider as not needed');
         const isPayment = m.text.startsWith('💰');
         if (isShare || isSkip || isPayment) {
@@ -1126,8 +1127,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       <button
                         className="btn btn-skip"
                         onClick={async () => {
-                          const labels = { pressKit: 'Press Kit', technicalRider: 'Technical Rider', hospitalityRider: 'Hospitality Rider' };
-                          const list = pendingDocCategories.map((k) => labels[k]).join(', ');
+                          const list = pendingDocCategories.map(labelForCategory).join(', ');
                           if (!window.confirm(`Skip ${list} for this booking?`)) return;
                           try {
                             for (const cat of pendingDocCategories) {
@@ -1155,9 +1155,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               </div>
                 );
               })()
-            ) : msg.documentAttachment && ['pressKit','technicalRider','hospitalityRider'].includes(msg.documentAttachment.category) ? (
+            ) : msg.documentAttachment && BROADCAST_DOC_CATEGORY_KEYS.includes(msg.documentAttachment.category) ? (
               (() => {
-                const labelByCategory = { pressKit: 'Press Kit', technicalRider: 'Technical Rider', hospitalityRider: 'Hospitality Rider' };
                 return (
                   <div className="message-with-timestamp">
                     <div className="offer-card-message">
@@ -1169,7 +1168,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         </div>
                         <div className="offer-card-text">
                           <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
-                          <p className="offer-card-action">shared {labelByCategory[msg.documentAttachment.category]}{msg.documentAttachment.title ? ` · ${msg.documentAttachment.title}` : ''}</p>
+                          <p className="offer-card-action">shared {labelForCategory(msg.documentAttachment.category)}{msg.documentAttachment.title ? ` · ${msg.documentAttachment.title}` : ''}</p>
                         </div>
                       </div>
                       <button
@@ -2478,11 +2477,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
           ? (selectedArtistForDocs || null)
           : currentUser;
         const needsArtistSelector = currentUser.role === 'AGENT' && !selectedArtistForDocs && !loadingArtistDocs;
-        const categories = [
-          { key: 'pressKit', label: 'Press Kit' },
-          { key: 'technicalRider', label: 'Technical Rider' },
-          { key: 'hospitalityRider', label: 'Hospitality Rider' },
-        ];
+        const categories = DOC_CATEGORIES.filter((c) => c.broadcast);
         const closeModal = () => {
           setShowDocumentPicker(false);
           setSelectedArtistForDocs(null);
@@ -2601,12 +2596,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         type="file"
                         accept="application/pdf,image/*"
                         style={{ display: 'none' }}
-                        ref={(el) => { window.__chatOtherFileInput = el; }}
+                        ref={otherFileInputRef}
                         onChange={(e) => handleSendOtherFile(e.target.files?.[0])}
                       />
                       <button
                         type="button"
-                        onClick={() => window.__chatOtherFileInput?.click()}
+                        onClick={() => otherFileInputRef.current?.click()}
                         style={{
                           width: '100%',
                           padding: '10px 12px',

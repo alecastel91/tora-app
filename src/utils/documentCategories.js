@@ -7,14 +7,20 @@
 // Mechanically the upload still lands in the same Supabase storage bucket
 // and the deal's sharedDocuments JSONB entry has the same shape as a library
 // share, so backend handlers stay identical.
+//
+// `broadcast: true` categories are the artist-side docs that the chat
+// paperclip auto-writes into every active deal between sender and recipient
+// (and that deal-accept seeds from chat history). Invoice opts out because
+// it's per-deal-fresh by definition.
 export const DOC_CATEGORIES = [
-  { key: 'pressKit', label: 'Press Kit' },
-  { key: 'technicalRider', label: 'Technical Rider' },
-  { key: 'hospitalityRider', label: 'Hospitality Rider' },
+  { key: 'pressKit', label: 'Press Kit', broadcast: true },
+  { key: 'technicalRider', label: 'Technical Rider', broadcast: true },
+  { key: 'hospitalityRider', label: 'Hospitality Rider', broadcast: true },
   { key: 'invoice', label: 'Invoice', uploadOnly: true },
 ];
 
 export const DOC_CATEGORY_KEYS = DOC_CATEGORIES.map((c) => c.key);
+export const BROADCAST_DOC_CATEGORY_KEYS = DOC_CATEGORIES.filter((c) => c.broadcast).map((c) => c.key);
 
 export function labelForCategory(key) {
   const hit = DOC_CATEGORIES.find((c) => c.key === key);
