@@ -1155,7 +1155,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               </div>
                 );
               })()
-            ) : msg.isSystem && msg.dealId && msg.documentAttachment && ['pressKit','technicalRider','hospitalityRider'].includes(msg.documentAttachment.category) ? (
+            ) : msg.documentAttachment && ['pressKit','technicalRider','hospitalityRider'].includes(msg.documentAttachment.category) ? (
               (() => {
                 const labelByCategory = { pressKit: 'Press Kit', technicalRider: 'Technical Rider', hospitalityRider: 'Hospitality Rider' };
                 return (
