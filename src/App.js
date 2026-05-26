@@ -13,6 +13,8 @@ import ViewProfileScreen from './components/screens/ViewProfileScreen';
 import LoginScreen from './components/screens/LoginScreen';
 import SignupScreen from './components/screens/SignupScreen';
 import Modal from './components/common/Modal';
+import AgentTierLadder from './components/common/AgentTierLadder';
+import AgentTierCard from './components/common/AgentTierCard';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
 import apiService from './services/api';
@@ -434,36 +436,42 @@ function App() {
 
             {/* Subscription & Usage Section */}
             <div className="settings-section subscription-section">
-              <h3>Subscription & Usage</h3>
+              <h3>{user?.role === 'AGENT' ? 'Agent plan' : 'Subscription & Usage'}</h3>
 
-              {/* Subscription Tier Badge (per-profile) */}
-              <div className="subscription-tier-badge">
-                <span className={`tier-label ${user?.subscriptionTier?.toLowerCase() || 'free'}`}>
-                  {user?.subscriptionTier || 'FREE'}
-                </span>
-                {(!user?.subscriptionTier || user?.subscriptionTier === 'FREE') && (
-                  <button
-                    className="btn btn-upgrade-small"
-                    onClick={() => {
-                      setShowSettings(false);
-                      setShowPremium(true);
-                    }}
-                  >
-                    Upgrade to Premium
-                  </button>
-                )}
-                {user?.subscriptionTier === 'MONTHLY' && (
-                  <button
-                    className="btn btn-upgrade-small"
-                    onClick={() => {
-                      setShowSettings(false);
-                      setShowPremium(true);
-                    }}
-                  >
-                    Upgrade to Yearly
-                  </button>
-                )}
-              </div>
+              {user?.role === 'AGENT' ? (
+                <AgentTierCard
+                  profile={user}
+                  onManage={() => { setShowSettings(false); setShowPremium(true); }}
+                />
+              ) : (
+                <div className="subscription-tier-badge">
+                  <span className={`tier-label ${user?.subscriptionTier?.toLowerCase() || 'free'}`}>
+                    {user?.subscriptionTier || 'FREE'}
+                  </span>
+                  {(!user?.subscriptionTier || user?.subscriptionTier === 'FREE') && (
+                    <button
+                      className="btn btn-upgrade-small"
+                      onClick={() => {
+                        setShowSettings(false);
+                        setShowPremium(true);
+                      }}
+                    >
+                      Upgrade to Premium
+                    </button>
+                  )}
+                  {user?.subscriptionTier === 'MONTHLY' && (
+                    <button
+                      className="btn btn-upgrade-small"
+                      onClick={() => {
+                        setShowSettings(false);
+                        setShowPremium(true);
+                      }}
+                    >
+                      Upgrade to Yearly
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Trial Countdown */}
               {user?.subscriptionTier === 'TRIAL' && user?.trialEndDate && (
@@ -578,7 +586,7 @@ function App() {
                 </div>
               </div>
             </div>
-            
+
             <div className="settings-section">
               <h3>{t('settings.language')}</h3>
               <div className="language-selector">
@@ -902,23 +910,31 @@ function App() {
               </div>
             </div>
             
-            <div className="premium-pricing">
-              <div className="price-card">
-                <h4>Monthly</h4>
-                <div className="price">€19.90<span>/month</span></div>
-                <button className="btn btn-outline" onClick={() => handleSelectPlan('monthly')}>Choose Monthly</button>
+            {user?.role === 'AGENT' ? (
+              <div style={{ marginTop: '24px' }}>
+                <AgentTierLadder currentTier={user?.agentTier || null} />
               </div>
-              <div className="price-card featured">
-                <div className="badge">Save 21%</div>
-                <h4>Yearly</h4>
-                <div className="price">€189.90<span>/year</span></div>
-                <button className="btn btn-primary" onClick={() => handleSelectPlan('yearly')}>Choose Yearly</button>
-              </div>
-            </div>
-            
-            <p className="premium-note">
-              Cancel anytime. All prices in EUR.
-            </p>
+            ) : (
+              <>
+                <div className="premium-pricing">
+                  <div className="price-card">
+                    <h4>Monthly</h4>
+                    <div className="price">€19.90<span>/month</span></div>
+                    <button className="btn btn-outline" onClick={() => handleSelectPlan('monthly')}>Choose Monthly</button>
+                  </div>
+                  <div className="price-card featured">
+                    <div className="badge">Save 21%</div>
+                    <h4>Yearly</h4>
+                    <div className="price">€189.90<span>/year</span></div>
+                    <button className="btn btn-primary" onClick={() => handleSelectPlan('yearly')}>Choose Yearly</button>
+                  </div>
+                </div>
+
+                <p className="premium-note">
+                  Cancel anytime. All prices in EUR.
+                </p>
+              </>
+            )}
           </div>
           </div>
         )}

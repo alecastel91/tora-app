@@ -24,6 +24,50 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (May 26-27, 2026)
+
+### Agent multi-tier pricing — Phase 4 (tier model + caps, Stripe deferred)
+The SubscriptionTier enum (`FREE/TRIAL/MONTHLY/YEARLY`) doesn't model agents — their value axis is roster size, not personal usage. Added a parallel `AgentTier` ladder with 6 paid tiers + `null = browse-only`.
+
+**Pricing ladder** (mirrored at [src/utils/agentTiers.js](src/utils/agentTiers.js) and [tora-backend-sql/src/utils/agentTiers.js](../tora-backend-sql/src/utils/agentTiers.js) — keep in sync if you tweak prices):
+- SOLO €19.90/mo · €189.90/yr · 3 artists
+- AGENCY_S €39.90/mo · €379.90/yr · 10
+- AGENCY_M €69.90/mo · €669.90/yr · 25
+- AGENCY_L €199.90/mo · €1899.90/yr · 50
+- AGENCY_LPLUS €349.90/mo · €3349.90/yr · 100
+- ENTERPRISE custom · unlimited (mailto:support@torahub.io)
+
+**New shared components:**
+- [`src/components/common/AgentTierLadder.js`](src/components/common/AgentTierLadder.js) — 6-tier comparison with monthly/yearly toggle, internal interval state, Select button stubs (Stripe TBD). Used inline in the Premium screen for AGENT users (replaces the generic monthly/yearly cards) and inside `AgentUpgradeModal` for the at-cap quick-upgrade flow on `RepresentedArtistsScreen`.
+- [`src/components/common/AgentTierCard.js`](src/components/common/AgentTierCard.js) — Settings card with tier label, price line, roster usage chip, Manage button. Replaces the generic Subscription badge for AGENT users in App.js Settings.
+- [`src/components/common/AgentUpgradeModal.js`](src/components/common/AgentUpgradeModal.js) — thin modal wrapper around `AgentTierLadder`.
+
+**Gating surfaces:**
+- `RepresentedArtistsScreen` shows roster usage chip (red at cap). `+` Add Artist button opens `AgentUpgradeModal` instead of the search modal when at cap. Empty state for free agents (cap=0) reads "Pick a plan to start" instead of "Add First Artist".
+- App.js Settings: AGENT profiles see `AgentTierCard` (label + price + roster usage + Manage button). Other roles unchanged.
+- App.js Premium screen: AGENT profiles see the feature comparison table + `AgentTierLadder` (replaces the generic monthly/yearly pricing cards). Other roles unchanged.
+- The likes/connections usage stats still render for AGENT (subscriptionTier is still meaningful for them — connection limits etc.).
+
+**Backend enforcement:** Cap-check gates added in [tora-backend-sql/src/routes/connections.js](../tora-backend-sql/src/routes/connections.js) at both send (`/representation-request`, agent-initiated direction only) and accept (`/accept-representation`, both directions). Returns 403 with `{ error, code: 'AGENT_ROSTER_CAP', tier, currentCount, cap }`. Error message phrasing differs by audience (agent-as-caller vs artist-as-caller) via the new `buildRosterCapError(profile, { audience })` helper. Existing roster entries are grandfathered — the check only blocks new additions.
+
+**Schema:** added `AgentTier` + `BillingInterval` enums + 4 nullable Profile fields (`agentTier`, `agentBillingInterval`, `agentTierStartDate`, `agentTierEndDate`). Purely additive migration — no backfill needed (user confirmed no existing over-cap agents).
+
+**What's NOT in this commit:** Stripe checkout + webhook wiring (separate Phase 4 chunk — agents activated manually via SQL until then), team seats (entirely out of scope).
+
+### Simplify pass on the agent-tier commit
+Three parallel reviewers (reuse / quality / efficiency) → 10 fixes applied:
+- Extracted `<AgentTierLadder />` shared component — eliminated ~130 lines of dupe between `AgentUpgradeModal` and App.js Premium screen ladder. `AgentUpgradeModal` shrunk from 158 → 25 lines.
+- Extracted `<AgentTierCard />` for Settings — replaces a 50-line IIFE + nested ternary chain with a clean component call.
+- Backend `buildRosterCapError(profile, { audience })` extracted — collapsed 3 near-identical 403 payload builders into 1. Connections.js cap-check sites went ~40 → ~5 lines.
+- `BILLING_INTERVAL` constant exported (was magic strings with inconsistent casing).
+- `callerIsAgent = !isAgentToArtist` double-negative → `toProfile.role === 'AGENT'` (direct).
+- `rosterUsage` moved inside the conditional (only computed when error path fires).
+- `const t = AGENT_TIER_PRICING[key]` shadowing i18n `t()` → renamed to `tier`.
+- `useState('monthly')` named `interval` (shadows `window.setInterval`) → renamed to `billingInterval`.
+- Trimmed narrating comments + `/* unlimited */` inline.
+
+**Skipped:** currency formatter consolidation (`ManageProfileScreen`/`ManageArtistScreen` have an older `formatCurrencyWithSymbol` dupe — real but expands scope), inline style refactors (Tailwind migration imminent).
+
 ## Recent Updates (May 22-25, 2026)
 
 ### Paperclip rework — modal mirrors Share Documents, auto-broadcasts to active deals

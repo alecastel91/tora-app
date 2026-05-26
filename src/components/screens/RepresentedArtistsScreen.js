@@ -4,8 +4,10 @@ import { CloseIcon, AddIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
 import ManageArtistScreen from './ManageArtistScreen';
 import SearchArtistsModal from '../common/SearchArtistsModal';
+import AgentUpgradeModal from '../common/AgentUpgradeModal';
 import { dummyProfiles } from '../../data/profiles';
 import apiService from '../../services/api';
+import { rosterUsage } from '../../utils/agentTiers';
 
 const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const { user, reloadProfileData } = useAppContext();
@@ -19,6 +21,8 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
 
   const representedArtists = user?.representingArtists || [];
   const [removingArtistId, setRemovingArtistId] = useState(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const usage = rosterUsage(user);
   // Pink dot on Manage CTA when the represented artist has pending action
   // items (same pattern as ProfileScreen — fetch per-artist in one burst).
   const [artistActionsMap, setArtistActionsMap] = useState({});
@@ -171,11 +175,41 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         <h1>Represented Artists</h1>
         <button
           className="add-artist-btn"
-          onClick={() => setShowSearchModal(true)}
+          onClick={() => usage.atLimit ? setShowUpgradeModal(true) : setShowSearchModal(true)}
+          title={usage.atLimit ? 'Roster limit reached — upgrade to add more' : 'Add artist'}
+          style={usage.atLimit ? { opacity: 0.5 } : undefined}
         >
           <AddIcon />
         </button>
       </div>
+
+      {usage.cap !== Infinity && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 16px',
+          margin: '0 16px 12px',
+          borderRadius: '10px',
+          background: usage.atLimit ? 'rgba(255,51,102,0.08)' : 'rgba(255,255,255,0.03)',
+          border: `1px solid ${usage.atLimit ? 'rgba(255,51,102,0.3)' : 'rgba(255,255,255,0.08)'}`,
+          fontSize: '13px',
+        }}>
+          <span style={{ color: usage.atLimit ? '#FF3366' : 'rgba(255,255,255,0.75)' }}>
+            <strong>Roster: {usage.current}/{usage.cap}</strong>
+            {usage.atLimit && (usage.cap === 0
+              ? ' — Pick a plan to start representing artists.'
+              : ' — Upgrade to add more.')}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowUpgradeModal(true)}
+            className="btn btn-outline btn-sm"
+          >
+            {usage.cap === 0 ? 'Choose plan' : 'Upgrade'}
+          </button>
+        </div>
+      )}
 
       <div className="represented-artists-content">
         {representedArtists.length > 0 ? (
@@ -238,13 +272,17 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         ) : (
           <div className="empty-state">
             <div className="empty-icon">🎵</div>
-            <h2>No Artists Yet</h2>
-            <p>Start building your roster by adding artists you represent.</p>
+            <h2>{usage.cap === 0 ? 'Pick a plan to start' : 'No Artists Yet'}</h2>
+            <p>
+              {usage.cap === 0
+                ? "Agent plans let you build a roster and act on artists' behalf. Solo starts at €19.90/month."
+                : 'Start building your roster by adding artists you represent.'}
+            </p>
             <button
               className="btn btn-primary"
-              onClick={() => setShowSearchModal(true)}
+              onClick={() => usage.cap === 0 ? setShowUpgradeModal(true) : setShowSearchModal(true)}
             >
-              <AddIcon /> Add First Artist
+              {usage.cap === 0 ? 'See plans' : <><AddIcon /> Add First Artist</>}
             </button>
           </div>
         )}
@@ -258,6 +296,12 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         )}
 
       </div>
+
+      <AgentUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentTier={user?.agentTier || null}
+      />
     </div>
   );
 };
