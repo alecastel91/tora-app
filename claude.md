@@ -26,6 +26,11 @@ Local `.env` is for local dev only — it points at Project 1. The two stacks ar
 
 ## Recent Updates (May 26-27, 2026)
 
+### Prod rollout of the agent-tier commit
+Schema pushed cleanly to Supabase Project 2 on 2026-05-26 (4 columns + 2 enums verified). Railway + Vercel auto-deployed. Alessandro's prod AGENT profile (`e3fe3e31-...`) set to `agent_tier=SOLO` for smoke testing.
+
+First Railway deploy after the push crashed on a Supavisor auth-failure lockout (`EC1RCD15TBRENVER`) — the prod DB password had been rotated minutes before, the old container kept retrying with the previous value, and the pooler temporarily blocked Railway's IP. Cleared after ~15 min with one restart. **Lesson:** when you see that error, don't spam restart — wait 15 min, then redeploy once. Operational details in [tora-backend-sql/CLAUDE.md](../tora-backend-sql/CLAUDE.md).
+
 ### Agent multi-tier pricing — Phase 4 (tier model + caps, Stripe deferred)
 The SubscriptionTier enum (`FREE/TRIAL/MONTHLY/YEARLY`) doesn't model agents — their value axis is roster size, not personal usage. Added a parallel `AgentTier` ladder with 6 paid tiers + `null = browse-only`.
 
