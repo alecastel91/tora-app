@@ -12,6 +12,8 @@ import ChatScreen from './components/screens/ChatScreen';
 import ViewProfileScreen from './components/screens/ViewProfileScreen';
 import LoginScreen from './components/screens/LoginScreen';
 import SignupScreen from './components/screens/SignupScreen';
+import ForgotPasswordScreen from './components/screens/ForgotPasswordScreen';
+import ResetPasswordScreen from './components/screens/ResetPasswordScreen';
 import Modal from './components/common/Modal';
 import AgentTierLadder from './components/common/AgentTierLadder';
 import AgentTierCard from './components/common/AgentTierCard';
@@ -24,7 +26,20 @@ import './styles/responsive.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+  // 'login' | 'signup' | 'forgot' | 'reset'. Default 'login', overridden on
+  // boot by URL detection so /reset-password?token=... shows the reset form.
+  const [authMode, setAuthMode] = useState(() => {
+    if (typeof window !== 'undefined'
+      && window.location.pathname === '/reset-password'
+      && new URLSearchParams(window.location.search).get('token')) {
+      return 'reset';
+    }
+    return 'login';
+  });
+  const [resetToken] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    return new URLSearchParams(window.location.search).get('token');
+  });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
   const [activeChatUser, setActiveChatUser] = useState(null);
@@ -352,17 +367,35 @@ function App() {
     );
   }
 
-  // Show login/signup screen if not authenticated
+  // Show login/signup/forgot/reset screen if not authenticated
   if (!isAuthenticated) {
-    return authMode === 'login' ? (
+    const goToLogin = () => {
+      // Clear ?token= from the URL when leaving the reset screen so a refresh
+      // doesn't reopen it with the now-used (or expired) token.
+      if (typeof window !== 'undefined' && window.location.pathname === '/reset-password') {
+        window.history.replaceState({}, '', '/');
+      }
+      setAuthMode('login');
+    };
+    if (authMode === 'reset' && resetToken) {
+      return <ResetPasswordScreen token={resetToken} onBackToLogin={goToLogin} />;
+    }
+    if (authMode === 'forgot') {
+      return <ForgotPasswordScreen onBackToLogin={goToLogin} />;
+    }
+    if (authMode === 'signup') {
+      return (
+        <SignupScreen
+          onSignupSuccess={handleSignupSuccess}
+          onSwitchToLogin={() => setAuthMode('login')}
+        />
+      );
+    }
+    return (
       <LoginScreen
         onLoginSuccess={handleLoginSuccess}
         onSwitchToSignup={() => setAuthMode('signup')}
-      />
-    ) : (
-      <SignupScreen
-        onSignupSuccess={handleSignupSuccess}
-        onSwitchToLogin={() => setAuthMode('login')}
+        onSwitchToForgotPassword={() => setAuthMode('forgot')}
       />
     );
   }

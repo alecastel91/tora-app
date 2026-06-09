@@ -3,7 +3,7 @@ import apiService from '../../services/api';
 import IntroSplash from '../common/IntroSplash';
 import { motion } from 'framer-motion';
 
-const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
+const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPassword }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -109,7 +109,7 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
           </div>
 
           {/* Password Input */}
-          <div className="mb-6">
+          <div className="mb-2">
             <input
               type="password"
               name="password"
@@ -121,6 +121,17 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup }) => {
               required
               className="w-full px-4 py-3.5 bg-black border border-[#333333] rounded-lg text-white text-[15px] font-rajdhani tracking-[0.1em] placeholder:text-[#666666] focus:outline-none focus:border-primary-pink transition-all duration-200 ease-in-out"
             />
+          </div>
+
+          {/* Forgot Password Link */}
+          <div className="text-right mb-6">
+            <button
+              type="button"
+              onClick={onSwitchToForgotPassword}
+              className="text-[12px] text-gray-400 hover:text-primary-pink underline bg-transparent border-none cursor-pointer transition-colors duration-200"
+            >
+              Forgot password?
+            </button>
           </div>
 
           {/* Login Button */}

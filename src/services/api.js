@@ -156,6 +156,24 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async forgotPassword(email) {
+    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    return this.handleResponse(response);
+  }
+
+  async resetPassword(token, newPassword) {
+    const response = await fetch(`${API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword })
+    });
+    return this.handleResponse(response);
+  }
+
   async updateUserPreferences(preferences) {
     const response = await fetch(`${API_URL}/auth/update-preferences`, {
       method: 'PUT',
