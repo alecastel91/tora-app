@@ -26,20 +26,13 @@ import './styles/responsive.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  // 'login' | 'signup' | 'forgot' | 'reset'. Default 'login', overridden on
-  // boot by URL detection so /reset-password?token=... shows the reset form.
-  const [authMode, setAuthMode] = useState(() => {
-    if (typeof window !== 'undefined'
-      && window.location.pathname === '/reset-password'
-      && new URLSearchParams(window.location.search).get('token')) {
-      return 'reset';
-    }
-    return 'login';
-  });
-  const [resetToken] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    return new URLSearchParams(window.location.search).get('token');
-  });
+  // /reset-password?token=... on boot enters the reset flow. URL is stable
+  // after mount, so the token is a one-shot const rather than state.
+  const resetToken = typeof window !== 'undefined' && window.location.pathname === '/reset-password'
+    ? new URLSearchParams(window.location.search).get('token')
+    : null;
+  // 'login' | 'signup' | 'forgot' | 'reset'
+  const [authMode, setAuthMode] = useState(resetToken ? 'reset' : 'login');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
   const [activeChatUser, setActiveChatUser] = useState(null);
