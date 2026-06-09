@@ -24,6 +24,31 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (June 9-10, 2026)
+
+### Password reset flow shipped (#61)
+The missing self-serve recovery path. End-to-end live on prod.
+
+**Two new screens** in Tailwind (matching LoginScreen's already-migrated style):
+- [`src/components/screens/ForgotPasswordScreen.js`](src/components/screens/ForgotPasswordScreen.js) — single email field → `apiService.forgotPassword(email)`. Submit shows a confirmation card with intentionally opaque wording ("If an account exists for that email…") so we don't reveal whether the email is registered.
+- [`src/components/screens/ResetPasswordScreen.js`](src/components/screens/ResetPasswordScreen.js) — reads `?token=` from the URL, two password fields (new + confirm), client-side validation for length + match before POSTing `apiService.resetPassword(token, newPassword)`. Success state shows a green confirmation card with "Go to Log In".
+
+**LoginScreen** ([`src/components/screens/LoginScreen.js`](src/components/screens/LoginScreen.js)): added a small right-aligned "Forgot password?" link below the password input. Wires through a new `onSwitchToForgotPassword` prop.
+
+**App.js routing**: extended `authMode` from `{ login, signup }` → `{ login, signup, forgot, reset }`. On boot, detects `/reset-password?token=...` in the URL and switches `authMode` to `'reset'` with the token. The "Back to Log In" flow clears the token from the URL so a refresh doesn't reopen the reset screen with the now-used token.
+
+**API client** ([`src/services/api.js`](src/services/api.js)): `forgotPassword(email)` + `resetPassword(token, newPassword)`. Both are unauthenticated POSTs (no `getHeaders()`) — deliberately, since they hit `/auth/*` routes before the user has a session.
+
+### New shared component: `<AuthScreenShell>`
+[`src/components/common/AuthScreenShell.js`](src/components/common/AuthScreenShell.js) — the motion-fade-in wrapper + logo + uppercase subtitle block that was being copy-pasted into every auth-flow screen. ForgotPassword + ResetPassword both use it. Saved ~40 lines net.
+
+**LoginScreen intentionally does NOT use it** — has its own `IntroSplash`-staged animation timing (form fades in 2.8s after splash starts; splash hides at 3.5s) that doesn't fit the simple shell. Worth revisiting after Max's Tailwind sweep finishes other screens — could be migrated then.
+
+### Simplify pass
+Two reviewers flagged the chrome duplication (covered above by `AuthScreenShell`). One also flagged `resetToken` being `useState` despite the URL never updating after mount, AND `window.location.search` being parsed twice. Collapsed to a single inline `const resetToken` + one `useState` for `authMode` derived from it.
+
+Also dropped a stray `✅` emoji prefix in the ResetPasswordScreen success message — `CLAUDE.md` rule disallows emoji unless explicitly requested.
+
 ## Recent Updates (May 26-27, 2026)
 
 ### Prod rollout of the agent-tier commit
