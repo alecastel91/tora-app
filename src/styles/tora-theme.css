@@ -1,0 +1,276 @@
+/* ============================================================================
+ * tora-theme.css — TORA shared design language (single source of truth)
+ * ----------------------------------------------------------------------------
+ * Imported by BOTH tora-application (Next.js) and tora-app (Vite) right after
+ * `@import "tailwindcss"`. Contains the full design system: tokens (@theme),
+ * base typography conventions, signature utility classes, and animations.
+ *
+ * Per-app responsibilities (NOT in this file):
+ *   - Font LOADING. This file only names families via --font-* tokens.
+ *       tora-application loads them with next/font (overrides --font-* on <body>).
+ *       tora-app loads them via Google Fonts <link> + @font-face for Supreme.
+ *   - Page background / color / layout (e.g. --background, position/overflow).
+ *
+ * Edit tokens & shared styles HERE. tora-app keeps a synced copy.
+ * ========================================================================== */
+
+@theme {
+  /* ===== Brand (same hex, two names — keep both for compatibility) ===== */
+  --color-infrared: #FF3366;
+  --color-infrared-dim: #cc2952;
+  --color-infrared-glow: rgba(255, 51, 102, 0.15);
+  --color-primary-pink: #FF3366;        /* alias: tora-app legacy */
+  --color-primary-pink-hover: #FF1A4D;
+
+  /* ===== Surfaces ===== */
+  --color-charcoal: #050505;
+  --color-near-black: #080808;
+  --color-bg-black: #000000;
+  --color-bg-dark: #0A0A0A;
+  --color-bg-card: #111111;
+  --color-bg-card-dark: #0D0D0D;
+  --color-glass: rgba(10, 10, 10, 0.6);
+
+  /* ===== Borders / Text ===== */
+  --color-border-dark: #222222;
+  --color-border-light: #333333;
+  --color-text-gray: #999999;
+  --color-text-gray-light: #666666;
+
+  /* ===== Role colors ===== */
+  --color-role-artist: #6B5FFF;
+  --color-role-venue: #FF5757;
+  --color-role-promoter: #00D4FF;
+  --color-role-agent: #FFB800;
+
+  /* ===== Status ===== */
+  --color-status-online: #00FF88;
+  --color-status-offline: #666666;
+
+  /* ===== Accents ===== */
+  --color-fuchsia-accent: rgba(217, 70, 239, 0.12);
+  --color-fuchsia-glow: rgba(217, 70, 239, 0.06);
+
+  /* ===== Radius (Tailwind scale; md/lg/xl use Tailwind defaults) ===== */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+
+  /* ===== Font families (names only — loading is per-app, see header) ===== */
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-rajdhani: 'Rajdhani', sans-serif;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+  --font-supreme: 'Supreme', 'Space Grotesk', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  /* ===== Letter-spacing ===== */
+  --tracking-landing: 0.22em;
+
+  /* ===== Motion ===== */
+  --pulse-bpm: 0.5s;                              /* 120 BPM = 0.5s per beat */
+  --ease-tora: cubic-bezier(0.16, 1, 0.3, 1);    /* signature landing easing */
+
+  /* ===== Effects ===== */
+  --shadow-infrared: 0 0 20px rgba(255, 255, 255, 0.1);
+  --shadow-glass-inset: inset 0 0 20px rgba(255, 255, 255, 0.02);
+
+  /* ===== Breakpoints ===== */
+  --breakpoint-sm: 24rem;                         /* 384px */
+}
+
+/* ============================================================================
+ * Base — typography conventions only.
+ * Element-level (low specificity) so class-styled headings keep their look
+ * and converge to Orbitron only as per-screen overrides are removed.
+ * Page background/color/layout stay in each app's own globals.
+ * ========================================================================== */
+@layer base {
+  body {
+    font-family: var(--font-inter), var(--font-rajdhani), sans-serif;
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-orbitron), var(--font-rajdhani), sans-serif;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ============================================================================
+ * Utilities — signature TORA looks.
+ * ========================================================================== */
+@layer utilities {
+  /* --- Surfaces --- */
+  .glass-card {
+    @apply bg-glass backdrop-blur-xl border border-white/10;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .bg-grid {
+    background-size: 40px 40px;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  }
+
+  /* --- Typography --- */
+  .font-futuristic {
+    font-family: var(--font-orbitron), sans-serif;
+    letter-spacing: 0.15em;
+  }
+
+  .font-tech {
+    font-family: var(--font-rajdhani), sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  .font-body {
+    font-family: var(--font-inter), sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  /* --- Glow / text effects --- */
+  .glow-orange {
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+  }
+
+  .text-glow {
+    text-shadow:
+      0 0 10px rgba(255, 255, 255, 0.5),
+      0 0 20px rgba(255, 255, 255, 0.3),
+      0 0 30px rgba(255, 255, 255, 0.1);
+  }
+
+  .text-glow-subtle {
+    text-shadow:
+      0 0 5px rgba(255, 255, 255, 0.3),
+      0 0 10px rgba(255, 255, 255, 0.1);
+  }
+
+  .infrared-text {
+    color: #ffffff;
+    text-shadow:
+      0 0 6px rgba(255, 255, 255, 0.6),
+      0 0 12px rgba(255, 255, 255, 0.35),
+      0 0 24px rgba(255, 255, 255, 0.18);
+  }
+
+  .infrared-embedded {
+    color: #ffffff;
+    text-shadow:
+      0 0 2px rgba(255, 255, 255, 0.8),
+      0 0 8px rgba(255, 255, 255, 0.35);
+  }
+
+  /* --- Lines / hairlines --- */
+  .laser-line {
+    @apply absolute h-px bg-gradient-to-r from-transparent via-infrared/20 to-transparent w-full;
+  }
+
+  .fuchsia-hairline {
+    background: linear-gradient(90deg, transparent, rgba(217, 70, 239, 0.18), transparent);
+  }
+
+  /* --- Transforms --- */
+  .skew-btn {
+    transform: skew(-15deg);
+  }
+
+  .unskew-text {
+    transform: skew(15deg);
+  }
+}
+
+/* ============================================================================
+ * Animations — keyframes + their paired classes.
+ * ========================================================================== */
+
+/* Core pulse (120 BPM ≈ 0.5s per beat) */
+@keyframes pulseCore {
+  0%, 100% { transform: scale(1);   opacity: 0.9; }
+  50%      { transform: scale(1.4); opacity: 1; }
+}
+
+/* Expanding 3D waves */
+@keyframes waveExpand {
+  0%   { transform: scale(0.3); opacity: 0.8; }
+  60%  { opacity: 0.25; }
+  100% { transform: scale(22);  opacity: 0; }
+}
+
+.wave {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: radial-gradient(circle,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.25) 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%);
+  animation: waveExpand 3s linear infinite;
+  filter: blur(1px);
+}
+.wave-1 { animation-delay: 0s; }
+.wave-2 { animation-delay: 1s; }
+.wave-3 { animation-delay: 2s; }
+
+/* Scanline */
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.scanline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+}
+
+/* Glitch */
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20%      { transform: translate(-2px, 2px); }
+  40%      { transform: translate(-2px, -2px); }
+  60%      { transform: translate(2px, 2px); }
+  80%      { transform: translate(2px, -2px); }
+}
+.glitch-hover:hover {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* Fade + slide up */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+}
+
+/* Pulse glow */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.2), 0 0 10px rgba(255,255,255,0.1), 0 0 20px rgba(217,70,239,0.04); }
+  50%      { box-shadow: 0 0 15px rgba(255,255,255,0.4), 0 0 30px rgba(255,255,255,0.2), 0 0 40px rgba(217,70,239,0.07); }
+}
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Typing cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+.typing-cursor::after {
+  content: "|";
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}

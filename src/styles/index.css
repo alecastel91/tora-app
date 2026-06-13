@@ -1,6 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* App-specific font loading (Supreme @font-face); families also via index.html. */
+@import "./fonts.css";
+
+/* TORA shared design language — synced from tora-application via `npm run sync-theme`.
+ * Single source of truth lives in tora-application/src/styles/tora-theme.css. */
+@import "./tora-theme.css";
 
 * {
   margin: 0;

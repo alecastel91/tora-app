@@ -40,12 +40,14 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 50%;
+  /* Border Radius — namespaced (--tora-radius-*) so they don't override
+   * Tailwind v4's --radius-* scale, which now backs the rounded-* utilities
+   * and is shared with tora-application. App.css consumes these px values. */
+  --tora-radius-sm: 8px;
+  --tora-radius-md: 12px;
+  --tora-radius-lg: 16px;
+  --tora-radius-xl: 24px;
+  --tora-radius-full: 50%;
   
   /* Font Sizes */
   --font-xs: 11px;

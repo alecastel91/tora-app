@@ -1,0 +1,37 @@
+/* App-specific font loading for tora-app (Vite).
+ * Inter / Rajdhani / Orbitron / Space Grotesk load via the Google Fonts <link>
+ * in index.html. Supreme is self-hosted here to match tora-application (which
+ * loads it via next/font/local). The shared theme only NAMES these families
+ * (--font-* tokens in tora-theme.css); this file makes 'Supreme' available. */
+
+@font-face {
+  font-family: 'Supreme';
+  src: url('/fonts/supreme/Supreme-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Supreme';
+  src: url('/fonts/supreme/Supreme-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Supreme';
+  src: url('/fonts/supreme/Supreme-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Supreme';
+  src: url('/fonts/supreme/Supreme-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

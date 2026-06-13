@@ -243,14 +243,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     return name ? name.charAt(0).toUpperCase() : 'A';
   };
 
-  const getRoleBadgeClass = (role) => {
-    const roleClasses = {
-      'ARTIST': 'role-badge artist',
-      'VENUE': 'role-badge venue',
-      'PROMOTER': 'role-badge promoter',
-      'AGENT': 'role-badge agent'
-    };
-    return roleClasses[role] || 'role-badge';
+  // Role accent classes drawn from the shared design tokens (--color-role-*).
+  const roleBadgeClasses = {
+    ARTIST: 'text-role-artist border-role-artist/40 bg-role-artist/10',
+    VENUE: 'text-role-venue border-role-venue/40 bg-role-venue/10',
+    PROMOTER: 'text-role-promoter border-role-promoter/40 bg-role-promoter/10',
+    AGENT: 'text-role-agent border-role-agent/40 bg-role-agent/10',
   };
 
   const handleDeleteProfile = async () => {
@@ -345,19 +343,23 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   }
 
   return (
-    <div className="screen active profile-screen">
-      <div className="profile-header">
-        <div className="profile-avatar-container">
-          <div 
-            className="profile-avatar clickable"
+    <div className="screen active px-4 py-6 text-center">
+      <div className="mb-8">
+        <div className="relative w-[120px] h-[120px] mx-auto mb-4">
+          <div
+            className="group w-[120px] h-[120px] rounded-full overflow-hidden flex items-center justify-center
+                       bg-near-black border border-infrared/40 text-5xl font-black text-white cursor-pointer
+                       font-futuristic shadow-[0_0_24px_rgba(255,51,102,0.18)]"
             onClick={() => fileInputRef.current?.click()}
           >
             {user?.avatar ? (
-              <img src={user.avatar} alt={user?.name} />
+              <img src={user.avatar} alt={user?.name} className="w-full h-full rounded-full object-cover" />
             ) : (
               getInitial(user?.name)
             )}
-            <div className="avatar-upload-overlay">
+            <div className="absolute inset-0 rounded-full bg-black/70 flex items-center justify-center
+                            opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                            text-white [&>svg]:w-8 [&>svg]:h-8">
               <UploadIcon />
             </div>
           </div>
@@ -369,22 +371,36 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
             style={{ display: 'none' }}
           />
         </div>
-        
-        <h2 className="profile-name">{user?.name || t('profile.yourName')}</h2>
-        <p className="profile-location">{user?.location || t('profile.addLocation')}</p>
-        <div className={getRoleBadgeClass(user?.role)}>
+
+        <h2 className="text-2xl font-black text-white text-glow-subtle tracking-[0.08em] mb-2">
+          {user?.name || t('profile.yourName')}
+        </h2>
+        <p className="flex items-center justify-center gap-1.5 text-xs text-white/50 font-tech">
+          <span>📍</span>{user?.location || t('profile.addLocation')}
+        </p>
+        <div className={`inline-block mt-3 px-2 py-0.5 rounded-xs border text-[9px] font-bold uppercase
+                         tracking-[0.15em] font-tech ${roleBadgeClasses[user?.role] || 'text-white/80 border-white/15 bg-white/5'}`}>
           {user?.role || 'ARTIST'}
         </div>
         {user?.genres && user.genres.length > 0 && (
-          <div className="profile-genres-container">
-            <div className={`profile-genres ${showAllGenres ? 'expanded' : 'collapsed'}`}>
+          <div className="flex flex-col items-center mt-3">
+            <div
+              className={`flex flex-wrap gap-2 justify-center w-full overflow-hidden transition-[max-height] duration-300
+                          ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[72px]'}`}
+            >
               {user.genres.map(genre => (
-                <span key={genre} className="genre-tag">{genre}</span>
+                <span
+                  key={genre}
+                  className="px-2.5 py-1 rounded-sm bg-infrared/10 border border-infrared/30 text-infrared
+                             text-[9px] font-medium uppercase font-tech"
+                >
+                  {genre}
+                </span>
               ))}
             </div>
             {user.genres.length > 6 && (
               <button
-                className="see-more-btn"
+                className="mt-2 px-2 py-1 text-infrared text-xs hover:opacity-80 hover:underline transition-opacity"
                 onClick={() => setShowAllGenres(!showAllGenres)}
               >
                 {showAllGenres ? t('profile.seeLess') : t('profile.seeMore')}

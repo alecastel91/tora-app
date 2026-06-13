@@ -120,7 +120,7 @@
   padding: 12px;
   background: var(--bg-black);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   cursor: pointer;
   transition: all 0.2s;
@@ -168,7 +168,7 @@
   border: 1px solid rgba(255, 0, 0, 0.3);
   color: #ff6b6b;
   padding: 10px;
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   margin-bottom: 20px;
   font-size: 14px;
 }
@@ -265,7 +265,7 @@
   background: rgba(76, 175, 80, 0.1);
   border: 1px solid rgba(76, 175, 80, 0.3);
   padding: 8px 12px;
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .form-input-readonly {
@@ -276,7 +276,7 @@
 .demo-credentials {
   background: var(--bg-black);
   padding: 15px;
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   margin-top: 20px;
   text-align: center;
 }
@@ -509,7 +509,7 @@
 .profile-avatar {
   width: 120px;
   height: 120px;
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
   background: var(--gradient-purple);
   display: flex;
   align-items: center;
@@ -535,7 +535,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -549,7 +549,7 @@
 .profile-avatar img {
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
   object-fit: cover;
 }
 
@@ -809,7 +809,7 @@
   gap: 12px;
   padding: 12px;
   background: var(--bg-card);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -821,7 +821,7 @@
 .profile-list-item img {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
 }
 
 .profile-info {
@@ -839,7 +839,7 @@
   padding: 2px 8px;
   background: var(--primary-pink);
   color: var(--text-white);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
@@ -860,7 +860,7 @@
   overflow-y: auto;
   padding: 8px;
   background: var(--bg-black);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .genre-checkbox {
@@ -869,7 +869,7 @@
   gap: 8px;
   padding: 8px;
   background: var(--bg-card-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -952,7 +952,7 @@
   justify-content: center;
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   color: var(--text-white);
   font-size: var(--font-sm);
   cursor: pointer;
@@ -1098,7 +1098,7 @@
   margin-top: 24px;
   padding: 16px;
   background: var(--bg-gray);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
   border: 1px solid var(--border-light);
 }
 
@@ -1122,7 +1122,7 @@
   padding: 8px 12px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   cursor: pointer;
   transition: all 0.2s;
   color: var(--text-gray);
@@ -1152,7 +1152,7 @@
 .legend-dot {
   width: 12px;
   height: 12px;
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
   border: 1px solid var(--border-dark);
 }
 
@@ -1169,7 +1169,7 @@
   margin-top: 20px;
   padding: 16px;
   background: var(--bg-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   border: 1px solid var(--border-dark);
 }
 
@@ -1182,7 +1182,7 @@
   padding: 12px;
   background: transparent;
   border: 1px dashed var(--primary-pink);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   color: var(--primary-pink);
   font-size: var(--font-base);
   font-weight: 500;
@@ -1246,7 +1246,7 @@
   align-items: center;
   padding: 8px 12px;
   background: var(--bg-card);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   border: 1px solid var(--border-dark);
 }
 
@@ -1321,7 +1321,7 @@
   padding: 14px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-xl);
+  border-radius: var(--tora-radius-xl);
   color: var(--text-white);
   font-size: var(--font-base);
   outline: none;
@@ -1365,7 +1365,7 @@
   width: 60px;
   height: 60px;
   background: var(--primary-pink);
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1393,7 +1393,7 @@
 /* User Cards */
 .user-card {
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
   padding: 16px;
   margin-bottom: 12px;
 }
@@ -1407,7 +1407,7 @@
 .user-avatar-circle {
   width: 56px;
   height: 56px;
-  border-radius: var(--radius-full);
+  border-radius: var(--tora-radius-full);
   background: var(--gradient-purple);
   display: flex;
   align-items: center;
@@ -1443,7 +1443,7 @@
   padding: 4px 8px;
   background: var(--role-artist);
   color: var(--text-white);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1841,7 +1841,7 @@
 /* Privacy Settings */
 .privacy-setting {
   background: var(--bg-gray);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 16px;
   border: 1px solid var(--border-light);
 }
@@ -1908,7 +1908,7 @@
   color: var(--text-white);
   border: none;
   padding: 10px 24px;
-  border-radius: var(--radius-xl);
+  border-radius: var(--tora-radius-xl);
   font-size: var(--font-base);
   font-weight: 600;
   cursor: pointer;
@@ -2480,7 +2480,7 @@
   padding: 20px;
   margin: 20px 0;
   background: var(--bg-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   border: 1px solid var(--border-dark);
 }
 
@@ -2498,7 +2498,7 @@
   padding: 20px;
   margin: 20px 0;
   background: var(--bg-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   border: 1px solid var(--border-dark);
 }
 
@@ -2521,7 +2521,7 @@
   gap: 12px;
   padding: 12px;
   background: var(--bg-gray);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   border: 1px solid var(--border-light);
   transition: all 0.2s;
   cursor: pointer;
@@ -2725,7 +2725,7 @@
   margin-top: 8px;
   padding: 16px;
   background: var(--bg-gray);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
 }
 
 .schedules-header {
@@ -2780,7 +2780,7 @@
   padding: 16px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .schedule-info {
@@ -2856,7 +2856,7 @@
   padding: 12px;
   background: var(--bg-gray);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   font-size: 16px;
   transition: border-color 0.2s;
@@ -2996,7 +2996,7 @@
   margin-bottom: 16px;
   padding: 20px;
   background: var(--bg-gray);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
 }
 
 .edit-section h3 {
@@ -3044,7 +3044,7 @@
   padding: 12px 24px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   cursor: pointer;
   transition: all 0.2s;
@@ -3075,7 +3075,7 @@
   padding: 10px 12px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   text-align: center;
   font-size: 14px;
   color: var(--text-gray);
@@ -3105,7 +3105,7 @@
   padding: 12px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -3132,14 +3132,14 @@
   padding: 16px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   max-height: 400px;
   overflow-y: auto;
 }
 
 .privacy-toggle {
   background: var(--bg-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 16px;
 }
 
@@ -3208,7 +3208,7 @@
 .embed-card {
   margin-bottom: 20px;
   background: var(--bg-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 15px;
   border: 1px solid var(--border-dark);
 }
@@ -3227,7 +3227,7 @@
   width: 100%;
   height: 200px;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   background: var(--bg-black);
 }
 
@@ -3273,7 +3273,7 @@
   align-items: center;
   background: var(--bg-dark);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   overflow: hidden;
 }
 
@@ -3311,7 +3311,7 @@
   position: relative;
   background: var(--bg-dark);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   overflow: hidden;
   width: 100%;
 }
@@ -3330,7 +3330,7 @@
   height: 32px;
   background: var(--bg-card);
   border: 1px solid var(--primary-pink);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   color: var(--primary-pink);
   cursor: pointer;
   display: flex;
@@ -3408,7 +3408,7 @@
   transform: translateX(-50%);
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   padding: 6px 10px;
   white-space: nowrap;
   display: none;
@@ -3438,7 +3438,7 @@
   left: 10px;
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   padding: 8px 12px;
   font-size: var(--font-sm);
   color: var(--text-gray);
@@ -3569,7 +3569,7 @@
   padding: 4px;
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
 }
 
 .filter-option {
@@ -4552,7 +4552,7 @@
   padding: 12px 16px;
   background: var(--bg-dark);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   color: var(--text-light);
   cursor: pointer;
   transition: all 0.2s;
@@ -4588,7 +4588,7 @@
   padding: 12px 16px;
   background: var(--bg-dark);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   cursor: pointer;
   transition: border-color 0.2s;
   color: var(--text-light);
@@ -4615,7 +4615,7 @@
   overflow-y: auto;
   background: var(--bg-card);
   border: 1px solid var(--primary-pink);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   padding: 4px 8px;
   margin-top: 4px;
   z-index: 100;
@@ -5392,7 +5392,7 @@
 
 .filter-dropdown-group {
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   overflow: hidden;
   background: var(--bg-card);
 }
@@ -5602,7 +5602,7 @@
   padding: 16px;
   background: var(--bg-secondary);
   border: 2px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
@@ -5855,7 +5855,7 @@
   padding: 8px 12px;
   background: var(--bg-dark);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   font-size: 13px;
   cursor: pointer;
@@ -5876,7 +5876,7 @@
   background: transparent;
   border: 1px solid var(--primary-pink);
   color: var(--primary-pink);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -5910,7 +5910,7 @@
 .upgrade-card {
   background: var(--bg-secondary);
   border: 2px solid var(--primary-pink);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
   padding: 40px 30px;
   text-align: center;
   max-width: 400px;
@@ -6147,7 +6147,7 @@
 .match-card-simple {
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 16px;
   margin-bottom: 16px;
   display: flex;
@@ -6364,7 +6364,7 @@
 
 .no-matches-tips {
   background: var(--bg-card);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 24px;
   max-width: 400px;
   margin: 0 auto;
@@ -6519,7 +6519,7 @@
   margin-bottom: 20px;
   padding: 16px;
   background: var(--bg-gray);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   border: 1px solid var(--border-light);
 }
 
@@ -6810,7 +6810,7 @@
 
 .subscription-summary {
   background: var(--bg-gray);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
   padding: 20px;
   margin-bottom: 24px;
 }
@@ -6878,7 +6878,7 @@
   padding: 16px;
   background: var(--bg-gray);
   border: 2px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   transition: all 0.2s;
 }
 
@@ -6909,7 +6909,7 @@
   padding: 12px 16px;
   background: var(--bg-gray);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   font-size: 16px;
   transition: border-color 0.2s;
@@ -7017,7 +7017,7 @@
   gap: 12px;
   padding: 12px 16px;
   background: rgba(255, 51, 102, 0.1);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   font-size: 16px;
 }
@@ -7109,7 +7109,7 @@
   left: 10px;
   background: rgba(26, 26, 26, 0.95);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 8px 12px;
   display: flex;
   gap: 12px;
@@ -7336,7 +7336,7 @@
 .artist-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 16px;
   display: flex;
   align-items: center;
@@ -7368,7 +7368,7 @@
 .artist-card-row {
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 12px;
   display: flex;
   align-items: center;
@@ -7532,7 +7532,7 @@
 
 .add-artist-modal {
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+  border-radius: var(--tora-radius-lg);
   padding: 32px 24px;
   max-width: 400px;
   width: 90%;
@@ -11415,7 +11415,7 @@ textarea.form-textarea:focus {
 .metric-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 16px;
   text-align: center;
 }
@@ -11451,7 +11451,7 @@ textarea.form-textarea:focus {
   padding: 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .action-icon {
@@ -11482,7 +11482,7 @@ textarea.form-textarea:focus {
   overflow-x: auto;
   overflow-y: hidden;
   margin-bottom: 8px;
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -11513,7 +11513,7 @@ textarea.form-textarea:focus {
   padding: 24px 16px 50px 16px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   min-width: max-content;
 }
 
@@ -11592,7 +11592,7 @@ textarea.form-textarea:focus {
   padding: 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .offer-info {
@@ -11668,7 +11668,7 @@ textarea.form-textarea:focus {
   margin-top: 12px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: var(--radius-sm);
+  border-radius: var(--tora-radius-sm);
   border: 1px solid var(--border-dark);
 }
 
@@ -11738,7 +11738,7 @@ textarea.form-textarea:focus {
   text-align: center;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-secondary);
 }
 
@@ -11779,7 +11779,7 @@ textarea.form-textarea:focus {
   padding: 16px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .event-card.status-confirmed {
@@ -11829,7 +11829,7 @@ textarea.form-textarea:focus {
 .calendar-inline-wrapper {
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 16px;
 }
 
@@ -11973,7 +11973,7 @@ textarea.form-textarea:focus {
 .btn-add-travel-schedule {
   background: transparent;
   border: 2px dashed var(--primary-pink);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   padding: 12px 24px;
   font-size: 13px;
   font-weight: 600;
@@ -11999,7 +11999,7 @@ textarea.form-textarea:focus {
   padding: 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   display: grid;
   grid-template-columns: 1fr auto auto;
   grid-template-rows: auto auto;
@@ -12067,7 +12067,7 @@ textarea.form-textarea:focus {
   padding: 10px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .info-label {
@@ -12096,7 +12096,7 @@ textarea.form-textarea:focus {
   padding: 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
 }
 
 .doc-info {
@@ -12218,7 +12218,7 @@ textarea.form-textarea:focus {
   margin-bottom: 12px;
   background: var(--bg-secondary);
   border: 2px solid var(--border-dark);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
@@ -12311,7 +12311,7 @@ textarea.form-textarea:focus {
   padding: 12px;
   background: #2a2a2a;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--tora-radius-md);
   color: var(--text-white);
   font-family: inherit;
   font-size: 14px;
