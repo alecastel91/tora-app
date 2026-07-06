@@ -385,13 +385,26 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     );
   }
 
+  // Bloom behind the avatar takes the profile's canonical role color.
+  const roleBloomColor = {
+    ARTIST: 'rgba(107, 95, 255, 0.18)',   // #6B5FFF
+    VENUE: 'rgba(255, 87, 87, 0.16)',     // #FF5757
+    PROMOTER: 'rgba(255, 184, 0, 0.13)',  // #FFB800
+    AGENT: 'rgba(0, 200, 117, 0.13)',     // #00C875
+  }[user?.role] || 'rgba(255, 255, 255, 0.08)';
+
   return (
     <div className="screen active relative isolate px-5 pt-6 pb-5">
-      {/* crimson "deep space" bloom behind the avatar */}
+      {/* deep-space backdrop: role-colored bloom + faint engineering grid, fading out */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-64 -z-10
-                   bg-[radial-gradient(60%_100%_at_50%_0%,rgba(255,51,102,0.16),transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 -z-10"
+        style={{ background: `radial-gradient(60% 100% at 50% 0%, ${roleBloomColor}, transparent 70%)` }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-56 -z-10 bg-grid
+                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
 
       {/* ===== Header ===== */}
@@ -400,8 +413,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="group block w-28 h-28 rounded-full overflow-hidden bg-near-black ring-1 ring-infrared/50
-                       shadow-[0_0_40px_rgba(255,51,102,0.4)] flex items-center justify-center
+            className="group block w-full h-full rounded-full overflow-hidden bg-near-black ring-1 ring-white/15
+                       flex items-center justify-center
                        text-4xl font-bold text-white font-space-grotesk"
           >
             {user?.avatar ? (
@@ -415,8 +428,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               <UploadIcon />
             </span>
           </button>
-          <span className="pointer-events-none absolute bottom-0.5 right-0.5 w-8 h-8 rounded-full bg-infrared
-                           flex items-center justify-center text-white shadow-[0_0_12px_rgba(255,51,102,0.6)]
+          <span className="pointer-events-none absolute bottom-0.5 right-0.5 w-8 h-8 rounded-full
+                           bg-[#232325] border border-white/15 flex items-center justify-center text-white/80
                            [&>svg]:w-3.5 [&>svg]:h-3.5">
             <UploadIcon />
           </span>
@@ -450,7 +463,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 <span
                   key={genre}
                   className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/10 text-white/60
-                             text-[9px] font-medium uppercase tracking-[0.15em] font-tech"
+                             text-[8px] font-medium uppercase tracking-[0.15em] font-tech"
                 >
                   {genre}
                 </span>

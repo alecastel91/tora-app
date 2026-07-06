@@ -28,11 +28,11 @@
   --text-gray-light: #666666;
   --text-light: rgba(255, 255, 255, 0.75);
   
-  /* Role Colors */
+  /* Role Colors (canonical) */
   --role-artist: #6B5FFF;
   --role-venue: #FF5757;
-  --role-promoter: #00D4FF;
-  --role-agent: #FFB800;
+  --role-promoter: #FFB800;
+  --role-agent: #00C875;
   
   /* Status Colors */
   --status-online: #00FF88;

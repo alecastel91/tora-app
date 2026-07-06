@@ -7,6 +7,16 @@
  * Single source of truth lives in tora-application/src/styles/tora-theme.css. */
 @import "./tora-theme.css";
 
+/* Canonical role colors (user-defined). The synced theme has agent/promoter
+ * wrong (agent gold, promoter cyan); corrected here until the canonical
+ * tora-theme.css in tora-application is updated. */
+@theme {
+  --color-role-artist: #6B5FFF;
+  --color-role-venue: #FF5757;
+  --color-role-promoter: #FFB800;
+  --color-role-agent: #00C875;
+}
+
 /* App typography: two families only — Space Grotesk (headings, names, display
  * numbers) + Inter (everything else). The shared theme maps h1-h6 to Orbitron
  * and .font-tech to Rajdhani for the marketing site; the app overrides both
