@@ -157,7 +157,7 @@ const EditProfileScreen = ({ onClose }) => {
           <h3>Basic Information</h3>
           
           <div className="form-group">
-            <label>{t('profile.name')}</label>
+            <label>{t('editProfile.name')}</label>
             <input
               type="text"
               value={editedUser.name || ''}
@@ -167,7 +167,7 @@ const EditProfileScreen = ({ onClose }) => {
           </div>
 
           <div className="form-group">
-            <label>{t('profile.role')}</label>
+            <label>{t('editProfile.role')}</label>
             <select
               value={editedUser.role || ''}
               onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}

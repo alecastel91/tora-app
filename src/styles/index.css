@@ -7,39 +7,66 @@
  * Single source of truth lives in tora-application/src/styles/tora-theme.css. */
 @import "./tora-theme.css";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior: none;
+/* App typography: two families only — Space Grotesk (headings, names, display
+ * numbers) + Inter (everything else). The shared theme maps h1-h6 to Orbitron
+ * and .font-tech to Rajdhani for the marketing site; the app overrides both
+ * here instead of editing tora-theme.css (that file is synced from
+ * tora-application and would be clobbered by `npm run sync-theme`). */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-space-grotesk), sans-serif;
+    letter-spacing: -0.01em;
+  }
 }
 
-html {
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
+@layer utilities {
+  .font-tech {
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  .font-futuristic {
+    font-family: var(--font-space-grotesk), sans-serif;
+  }
 }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-  background: #000;
-  color: #fff;
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  font-weight: 400;
-  overflow: hidden;
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
-  -webkit-font-smoothing: antialiased;
-}
+/* Legacy app resets live in @layer base so Tailwind v4 utilities (which sit in
+ * @layer utilities) can override them. Unlayered, the universal margin/padding
+ * reset would beat every padding/margin/gap utility regardless of specificity. */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
 
-#root {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
+  html {
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #000;
+    color: #fff;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    font-weight: 400;
+    overflow: hidden;
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
 }

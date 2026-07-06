@@ -4,20 +4,29 @@
   --primary-pink-hover: #FF1A4D;
   --primary-pink-light: rgba(255, 51, 102, 0.1);
   
-  /* Background Colors */
+  /* Background Colors — Obsidian Neon: cards are translucent white-on-black
+   * glass, not lighter grey tones. --bg-black/--bg-dark stay opaque for
+   * page backgrounds and sticky chrome. */
   --bg-black: #000000;
   --bg-dark: #0A0A0A;
-  --bg-card: #111111;
-  --bg-card-dark: #0D0D0D;
-  
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-dark: rgba(255, 255, 255, 0.02);
+  /* These four were referenced throughout App.css but never defined
+   * (silently transparent). Defined now as part of the glass palette. */
+  --bg-secondary: rgba(255, 255, 255, 0.03);
+  --bg-gray: rgba(255, 255, 255, 0.03);
+  --bg-primary: #0A0A0C;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+
   /* Border Colors */
-  --border-dark: #222222;
-  --border-light: #333333;
-  
+  --border-dark: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.15);
+
   /* Text Colors */
   --text-white: #FFFFFF;
   --text-gray: #999999;
   --text-gray-light: #666666;
+  --text-light: rgba(255, 255, 255, 0.75);
   
   /* Role Colors */
   --role-artist: #6B5FFF;

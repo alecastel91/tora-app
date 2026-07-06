@@ -188,7 +188,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {/* Title */}
             <h2 style={{
-              fontFamily: 'Rajdhani, sans-serif',
+              fontFamily: 'Inter, sans-serif',
               fontSize: '24px',
               fontWeight: 700,
               textTransform: 'uppercase',
@@ -381,7 +381,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                       background: isSelected ? 'rgba(255,51,102,0.15)' : 'rgba(255,255,255,0.05)',
                       color: isSelected ? '#FF3366' : 'rgba(255,255,255,0.7)',
                       fontSize: '13px',
-                      fontFamily: 'Rajdhani, sans-serif',
+                      fontFamily: 'Inter, sans-serif',
                       fontWeight: 500,
                       cursor: 'pointer',
                       textAlign: 'center',
@@ -640,7 +640,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
 // Shared label style
 const labelStyle = {
-  fontFamily: 'Rajdhani, sans-serif',
+  fontFamily: 'Inter, sans-serif',
   fontSize: '13px',
   fontWeight: 500,
   textTransform: 'uppercase',

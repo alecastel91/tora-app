@@ -14,22 +14,36 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
   ];
 
   return (
-    <nav className="tab-bar">
+    // .tab-bar / .tab-item / .active stay as hooks for responsive.css's desktop sidebar layout.
+    // -translate-x-1/2 scoped to <lg: it compiles to the `translate` property, which the
+    // desktop sidebar override in responsive.css (transform: none) cannot reset.
+    <nav className="tab-bar fixed bottom-0 left-1/2 max-lg:-translate-x-1/2 w-full max-w-[428px] z-[100]
+                    flex justify-around pt-1.5 pb-[env(safe-area-inset-bottom,0.375rem)]
+                    bg-black/70 backdrop-blur-2xl border-t border-white/10">
       {tabs.map(tab => {
         const Icon = tab.icon;
         const showMessagesBadge = tab.id === 'messages' && unreadMessagesCount > 0;
         const showTourBadge = tab.id === 'tour' && unreadProposalsCount > 0;
         const badgeCount = tab.id === 'messages' ? unreadMessagesCount : unreadProposalsCount;
+        const isActive = activeTab === tab.id;
         return (
           <button
             key={tab.id}
-            className={`tab-item ${activeTab === tab.id ? 'active' : ''}`}
+            className={`tab-item ${isActive ? 'active' : ''} flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5
+                        text-[8px] font-semibold uppercase tracking-[0.1em] font-tech cursor-pointer
+                        transition-colors ${isActive
+                          ? 'text-infrared [&_svg]:drop-shadow-[0_0_6px_rgba(255,51,102,0.6)]'
+                          : 'text-white/40 hover:text-white/70'}`}
             onClick={() => onTabChange(tab.id)}
           >
-            <div className="tab-icon-wrapper">
+            <div className="relative flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5">
               <Icon />
               {(showMessagesBadge || showTourBadge) && (
-                <span className="tab-badge">{badgeCount > 99 ? '99+' : badgeCount}</span>
+                <span className="absolute -top-1 -right-2 min-w-4 h-4 px-1 rounded-full bg-infrared
+                                 text-white text-[10px] font-semibold flex items-center justify-center
+                                 shadow-[0_0_8px_rgba(255,51,102,0.5)]">
+                  {badgeCount > 99 ? '99+' : badgeCount}
+                </span>
               )}
             </div>
             <span>{tab.label}</span>

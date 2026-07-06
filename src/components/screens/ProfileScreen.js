@@ -3,7 +3,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
 import RAEventsModal from '../common/RAEventsModal';
-import { CalendarIcon, UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon } from '../../utils/icons';
+import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, SearchIcon, LocationIcon, GlobeIcon, LinkIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import EditProfileScreen from './EditProfileScreen';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
@@ -14,6 +14,48 @@ import ViewProfileScreen from './ViewProfileScreen';
 import SearchAgentsModal from '../common/SearchAgentsModal';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
+
+// --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
+const GridIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+  </svg>
+);
+const ExternalLinkIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+const InstagramGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4" />
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
+  </svg>
+);
+
+// Glassmorphic action tile (Edit Profile / Manage / Find Agent / Add Profile).
+const ActionCard = ({ icon, label, onClick, dot }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="group relative flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.03]
+               px-3.5 py-3 min-h-[58px] text-left transition-colors hover:border-infrared/40 hover:bg-white/[0.05]"
+  >
+    <span className="shrink-0 text-infrared [&>svg]:w-5 [&>svg]:h-5">{icon}</span>
+    <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white font-tech leading-tight">{label}</span>
+    {dot && (
+      <span
+        aria-label="Actions required"
+        className="absolute top-3 right-3 w-2 h-2 rounded-full bg-infrared shadow-[0_0_6px_rgba(255,51,102,0.7)]"
+      />
+    )}
+  </button>
+);
+
+// 1234 -> "1.2K" for the stats row.
+const fmtStat = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K` : `${n ?? 0}`);
 
 const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const { user, updateUser, userProfiles, switchProfile, addProfile, deleteProfile, likedProfiles, likedProfilesData, connectedUsers, connectedUsersData, likerProfilesData } = useAppContext();
@@ -244,11 +286,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   };
 
   // Role accent classes drawn from the shared design tokens (--color-role-*).
+  // Outline-pill style per the reference (ARTIST = ethereal violet).
   const roleBadgeClasses = {
-    ARTIST: 'text-role-artist border-role-artist/40 bg-role-artist/10',
-    VENUE: 'text-role-venue border-role-venue/40 bg-role-venue/10',
-    PROMOTER: 'text-role-promoter border-role-promoter/40 bg-role-promoter/10',
-    AGENT: 'text-role-agent border-role-agent/40 bg-role-agent/10',
+    ARTIST: 'text-role-artist border-role-artist/60',
+    VENUE: 'text-role-venue border-role-venue/60',
+    PROMOTER: 'text-role-promoter border-role-promoter/60',
+    AGENT: 'text-role-agent border-role-agent/60',
   };
 
   const handleDeleteProfile = async () => {
@@ -343,26 +386,40 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   }
 
   return (
-    <div className="screen active px-4 py-6 text-center">
-      <div className="mb-8">
-        <div className="relative w-[120px] h-[120px] mx-auto mb-4">
-          <div
-            className="group w-[120px] h-[120px] rounded-full overflow-hidden flex items-center justify-center
-                       bg-near-black border border-infrared/40 text-5xl font-black text-white cursor-pointer
-                       font-futuristic shadow-[0_0_24px_rgba(255,51,102,0.18)]"
+    <div className="screen active relative isolate px-5 pt-6 pb-5">
+      {/* crimson "deep space" bloom behind the avatar */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 -z-10
+                   bg-[radial-gradient(60%_100%_at_50%_0%,rgba(255,51,102,0.16),transparent_70%)]"
+      />
+
+      {/* ===== Header ===== */}
+      <div className="text-center mb-6">
+        <div className="relative w-28 h-28 mx-auto mb-4">
+          <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
+            className="group block w-28 h-28 rounded-full overflow-hidden bg-near-black ring-1 ring-infrared/50
+                       shadow-[0_0_40px_rgba(255,51,102,0.4)] flex items-center justify-center
+                       text-4xl font-bold text-white font-space-grotesk"
           >
             {user?.avatar ? (
-              <img src={user.avatar} alt={user?.name} className="w-full h-full rounded-full object-cover" />
+              <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
             ) : (
               getInitial(user?.name)
             )}
-            <div className="absolute inset-0 rounded-full bg-black/70 flex items-center justify-center
-                            opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                            text-white [&>svg]:w-8 [&>svg]:h-8">
+            <span className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center
+                             opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                             text-white [&>svg]:w-7 [&>svg]:h-7">
               <UploadIcon />
-            </div>
-          </div>
+            </span>
+          </button>
+          <span className="pointer-events-none absolute bottom-0.5 right-0.5 w-8 h-8 rounded-full bg-infrared
+                           flex items-center justify-center text-white shadow-[0_0_12px_rgba(255,51,102,0.6)]
+                           [&>svg]:w-3.5 [&>svg]:h-3.5">
+            <UploadIcon />
+          </span>
           <input
             ref={fileInputRef}
             type="file"
@@ -372,27 +429,28 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           />
         </div>
 
-        <h2 className="text-2xl font-black text-white text-glow-subtle tracking-[0.08em] mb-2">
+        <h2 className="text-3xl font-bold text-white font-space-grotesk tracking-[-0.02em] leading-none mb-2">
           {user?.name || t('profile.yourName')}
         </h2>
-        <p className="flex items-center justify-center gap-1.5 text-xs text-white/50 font-tech">
-          <span>📍</span>{user?.location || t('profile.addLocation')}
+        <p className="flex items-center justify-center gap-1.5 text-[13px] text-white/60 mb-3 font-tech [&>svg]:w-3.5 [&>svg]:h-3.5">
+          <LocationIcon />{user?.location || t('profile.addLocation')}
         </p>
-        <div className={`inline-block mt-3 px-2 py-0.5 rounded-xs border text-[9px] font-bold uppercase
-                         tracking-[0.15em] font-tech ${roleBadgeClasses[user?.role] || 'text-white/80 border-white/15 bg-white/5'}`}>
+        <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-[10px] font-semibold uppercase
+                         tracking-[0.2em] font-tech ${roleBadgeClasses[user?.role] || 'text-white/70 border-white/20'}`}>
           {user?.role || 'ARTIST'}
         </div>
+
         {user?.genres && user.genres.length > 0 && (
           <div className="flex flex-col items-center mt-3">
             <div
               className={`flex flex-wrap gap-2 justify-center w-full overflow-hidden transition-[max-height] duration-300
-                          ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[72px]'}`}
+                          ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[64px]'}`}
             >
               {user.genres.map(genre => (
                 <span
                   key={genre}
-                  className="px-2.5 py-1 rounded-sm bg-infrared/10 border border-infrared/30 text-infrared
-                             text-[9px] font-medium uppercase font-tech"
+                  className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/10 text-white/60
+                             text-[9px] font-medium uppercase tracking-[0.15em] font-tech"
                 >
                   {genre}
                 </span>
@@ -417,17 +475,17 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
         if (trialInfo.expired) {
           return (
-            <div className="trial-banner trial-expired">
-              <div className="trial-banner-content">
-                <span className="trial-icon">⚠️</span>
-                <div className="trial-text">
-                  <strong>Your trial has expired</strong>
-                  <p>Upgrade to Premium to keep access to all features</p>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/[0.06] p-4 mb-6 text-left">
+              <div className="flex items-center gap-3 flex-1">
+                <span className="text-2xl shrink-0">⚠️</span>
+                <div>
+                  <strong className="block text-sm font-semibold text-amber-300">Your trial has expired</strong>
+                  <p className="text-xs text-white/50 mt-0.5">Upgrade to Premium to keep access to all features</p>
                 </div>
               </div>
               <button
-                className="btn btn-primary btn-sm"
                 onClick={() => onOpenPremium && onOpenPremium()}
+                className="shrink-0 px-4 py-2 rounded-lg bg-infrared text-white text-xs font-semibold uppercase tracking-wider whitespace-nowrap hover:bg-infrared-dim transition-colors"
               >
                 Upgrade Now
               </button>
@@ -436,22 +494,21 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         }
 
         return (
-          <div className="trial-banner trial-active">
-            <div className="trial-banner-content">
-              <span className="trial-icon">🎉</span>
-              <div className="trial-text">
-                <strong>Premium Trial Active</strong>
-                <p>
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.06] p-4 mb-6 text-left">
+            <div className="flex items-center gap-3 flex-1">
+              <span className="text-2xl shrink-0">🎉</span>
+              <div>
+                <strong className="block text-sm font-semibold text-emerald-300">Premium Trial Active</strong>
+                <p className="text-xs text-white/50 mt-0.5">
                   {trialInfo.days
                     ? `${trialInfo.days} ${trialInfo.days === 1 ? 'day' : 'days'} remaining`
-                    : `${trialInfo.hours} ${trialInfo.hours === 1 ? 'hour' : 'hours'} remaining`
-                  }
+                    : `${trialInfo.hours} ${trialInfo.hours === 1 ? 'hour' : 'hours'} remaining`}
                 </p>
               </div>
             </div>
             <button
-              className="btn btn-outline btn-sm"
               onClick={() => onOpenPremium && onOpenPremium()}
+              className="shrink-0 px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider whitespace-nowrap hover:border-infrared/50 hover:text-infrared transition-colors"
             >
               Upgrade
             </button>
@@ -459,149 +516,84 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         );
       })()}
 
-      <div className="profile-stats">
-        <div className="stat-item" onClick={() => setShowLikesList(true)}>
-          <span className="stat-value">{likedProfiles.size}</span>
-          <span className="stat-label">{t('profile.liked')}</span>
-        </div>
-        <div className="stat-item" onClick={() => setShowLikersList(true)}>
-          <span className="stat-value">{likerProfilesList.length}</span>
-          <span className="stat-label">{t('profile.likes')}</span>
-        </div>
-        <div className="stat-item" onClick={() => setShowConnectionsList(true)}>
-          <span className="stat-value">{connectedUsers.size}</span>
-          <span className="stat-label">{t('profile.connections')}</span>
-        </div>
+      <div className="grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5 mb-5">
+        <button type="button" onClick={() => setShowLikesList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
+          <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(likedProfiles.size)}</span>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.liked')}</span>
+        </button>
+        <button type="button" onClick={() => setShowLikersList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
+          <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(likerProfilesList.length)}</span>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likes')}</span>
+        </button>
+        <button type="button" onClick={() => setShowConnectionsList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
+          <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(connectedUsers.size)}</span>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.connections')}</span>
+        </button>
       </div>
 
-
-      <div className="profile-actions">
-        <button 
-          className="btn btn-primary btn-full-width"
-          onClick={() => setShowEditProfile(true)}
-        >
-          {t('profile.editProfile')}
-        </button>
+      {/* ===== Actions (2x2 glass grid) ===== */}
+      <div className="grid grid-cols-2 gap-2.5 mb-6">
+        <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => setShowEditProfile(true)} />
         {user?.role === 'AGENT' ? (
-          <button
-            className="btn btn-outline btn-full-width"
-            onClick={() => setShowRepresentedArtists(true)}
-          >
-            <AddIcon /> Represented Artists
-          </button>
+          <ActionCard icon={<ListIcon />} label="Represented Artists" onClick={() => setShowRepresentedArtists(true)} />
         ) : (
-          <>
-            <button
-              className="btn btn-outline btn-full-width"
-              onClick={() => setShowManageProfile(true)}
-              style={{ position: 'relative' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}>
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-              Manage
-              {ownHasActions && (
-                <span
-                  aria-label="Actions required"
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '10px',
-                    width: '8px',
-                    height: '8px',
-                    background: '#FF3366',
-                    borderRadius: '50%',
-                    boxShadow: '0 0 6px rgba(255, 51, 102, 0.6)',
-                  }}
-                />
-              )}
-            </button>
-            {user?.role === 'ARTIST' && (
-              <button
-                className="btn btn-outline btn-full-width"
-                onClick={() => setShowFindAgent(true)}
-              >
-                <AddIcon /> Find Agent
-              </button>
-            )}
-          </>
+          <ActionCard icon={<GridIcon />} label="Manage" onClick={() => setShowManageProfile(true)} dot={ownHasActions} />
         )}
-        <button
-          className="btn btn-secondary btn-full-width"
+        {user?.role === 'ARTIST' && (
+          <ActionCard icon={<SearchIcon />} label="Find Agent" onClick={() => setShowFindAgent(true)} />
+        )}
+        <ActionCard
+          icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}
+          label={userProfiles.length > 1 ? 'Switch Profile' : 'Add Profile'}
           onClick={() => setShowProfileSwitcher(true)}
-        >
-          {userProfiles.length > 1 ? (
-            <><SwitchIcon /> Switch Profile</>
-          ) : (
-            <><AddIcon /> Add Profile</>
-          )}
-        </button>
+        />
       </div>
 
       {/* Bio Section */}
       {user?.bio && (
-        <div className="profile-bio">
-          <p>{user.bio}</p>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 mb-5 text-left">
+          <p className="text-sm leading-relaxed text-white/70">{user.bio}</p>
         </div>
       )}
 
       {/* Agent Artists Representing Section */}
       {user?.role === 'AGENT' && (
-        <div className="agent-artists-section">
-          <h3>Artists Representing</h3>
-          <div className="agent-artists-grid">
+        <div className="mb-8 text-left">
+          <h3 className="text-lg font-bold text-white font-space-grotesk mb-4">Artists Representing</h3>
+          <div className="flex flex-col gap-3">
             {user?.representingArtists && user.representingArtists.length > 0 ? user.representingArtists.map(artist => (
               <div
                 key={artist.id}
-                className="agent-artist-card"
                 onClick={() => setViewingArtistProfile(artist.id)}
+                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 cursor-pointer
+                           hover:border-infrared/40 transition-colors"
               >
-                <div className="agent-artist-avatar">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-near-black ring-1 ring-white/10 shrink-0
+                                flex items-center justify-center text-lg font-bold text-white font-space-grotesk">
                   {artist.avatar ? (
-                    <img src={artist.avatar} alt={artist.name} />
+                    <img src={artist.avatar} alt={artist.name} className="w-full h-full object-cover" />
                   ) : (
                     <span>{artist.name.charAt(0)}</span>
                   )}
                 </div>
-                <div className="agent-artist-info">
-                  <h4>{artist.name}</h4>
-                  <p>{artist.location}</p>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-semibold text-white truncate">{artist.name}</h4>
+                  <p className="text-xs text-white/50 truncate">{artist.location}</p>
                 </div>
-                <div className="agent-artist-actions">
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setManagingArtist(artist);
-                    }}
-                    style={{ position: 'relative' }}
-                  >
-                    Manage
-                    {artistActionsMap[artist.profileId || artist.id] && (
-                      <span
-                        aria-label="Actions required"
-                        style={{
-                          position: 'absolute',
-                          top: '4px',
-                          right: '6px',
-                          width: '7px',
-                          height: '7px',
-                          background: '#FF3366',
-                          borderRadius: '50%',
-                          boxShadow: '0 0 5px rgba(255, 51, 102, 0.7)',
-                        }}
-                      />
-                    )}
-                  </button>
-                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setManagingArtist(artist); }}
+                  className="relative shrink-0 px-3 py-1.5 rounded-lg bg-infrared text-white text-xs font-semibold uppercase tracking-wider hover:bg-infrared-dim transition-colors"
+                >
+                  Manage
+                  {artistActionsMap[artist.profileId || artist.id] && (
+                    <span aria-label="Actions required" className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+                  )}
+                </button>
               </div>
             )) : (
-              <div className="no-artists-message">
-                <p>No artists added yet</p>
-                <button className="btn btn-outline" onClick={() => setShowRepresentedArtists(true)}>Add Artists</button>
+              <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center">
+                <p className="text-sm text-white/50 mb-3">No artists added yet</p>
+                <button onClick={() => setShowRepresentedArtists(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Add Artists</button>
               </div>
             )}
           </div>
@@ -609,71 +601,57 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       )}
 
       {/* Embedded Media Section */}
-      <div className="profile-embeds">
+      <div className="flex flex-col gap-3 mb-6 text-left">
         {user?.mixtape && (
-          <div className="embed-card">
-            <h4>Latest Mix</h4>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">Latest Mix</h4>
             {resolvedSoundCloudUrl ? (
               <iframe
                 src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(resolvedSoundCloudUrl)}&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`}
                 frameBorder="0"
-                className="embed-iframe soundcloud-embed"
+                className="w-full h-[320px] rounded-lg"
                 title="SoundCloud Mix"
               />
             ) : (
-              <div className="embed-placeholder">
-                <p style={{ marginBottom: '8px' }}>⚠️ Please use the full SoundCloud URL</p>
-                <p style={{ fontSize: '12px', opacity: 0.7, marginBottom: '12px' }}>
-                  Example: https://soundcloud.com/artist/track-name
-                </p>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => setShowEditProfile(true)}
-                >
-                  Update Link
-                </button>
+              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
+                <p className="text-sm text-white/70 mb-1">⚠️ Please use the full SoundCloud URL</p>
+                <p className="text-xs text-white/40 mb-3">Example: https://soundcloud.com/artist/track-name</p>
+                <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
             )}
           </div>
         )}
 
         {user?.spotify && (
-          <div className="embed-card">
-            <h4>Spotify Artist</h4>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">Spotify Artist</h4>
             {resolvedSpotifyId ? (
               <iframe
                 src={`https://open.spotify.com/embed/artist/${resolvedSpotifyId}`}
                 frameBorder="0"
                 allowTransparency="true"
                 allow="encrypted-media"
-                className="embed-iframe spotify-embed"
+                className="w-full h-[380px] rounded-lg"
                 title="Spotify Artist Profile"
               />
             ) : (
-              <div className="embed-placeholder">
-                <p style={{ marginBottom: '8px' }}>⚠️ Please use the full Spotify URL</p>
-                <p style={{ fontSize: '12px', opacity: 0.7, marginBottom: '12px' }}>
-                  Example: https://open.spotify.com/artist/XXXXX
-                </p>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => setShowEditProfile(true)}
-                >
-                  Update Link
-                </button>
+              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
+                <p className="text-sm text-white/70 mb-1">⚠️ Please use the full Spotify URL</p>
+                <p className="text-xs text-white/40 mb-3">Example: https://open.spotify.com/artist/XXXXX</p>
+                <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
             )}
           </div>
         )}
-        
+
         {user?.residentAdvisor && (
-          <div className="embed-card ra-card">
-            <h4>Events</h4>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">Events</h4>
             <button
-              className="ra-events-button"
               onClick={() => setShowRAEvents(true)}
+              className="w-full px-4 py-3 rounded-lg bg-infrared/10 border border-infrared/30 text-infrared text-sm font-semibold uppercase tracking-wider hover:bg-infrared/15 transition-colors mb-3"
             >
-              <span>View Upcoming Events</span>
+              View Upcoming Events
             </button>
             <a
               href={user.residentAdvisor.startsWith('http')
@@ -682,7 +660,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="ra-profile-link"
+              className="block text-center text-xs text-white/50 hover:text-infrared transition-colors"
             >
               View Full RA Profile →
             </a>
@@ -690,35 +668,54 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         )}
       </div>
 
-      {/* Social CTAs */}
-      <div className="profile-social-ctas">
-        {user?.instagram && (
-          <a
-            href={`https://instagram.com/${user.instagram.replace('@', '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-outline btn-social"
+      {/* ===== Links ===== */}
+      <div className="mb-6 text-left">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">Links</p>
+        <div className="flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => user?.website && window.open(user.website, '_blank')}
+            disabled={!user?.website}
+            className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left
+                       transition-colors enabled:hover:border-infrared/40 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span>Instagram</span>
-          </a>
-        )}
-        <button
-          className={`btn btn-outline btn-social ${!user?.website ? 'disabled' : ''}`}
-          onClick={() => user?.website && window.open(user.website, '_blank')}
-          disabled={!user?.website}
-        >
-          <span>Website</span>
-        </button>
-        {user?.linkedin && (
-          <a
-            href={user.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-outline btn-social"
-          >
-            <span>LinkedIn</span>
-          </a>
-        )}
+            <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
+              <GlobeIcon />
+            </span>
+            <span className="flex-1 text-sm font-medium text-white">Official Website</span>
+            <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
+          </button>
+
+          {user?.instagram && (
+            <a
+              href={`https://instagram.com/${user.instagram.replace('@', '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors"
+            >
+              <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
+                <InstagramGlyph />
+              </span>
+              <span className="flex-1 text-sm font-medium text-white">Instagram</span>
+              <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
+            </a>
+          )}
+
+          {user?.linkedin && (
+            <a
+              href={user.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors"
+            >
+              <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
+                <LinkIcon />
+              </span>
+              <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>
+              <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Represented By Badge */}
@@ -731,9 +728,9 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           .filter(Boolean);
         if (agentNames.length === 0) return null;
         return (
-          <div className="represented-by-container">
-            <div className="represented-by-badge">
-              <span className="represented-icon"><HandshakeIcon /></span>
+          <div className="flex justify-center mb-4">
+            <div className="inline-flex items-center gap-2 text-xs text-role-agent/90 font-tech">
+              <span className="inline-flex [&>svg]:w-4 [&>svg]:h-4"><HandshakeIcon /></span>
               Represented by {agentNames.join(', ')}
             </div>
           </div>

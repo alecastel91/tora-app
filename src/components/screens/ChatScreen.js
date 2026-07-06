@@ -872,7 +872,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               </div>
             )}
             {msg.text && msg.text.startsWith('Counter-Offer:') ? (
-              <div className="message-with-timestamp">
+              <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                 <div className="offer-card-message">
                   <div className="offer-card-content">
                     <div className="offer-card-icon counter-offer-icon">
@@ -915,7 +915,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 const customMessage = request.message || '';
 
                 return (
-                  <div className="message-with-timestamp">
+                  <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message">
                       <div className="offer-card-content">
                         <div className={`offer-card-icon ${isDeclined ? 'declined-offer-icon' : isAccepted ? 'accepted-offer-icon' : ''}`}>
@@ -971,7 +971,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   : [];
                 const showDocActions = pendingDocCategories.length > 0;
                 return (
-              <div className="message-with-timestamp">
+              <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                 <div
                   className="offer-card-message"
                   style={{
@@ -1158,7 +1158,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             ) : msg.documentAttachment && BROADCAST_DOC_CATEGORY_KEYS.includes(msg.documentAttachment.category) ? (
               (() => {
                 return (
-                  <div className="message-with-timestamp">
+                  <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message">
                       <div className="offer-card-content">
                         <div className="offer-card-icon" style={{ color: 'rgba(80,200,120,1)' }}>
@@ -1187,7 +1187,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               (() => {
                 const which = msg.text.includes('Press Kit') ? 'Press Kit' : msg.text.includes('Technical Rider') ? 'Technical Rider' : 'Hospitality Rider';
                 return (
-                  <div className="message-with-timestamp">
+                  <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message" style={{ borderLeft: '3px solid rgba(255, 255, 255, 0.15)', opacity: 0.9 }}>
                       <div className="offer-card-content">
                         <div className="offer-card-icon" style={{ color: '#888' }}>
@@ -1209,7 +1209,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               (() => {
                 const isFull = msg.text.includes('Full payment');
                 return (
-                  <div className="message-with-timestamp">
+                  <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message" style={{ borderLeft: '3px solid rgba(80,200,120,0.5)' }}>
                       <div className="offer-card-content">
                         <div className="offer-card-icon" style={{ color: 'rgba(80,200,120,1)' }}>
@@ -1248,7 +1248,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   && (!cachedDeal.contract?.status || cachedDeal.contract.status === 'NOT_SENT');
 
                 return (
-                  <div className="message-with-timestamp">
+                  <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div
                       className="offer-card-message"
                       style={showContractActions ? { flexDirection: 'column', alignItems: 'stretch' } : undefined}
