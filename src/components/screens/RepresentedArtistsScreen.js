@@ -8,6 +8,7 @@ import AgentUpgradeModal from '../common/AgentUpgradeModal';
 import { dummyProfiles } from '../../data/profiles';
 import apiService from '../../services/api';
 import { rosterUsage } from '../../utils/agentTiers';
+import LoadingGlobe from '../common/LoadingGlobe';
 
 const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const { user, reloadProfileData } = useAppContext();
@@ -159,9 +160,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
           </button>
           <h1>Represented Artists</h1>
         </div>
-        <div className="loading-state" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-          <p>Loading profile...</p>
-        </div>
+        <LoadingGlobe label="Loading profile..." className="h-[60vh]" />
       </div>
     );
   }

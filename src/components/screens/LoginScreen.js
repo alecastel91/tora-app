@@ -60,21 +60,32 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="fixed inset-0 flex items-start justify-center bg-black px-5 py-5 overflow-y-auto"
         >
-      <div className="w-full max-w-md my-5">
+      {/* quiet-premium backdrop: faint crimson bloom + engineering grid fading out */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-72
+                   bg-[radial-gradient(60%_100%_at_50%_0%,rgba(255,51,102,0.06),transparent_70%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-grid
+                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+      />
+      <div className="relative w-full max-w-md my-5">
         {/* Header with Logo and Tagline */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
           <img
             src="/tora_logo.png"
             alt="TORA"
-            className="max-w-[200px] md:max-w-[220px] h-auto mb-3 mx-auto block"
+            className="max-w-[190px] md:max-w-[210px] h-auto mb-3 mx-auto block mix-blend-screen"
           />
-          <p className="text-white text-[10px] md:text-[12px] tracking-[0.22em] font-normal mt-2 whitespace-nowrap uppercase">
-            WHERE MUSIC MEETS
+          <p className="text-white/70 text-[10px] md:text-[11px] tracking-[0.25em] font-normal mt-2 whitespace-nowrap uppercase font-tech">
+            Where Music Meets
           </p>
         </motion.div>
 
@@ -88,68 +99,75 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
         >
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 rounded-lg px-4 py-3 mb-6 text-red-400 text-[13px] leading-relaxed">
+            <div className="bg-infrared/[0.08] border border-infrared/40 rounded-xl px-4 py-3 mb-5 text-infrared text-[13px] leading-relaxed">
               {error}
             </div>
           )}
 
-          {/* Email Input */}
-          <div className="mb-4">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              aria-label="Email"
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3.5 bg-black border border-[#333333] rounded-lg text-white text-[15px] font-rajdhani tracking-[0.1em] placeholder:text-[#666666] focus:outline-none focus:border-primary-pink transition-all duration-200 ease-in-out"
-            />
-          </div>
+            {/* Email Input */}
+            <div className="mb-3">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                aria-label="Email"
+                autoComplete="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white text-sm
+                           placeholder:text-white/35 focus:outline-none focus:border-infrared/60 focus:bg-white/[0.04]
+                           transition-colors duration-300"
+              />
+            </div>
 
-          {/* Password Input */}
-          <div className="mb-2">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              aria-label="Password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3.5 bg-black border border-[#333333] rounded-lg text-white text-[15px] font-rajdhani tracking-[0.1em] placeholder:text-[#666666] focus:outline-none focus:border-primary-pink transition-all duration-200 ease-in-out"
-            />
-          </div>
+            {/* Password Input */}
+            <div className="mb-2">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                aria-label="Password"
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white text-sm
+                           placeholder:text-white/35 focus:outline-none focus:border-infrared/60 focus:bg-white/[0.04]
+                           transition-colors duration-300"
+              />
+            </div>
 
-          {/* Forgot Password Link */}
-          <div className="text-right mb-6">
+            {/* Forgot Password Link */}
+            <div className="text-right mb-5">
+              <button
+                type="button"
+                onClick={onSwitchToForgotPassword}
+                className="text-[12px] text-white/40 hover:text-infrared bg-transparent border-none cursor-pointer transition-colors duration-200"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Login Button */}
             <button
-              type="button"
-              onClick={onSwitchToForgotPassword}
-              className="text-[12px] text-gray-400 hover:text-primary-pink underline bg-transparent border-none cursor-pointer transition-colors duration-200"
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-infrared/[0.08] border border-infrared/45 rounded-xl text-white text-[11px]
+                         font-semibold uppercase tracking-[0.15em] font-tech cursor-pointer transition-all duration-300
+                         hover:bg-infrared/15 hover:border-infrared/70 active:scale-[0.98]
+                         disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Forgot password?
+              {loading ? 'Logging in...' : 'Log In'}
             </button>
-          </div>
-
-          {/* Login Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-8 py-4 bg-[#1a1a1a] text-white text-sm font-bold uppercase tracking-widest rounded-xs border border-white/15 cursor-pointer transition-all duration-300 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'LOGGING IN...' : 'LOG IN'}
-          </button>
 
           {/* Activate (with invitation code) */}
-          <div className="text-center mt-5 text-[13px] font-normal">
-            <span className="text-gray-400">Have an invitation? </span>
+          <div className="text-center mt-6 text-[13px] font-normal">
+            <span className="text-white/40">Have an invitation? </span>
             <button
               type="button"
               onClick={onSwitchToSignup}
-              className="text-primary-pink hover:text-primary-pink-hover underline bg-transparent border-none cursor-pointer font-normal transition-colors duration-200"
+              className="text-infrared hover:opacity-80 underline underline-offset-2 bg-transparent border-none cursor-pointer font-normal transition-opacity duration-200"
             >
               Activate your account
             </button>
@@ -157,12 +175,12 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
 
           {/* Apply (no invitation yet) */}
           <div className="text-center mt-2 text-[13px] font-normal">
-            <span className="text-gray-400">New to TORA? </span>
+            <span className="text-white/40">New to TORA? </span>
             <a
               href={import.meta.env.VITE_APPLY_URL || 'https://torahub.io/apply'}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white underline cursor-pointer font-normal transition-colors duration-200"
+              className="text-white/60 hover:text-white underline underline-offset-2 cursor-pointer font-normal transition-colors duration-200"
             >
               Apply for membership
             </a>

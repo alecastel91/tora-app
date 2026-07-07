@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Modal from './Modal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import raService from '../../services/raService';
+import LoadingGlobe from './LoadingGlobe';
 
 const RAEventsModal = ({ isOpen, onClose, artistName }) => {
   const { t } = useLanguage();
@@ -112,9 +113,7 @@ const RAEventsModal = ({ isOpen, onClose, artistName }) => {
 
         <div className="ra-events-list" style={{ display: 'none' }}>
           {loading ? (
-            <div className="loading-events">
-              <p>{t('common.loading')}</p>
-            </div>
+            <LoadingGlobe label={t('common.loading')} className="py-8" />
           ) : error ? (
             <div className="error-state">
               <p>{error}</p>

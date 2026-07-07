@@ -3,6 +3,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import { subscribeToInbox } from '../../services/realtime';
+import LoadingGlobe from '../common/LoadingGlobe';
 
 const MessagesScreen = ({ onOpenChat }) => {
   const { user, getConversations, acceptRequest, declineRequest } = useAppContext();
@@ -110,7 +111,7 @@ const MessagesScreen = ({ onOpenChat }) => {
   if (loading) {
     return (
       <div className="screen active messages-screen">
-        <p className="text-center text-sm text-white/40 py-16">Loading...</p>
+        <LoadingGlobe />
       </div>
     );
   }

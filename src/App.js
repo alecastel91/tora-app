@@ -23,6 +23,7 @@ import apiService from './services/api';
 import { StarIcon } from './utils/icons';
 import './styles/App.css';
 import './styles/responsive.css';
+import LoadingGlobe from './components/common/LoadingGlobe';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -353,7 +354,7 @@ function App() {
         <div className="auth-container">
           <div className="auth-header">
             <img src="/tora_logo.png" alt="TORA" className="auth-logo" />
-            <p className="auth-subtitle">Loading...</p>
+            <LoadingGlobe label="" className="py-2" />
           </div>
         </div>
       </div>
@@ -1066,7 +1067,7 @@ function App() {
 
             {subscriptionStep === 'processing' && (
               <div className="processing-state">
-                <div className="spinner"></div>
+                <LoadingGlobe label="" className="py-2" />
                 <h3>Processing Payment...</h3>
                 <p>Please wait while we secure your subscription</p>
               </div>

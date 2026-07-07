@@ -13,6 +13,7 @@ import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
+import LoadingGlobe from '../common/LoadingGlobe';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -1135,10 +1136,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
       <div className="bookings-content">
         {loading ? (
-          <div className="bookings-loading">
-            <div className="spinner"></div>
-            <p>Loading bookings...</p>
-          </div>
+          <LoadingGlobe label="Loading bookings..." />
         ) : error ? (
           <div className="bookings-error">
             <p>{error}</p>

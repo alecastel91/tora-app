@@ -7,6 +7,7 @@ import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
+import LoadingGlobe from '../common/LoadingGlobe';
 
 const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, accountUser }) => {
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptConnectionRequest, declineConnectionRequest } = useAppContext();
@@ -520,7 +521,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       {/* Search Results */}
       <div className="search-results">
         {loading ? (
-          <p className="text-center text-sm text-white/40 py-16">Loading profiles...</p>
+          <LoadingGlobe label="Loading profiles..." />
         ) : searchResults.length > 0 ? (
           searchResults.map(profile => {
             const profileId = profile.id;

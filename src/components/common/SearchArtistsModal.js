@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import ViewProfileScreen from '../screens/ViewProfileScreen';
+import LoadingGlobe from './LoadingGlobe';
 
 const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -404,9 +405,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
           {/* Loading State */}
           {loading && (
-            <div className="loading-state">
-              <p>Searching artists...</p>
-            </div>
+            <LoadingGlobe label="Searching artists..." />
           )}
 
           {/* Prompt to search */}
