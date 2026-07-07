@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
-import { HeartIcon, FilterIcon, SlashCircleIcon } from '../../utils/icons';
+import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
 import Modal from '../common/Modal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
@@ -446,6 +446,16 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
   return (
     <div className="screen active search-screen">
+      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
+          full-screen overlays (filter screen, modals) must live OUTSIDE it or
+          they get trapped under the sticky app header's stacking context. */}
+      <div className="relative isolate">
+      {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 -z-10 bg-grid opacity-40
+                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+      />
       <div className="search-header">
         {/* Search Bar */}
         <div className="search-bar">
@@ -471,7 +481,13 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         {/* Tier-based notification banner */}
         {user && hasGlobalSearch() && (
           <div className="search-premium-notice">
-            <span className="premium-icon">✨</span>
+            <span className="premium-icon" aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+            </span>
             <span>
               {user?.subscriptionTier === 'TRIAL' ? 'Searching worldwide with 48h trial' : 'Searching worldwide with Premium'}
             </span>
@@ -482,7 +498,12 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         {user && !hasGlobalSearch() && (
           <div className="search-upgrade-banner">
             <div className="upgrade-banner-content">
-              <span className="upgrade-icon">🔒</span>
+              <span className="upgrade-icon" aria-hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
               <div className="upgrade-text">
                 <strong>Search limited to {user.city}</strong>
                 <p>Upgrade to search worldwide and unlock premium features</p>
@@ -499,7 +520,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       {/* Search Results */}
       <div className="search-results">
         {loading ? (
-          <div className="loading-message">Loading profiles...</div>
+          <p className="text-center text-sm text-white/40 py-16">Loading profiles...</p>
         ) : searchResults.length > 0 ? (
           searchResults.map(profile => {
             const profileId = profile.id;
@@ -569,15 +590,25 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             );
           })
         ) : (
-          <div className="empty-state">
-            <p>{hasSearched ? 'No results found' : 'Start searching to find profiles'}</p>
+          <div className="flex flex-col items-center py-20 text-center">
+            <span aria-hidden className="text-white/15 [&>svg]:w-9 [&>svg]:h-9 mb-4"><SearchIcon /></span>
+            <p className="text-sm text-white/50">{hasSearched ? 'No results found' : 'Start searching to find profiles'}</p>
+            <p className="text-xs text-white/30 mt-1.5">
+              {hasSearched ? 'Try different keywords or filters' : 'Search by name or use the filters'}
+            </p>
           </div>
         )}
       </div>
-      
+      </div>
+
       {/* Filter Full-Page Screen */}
       {showFilters && (
         <div className="screen active filter-screen">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-grid opacity-40
+                       [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+          />
           <div className="screen-header">
             <button className="back-btn" onClick={() => setShowFilters(false)}>
               ←

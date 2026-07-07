@@ -220,7 +220,27 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
         <div style={{ width: '24px' }}></div>
       </div>
       
-      <div className="view-profile-content">
+      <div className="view-profile-content relative isolate">
+        {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-64 -z-10"
+          style={{
+            background: `radial-gradient(60% 100% at 50% 0%, ${
+              {
+                ARTIST: 'rgba(107, 95, 255, 0.18)',
+                VENUE: 'rgba(255, 87, 87, 0.16)',
+                PROMOTER: 'rgba(255, 184, 0, 0.13)',
+                AGENT: 'rgba(0, 200, 117, 0.13)',
+              }[profile.role] || 'rgba(255, 255, 255, 0.08)'
+            }, transparent 70%)`,
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-56 -z-10 bg-grid
+                     [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+        />
         <div className="profile-header">
           <div className="profile-avatar-container">
             <div className="profile-avatar">

@@ -394,7 +394,10 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   }[user?.role] || 'rgba(255, 255, 255, 0.08)';
 
   return (
-    <div className="screen active relative isolate px-5 pt-6 pb-5">
+    <div className="screen active px-5 pt-6 pb-5">
+      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
+          modals live OUTSIDE it so they aren't trapped under the app header. */}
+      <div className="relative isolate">
       {/* deep-space backdrop: role-colored bloom + faint engineering grid, fading out */}
       <div
         aria-hidden
@@ -749,6 +752,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           </div>
         );
       })()}
+      </div>
 
       {/* Likes List Modal */}
       <Modal

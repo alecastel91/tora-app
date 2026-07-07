@@ -1076,6 +1076,15 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
   return (
     <div className="bookings-screen">
+      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
+          overlays (delete modal, etc.) live outside it. */}
+      <div className="relative isolate">
+      {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 -z-10 bg-grid opacity-40
+                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+      />
       <div className="bookings-tabs">
         <button
           className={`bookings-tab ${activeTab === 'upcoming' ? 'active' : ''}`}
@@ -1139,7 +1148,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
           </div>
         ) : filteredDeals.length === 0 ? (
           <div className="bookings-empty">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -1168,6 +1177,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             ))}
           </div>
         )}
+      </div>
       </div>
 
       {/* Custom Delete Confirmation Modal */}

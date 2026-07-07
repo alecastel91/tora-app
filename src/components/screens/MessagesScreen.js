@@ -118,7 +118,13 @@ const MessagesScreen = ({ onOpenChat }) => {
   const totalUnread = conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
 
   return (
-    <div className="screen active messages-screen">
+    <div className="screen active messages-screen relative isolate">
+      {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 -z-10 bg-grid opacity-40
+                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+      />
       {/* Tab Navigation */}
       <div className="flex border-b border-white/10 mb-5 px-1">
         <TabButton id="messages" label="Messages" count={totalUnread} />

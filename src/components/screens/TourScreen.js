@@ -1648,6 +1648,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   return (
     <div className="screen active matches-screen tour-screen">
+      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
+          overlays (modals) live outside it. */}
+      <div className="relative isolate">
+      {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 -z-10 bg-grid opacity-40
+                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+      />
       {/* Sub-tabs */}
       <div className="tour-tabs">
         <button
@@ -1669,6 +1678,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       {/* Tab Content */}
       <div className="tour-tab-content">
         {activeTab === 'calendar' ? renderCalendarMatches() : renderTourKickstart()}
+      </div>
       </div>
 
       {/* Message Modal */}

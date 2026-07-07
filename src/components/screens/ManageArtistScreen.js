@@ -2419,7 +2419,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       </div>
 
       {/* Tab Content */}
-      <div className="manage-artist-content">
+      <div className="manage-artist-content relative isolate">
+        {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 -z-10 bg-grid opacity-40
+                     [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+        />
         {activeTab === 'dashboard' && renderDashboardTab()}
         {activeTab === 'events' && renderEventsTab()}
         {activeTab === 'info' && renderArtistInfoTab()}
