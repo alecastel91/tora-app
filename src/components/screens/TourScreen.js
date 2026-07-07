@@ -6,6 +6,7 @@ import ViewProfileScreen from './ViewProfileScreen';
 import MakeOfferModal from '../common/MakeOfferModal';
 import { CalendarIcon, PlaneIcon, LocationIcon, HandshakeIcon, DollarIcon, TargetIcon, StarIcon, EyeIcon, SlidersIcon } from '../../utils/icons';
 import apiService from '../../services/api';
+import LoadingGlobe from '../common/LoadingGlobe';
 import { citiesByCountry, countriesByZone, genresList } from '../../data/profiles';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser }) => {
@@ -34,6 +35,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // Tour Kickstart state
   const [showCreateTourModal, setShowCreateTourModal] = useState(false);
   const [myTours, setMyTours] = useState([]);
+  const [toursLoading, setToursLoading] = useState(true);
   const [allTours, setAllTours] = useState([]); // For promoters/venues
   const [tourZoneFilter, setTourZoneFilter] = useState('all');
   const [tourGenreFilter, setTourGenreFilter] = useState([]); // Array for multi-select
@@ -163,6 +165,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const fetchTours = async () => {
       if (!user || activeTab !== 'kickstart') return;
 
+      setToursLoading(true);
       console.log('[TourScreen] Fetching tours, user role:', user.role);
 
       try {
@@ -184,6 +187,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         }
       } catch (error) {
         console.error('Error fetching tours:', error);
+      } finally {
+        setToursLoading(false);
       }
     };
 
@@ -1247,7 +1252,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
 
             {/* Tour cards or empty state */}
-            {myTours.length === 0 ? (
+            {toursLoading ? (
+              <LoadingGlobe label="Loading tours..." />
+            ) : myTours.length === 0 ? (
               <div className="tour-empty-state">
                 <PlaneIcon />
                 <p>You haven't created any tours yet</p>
@@ -1255,64 +1262,85 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               </div>
             ) : (
               <div className="tour-cards-list">
-                {myTours.map(tour => (
-                  <div key={tour.id} className="tour-card">
-                    <div className="tour-card-header">
-                      <div className="tour-info">
-                        <h4>{tour.country || tour.zone} Tour</h4>
-                        <p className="tour-dates">
-                          {new Date(tour.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(tour.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {myTours.map(tour => {
+                  const pct = Math.min(100, Math.round(((tour.totalRevenue || 0) / (tour.minRevenue || 1)) * 100));
+                  const statusPill = {
+                    ACTIVE: 'text-role-agent border-role-agent/50',
+                    COMPLETED: 'text-white/60 border-white/25',
+                    CANCELLED: 'text-role-venue border-role-venue/50',
+                  }[tour.status] || 'text-white/60 border-white/25';
+                  return (
+                  <div
+                    key={tour.id}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-white/20"
+                  >
+                    {/* Header: destination + window, status pill */}
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="min-w-0">
+                        <h4 className="text-[17px] font-semibold text-white font-space-grotesk tracking-[-0.01em] m-0 truncate">
+                          {tour.country || tour.zone} Tour
+                        </h4>
+                        <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
+                          {new Date(tour.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {' — '}
+                          {new Date(tour.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          {tour.zone && tour.country ? ` · ${tour.zone}` : ''}
                         </p>
                       </div>
-                      <span className={`tour-status-badge status-${tour.status.toLowerCase()}`}>
+                      <span className={`shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full border text-[9px]
+                                        font-semibold uppercase tracking-[0.15em] font-tech ${statusPill}`}>
                         {tour.status}
                       </span>
                     </div>
-                    <div className="tour-card-body">
-                      {/* Revenue Progress Bar */}
-                      <div className="tour-progress">
-                        <div className="tour-progress-header">
-                          <span className="tour-progress-label">
-                            {tour.confirmedGigs || 0} gigs confirmed
-                          </span>
-                          <span className="tour-progress-amount">
-                            {tour.revenueCurrency || 'EUR'} {Math.round(tour.totalRevenue || 0)} / {Math.round(tour.minRevenue || 0)}
-                          </span>
-                        </div>
-                        <div className="tour-progress-bar">
-                          <div
-                            className="tour-progress-fill"
-                            style={{ width: `${Math.min(100, ((tour.totalRevenue || 0) / (tour.minRevenue || 1)) * 100)}%` }}
-                          />
-                        </div>
-                        <div className="tour-progress-percentage">
-                          {Math.round(((tour.totalRevenue || 0) / (tour.minRevenue || 1)) * 100)}%
-                        </div>
-                      </div>
 
+                    {/* Console: gigs + revenue tiles */}
+                    <div className="grid grid-cols-2 gap-2.5 mb-3">
+                      <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
+                        <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
+                          {tour.confirmedGigs || 0}
+                        </p>
+                        <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
+                          Gigs confirmed
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
+                        <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
+                          {Math.round(tour.totalRevenue || 0).toLocaleString()}
+                          <span className="text-xs font-medium text-white/35"> / {Math.round(tour.minRevenue || 0).toLocaleString()} {tour.revenueCurrency || 'EUR'}</span>
+                        </p>
+                        <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
+                          Revenue target
+                        </p>
+                      </div>
                     </div>
-                    <div className="tour-card-footer">
-                      <button
-                        className="btn btn-outline btn-small"
-                        onClick={() => handleViewTourGigs(tour)}
-                      >
+
+                    {/* Thin crimson progress line */}
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="flex-1 h-[3px] rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full rounded-full bg-infrared" style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="shrink-0 text-[10px] text-white/50 font-tech">{pct}%</span>
+                    </div>
+
+                    {/* Actions: primary → neutral → quiet danger */}
+                    <div className="flex items-center gap-2 pt-3 border-t border-white/[0.07]">
+                      <button className="btn btn-primary btn-small" onClick={() => handleViewTourGigs(tour)}>
                         View Gigs
                       </button>
-                      <button
-                        className="btn btn-outline btn-small"
-                        onClick={() => handleEditTour(tour)}
-                      >
+                      <button className="btn btn-outline btn-small" onClick={() => handleEditTour(tour)}>
                         Edit
                       </button>
                       <button
-                        className="btn btn-outline btn-small"
+                        className="ml-auto bg-transparent border-none cursor-pointer text-[10px] uppercase tracking-[0.1em]
+                                   font-tech text-white/35 hover:text-role-venue transition-colors"
                         onClick={() => handleDeleteTour(tour)}
                       >
                         Cancel Tour
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
