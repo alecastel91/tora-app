@@ -467,6 +467,17 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
             <p className="party-location">
               {deal.city && deal.country ? `${deal.city}, ${deal.country}` : otherParty.location}
             </p>
+            {!isExpanded && (
+            <p className="m-0 mb-2 text-[12px] font-space-grotesk font-medium text-white/85 truncate">
+              {deal.eventName || 'Booking'}
+              <span className="text-white/30"> · </span>
+              <span className="text-infrared font-semibold">
+                {Number.isInteger(deal.currentFee)
+                  ? deal.currentFee.toLocaleString()
+                  : deal.currentFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {deal.currency}
+              </span>
+            </p>
+            )}
             <div className="party-status-row">
               {(() => {
                 const displayStatus = getDealDisplayStatus(deal);
@@ -491,13 +502,20 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
         {isExpanded && (
           <>
+            {(deal.eventName || deal.performanceType) && (
+              <div className="flex items-center gap-2.5 mb-2">
+                <h3 className="m-0 text-[16px] font-semibold font-space-grotesk tracking-[-0.01em] text-white truncate">
+                  {deal.eventName || 'Booking'}
+                </h3>
+                {deal.performanceType && (
+                  <span className="shrink-0 px-2 py-0.5 rounded-lg bg-white/[0.04] border border-white/10 text-white/60
+                                   text-[8px] font-medium uppercase tracking-[0.15em] font-tech">
+                    {deal.performanceType}
+                  </span>
+                )}
+              </div>
+            )}
             <div className="booking-details">
-              {deal.eventName && (
-                <div className="booking-detail-row">
-                  <span className="detail-label">Event:</span>
-                  <span className="detail-value">{deal.eventName}</span>
-                </div>
-              )}
               {deal.artistName && (
                 <div className="booking-detail-row">
                   <span className="detail-label">Artist:</span>
@@ -515,22 +533,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   )}
                 </span>
               </div>
-              <div className="booking-detail-row">
-                <span className="detail-label">Date:</span>
-                <span className="detail-value">{formatDate(deal.date)}</span>
-              </div>
               {deal.startTime && deal.endTime && (
                 <div className="booking-detail-row">
                   <span className="detail-label">Event Time:</span>
                   <span className="detail-value">
                     {deal.startTime} - {deal.endTime}
                   </span>
-                </div>
-              )}
-              {deal.performanceType && (
-                <div className="booking-detail-row">
-                  <span className="detail-label">Type:</span>
-                  <span className="detail-value">{deal.performanceType}</span>
                 </div>
               )}
               {deal.setStartTime && deal.setEndTime && (
@@ -610,13 +618,13 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                   <span className="detail-value">{deal.paymentTerms}</span>
                 </div>
               )}
-              {deal.notes && (
-                <div className="booking-detail-row full-width">
-                  <span className="detail-label">Notes:</span>
-                  <span className="detail-value">{deal.notes}</span>
-                </div>
-              )}
             </div>
+            {deal.notes && (
+              <div className="mb-4 -mt-1">
+                <p className="m-0 mb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30 font-tech">Notes</p>
+                <p className="m-0 text-[12px] leading-relaxed text-white/45">{deal.notes}</p>
+              </div>
+            )}
 
             {/* Workflow Timeline for ACCEPTED deals */}
             {deal.status === 'ACCEPTED' && !hideWorkflow && (
