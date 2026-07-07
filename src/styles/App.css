@@ -10036,11 +10036,6 @@ textarea.form-textarea:focus {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
-  .bookings-tab {
-    padding: 12px 16px;
-    font-size: 13px;
-  }
 }
 
 /* ==========================================
