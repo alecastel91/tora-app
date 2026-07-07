@@ -9706,13 +9706,15 @@ textarea.form-textarea:focus {
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  padding: 4px 0 5px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 700;
@@ -9890,16 +9892,26 @@ textarea.form-textarea:focus {
 }
 
 .booking-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 24px;
+  display: flex;
+  flex-direction: column;
   margin-bottom: 16px;
 }
 
 .booking-detail-row {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.booking-detail-row:last-child {
+  border-bottom: none;
+}
+
+.booking-detail-row .detail-value {
+  text-align: right;
 }
 
 .booking-detail-row.full-width {
@@ -9934,6 +9946,7 @@ textarea.form-textarea:focus {
   color: var(--primary-pink);
   font-weight: 700;
   font-size: 15px;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .booking-actions {
@@ -10352,8 +10365,8 @@ textarea.form-textarea:focus {
 }
 
 .detail-subtext {
-  font-size: 13px;
-  color: var(--text-gray);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .extras-list {
@@ -13346,4 +13359,23 @@ textarea.form-textarea:focus {
 /* Calendar-match card: pill sits inline with the name, not pushed down */
 .match-name-role .role-badge {
   margin-top: 0;
+}
+
+
+/* Mini calendar chip internals */
+.booking-date-month {
+  font-size: 7px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1;
+}
+
+.booking-date-day {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  color: #fff;
+  line-height: 1;
 }

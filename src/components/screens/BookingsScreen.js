@@ -423,7 +423,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
     return (
       <div key={deal.id} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
         <div className="booking-date-badge">
-          {dayNumber}
+          <span className="booking-date-month">
+            {dealDate.toLocaleDateString('en-US', { month: 'short' })}
+          </span>
+          <span className="booking-date-day">{dayNumber}</span>
         </div>
         <div className="booking-compact-view">
           <div
@@ -635,7 +638,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
                 {(!deal.contract || !deal.contract.status || deal.contract.status === 'NOT_SENT') && isArtistSideForDeal(deal, currentUser) && (
                   <>
                     <button
-                      className="btn btn-outline"
+                      className="btn btn-primary"
                       disabled={actionBusy}
                       onClick={async () => {
                         if (actionBusy) return;
