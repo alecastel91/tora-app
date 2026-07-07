@@ -428,7 +428,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     return (
       <div className="tour-kickstart-content">
         <div className="coming-soon-placeholder">
-          <p style={{ marginBottom: '24px', marginTop: 0 }}>Find professionals with matching travel schedules, availability, and music genres</p>
+          <p className="text-xs text-white/45 leading-relaxed max-w-[300px] mx-auto mt-0 mb-6">
+            Find professionals with matching travel schedules, availability, and music genres
+          </p>
 
           <div className="feature-preview">
             {/* Filters Section */}
@@ -556,7 +558,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <div className="no-matches-simple">
                 <p>No profiles match your travel schedule or events.</p>
                 <div className="no-matches-tips">
-                  <h4>Tips to get more matches:</h4>
+                  <h4>Tips to get more matches</h4>
                   <ul className="feature-list">
                     <li>
                       <span className="feature-icon"><CalendarIcon /></span>

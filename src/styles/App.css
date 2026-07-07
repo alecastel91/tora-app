@@ -5870,9 +5870,13 @@
 
 /* Matches Results */
 .matches-count {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 14px;
+  text-align: left;
 }
 
 .match-card {
@@ -5933,14 +5937,15 @@
 }
 
 .match-avatar {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 17px;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   color: white;
   margin-right: 16px;
   position: relative;
@@ -6071,9 +6076,12 @@
 
 .match-date-location {
   display: flex;
-  gap: 16px;
-  font-size: 13px;
-  color: var(--text-secondary);
+  gap: 14px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -6106,9 +6114,9 @@
 
 .match-name-role h3 {
   margin: 0;
-  font-size: 17px;
-  font-weight: 400;
-  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
   color: var(--text-white);
   line-height: 1.2;
 }
@@ -6125,8 +6133,8 @@
 
 .btn-match-full {
   width: 100%;
-  padding: 10px;
-  font-size: 14px;
+  padding: 9px;
+  font-size: 10px;
   margin-top: 4px;
 }
 
@@ -6287,9 +6295,13 @@
 }
 
 .no-matches-tips h4 {
-  color: var(--text-white);
-  font-size: 16px;
-  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 14px;
 }
 
 .no-matches-tips ul {
@@ -6299,20 +6311,13 @@
 }
 
 .no-matches-tips li {
-  color: var(--text-light);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
   padding: 6px 0;
   position: relative;
-  padding-left: 20px;
 }
 
-.no-matches-tips li:before {
-  content: "•";
-  color: var(--primary-pink);
-  font-weight: bold;
-  position: absolute;
-  left: 0;
-}
+
 
 
 /* Premium Screen Styles */
@@ -6448,10 +6453,10 @@
 }
 
 .feature-icon svg {
-  width: 24px;
-  height: 24px;
-  stroke: #ffffff;
-  stroke-width: 2;
+  width: 16px;
+  height: 16px;
+  stroke: rgba(255, 255, 255, 0.45);
+  stroke-width: 1.8;
   fill: none;
 }
 
@@ -12700,9 +12705,11 @@ textarea.form-textarea:focus {
 }
 
 .coming-soon-placeholder > p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  margin-bottom: 32px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto 24px;
 }
 
 .feature-preview {
@@ -12728,9 +12735,9 @@ textarea.form-textarea:focus {
 }
 
 .feature-preview li {
-  color: rgba(255, 255, 255, 0.8);
-  padding: 8px 0;
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 7px 0;
+  font-size: 12px;
   line-height: 1.6;
   display: flex;
   align-items: center;
@@ -12745,9 +12752,9 @@ textarea.form-textarea:focus {
 }
 
 .feature-icon svg {
-  width: 20px;
-  height: 20px;
-  stroke: var(--primary-pink);
+  width: 15px;
+  height: 15px;
+  stroke: rgba(255, 255, 255, 0.4);
 }
 
 .coming-soon-badge {
@@ -13236,10 +13243,12 @@ textarea.form-textarea:focus {
 }
 
 .no-matches-tips h4 {
-  color: #fff;
-  font-size: 14px;
-  margin-bottom: 12px;
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 14px;
 }
 
 /* Actions Required Section */
@@ -13326,4 +13335,10 @@ textarea.form-textarea:focus {
   color: rgba(255, 255, 255, 0.5);
   font-weight: 400;
   margin-left: 6px;
+}
+
+
+/* Calendar-match card: pill sits inline with the name, not pushed down */
+.match-name-role .role-badge {
+  margin-top: 0;
 }
