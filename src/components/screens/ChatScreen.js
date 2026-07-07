@@ -113,6 +113,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         isMe: msg.from.id === currentUser.id,
         isSystem: msg.isSystemMessage || false,
         dealId: msg.dealId || null,
+        deal: msg.deal || null,
         connectionRequestId: msg.connectionRequest ? (msg.connectionRequest.id || msg.connectionRequest) : null,
         documentAttachment: msg.documentAttachment || null
       }));
@@ -885,7 +886,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     </div>
                     <div className="offer-card-text">
                       <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
-                      <p className="offer-card-action">counter-offered</p>
+                      <p className="offer-card-action">
+                        counter-offered{msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
+                      </p>
                     </div>
                   </div>
                   <button
@@ -975,7 +978,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 <div
                   className="offer-card-message"
                   style={{
-                    ...(msg._withdrawn ? { borderLeft: '3px solid rgba(255, 165, 0, 0.6)', opacity: 0.85 } : {}),
+                    ...(msg._withdrawn ? { opacity: 0.75 } : {}),
                     ...(showDocActions ? { flexDirection: 'column', alignItems: 'stretch' } : {}),
                   }}
                 >
@@ -1010,6 +1013,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             : msg._fullySigned ? 'contract fully signed'
                             : msg._signedByOne ? 'contract signed — waiting for the other party'
                             : 'sent a contract'}
+                          {msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
                         </p>
                       </div>
                     </div>
@@ -1161,7 +1165,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message">
                       <div className="offer-card-content">
-                        <div className="offer-card-icon" style={{ color: 'rgba(80,200,120,1)' }}>
+                        <div className="offer-card-icon" style={{ color: 'rgba(255,255,255,0.55)' }}>
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                           </svg>
@@ -1188,9 +1192,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 const which = msg.text.includes('Press Kit') ? 'Press Kit' : msg.text.includes('Technical Rider') ? 'Technical Rider' : 'Hospitality Rider';
                 return (
                   <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
-                    <div className="offer-card-message" style={{ borderLeft: '3px solid rgba(255, 255, 255, 0.15)', opacity: 0.9 }}>
+                    <div className="offer-card-message">
                       <div className="offer-card-content">
-                        <div className="offer-card-icon" style={{ color: '#888' }}>
+                        <div className="offer-card-icon" style={{ color: 'rgba(255,255,255,0.35)' }}>
                           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                           </svg>
@@ -1210,9 +1214,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 const isFull = msg.text.includes('Full payment');
                 return (
                   <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
-                    <div className="offer-card-message" style={{ borderLeft: '3px solid rgba(80,200,120,0.5)' }}>
+                    <div className="offer-card-message">
                       <div className="offer-card-content">
-                        <div className="offer-card-icon" style={{ color: 'rgba(80,200,120,1)' }}>
+                        <div className="offer-card-icon" style={{ color: '#00C875' }}>
                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="12" y1="1" x2="12" y2="23"></line>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -1221,7 +1225,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         <div className="offer-card-text">
                           <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
                           <p className="offer-card-action">{isFull ? 'recorded full payment' : 'recorded a deposit payment'}</p>
-                          <p style={{ margin: '4px 0 0', fontSize: '11px', color: '#aaa' }}>{msg.previewText || (msg.text.split('\n').pop() || '')}</p>
+                          <p style={{ margin: '3px 0 0', fontSize: '10px', color: 'rgba(255,255,255,0.45)' }}>{msg.previewText || (msg.text.split('\n').pop() || '')}</p>
                         </div>
                       </div>
                     </div>
@@ -1281,6 +1285,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             <p className="offer-card-name">{displayName}</p>
                             <p className="offer-card-action">
                               {isDeclined ? 'declined offer' : isAccepted ? 'accepted offer' : 'sent an offer'}
+                              {msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
                             </p>
                           </div>
                         </div>
@@ -1406,6 +1411,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                   isMe: m.from.id === currentUser.id,
                                   isSystem: m.isSystemMessage || false,
                                   dealId: m.dealId || null,
+                                  deal: m.deal || null,
                                   connectionRequestId: m.connectionRequest ? (m.connectionRequest.id || m.connectionRequest) : null,
                                   documentAttachment: m.documentAttachment || null
                                 }));

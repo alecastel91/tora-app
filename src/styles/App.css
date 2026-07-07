@@ -10148,15 +10148,21 @@ textarea.form-textarea:focus {
 }
 
 .counter-offer-icon {
-  color: #FFA726;
+  color: #FFB800;
 }
 
 .accepted-offer-icon {
-  color: #4CAF50;
+  color: #00C875;
 }
 
 .declined-offer-icon {
-  color: #F44336;
+  color: #FF5757;
+}
+
+/* One glyph scale for every action card, regardless of inline svg attrs */
+.offer-card-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .offer-card-text {
