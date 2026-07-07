@@ -860,7 +860,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
         {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-40 -z-10 bg-grid opacity-40
+          className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
         {activeTab === 'dashboard' && renderDashboardTab()}

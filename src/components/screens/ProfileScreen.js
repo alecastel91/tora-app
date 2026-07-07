@@ -401,12 +401,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       {/* deep-space backdrop: role-colored bloom + faint engineering grid, fading out */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-64 -z-10"
+        className="pointer-events-none absolute -inset-x-5 -top-6 h-64 -z-10"
         style={{ background: `radial-gradient(60% 100% at 50% 0%, ${roleBloomColor}, transparent 70%)` }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-56 -z-10 bg-grid
+        className="pointer-events-none absolute -inset-x-5 -top-6 h-56 -z-10 bg-grid
                    [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
 

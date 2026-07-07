@@ -224,7 +224,7 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
         {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-64 -z-10"
+          className="pointer-events-none absolute -inset-x-5 -top-5 h-64 -z-10"
           style={{
             background: `radial-gradient(60% 100% at 50% 0%, ${
               {
@@ -238,7 +238,7 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-56 -z-10 bg-grid
+          className="pointer-events-none absolute -inset-x-5 -top-5 h-56 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
         <div className="profile-header">

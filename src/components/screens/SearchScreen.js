@@ -453,7 +453,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-48 -z-10 bg-grid opacity-40
+        className="pointer-events-none absolute -inset-x-4 -top-6 h-48 -z-10 bg-grid
                    [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
       <div className="search-header">
@@ -606,7 +606,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         <div className="screen active filter-screen">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-grid opacity-40
+            className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-grid
                        [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
           />
           <div className="screen-header">
