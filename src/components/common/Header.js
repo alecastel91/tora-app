@@ -52,7 +52,7 @@ const Header = ({ onOpenSettings, onOpenPremium, accountUser, onSwitchTab }) => 
 
   return (
     <header className="app-header sticky top-0 z-[100] flex items-center justify-between
-                       px-4 py-2.5 bg-black/70 backdrop-blur-xl border-b border-white/10">
+                       px-4 py-2.5 bg-black/95 border-b border-white/10">
       <div className="logo flex items-center">
         <img src="/tora_logo.png" alt="TORA" className="h-6 w-auto block" />
       </div>

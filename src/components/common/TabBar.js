@@ -19,7 +19,7 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
     // desktop sidebar override in responsive.css (transform: none) cannot reset.
     <nav className="tab-bar fixed bottom-0 left-1/2 max-lg:-translate-x-1/2 w-full max-w-[428px] z-[100]
                     flex justify-around pt-1.5 pb-[env(safe-area-inset-bottom,0.375rem)]
-                    bg-black/70 backdrop-blur-2xl border-t border-white/10">
+                    bg-black/95 border-t border-white/10">
       {tabs.map(tab => {
         const Icon = tab.icon;
         const showMessagesBadge = tab.id === 'messages' && unreadMessagesCount > 0;
