@@ -1682,7 +1682,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-4 -top-6 h-48 -z-10 bg-grid
+        className="pointer-events-none absolute -inset-x-4 top-11 h-44 -z-10 bg-grid
                    [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
       {/* Sub-tabs */}

@@ -12490,32 +12490,36 @@ textarea.form-textarea:focus {
 /* Tour Screen Tabs */
 .tour-tabs {
   display: flex;
-  gap: 12px;
-  padding: 0 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tour-tab {
-  padding: 12px 24px;
+  flex: 1;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 14px 8px;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.15em;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s;
+  transition: color 0.2s, border-color 0.2s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   font-family: 'Inter', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
 .tour-tab svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   stroke: currentColor;
   flex-shrink: 0;
 }
@@ -12526,17 +12530,10 @@ textarea.form-textarea:focus {
 
 .tour-tab.active {
   color: var(--primary-pink);
+  border-bottom-color: var(--primary-pink);
 }
 
-.tour-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--primary-pink);
-}
+
 
 /* Tour Screen Layout Fix */
 .tour-screen.screen.active {
@@ -12566,6 +12563,15 @@ textarea.form-textarea:focus {
 
 .tour-kickstart-section {
   margin-bottom: 32px;
+}
+
+.tour-kickstart-section .section-header h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-family: 'Inter', sans-serif;
 }
 
 .section-header {
