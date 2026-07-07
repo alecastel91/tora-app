@@ -1094,6 +1094,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
           className={`bookings-tab ${activeTab === 'upcoming' ? 'active' : ''}`}
           onClick={() => setActiveTab('upcoming')}
         >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Upcoming
           {activeTab === 'upcoming' && filteredDeals.length > 0 && (
             <span className="tab-badge">{filteredDeals.length}</span>
@@ -1103,6 +1104,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
           className={`bookings-tab ${activeTab === 'past' ? 'active' : ''}`}
           onClick={() => setActiveTab('past')}
         >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           Past
           {activeTab === 'past' && filteredDeals.length > 0 && (
             <span className="tab-badge">{filteredDeals.length}</span>
@@ -1112,6 +1114,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
           className={`bookings-tab ${activeTab === 'declined' ? 'active' : ''}`}
           onClick={() => setActiveTab('declined')}
         >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
           Declined
           {activeTab === 'declined' && filteredDeals.length > 0 && (
             <span className="tab-badge">{filteredDeals.length}</span>
