@@ -185,17 +185,17 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       {usage.cap !== Infinity && (
         <div className={`flex items-center justify-between gap-3 mx-4 mt-4 mb-3 px-4 py-3 rounded-2xl border
                         ${usage.atLimit ? 'border-infrared/30 bg-infrared/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
-          <div className="min-w-0">
-            <p className={`m-0 text-[9px] font-semibold uppercase tracking-[0.2em] font-tech
-                          ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>Roster</p>
-            <p className={`m-0 mt-1 text-sm font-medium ${usage.atLimit ? 'text-infrared' : 'text-white'}`}>
+          <div className="min-w-0 flex items-baseline gap-2">
+            <span className={`text-[9px] font-semibold uppercase tracking-[0.2em] font-tech
+                             ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>Roster</span>
+            <span className={`text-sm font-medium ${usage.atLimit ? 'text-infrared' : 'text-white'}`}>
               {usage.current}/{usage.cap}
               <span className={`font-normal ${usage.atLimit ? 'text-infrared/80' : 'text-white/50'}`}>
                 {usage.atLimit && (usage.cap === 0
                   ? ' — pick a plan to start representing artists'
                   : ' — upgrade to add more')}
               </span>
-            </p>
+            </span>
           </div>
           <button
             type="button"
