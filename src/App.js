@@ -56,6 +56,21 @@ function App() {
       appContentRef.current.scrollTop = tabScrollPositions.current[activeTab] || 0;
     }
   }, [activeTab]);
+  // Warm the remaining tabs shortly after login: they mount hidden and
+  // fetch their data in the background, so even the FIRST visit to a tab
+  // shows content immediately. Delayed so the landing tab paints first.
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setMountedTabs(['profile']);
+      return;
+    }
+    const warmup = setTimeout(
+      () => setMountedTabs(['profile', 'search', 'tour', 'bookings', 'messages']),
+      1000
+    );
+    return () => clearTimeout(warmup);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
