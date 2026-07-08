@@ -139,7 +139,11 @@ const EditProfileScreen = ({ onClose }) => {
     setSelectedGenres(newGenres);
   };
 
-  const displayedGenres = showAllGenres ? genresList : genresList.slice(0, 12);
+  // Collapsed view keeps the first 12 PLUS anything already selected, so a
+  // selection never disappears behind the "+ more" fold.
+  const displayedGenres = showAllGenres
+    ? genresList
+    : genresList.filter((g, i) => i < 12 || selectedGenres.has(g));
 
   return (
     <div className="screen active edit-profile-screen">
@@ -282,47 +286,43 @@ const EditProfileScreen = ({ onClose }) => {
         <div className="edit-section" style={{ marginTop: '8px' }}>
           <div className="form-group">
             <label>Genres</label>
-            <div 
-              className="genres-dropdown-trigger"
-              onClick={() => setShowGenresDropdown(!showGenresDropdown)}
-            >
-              <span className="genres-selected-text">
-                {selectedGenres.size > 0 
-                  ? `${selectedGenres.size} genre${selectedGenres.size > 1 ? 's' : ''} selected`
-                  : 'Select genres'}
-              </span>
-              <span className="dropdown-arrow">{showGenresDropdown ? '▲' : '▼'}</span>
-            </div>
-            
-            {showGenresDropdown && (
-              <div className="genres-dropdown-content">
-                <div className="genres-grid">
-                  {displayedGenres.map(genre => (
-                    <label key={genre} className="genre-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={selectedGenres.has(genre)}
-                        onChange={() => handleGenreToggle(genre)}
-                      />
-                      <span className={selectedGenres.has(genre) ? 'selected' : ''}>
-                        {genre}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                {genresList.length > 12 && (
+            {/* Chip cloud: every genre is a tappable pill; selected = crimson. */}
+            <div className="flex flex-wrap gap-2 mt-1">
+              {displayedGenres.map(genre => {
+                const on = selectedGenres.has(genre);
+                return (
                   <button
-                    className="show-more-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowAllGenres(!showAllGenres);
-                    }}
+                    key={genre}
+                    type="button"
+                    onClick={() => handleGenreToggle(genre)}
+                    className={`px-3 py-1.5 rounded-lg border text-[10px] font-medium uppercase tracking-[0.12em]
+                                font-tech cursor-pointer transition-colors ${
+                      on
+                        ? 'bg-infrared/[0.12] border-infrared/60 text-infrared'
+                        : 'bg-white/[0.03] border-white/10 text-white/50 hover:border-white/25 hover:text-white/75'
+                    }`}
                   >
-                    {showAllGenres ? 'Show less' : `Show all ${genresList.length} genres`}
+                    {genre}
                   </button>
-                )}
-              </div>
-            )}
+                );
+              })}
+              {genresList.length > 12 && (
+                <button
+                  type="button"
+                  className="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-medium uppercase
+                             tracking-[0.12em] font-tech cursor-pointer text-infrared/80 hover:text-infrared
+                             bg-transparent transition-colors"
+                  onClick={() => setShowAllGenres(!showAllGenres)}
+                >
+                  {showAllGenres ? '− Show less' : `+ ${genresList.length - 12} more`}
+                </button>
+              )}
+            </div>
+            <p className="mt-2 mb-0 text-[10px] text-white/30">
+              {selectedGenres.size > 0
+                ? `${selectedGenres.size} selected`
+                : 'Tap the genres you play'}
+            </p>
           </div>
         </div>
 
