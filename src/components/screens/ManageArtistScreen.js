@@ -1725,26 +1725,15 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         </div>
 
         {documents[category].length === 0 ? (
-          <div style={{
-            padding: '20px 24px',
-            textAlign: 'center'
-          }}>
+          <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.015] px-5 py-4 text-center">
             {note && (
-              <div style={{
-                marginBottom: '12px',
-                fontSize: '13px',
-                color: '#888'
-              }}>
+              <div className="mb-3 text-[11px] leading-relaxed text-white/35">
                 {note}
               </div>
             )}
             <button
-              className="btn btn-primary"
+              className="btn btn-primary btn-small"
               onClick={() => handleAddDocument(category)}
-              style={{
-                padding: '8px 16px',
-                fontSize: '12px'
-              }}
             >
               + Add
             </button>
@@ -1775,11 +1764,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                       </button>
                     )}
                     {doc.addedDate && (
-                      <div style={{
-                        color: '#666',
-                        fontSize: '12px'
-                      }}>
-                        + Added {new Date(doc.addedDate).toLocaleDateString()}
+                      <div className="text-[10px] uppercase tracking-[0.08em] text-white/30">
+                        Added {new Date(doc.addedDate).toLocaleDateString()}
                       </div>
                     )}
                   </div>
@@ -1792,9 +1778,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                     Edit
                   </button>
                   <button
-                    className="btn btn-outline btn-sm"
+                    className="bg-transparent border-none cursor-pointer text-[10px] uppercase tracking-[0.1em]
+                               font-tech text-white/35 hover:text-role-venue transition-colors"
                     onClick={() => handleDeleteDocument(category, doc.id)}
-                    style={{ color: '#ff4444' }}
                   >
                     Delete
                   </button>
