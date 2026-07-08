@@ -863,14 +863,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                       profile.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-[15px] font-medium text-white truncate">{profile.name}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`role-badge ${profile.role.toLowerCase()}`}>
-                        {profile.role}
-                      </span>
-                    </div>
-                    <p className="text-xs text-white/50 truncate mt-1">{profile.location}</p>
+                  <div className="flex-1 min-w-0 flex flex-col items-start gap-1.5">
+                    <h4 className="text-[15px] font-medium text-white truncate leading-none m-0">{profile.name}</h4>
+                    <span className={`role-badge ${profile.role.toLowerCase()}`}>
+                      {profile.role}
+                    </span>
+                    <p className="text-xs text-white/50 truncate leading-none m-0">{profile.location}</p>
                   </div>
                   {isActive && (
                     <svg className="shrink-0 text-infrared" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
