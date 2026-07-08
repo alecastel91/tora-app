@@ -13454,3 +13454,67 @@ textarea.form-textarea:focus {
   letter-spacing: 0.15em;
   font-weight: 600;
 }
+
+
+/* ==========================================================================
+ * Canonical sub-screen header. One voice for every full-screen sub-page:
+ * near-opaque band, hairline divider, centered Space Grotesk small-caps
+ * title, round glass back/close button. Headers whose only control is the
+ * left button get a right margin equal to it so the title centers optically.
+ * ========================================================================== */
+.settings-header,
+.premium-header,
+.edit-profile-header,
+.manage-artist-header,
+.search-agents-header,
+.represented-artists-header,
+.calendar-header {
+  background: rgba(10, 10, 12, 0.97);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 16px;
+}
+
+.settings-header h1,
+.premium-header h1,
+.edit-profile-header h1,
+.manage-artist-header h1,
+.search-agents-header h1,
+.represented-artists-header h1,
+.calendar-header h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-white);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+/* single-left-button headers: balance the 36px control + 16px gap */
+.edit-profile-header h1,
+.manage-artist-header h1,
+.search-agents-header h1,
+.represented-artists-header h1 {
+  margin-right: 52px;
+}
+
+.premium-header .back-button {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  color: var(--text-white);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+
+.premium-header .back-button:hover {
+  border-color: rgba(255, 51, 102, 0.5);
+}
