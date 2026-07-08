@@ -829,47 +829,58 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         onClose={() => setShowProfileSwitcher(false)}
         title={userProfiles.length > 1 ? "Switch Profile" : "Add Profile"}
       >
-        <div className="profile-switcher-content">
+        <div className="text-left">
           {userProfiles.length > 1 && (
-            <p className="profile-switcher-description">
+            <p className="text-sm text-white/50 mb-4">
               Select which profile you want to manage:
             </p>
           )}
-          <div className="profile-switcher-list">
+          <div className="flex flex-col gap-2.5">
             {userProfiles.map(profile => {
               const profileId = profile.id;
-              const currentUserId = user?.id;
-              const isActive = profileId === currentUserId;
+              const isActive = profileId === user?.id;
+              const avatarClass = {
+                ARTIST: 'avatar-artist', VENUE: 'avatar-venue',
+                PROMOTER: 'avatar-promoter', AGENT: 'avatar-agent'
+              }[profile.role] || 'avatar-artist';
 
               return (
                 <div
                   key={profileId}
-                  className={`profile-switcher-item ${isActive ? 'active' : ''}`}
+                  className={`rounded-2xl border p-3.5 cursor-pointer flex items-center gap-3 transition-colors
+                              ${isActive
+                                ? 'border-white/25 bg-white/[0.06]'
+                                : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'}`}
                   onClick={() => {
                     switchProfile(profileId);
                     setShowProfileSwitcher(false);
                   }}
                 >
-                  <div className="switcher-avatar">
+                  <div className={`message-avatar shrink-0 ${avatarClass}`}>
                     {profile.avatar ? (
                       <img src={profile.avatar} alt={profile.name} />
                     ) : (
                       profile.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <div className="switcher-info">
-                    <h4>{profile.name}</h4>
-                    <span className={`role-badge ${profile.role.toLowerCase()}`}>
-                      {profile.role}
-                    </span>
-                    <p className="switcher-location">{profile.location}</p>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-[15px] font-medium text-white truncate">{profile.name}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`role-badge ${profile.role.toLowerCase()}`}>
+                        {profile.role}
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/50 truncate mt-1">{profile.location}</p>
                   </div>
                   {isActive && (
-                    <div className="active-indicator">✓</div>
+                    <svg className="shrink-0 text-infrared" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
                   )}
                   {!isActive && userProfiles.length > 1 && (
                     <button
-                      className="delete-profile-btn"
+                      className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-white/[0.06] transition-colors cursor-pointer bg-transparent border-none"
+                      aria-label={`Delete ${profile.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setProfileToDelete(profile);
@@ -884,18 +895,19 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
             {/* Add Profile Button */}
             <div
-              className="profile-switcher-item add-profile-item"
+              className="rounded-2xl border border-dashed border-white/20 p-3.5 cursor-pointer flex items-center gap-3
+                         transition-colors hover:bg-white/[0.04] hover:border-white/30"
               onClick={() => {
                 setShowProfileSwitcher(false);
                 setShowAddProfile(true);
               }}
             >
-              <div className="switcher-avatar add-avatar">
+              <div className="w-[54px] h-[54px] shrink-0 rounded-full border border-dashed border-white/25 flex items-center justify-center text-white/60">
                 <AddIcon />
               </div>
-              <div className="switcher-info">
-                <h4>Add New Profile</h4>
-                <p className="add-profile-description">Create another professional profile</p>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-[15px] font-medium text-white">Add New Profile</h4>
+                <p className="text-xs text-white/50 mt-1">Create another professional profile</p>
               </div>
             </div>
           </div>
