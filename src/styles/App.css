@@ -847,48 +847,60 @@
   position: relative;
 }
 
+/* Trip bar: translucent crimson ribbon that runs continuously under the
+   days — segments overshoot half the 4px grid gap so they visually join. */
 .schedule-label {
   position: absolute;
-  bottom: 2px;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background: var(--primary-pink);
-  color: var(--text-white);
-  font-size: 6px;
+  bottom: 1px;
+  left: -2px;
+  right: -2px;
+  height: 13px;
+  background: rgba(255, 51, 102, 0.16);
+  color: var(--primary-pink);
+  font-size: 7px;
   font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   white-space: nowrap;
-  padding: 0 2px;
+  padding: 0 4px;
   text-transform: uppercase;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.06em;
 }
 
-/* Single day schedule - show as rounded pill, centered */
+.schedule-plane {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  margin-right: 3px;
+  opacity: 0.9;
+}
+
+/* Cells that carry the city name paint above the following segments so the
+   text can run across the ribbon. */
+.calendar-day.schedule-start,
+.calendar-day.schedule-single,
+.calendar-day .schedule-label.has-city {
+  z-index: 2;
+}
+
 .calendar-day.schedule-single .schedule-label {
-  left: 10%;
-  right: 10%;
-  border-radius: 2px;
+  left: 6%;
+  right: 6%;
+  border-radius: 7px;
+  justify-content: center;
 }
 
-/* Start of schedule - rounded on left, extends to right edge */
 .calendar-day.schedule-start .schedule-label {
-  left: 10%;
-  right: 0;
-  border-radius: 2px 0 0 2px;
+  left: 8%;
+  border-radius: 7px 0 0 7px;
 }
 
-/* End of schedule - rounded on right */
 .calendar-day.schedule-end .schedule-label {
-  right: 10%;
-  border-radius: 0 2px 2px 0;
+  right: 8%;
+  border-radius: 0 7px 7px 0;
 }
 
-/* Middle of schedule - no rounding, full width */
 .calendar-day.schedule-middle .schedule-label {
   border-radius: 0;
 }
@@ -896,11 +908,11 @@
 /* Schedule bar (no text) for middle and end days */
 .schedule-bar {
   position: absolute;
-  bottom: 2px;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background: var(--primary-pink);
+  bottom: 1px;
+  left: -2px;
+  right: -2px;
+  height: 13px;
+  background: rgba(255, 51, 102, 0.16);
   border-radius: 0;
 }
 
@@ -11923,18 +11935,7 @@ textarea.form-textarea:focus {
   background: rgba(0, 200, 117, 0.22);
 }
 
-.calendar-grid-inline .calendar-day .schedule-label {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 8px;
-  color: var(--primary-pink);
-  white-space: nowrap;
-  max-width: 90%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 
 /* Travel Schedules Section */
 .travel-schedules-section {

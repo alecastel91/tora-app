@@ -702,6 +702,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
         <div
           key={`day-${day}`}
           className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}`}
+          data-weekday={new Date(currentYear, currentMonth, day).getDay()}
           onClick={() => {
             console.log('[CalendarScreen] onClick fired for day:', day);
             handleDateMouseDown(day);
@@ -734,11 +735,29 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
           style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'pointer' }}
         >
           {day}
-          {schedulePos.hasSchedule && (
-            <div className="schedule-label">
-              {getLocationDisplayText(schedulePos.schedule)}
-            </div>
-          )}
+          {schedulePos.hasSchedule && (() => {
+            // The trip renders as ONE continuous bar: every scheduled day
+            // carries a segment; the destination is written once per week
+            // row (at the trip start, and again on Sundays for multi-week
+            // trips), with a plane marking the departure day.
+            const weekday = new Date(currentYear, currentMonth, day).getDay();
+            const isTripStart = schedulePos.isSingle || schedulePos.isStart;
+            const showLabel = isTripStart || weekday === 0;
+            return (
+              <div className={`schedule-label ${showLabel ? 'has-city' : ''}`}>
+                {showLabel && (
+                  <>
+                    {isTripStart && (
+                      <svg className="schedule-plane" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                        <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+                      </svg>
+                    )}
+                    <span className="schedule-city">{getLocationDisplayText(schedulePos.schedule)}</span>
+                  </>
+                )}
+              </div>
+            );
+          })()}
         </div>
       );
     }
