@@ -849,8 +849,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                   key={profileId}
                   className={`rounded-2xl border p-3.5 cursor-pointer flex items-center gap-3 transition-colors
                               ${isActive
-                                ? 'border-white/25 bg-white/[0.06]'
-                                : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'}`}
+                                ? 'border-white/25 bg-black/40'
+                                : 'border-white/10 bg-black/30 hover:bg-black/20'}`}
                   onClick={() => {
                     switchProfile(profileId);
                     setShowProfileSwitcher(false);
@@ -895,8 +895,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
             {/* Add Profile Button */}
             <div
-              className="rounded-2xl border border-dashed border-white/20 p-3.5 cursor-pointer flex items-center gap-3
-                         transition-colors hover:bg-white/[0.04] hover:border-white/30"
+              className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-3.5 cursor-pointer flex items-center gap-3
+                         transition-colors hover:bg-black/30 hover:border-white/30"
               onClick={() => {
                 setShowProfileSwitcher(false);
                 setShowAddProfile(true);

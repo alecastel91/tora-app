@@ -1528,11 +1528,19 @@
 }
 
 .modal-header {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 16px 18px;
+  padding: 16px 50px; /* side padding keeps a long title clear of the close X */
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-header .modal-close {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .modal-header h3 {
@@ -8950,12 +8958,20 @@
 }
 
 .modal-header {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 24px 24px 0 24px;
+  padding: 24px 50px 0 50px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 24px;
+}
+
+/* Close buttons float right of the (now centered) title. */
+.modal-header .close-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
 }
 
 .modal-header h2 {
