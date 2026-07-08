@@ -543,8 +543,14 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
           {/* Prompt to search */}
           {!loading && !hasSearched && (
-            <div className="empty-state">
-              <p>Search for an agent by name</p>
+            <div className="flex flex-col items-center py-16 text-center">
+              <span aria-hidden className="text-white/15 [&>svg]:w-9 [&>svg]:h-9 mb-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <p className="text-sm text-white/50 m-0">Search for an agent by name</p>
+              <p className="text-xs text-white/30 mt-1.5 m-0">Agents can manage your bookings and represent you</p>
             </div>
           )}
 
@@ -561,15 +567,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
               ) : (
                 <>
                   {/* Info banner about connection requirement */}
-                  <div className="info-banner" style={{
-                    padding: '12px 16px',
-                    marginBottom: '16px',
-                    backgroundColor: 'rgba(255, 51, 102, 0.1)',
-                    border: '1px solid rgba(255, 51, 102, 0.3)',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    color: '#ccc'
-                  }}>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 mb-4 text-[11px] leading-relaxed text-white/45">
                     To send a representation request, you must be connected with the agent first.
                   </div>
 
@@ -630,7 +628,10 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                           className="artist-info clickable"
                           onClick={() => handleCardClick(agent)}
                         >
-                          <div className="artist-avatar">
+                          <div
+                            className="artist-avatar"
+                            style={agent.avatar ? undefined : { background: 'linear-gradient(135deg, #34E3A0 0%, #00C875 100%)' }}
+                          >
                             {agent.avatar ? (
                               <img src={agent.avatar} alt={agent.name} />
                             ) : (
