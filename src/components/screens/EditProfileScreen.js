@@ -103,6 +103,9 @@ const EditProfileScreen = ({ onClose }) => {
       delete updatedProfile.zone;
       delete updatedProfile.city;
       delete updatedProfile.country;
+      // This screen never edits the avatar — don't echo it back. Avatar
+      // uploads go through ProfileScreen, which sends only { avatar }.
+      delete updatedProfile.avatar;
 
       const profileId = user.id;
 

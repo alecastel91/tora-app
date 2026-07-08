@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
 import RAEventsModal from '../common/RAEventsModal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
+import apiService from '../../services/api';
 
-const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
+const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { likedProfiles, toggleLike, sentRequests, receivedRequests, sendConnectionRequest, connectedUsers, removeConnection } = useAppContext();
+  // Callers pass whatever row object they have (search result, conversation
+  // partner, roster entry) — those are list projections and may lack detail
+  // fields like bio. Enrich with the full profile; the passed object renders
+  // immediately as the fallback.
+  const [fullProfile, setFullProfile] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    setFullProfile(null);
+    if (!passedProfile?.id) return undefined;
+    apiService.getProfile(passedProfile.id)
+      .then((data) => { if (!cancelled) setFullProfile(data.profile || data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [passedProfile?.id]);
+  const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [message, setMessage] = useState('');
   const [showRAEvents, setShowRAEvents] = useState(false);
