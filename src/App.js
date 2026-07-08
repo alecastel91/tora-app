@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Header from './components/common/Header';
 import TabBar from './components/common/TabBar';
@@ -35,6 +35,27 @@ function App() {
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : 'login');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
+  // Keep-mounted tabs: once visited, a tab's screen stays mounted and is
+  // hidden with display:none, so switching back is instant — no refetch,
+  // no rebuild. Realtime subscriptions (deals, inbox) and the context poll
+  // keep hidden tabs fresh. Scroll position is saved per tab.
+  const [mountedTabs, setMountedTabs] = useState(['profile']);
+  const appContentRef = useRef(null);
+  const tabScrollPositions = useRef({});
+  const switchTab = (tab) => {
+    setActiveTab((prev) => {
+      if (prev !== tab && appContentRef.current) {
+        tabScrollPositions.current[prev] = appContentRef.current.scrollTop;
+      }
+      return tab;
+    });
+    setMountedTabs((prev) => (prev.includes(tab) ? prev : [...prev, tab]));
+  };
+  useLayoutEffect(() => {
+    if (appContentRef.current) {
+      appContentRef.current.scrollTop = tabScrollPositions.current[activeTab] || 0;
+    }
+  }, [activeTab]);
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
@@ -304,21 +325,12 @@ function App() {
     }
   };
 
-  const renderScreen = () => {
-    switch(activeTab) {
-      case 'profile':
-        return <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={setActiveTab} />;
-      case 'search':
-        return <SearchScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => setActiveTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />;
-      case 'tour':
-        return <TourScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => setActiveTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />;
-      case 'bookings':
-        return <BookingsScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => setActiveTab('messages')} />;
-      case 'messages':
-        return <MessagesScreen onOpenChat={setActiveChatUser} key={activeChatUser ? 'with-chat' : 'without-chat'} />;
-      default:
-        return <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={setActiveTab} />;
-    }
+  const tabScreens = {
+    profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
+    search: <SearchScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
+    tour: <TourScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
+    bookings: <BookingsScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} />,
+    messages: <MessagesScreen onOpenChat={setActiveChatUser} key={activeChatUser ? 'with-chat' : 'without-chat'} />,
   };
 
   const handleSelectPlan = (plan) => {
@@ -397,10 +409,18 @@ function App() {
           onOpenSettings={() => setShowSettings(true)}
           onOpenPremium={() => setShowPremium(true)}
           accountUser={accountUser}
-          onSwitchTab={setActiveTab}
+          onSwitchTab={switchTab}
         />
-        <main className="app-content">
-          {renderScreen()}
+        <main className="app-content" ref={appContentRef}>
+          {mountedTabs.map((tab) => (
+            <div
+              key={tab}
+              className="tab-panel"
+              style={{ display: activeTab === tab ? undefined : 'none' }}
+            >
+              {tabScreens[tab]}
+            </div>
+          ))}
         </main>
         {activeChatUser && !viewingProfile && (
           <ChatScreen
@@ -419,7 +439,7 @@ function App() {
             }}
           />
         )}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} />
+        <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} />
         
         {/* Settings Screen */}
         {showSettings && (

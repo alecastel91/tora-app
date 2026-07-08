@@ -197,8 +197,10 @@
 
 /* Wide Desktop (1440px and up) */
 @media (min-width: 1440px) {
-  /* Limit content width for readability */
-  .app-content > .screen {
+  /* Limit content width for readability. Tab screens live inside a
+     .tab-panel wrapper (keep-mounted tabs); overlays stay direct children. */
+  .app-content > .screen,
+  .app-content > .tab-panel > .screen {
     max-width: 1200px;
     margin: 0 auto;
   }
