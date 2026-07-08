@@ -333,6 +333,13 @@
   min-height: calc(100vh - 120px);
 }
 
+/* Keep-mounted tabs: re-showing a hidden tab toggles display, which
+   restarts CSS animations — the fadeIn replayed on every tab switch and
+   read as a loading moment. Tab screens appear instantly instead. */
+.tab-panel .screen {
+  animation: none;
+}
+
 .screen.active {
   display: block;
 }
