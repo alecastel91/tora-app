@@ -2904,8 +2904,10 @@
 }
 
 .edit-section h3 {
-  color: var(--text-white);
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
   margin: 0 0 16px 0;
   font-weight: 600;
 }
@@ -13430,4 +13432,20 @@ textarea.form-textarea:focus {
   letter-spacing: 0.12em;
   color: rgba(255, 255, 255, 0.4);
   margin: 0;
+}
+
+
+/* ==========================================================================
+ * Canonical form label voice. App.css accumulated nine .form-group label
+ * duplicates over time; this final rule settles the cascade for all of them.
+ * ========================================================================== */
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
 }

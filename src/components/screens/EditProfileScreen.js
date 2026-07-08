@@ -344,7 +344,7 @@ const EditProfileScreen = ({ onClose }) => {
               marginTop: '4px',
               lineHeight: '1.4'
             }}>
-              💡 If using a share link: Open it in your web browser, then copy the full URL from the address bar
+              If using a share link, open it in your browser and copy the full URL
             </p>
           </div>
 
@@ -363,7 +363,7 @@ const EditProfileScreen = ({ onClose }) => {
                 marginTop: '4px',
                 lineHeight: '1.4'
               }}>
-                💡 If using a share link: Open it in your web browser, then copy the full URL from the address bar
+                If using a share link, open it in your browser and copy the full URL
               </p>
             </div>
           )}
