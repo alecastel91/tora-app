@@ -14,6 +14,7 @@ import ViewProfileScreen from './ViewProfileScreen';
 import SearchAgentsModal from '../common/SearchAgentsModal';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
+import { downscaleImageToDataUrl } from '../../utils/image';
 
 // --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
 const GridIcon = () => (
@@ -252,32 +253,16 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        try {
-          const avatarData = reader.result;
-          const profileId = user.id;
-
-          if (!profileId) {
-            console.error('Profile ID is missing');
-            return;
-          }
-
-          // Save to backend immediately
-          const updatedProfile = await apiService.updateProfile(profileId, {
-            ...user,
-            avatar: avatarData
-          });
-
-          // Update local state with response from backend
-          updateUser(updatedProfile);
-        } catch (error) {
-          console.error('Failed to upload avatar:', error);
-          alert('Failed to upload image. Please try again.');
-        }
-      };
-      reader.readAsDataURL(file);
+    if (!file || !user?.id) return;
+    try {
+      // Downscale on-device before upload (backend re-normalizes to 512px
+      // webp and stores it in object storage — the profile keeps a URL).
+      const avatarData = await downscaleImageToDataUrl(file);
+      const updatedProfile = await apiService.updateProfile(user.id, { avatar: avatarData });
+      updateUser(updatedProfile);
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      alert(error.message || 'Failed to upload image. Please try again.');
     }
   };
 
