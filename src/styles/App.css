@@ -11287,9 +11287,8 @@ textarea.form-textarea:focus {
 /* Tab Navigation */
 .tab-navigation {
   display: flex;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-dark);
-  padding: 0 16px;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tab-button {
