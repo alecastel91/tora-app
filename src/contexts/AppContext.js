@@ -222,17 +222,18 @@ export const AppProvider = ({ children }) => {
       setLikerProfilesData(profileData.likerProfiles || []);
       setNotifications(profileData.notifications || []);
 
-      // Also reload user stats
-      console.log('🔍 [reloadProfileData] userData:', userData);
-      console.log('🔍 [reloadProfileData] userData.profiles:', userData.profiles);
+      // Also reload user stats. Only swap the objects when the payload
+      // actually changed — every poll used to publish fresh identities,
+      // re-running every effect that depends on `user` app-wide.
       const currentProfileId = user.id;
       const currentProfile = userData.profiles.find(p => p.id === currentProfileId);
-      console.log('🔍 [reloadProfileData] Found current profile:', currentProfile);
-      console.log('🔍 [reloadProfileData] Current profile id:', currentProfile?.id);
       if (currentProfile) {
-        setUser(currentProfile);
-        // Update profiles array as well
-        setUserProfiles(userData.profiles);
+        setUser(prev =>
+          JSON.stringify(prev) === JSON.stringify(currentProfile) ? prev : currentProfile
+        );
+        setUserProfiles(prev =>
+          JSON.stringify(prev) === JSON.stringify(userData.profiles) ? prev : userData.profiles
+        );
       }
       // Also refresh accountUser in App.js (usage stats, subscription tier)
       if (refreshAccountUserCallback) {
@@ -245,8 +246,9 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Periodic polling: refresh profile data every 15 seconds to catch cross-user changes
-  // (e.g. when another user accepts your connection request)
+  // Periodic polling: refresh profile data to catch cross-user changes
+  // (e.g. when another user accepts your connection request). Realtime
+  // broadcasts cover chat; this is only a safety net, so 60s is plenty.
   useEffect(() => {
     if (!user?.id) return;
 
@@ -254,7 +256,7 @@ export const AppProvider = ({ children }) => {
       if (!isLoadingProfileData) {
         reloadProfileData();
       }
-    }, 15000); // 15 seconds
+    }, 60000);
 
     return () => clearInterval(pollInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps

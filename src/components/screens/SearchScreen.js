@@ -828,7 +828,6 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       )}
 
       {/* Connection Choice Modal */}
-      {console.log('[RENDER] showConnectionChoice:', showConnectionChoice, 'selectedProfile:', selectedProfile?.name)}
       {showConnectionChoice && selectedProfile && (
         <ConnectionChoiceModal
           artist={selectedProfile}

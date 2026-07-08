@@ -525,7 +525,6 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
       {/* Profile View Modal - rendered on top */}
       {viewingProfile && (
         <>
-          {console.log('[SearchArtistsModal] Rendering ViewProfileScreen for:', viewingProfile.id)}
           <ViewProfileScreen
             profile={viewingProfile}
             onClose={() => setViewingProfile(null)}

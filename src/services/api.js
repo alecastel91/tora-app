@@ -429,6 +429,15 @@ class ApiService {
   }
 
   // MESSAGE ENDPOINTS
+  async getUnreadCount(profileId) {
+    const response = await fetch(`${API_URL}/messages/unread-count?profileId=${profileId}`, {
+      method: 'GET',
+      headers: this.getHeaders()
+    });
+
+    return this.handleResponse(response);
+  }
+
   async getConversations(profileId) {
     const response = await fetch(`${API_URL}/messages/conversations/${profileId}`, {
       method: 'GET',

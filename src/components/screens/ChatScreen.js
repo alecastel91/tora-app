@@ -146,23 +146,18 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         setDealStatuses(embeddedStatuses);
       }
 
-      // Fetch connection request details for all messages with connectionRequestId
-      const connectionRequestIds = transformedMessages
-        .filter(msg => msg.connectionRequestId)
-        .map(msg => msg.connectionRequestId);
-
-      if (connectionRequestIds.length > 0) {
-        const requests = {};
-        await Promise.all(
-          connectionRequestIds.map(async (requestId) => {
-            try {
-              const requestResponse = await apiService.getConnectionRequest(requestId);
-              requests[requestId] = requestResponse;
-            } catch (error) {
-              console.error(`Error fetching connection request ${requestId}:`, error);
-            }
-          })
-        );
+      // The thread response embeds each message's connectionRequest, so no
+      // per-message fetch is needed. Attach a minimal `to` (the modal shows
+      // "Awaiting response from {to.name}") from the two chat participants.
+      const participants = { [currentUser.id]: currentUser, [user.id]: user };
+      const requests = {};
+      for (const msg of (response.messages || [])) {
+        const cr = msg.connectionRequest;
+        if (cr && cr.id && !requests[cr.id]) {
+          requests[cr.id] = { ...cr, to: cr.to || participants[cr.toProfileId] || null };
+        }
+      }
+      if (Object.keys(requests).length > 0) {
         setConnectionRequests(requests);
       }
     } catch (error) {
@@ -173,11 +168,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     }
   };
 
-  // Fetch messages when component mounts
+  // Fetch messages when the chat pairing changes. Ids, not objects — the
+  // AppContext poll republishes profile objects and would refetch the
+  // whole thread every cycle.
   useEffect(() => {
     fetchMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, user]);
+  }, [currentUser?.id, user?.id]);
 
   // Realtime: subscribe to new messages on this chat thread.
   // The backend broadcasts on the same channel after every message create.

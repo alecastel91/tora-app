@@ -2604,9 +2604,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 <option key={zone} value={zone}>{zone}</option>
               ))}
             </select>
-            {console.log('[FORM RENDER] editedArtistInfo.zone:', editedArtistInfo.zone)}
-            {console.log('[FORM RENDER] editedArtistInfo.country:', editedArtistInfo.country)}
-            {console.log('[FORM RENDER] editedArtistInfo.city:', editedArtistInfo.city)}
           </div>
           {editedArtistInfo.zone && (
             <div className="form-group">

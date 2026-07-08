@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createPortal } from 'react-dom';
-import PdfViewer from './PdfViewer';
+
+// Lazy so react-pdf and its ~1MB pdf.worker stay out of the entry bundle —
+// they load the first time someone actually opens a PDF.
+const PdfViewer = lazy(() => import('./PdfViewer'));
 
 // Shared PDF viewer modal — portals to document.body so it escapes any
 // overflow:hidden ancestor (iOS Safari fix), full-screen on mobile via
@@ -127,7 +130,13 @@ const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
             </button>
           </div>
         </div>
-        <PdfViewer url={url} onLoaded={onLoaded} />
+        <Suspense fallback={
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>
+            Loading viewer…
+          </div>
+        }>
+          <PdfViewer url={url} onLoaded={onLoaded} />
+        </Suspense>
       </div>
     </div>,
     document.body,

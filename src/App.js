@@ -5,7 +5,6 @@ import TabBar from './components/common/TabBar';
 import ProfileScreen from './components/screens/ProfileScreen';
 import SearchScreen from './components/screens/SearchScreen';
 import TourScreen from './components/screens/TourScreen';
-import ExploreScreen from './components/screens/ExploreScreen';
 import BookingsScreen from './components/screens/BookingsScreen';
 import MessagesScreen from './components/screens/MessagesScreen';
 import ChatScreen from './components/screens/ChatScreen';
@@ -57,7 +56,7 @@ function App() {
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
   const [accountUser, setAccountUser] = useState(null); // Account-level user data (email, currency, etc)
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
-  const { updateUser, user, getConversations, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback } = useAppContext();
+  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback } = useAppContext();
 
   // Available currencies
   const availableCurrencies = [
@@ -142,22 +141,16 @@ function App() {
       if (!isAuthenticated || !user || !user.id) return;
 
       try {
-        // Fetch both conversations and connection requests
-        const [conversations, requestsData] = await Promise.all([
-          getConversations(),
+        // Badge = unread messages + pending connection requests. Uses the
+        // lightweight count endpoint instead of downloading every
+        // conversation just to sum unreadCount fields.
+        const [countData, requestsData] = await Promise.all([
+          apiService.getUnreadCount(user.id),
           apiService.getReceivedRequests(user.id)
         ]);
 
-        // Count unread messages in conversations
-        const conversationUnread = conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
-
-        // Count pending connection requests
         const requestsCount = (requestsData.requests || []).length;
-
-        // Total badge count = unread messages + pending requests
-        const totalBadgeCount = conversationUnread + requestsCount;
-
-        setUnreadMessagesCount(totalBadgeCount);
+        setUnreadMessagesCount((countData.unreadCount || 0) + requestsCount);
       } catch (error) {
         console.error('Error fetching unread count:', error);
       }
@@ -173,7 +166,10 @@ function App() {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [isAuthenticated, user, activeChatUser]); // Refresh when chat changes
+    // Depend on ids, not object identities — the AppContext poll republishes
+    // `user` and would otherwise restart this effect every cycle.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id, activeChatUser?.id]);
 
   const handleLoginSuccess = async (data) => {
     console.log('[App] Login success, received data:', data);
