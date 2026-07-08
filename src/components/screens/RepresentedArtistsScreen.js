@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
-import { CloseIcon, AddIcon } from '../../utils/icons';
+import { CloseIcon, AddIcon, TrashIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
 import ManageArtistScreen from './ManageArtistScreen';
 import SearchArtistsModal from '../common/SearchArtistsModal';
@@ -183,27 +183,24 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       </div>
 
       {usage.cap !== Infinity && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 16px',
-          margin: '0 16px 12px',
-          borderRadius: '10px',
-          background: usage.atLimit ? 'rgba(255,51,102,0.08)' : 'rgba(255,255,255,0.03)',
-          border: `1px solid ${usage.atLimit ? 'rgba(255,51,102,0.3)' : 'rgba(255,255,255,0.08)'}`,
-          fontSize: '13px',
-        }}>
-          <span style={{ color: usage.atLimit ? '#FF3366' : 'rgba(255,255,255,0.75)' }}>
-            <strong>Roster: {usage.current}/{usage.cap}</strong>
-            {usage.atLimit && (usage.cap === 0
-              ? ' — Pick a plan to start representing artists.'
-              : ' — Upgrade to add more.')}
-          </span>
+        <div className={`flex items-center justify-between gap-3 mx-4 mt-4 mb-3 px-4 py-3 rounded-2xl border
+                        ${usage.atLimit ? 'border-infrared/30 bg-infrared/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
+          <div className="min-w-0">
+            <p className={`m-0 text-[9px] font-semibold uppercase tracking-[0.2em] font-tech
+                          ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>Roster</p>
+            <p className={`m-0 mt-1 text-sm font-medium ${usage.atLimit ? 'text-infrared' : 'text-white'}`}>
+              {usage.current}/{usage.cap}
+              <span className={`font-normal ${usage.atLimit ? 'text-infrared/80' : 'text-white/50'}`}>
+                {usage.atLimit && (usage.cap === 0
+                  ? ' — pick a plan to start representing artists'
+                  : ' — upgrade to add more')}
+              </span>
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => setShowUpgradeModal(true)}
-            className="btn btn-outline btn-sm"
+            className="btn btn-outline btn-sm shrink-0"
           >
             {usage.cap === 0 ? 'Choose plan' : 'Upgrade'}
           </button>
@@ -258,11 +255,12 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                     )}
                   </button>
                   <button
-                    className="btn btn-outline btn-sm btn-remove-artist"
+                    className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-white/[0.06] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
+                    aria-label={`Remove ${artist.name}`}
                     onClick={() => handleRemoveArtist(artist)}
                     disabled={removingArtistId === (artist.profileId || artist.id)}
                   >
-                    {removingArtistId === (artist.profileId || artist.id) ? '...' : '✕'}
+                    {removingArtistId === (artist.profileId || artist.id) ? '...' : <TrashIcon />}
                   </button>
                 </div>
               </div>
@@ -270,7 +268,13 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
           </div>
         ) : (
           <div className="empty-state">
-            <div className="empty-icon">🎵</div>
+            <div className="flex justify-center mb-4 text-white/25">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
+              </svg>
+            </div>
             <h2>{usage.cap === 0 ? 'Pick a plan to start' : 'No Artists Yet'}</h2>
             <p>
               {usage.cap === 0

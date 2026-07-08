@@ -7266,17 +7266,19 @@
 }
 
 .add-artist-btn {
-  background: var(--primary-pink);
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   width: 36px;
   height: 36px;
+  color: var(--text-white);
+  cursor: pointer;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: white;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .add-artist-btn:hover {
@@ -7327,10 +7329,10 @@
 
 /* Artist Card Row Layout */
 .artist-card-row {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--tora-radius-md);
-  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 14px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -7340,7 +7342,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--primary-pink);
+  background: linear-gradient(135deg, #8F86FF 0%, #6B5FFF 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13518,8 +13520,7 @@ textarea.form-textarea:focus {
 /* single-left-button headers: balance the 36px control + 16px gap */
 .edit-profile-header h1,
 .manage-artist-header h1,
-.search-agents-header h1,
-.represented-artists-header h1 {
+.search-agents-header h1 {
   margin-right: 52px;
 }
 
