@@ -3599,7 +3599,7 @@
 }
 
 .result-avatar.avatar-promoter {
-  background: linear-gradient(135deg, #FFD16A 0%, #FFA800 100%);
+  background: linear-gradient(135deg, #FFD16A 0%, #FFB800 100%);
 }
 
 .result-avatar.avatar-agent {
@@ -3877,7 +3877,7 @@
 }
 
 .message-avatar.avatar-promoter {
-  background: linear-gradient(135deg, #FFD16A 0%, #FFA800 100%);
+  background: linear-gradient(135deg, #FFD16A 0%, #FFB800 100%);
 }
 
 .message-avatar.avatar-agent {
@@ -4076,7 +4076,7 @@
 }
 
 .chat-avatar.avatar-promoter {
-  background: linear-gradient(135deg, #FFD16A 0%, #FFA800 100%);
+  background: linear-gradient(135deg, #FFD16A 0%, #FFB800 100%);
 }
 
 .chat-avatar.avatar-agent {

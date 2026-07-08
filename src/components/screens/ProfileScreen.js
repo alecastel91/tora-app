@@ -929,18 +929,21 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           onClose={() => setProfileToDelete(null)}
           title="Delete Profile"
         >
-          <div className="delete-profile-confirmation">
-            <p>Are you sure you want to delete the profile <strong>{profileToDelete.name}</strong>?</p>
-            <p className="warning-text">This action cannot be undone.</p>
-            <div className="confirmation-buttons">
+          <div className="text-left">
+            <p className="text-sm leading-relaxed text-white/70 m-0">
+              Are you sure you want to delete the profile{' '}
+              <span className="font-semibold text-white">{profileToDelete.name}</span>?
+            </p>
+            <p className="text-xs text-red-400/80 mt-2 mb-5">This action cannot be undone.</p>
+            <div className="flex gap-2.5">
               <button
-                className="cancel-btn"
+                className="btn btn-outline flex-1"
                 onClick={() => setProfileToDelete(null)}
               >
                 Cancel
               </button>
               <button
-                className="delete-btn"
+                className="btn btn-danger flex-1"
                 onClick={handleDeleteProfile}
               >
                 Delete Profile
