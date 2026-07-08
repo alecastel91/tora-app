@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
-import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon } from '../../utils/icons';
+import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
 import RAEventsModal from '../common/RAEventsModal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 
@@ -243,7 +243,7 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
         />
         <div className="profile-header">
           <div className="profile-avatar-container">
-            <div className="profile-avatar">
+            <div className={`profile-avatar avatar-${(profile.role || 'artist').toLowerCase()}`}>
               {profile.avatar ? (
                 <img src={profile.avatar} alt={profile.name} />
               ) : (
@@ -255,7 +255,7 @@ const ViewProfileScreen = ({ profile, onClose, onOpenChat, onNavigateToMessages,
           <div className="profile-name-role-container">
             <h2 className="profile-name">{profile.name}</h2>
           </div>
-          <p className="profile-location">{profile.location}</p>
+          <p className="profile-location"><LocationIcon />{profile.location}</p>
           <div className="profile-role-centered">
             <div className={getRoleBadgeClass(profile.role)}>
               {profile.role}

@@ -430,9 +430,11 @@
   letter-spacing: 0.05em;
 }
 
-.profile-location::before {
-  content: '📍';
-}
+/* Canonical role gradients for initial-fallback avatars, any size. */
+.avatar-artist { background: linear-gradient(135deg, #8F86FF 0%, #6B5FFF 100%); }
+.avatar-venue { background: linear-gradient(135deg, #FF8A80 0%, #FF5757 100%); }
+.avatar-promoter { background: linear-gradient(135deg, #FFD16A 0%, #FFB800 100%); }
+.avatar-agent { background: linear-gradient(135deg, #34E3A0 0%, #00C875 100%); }
 
 /* Outline pills using the shared --color-role-* tokens (matches ProfileScreen). */
 .role-badge {
@@ -6273,16 +6275,16 @@
   padding: 0 16px;
   margin-top: 12px;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 }
 
-.btn-remove-connection {
-  width: 100%;
+.btn-outline.btn-remove-connection {
   color: rgba(244, 67, 54, 0.9);
   border-color: rgba(244, 67, 54, 0.3);
-  font-size: 14px;
 }
 
-.btn-remove-connection:hover {
+.btn-outline.btn-remove-connection:hover {
   background: rgba(244, 67, 54, 0.1);
   border-color: rgba(244, 67, 54, 0.6);
 }
