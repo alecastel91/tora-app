@@ -78,7 +78,7 @@ const VerificationModal = ({ onClose, contextMessage }) => {
           <div className="mt-5 text-center">
             <p className="text-sm leading-relaxed text-white/70 m-0">
               Thanks — we're checking your DM. Your badge appears as soon as
-              the code is matched (usually within a day).
+              the code is matched.
             </p>
             <button type="button" className="btn btn-outline w-full mt-5" onClick={onClose}>Close</button>
           </div>
