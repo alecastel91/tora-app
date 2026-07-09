@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
+import CountBadge from './CountBadge';
 
 const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0 }) => {
   const { t } = useLanguage();
@@ -39,11 +40,7 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
             <div className="relative flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5">
               <Icon />
               {(showMessagesBadge || showTourBadge) && (
-                <span className="absolute -top-1 -right-2 min-w-4 h-4 px-1 rounded-full bg-infrared
-                                 text-white text-[10px] font-semibold flex items-center justify-center
-                                 shadow-[0_0_8px_rgba(255,51,102,0.5)]">
-                  {badgeCount > 99 ? '99+' : badgeCount}
-                </span>
+                <CountBadge count={badgeCount} className="absolute -top-1 -right-2" />
               )}
             </div>
             <span>{tab.label}</span>

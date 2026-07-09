@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
@@ -24,7 +24,7 @@ function validatePaymentProof(file) {
   return null;
 }
 
-const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
+const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) => {
   const { user: currentUser, reloadProfileData } = useAppContext();
   const getFullUrl = (url) => getAuthedBackendUrl(url, currentUser?.id);
 
@@ -92,10 +92,23 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages }) => {
 
   // Realtime: refetch deals when the backend broadcasts a deal_update
   // touching this profile (their own deals OR any artist they represent).
+  // While this keep-mounted tab is hidden, just mark the list stale and
+  // refetch once on reveal instead of on every broadcast.
+  const isActiveRef = useRef(isActive);
+  isActiveRef.current = isActive;
+  const staleRef = useRef(false);
+  useEffect(() => {
+    if (isActive && staleRef.current) {
+      staleRef.current = false;
+      fetchDeals();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
   useEffect(() => {
     if (!currentUser?.id) return;
     const unsubscribe = subscribeToDeals(currentUser.id, () => {
-      fetchDeals();
+      if (isActiveRef.current) fetchDeals();
+      else staleRef.current = true;
     });
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps

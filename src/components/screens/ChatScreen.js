@@ -13,6 +13,7 @@ import PdfViewerModal from '../common/PdfViewerModal';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
 import { getAuthedBackendUrl } from '../../utils/urls';
+import { getAvatarClass } from '../../utils/roles';
 
 const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const { user: currentUser, sendMessage, connectedUsers, reloadProfileData } = useAppContext();
@@ -639,15 +640,6 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
 
-  const getAvatarClass = (role) => {
-    const roleClass = {
-      'ARTIST': 'avatar-artist',
-      'VENUE': 'avatar-venue',
-      'PROMOTER': 'avatar-promoter',
-      'AGENT': 'avatar-agent'
-    };
-    return roleClass[role] || 'avatar-artist';
-  };
 
   const formatMessageTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString('en-US', { 

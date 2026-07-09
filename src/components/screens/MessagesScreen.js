@@ -4,8 +4,10 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import { subscribeToInbox } from '../../services/realtime';
 import LoadingGlobe from '../common/LoadingGlobe';
+import { getAvatarClass } from '../../utils/roles';
+import CountBadge from '../common/CountBadge';
 
-const MessagesScreen = ({ onOpenChat }) => {
+const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
   const { user, getConversations, acceptRequest, declineRequest } = useAppContext();
   const { t } = useLanguage();
   const [conversations, setConversations] = useState([]);
@@ -48,12 +50,38 @@ const MessagesScreen = ({ onOpenChat }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
+  // Keep-mounted awareness: while this tab is hidden, don't refetch on every
+  // inbox broadcast — just mark the list stale and refetch once on reveal.
+  const isActiveRef = React.useRef(isActive);
+  isActiveRef.current = isActive;
+  const staleRef = React.useRef(false);
+  useEffect(() => {
+    if (isActive && staleRef.current) {
+      staleRef.current = false;
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
+
+  // Refetch once when a chat closes (messages were marked read there).
+  // Replaces the old key-remount which refetched on open AND close.
+  const prevChatOpenRef = React.useRef(chatOpen);
+  useEffect(() => {
+    if (prevChatOpenRef.current && !chatOpen) {
+      if (isActiveRef.current) fetchData();
+      else staleRef.current = true;
+    }
+    prevChatOpenRef.current = chatOpen;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatOpen]);
+
   // Realtime: subscribe to inbox updates so the conversation list refreshes
   // automatically when a new message arrives or a request is sent.
   useEffect(() => {
     if (!user?.id) return;
     const unsubscribe = subscribeToInbox(user.id, () => {
-      fetchData();
+      if (isActiveRef.current) fetchData();
+      else staleRef.current = true;
     });
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,15 +106,6 @@ const MessagesScreen = ({ onOpenChat }) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
 
-  const getAvatarClass = (role) => {
-    const roleClass = {
-      'ARTIST': 'avatar-artist',
-      'VENUE': 'avatar-venue',
-      'PROMOTER': 'avatar-promoter',
-      'AGENT': 'avatar-agent'
-    };
-    return roleClass[role] || 'avatar-artist';
-  };
 
   // Obsidian Neon segmented tab (Messages / Requests) with count pill.
   const TabButton = ({ id, label, icon, count }) => (
@@ -100,12 +119,7 @@ const MessagesScreen = ({ onOpenChat }) => {
     >
       {icon}
       {label}
-      {count > 0 && (
-        <span className="min-w-4 h-4 px-1 rounded-full bg-infrared text-white text-[10px] font-semibold
-                         flex items-center justify-center shadow-[0_0_8px_rgba(255,51,102,0.5)]">
-          {count}
-        </span>
-      )}
+      <CountBadge count={count} />
     </button>
   );
 

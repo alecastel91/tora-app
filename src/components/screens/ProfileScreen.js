@@ -15,6 +15,7 @@ import SearchAgentsModal from '../common/SearchAgentsModal';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { downscaleImageToDataUrl } from '../../utils/image';
+import { getAvatarClass } from '../../utils/roles';
 
 // --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
 const GridIcon = () => (
@@ -478,7 +479,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           return (
             <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/[0.06] p-4 mb-6 text-left">
               <div className="flex items-center gap-3 flex-1">
-                <span className="text-2xl shrink-0">⚠️</span>
+                <span className="shrink-0 text-amber-400">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </span>
                 <div>
                   <strong className="block text-sm font-semibold text-amber-300">Your trial has expired</strong>
                   <p className="text-xs text-white/50 mt-0.5">Upgrade to Premium to keep access to all features</p>
@@ -497,7 +503,11 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         return (
           <div className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.06] p-4 mb-6 text-left">
             <div className="flex items-center gap-3 flex-1">
-              <span className="text-2xl shrink-0">🎉</span>
+              <span className="shrink-0 text-emerald-400">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8z" />
+                </svg>
+              </span>
               <div>
                 <strong className="block text-sm font-semibold text-emerald-300">Premium Trial Active</strong>
                 <p className="text-xs text-white/50 mt-0.5">
@@ -615,7 +625,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               />
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
-                <p className="text-sm text-white/70 mb-1">⚠️ Please use the full SoundCloud URL</p>
+                <p className="text-sm text-white/70 mb-1">Please use the full SoundCloud URL</p>
                 <p className="text-xs text-white/40 mb-3">Example: https://soundcloud.com/artist/track-name</p>
                 <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
@@ -637,7 +647,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               />
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
-                <p className="text-sm text-white/70 mb-1">⚠️ Please use the full Spotify URL</p>
+                <p className="text-sm text-white/70 mb-1">Please use the full Spotify URL</p>
                 <p className="text-xs text-white/40 mb-3">Example: https://open.spotify.com/artist/XXXXX</p>
                 <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
@@ -839,10 +849,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
             {userProfiles.map(profile => {
               const profileId = profile.id;
               const isActive = profileId === user?.id;
-              const avatarClass = {
-                ARTIST: 'avatar-artist', VENUE: 'avatar-venue',
-                PROMOTER: 'avatar-promoter', AGENT: 'avatar-agent'
-              }[profile.role] || 'avatar-artist';
+              const avatarClass = getAvatarClass(profile.role);
 
               return (
                 <div

@@ -43,12 +43,10 @@ function App() {
   const appContentRef = useRef(null);
   const tabScrollPositions = useRef({});
   const switchTab = (tab) => {
-    setActiveTab((prev) => {
-      if (prev !== tab && appContentRef.current) {
-        tabScrollPositions.current[prev] = appContentRef.current.scrollTop;
-      }
-      return tab;
-    });
+    if (activeTab !== tab && appContentRef.current) {
+      tabScrollPositions.current[activeTab] = appContentRef.current.scrollTop;
+    }
+    setActiveTab(tab);
     setMountedTabs((prev) => (prev.includes(tab) ? prev : [...prev, tab]));
   };
   useLayoutEffect(() => {
@@ -344,8 +342,11 @@ function App() {
     profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
     search: <SearchScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
     tour: <TourScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
-    bookings: <BookingsScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} />,
-    messages: <MessagesScreen onOpenChat={setActiveChatUser} key={activeChatUser ? 'with-chat' : 'without-chat'} />,
+    bookings: <BookingsScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} />,
+    // chatOpen (not a key remount): MessagesScreen refetches once when a
+    // chat closes, to pick up read-state changes. A key here remounted the
+    // permanently-mounted screen twice per chat session.
+    messages: <MessagesScreen onOpenChat={setActiveChatUser} chatOpen={!!activeChatUser} isActive={activeTab === 'messages'} />,
   };
 
   const handleSelectPlan = (plan) => {
@@ -427,7 +428,9 @@ function App() {
           onSwitchTab={switchTab}
         />
         <main className="app-content" ref={appContentRef}>
-          {mountedTabs.map((tab) => (
+          {/* The active tab always renders even if a code path bypassed
+              switchTab's mount bookkeeping — never a blank main area. */}
+          {(mountedTabs.includes(activeTab) ? mountedTabs : [...mountedTabs, activeTab]).map((tab) => (
             <div
               key={tab}
               className="tab-panel"

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { mockUsers, mockConversations, mockExploreFeed } from '../services/mockData';
 import apiService from '../services/api';
 
@@ -199,6 +199,7 @@ export const AppProvider = ({ children }) => {
   };
 
   // Helper function to reload profile data (call after likes/connections change)
+  const lastReloadSignatureRef = useRef('');
   const reloadProfileData = async () => {
     const userId = user?.id;
     if (!user || !userId) return;
@@ -213,31 +214,32 @@ export const AppProvider = ({ children }) => {
         apiService.getCurrentUser()
       ]);
 
-      setLikedProfiles(new Set(profileData.likedProfileIds || []));
-      setLikedProfilesData(profileData.likedProfiles || []);
-      setConnectedUsers(new Set(profileData.connectedProfileIds || []));
-      setConnectedUsersData(profileData.connectedProfiles || []);
-      setSentRequests(new Set(profileData.sentRequestIds || []));
-      setReceivedRequests(new Set(profileData.receivedRequestIds || []));
-      setLikerProfilesData(profileData.likerProfiles || []);
-      setNotifications(profileData.notifications || []);
+      // Publish only when something actually changed. One signature gates
+      // ALL the setters: publishing fresh Set/array identities every poll
+      // re-rendered every consumer (including the keep-mounted tab screens)
+      // even when nothing was new.
+      const signature = userId + ':' + JSON.stringify([profileData, userData.profiles]);
+      if (signature !== lastReloadSignatureRef.current) {
+        lastReloadSignatureRef.current = signature;
 
-      // Also reload user stats. Only swap the objects when the payload
-      // actually changed — every poll used to publish fresh identities,
-      // re-running every effect that depends on `user` app-wide.
-      const currentProfileId = user.id;
-      const currentProfile = userData.profiles.find(p => p.id === currentProfileId);
-      if (currentProfile) {
-        setUser(prev =>
-          JSON.stringify(prev) === JSON.stringify(currentProfile) ? prev : currentProfile
-        );
-        setUserProfiles(prev =>
-          JSON.stringify(prev) === JSON.stringify(userData.profiles) ? prev : userData.profiles
-        );
-      }
-      // Also refresh accountUser in App.js (usage stats, subscription tier)
-      if (refreshAccountUserCallback) {
-        refreshAccountUserCallback();
+        setLikedProfiles(new Set(profileData.likedProfileIds || []));
+        setLikedProfilesData(profileData.likedProfiles || []);
+        setConnectedUsers(new Set(profileData.connectedProfileIds || []));
+        setConnectedUsersData(profileData.connectedProfiles || []);
+        setSentRequests(new Set(profileData.sentRequestIds || []));
+        setReceivedRequests(new Set(profileData.receivedRequestIds || []));
+        setLikerProfilesData(profileData.likerProfiles || []);
+        setNotifications(profileData.notifications || []);
+
+        const currentProfile = userData.profiles.find(p => p.id === userId);
+        if (currentProfile) {
+          setUser(currentProfile);
+          setUserProfiles(userData.profiles);
+        }
+        // Also refresh accountUser in App.js (usage stats, subscription tier)
+        if (refreshAccountUserCallback) {
+          refreshAccountUserCallback();
+        }
       }
     } catch (error) {
       console.error('Error reloading profile data:', error);
