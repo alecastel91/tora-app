@@ -471,8 +471,9 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getMessageThread(profileId, otherProfileId) {
-    const response = await fetch(`${API_URL}/messages/thread/${profileId}/${otherProfileId}`, {
+  async getMessageThread(profileId, otherProfileId, { before } = {}) {
+    const qs = before ? `?before=${encodeURIComponent(before)}` : '';
+    const response = await fetch(`${API_URL}/messages/thread/${profileId}/${otherProfileId}${qs}`, {
       method: 'GET',
       headers: this.getHeaders()
     });

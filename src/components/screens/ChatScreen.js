@@ -71,6 +71,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   // card so the artist side can pick docs without leaving the chat.
   const [shareDocsDeal, setShareDocsDeal] = useState(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const skipAutoScrollRef = useRef(false);
+  const [hasOlder, setHasOlder] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
   const inputRef = useRef(null);
   const otherFileInputRef = useRef(null);
 
@@ -97,6 +101,51 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
 
   // Function to fetch messages (can be called externally)
   // isPoll: when true, skip loading spinner and only update state if messages actually changed
+  const transformThreadMessage = (msg) => ({
+    id: msg.id,
+    text: msg.text,
+    timestamp: msg.createdAt,
+    isMe: msg.from.id === currentUser.id,
+    isSystem: msg.isSystemMessage || false,
+    dealId: msg.dealId || null,
+    deal: msg.deal || null,
+    connectionRequestId: msg.connectionRequest ? (msg.connectionRequest.id || msg.connectionRequest) : null,
+    documentAttachment: msg.documentAttachment || null
+  });
+
+  // "Load earlier" pagination: prepend the page older than the oldest
+  // loaded message, keeping the viewport anchored (no jump, no auto-scroll).
+  const loadOlderMessages = async () => {
+    const oldest = userMessages[0];
+    if (loadingOlder || !oldest?.id) return;
+    setLoadingOlder(true);
+    try {
+      const container = messagesContainerRef.current;
+      const prevHeight = container ? container.scrollHeight : 0;
+      const response = await apiService.getMessageThread(currentUser.id, user.id, { before: oldest.id });
+      const older = (response.messages || []).map(transformThreadMessage);
+      setHasOlder(!!response.hasMore);
+      skipAutoScrollRef.current = true;
+      setUserMessages(prev => [...older.filter(o => !prev.some(m => m.id === o.id)), ...prev]);
+      setDealStatuses(prev => {
+        const merged = { ...prev };
+        for (const msg of (response.messages || [])) {
+          if (msg.dealId && msg.deal && !merged[msg.dealId]) {
+            merged[msg.dealId] = { status: msg.deal.status, declineReason: msg.deal.declineReason, deal: msg.deal };
+          }
+        }
+        return merged;
+      });
+      requestAnimationFrame(() => {
+        if (container) container.scrollTop += container.scrollHeight - prevHeight;
+      });
+    } catch (error) {
+      console.error('Error loading older messages:', error);
+    } finally {
+      setLoadingOlder(false);
+    }
+  };
+
   const fetchMessages = async (isPoll = false) => {
     if (!currentUser || !currentUser.id || !user || !user.id) {
       setLoading(false);
@@ -108,16 +157,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       const response = await apiService.getMessageThread(currentUser.id, user.id);
 
       // Transform backend messages to match the format expected by the UI
-      const transformedMessages = (response.messages || []).map(msg => ({
-        text: msg.text,
-        timestamp: msg.createdAt,
-        isMe: msg.from.id === currentUser.id,
-        isSystem: msg.isSystemMessage || false,
-        dealId: msg.dealId || null,
-        deal: msg.deal || null,
-        connectionRequestId: msg.connectionRequest ? (msg.connectionRequest.id || msg.connectionRequest) : null,
-        documentAttachment: msg.documentAttachment || null
-      }));
+      const transformedMessages = (response.messages || []).map(transformThreadMessage);
+      setHasOlder(!!response.hasMore);
 
       // Backend now embeds the linked deal on each message, so we can
       // build dealStatuses from the same response — no second round-trip.
@@ -137,11 +178,20 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       // appear with their bottom-row CTAs already wired. React 18 batches
       // adjacent setStates so this resolves in a single commit.
       setUserMessages(prev => {
-        if (prev.length !== transformedMessages.length) return transformedMessages;
-        const lastPrev = prev[prev.length - 1];
-        const lastNew = transformedMessages[transformedMessages.length - 1];
-        if (lastPrev?.timestamp !== lastNew?.timestamp) return transformedMessages;
-        return prev;
+        // Keep older pages the user already loaded: everything before the
+        // fresh page's oldest message survives a poll/refetch.
+        const pageOldest = transformedMessages[0];
+        const olderLoaded = pageOldest
+          ? prev.filter(m => m.id && !transformedMessages.some(n => n.id === m.id)
+              && new Date(m.timestamp) < new Date(pageOldest.timestamp))
+          : [];
+        const next = [...olderLoaded, ...transformedMessages];
+        if (prev.length === next.length) {
+          const lastPrev = prev[prev.length - 1];
+          const lastNew = next[next.length - 1];
+          if (lastPrev?.timestamp === lastNew?.timestamp) return prev;
+        }
+        return next;
       });
       if (Object.keys(embeddedStatuses).length > 0) {
         setDealStatuses(embeddedStatuses);
@@ -189,6 +239,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   }, [currentUser?.id, user?.id]);
 
   useEffect(() => {
+    if (skipAutoScrollRef.current) {
+      skipAutoScrollRef.current = false;
+      return;
+    }
     scrollToBottom();
     inputRef.current?.focus();
   }, [userMessages]);
@@ -847,7 +901,19 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         </div>
       )}
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messagesContainerRef}>
+        {hasOlder && (
+          <button
+            type="button"
+            onClick={loadOlderMessages}
+            disabled={loadingOlder}
+            className="mx-auto mb-4 block px-4 py-2 rounded-full border border-white/15 bg-white/[0.04] text-xs
+                       uppercase tracking-[0.12em] text-white/60 font-tech cursor-pointer hover:text-white
+                       hover:border-white/30 transition-colors disabled:opacity-50"
+          >
+            {loadingOlder ? 'Loading…' : 'Load earlier messages'}
+          </button>
+        )}
         {filteredMessages.length === 0 && (
           <div className="chat-empty">
             <p>{t('messages.startConversationWith')} {user.name}</p>
