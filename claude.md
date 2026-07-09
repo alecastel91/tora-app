@@ -24,6 +24,15 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (July 9-10, 2026)
+
+### Identity verification UI
+`VerifiedBadge` (crimson seal + modest-claim explainer) on ProfileScreen/ViewProfileScreen; `VerificationModal` (issue/copy code → DM @tora.verify → "I've sent it" → in-review; prompts to add Instagram first when the profile has none). Global blocked-state handling at one altitude: api.js dispatches `tora:verification-required` on any 403 `VERIFICATION_REQUIRED` and App.js opens the modal — no per-call-site wiring. Non-blocking infrared nudge banner on unverified own profiles; sender-side notice on unverified counterparties (rendered after the ViewProfile enrich fetch resolves).
+
+### Pagination UI
+- ChatScreen "Load earlier messages" pill (pages of 100; prepends with the viewport anchored, auto-scroll suppressed for prepends, poll refreshes preserve loaded history).
+- BookingsScreen "Load older bookings" pill (pages of 200; appends by cursor).
+
 ## Recent Updates (June 12 - July 9, 2026)
 
 ### Obsidian Neon restyle (full app)
