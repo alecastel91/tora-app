@@ -142,6 +142,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showContractModal, showAddContractModal, selectedDealForWorkflow?.artistId]);
 
+  const [hasMoreDeals, setHasMoreDeals] = useState(false);
+  const [loadingOlderDeals, setLoadingOlderDeals] = useState(false);
+
   const fetchDeals = async () => {
     if (!currentUser || !currentUser.id) {
       setLoading(false);
@@ -154,19 +157,31 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
     try {
       // Fetch all deals for this user (both sent and received)
       const response = await apiService.getDeals({ profileId: currentUser.id });
-
-      // DEBUG: Log deal artistId fields
-      console.log('[fetchDeals] Fetched', response.deals?.length, 'deals');
-      response.deals?.forEach((deal, idx) => {
-        console.log(`[fetchDeals] Deal ${idx}:`, deal.eventName, 'bookedArtistId:', deal.bookedArtistId || 'NOT SET');
-      });
-
       setDeals(response.deals || []);
+      setHasMoreDeals(!!response.hasMore);
     } catch (err) {
       console.error('Error fetching deals:', err);
       setError(err.message || 'Failed to load bookings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Older pages: deals arrive newest-first, so the oldest loaded deal is
+  // the cursor for the next page.
+  const loadOlderDeals = async () => {
+    const oldest = deals[deals.length - 1];
+    if (loadingOlderDeals || !oldest?.id) return;
+    setLoadingOlderDeals(true);
+    try {
+      const response = await apiService.getDeals({ profileId: currentUser.id, before: oldest.id });
+      const older = response.deals || [];
+      setHasMoreDeals(!!response.hasMore);
+      setDeals(prev => [...prev, ...older.filter(d => !prev.some(p => p.id === d.id))]);
+    } catch (err) {
+      console.error('Error loading older bookings:', err);
+    } finally {
+      setLoadingOlderDeals(false);
     }
   };
 
@@ -1200,6 +1215,18 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 {cluster.deals.map(deal => renderDealCard(deal))}
               </div>
             ))}
+            {hasMoreDeals && (
+              <button
+                type="button"
+                onClick={loadOlderDeals}
+                disabled={loadingOlderDeals}
+                className="mx-auto my-4 block px-4 py-2 rounded-full border border-white/15 bg-white/[0.04] text-xs
+                           uppercase tracking-[0.12em] text-white/60 font-tech cursor-pointer hover:text-white
+                           hover:border-white/30 transition-colors disabled:opacity-50"
+              >
+                {loadingOlderDeals ? 'Loading…' : 'Load older bookings'}
+              </button>
+            )}
           </div>
         )}
       </div>
