@@ -24,6 +24,22 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (June 12 - July 9, 2026)
+
+### Obsidian Neon restyle (full app)
+Every screen redesigned to the dark-glassmorphism + crimson-neon system (design spec: Space Grotesk display + Inter body, #FF3366 "infrared" accent used sparingly, quiet-premium calibration — atmosphere yes, glows/hairlines no). Canonical role colors: ARTIST #6B5FFF · AGENT #00C875 · PROMOTER #FFB800 · VENUE #FF5757 (single source: global `.avatar-{role}` gradient classes in App.css + `--color-role-*` tokens; `src/utils/roles.js#getAvatarClass` maps role → class). Unified patterns: sub-screen headers (one canonical block for Settings/Premium/Edit/Manage/FindAgent/Roster/Calendar), one canonical `.modal-header` (centered title, absolute close), segmented tab rows, `LoadingGlobe` wireframe-globe loader, `CountBadge` infrared pill. Modal cards are true-dark (`bg-black/30-40`), screens sit on `--bg-black`.
+
+### Performance overhaul (frontend half)
+- **Client downscale before avatar upload**: `src/utils/image.js#downscaleImageToDataUrl` (canvas fit 1024px, webp/jpeg 0.85); ProfileScreen sends only `{ avatar }`; EditProfileScreen never echoes the avatar back.
+- **Keep-mounted tabs**: visited tabs stay mounted in hidden `.tab-panel` divs (display:none) with per-tab scroll restore; all five tabs pre-warm 1s after login, so even first visits render instantly. Gotchas: CSS animations restart on display toggles (`.tab-panel .screen { animation: none }` stops the fadeIn replaying as a fake loading moment), and Playwright selectors must scope to `>> visible=true` since hidden panels match too.
+- **Keep-mounted hygiene**: Bookings/Messages gate realtime refetches by an `isActive` prop — hidden tabs mark themselves stale and refetch once on reveal. MessagesScreen refetches once when a chat closes (`chatOpen` prop; the old key-remount fetched on open AND close). AppContext's 60s poll publishes only when the payload signature actually changed (one gate for ALL setters).
+- **Request hygiene**: unread badge uses `GET /messages/unread-count?profileId=` + received requests (not a full conversations download); ChatScreen builds connection-request state from the thread's embedded objects (no per-message fan-out) and keys effects on ids, not object identities.
+- **Bundle**: PdfViewer lazy-loaded (react-pdf + 1MB worker out of the entry chunk: 1.48MB → 1.02MB); production builds strip console.log/info/debug (esbuild `pure`); dead ExploreScreen/MatchesScreen deleted.
+- **ViewProfileScreen enriches** any passed row object with the full profile via getProfile (guards against list-projection gaps like the missing bio when opened from Messages).
+
+### Review + simplify pass (2026-07-09)
+8-angle review, 24 verified findings fixed or triaged. Notable: Tour calendar matching reads `availableDates` from SEARCH rows (backend must keep it in the projection); `.match-avatar` had drifted to the pre-restyle palette (fixed via canonical gradient classes); ~1,000 lines of dead CSS/screens removed. Deferred: React.memo on tab screens; avatar upload via multipart.
+
 ## Recent Updates (June 9-10, 2026)
 
 ### Password reset flow shipped (#61)
