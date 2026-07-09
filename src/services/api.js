@@ -49,6 +49,12 @@ class ApiService {
         errorData = { error: response.statusText || 'Something went wrong' };
       }
 
+      // Identity gate tripped: one global signal instead of per-call-site
+      // handling. App.js listens and opens the verification prompt.
+      if (errorData.code === 'VERIFICATION_REQUIRED' && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('tora:verification-required', { detail: errorData }));
+      }
+
       // Create an error object that mimics axios structure
       const error = new Error(errorData.message || errorData.error || 'Request failed');
       error.response = {
@@ -429,6 +435,24 @@ class ApiService {
   }
 
   // MESSAGE ENDPOINTS
+  async issueVerifyCode(profileId) {
+    const response = await fetch(`${API_URL}/verification/issue-code`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId })
+    });
+    return this.handleResponse(response);
+  }
+
+  async markVerificationSent(profileId) {
+    const response = await fetch(`${API_URL}/verification/mark-sent`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId })
+    });
+    return this.handleResponse(response);
+  }
+
   async getUnreadCount(profileId) {
     const response = await fetch(`${API_URL}/messages/unread-count?profileId=${profileId}`, {
       method: 'GET',

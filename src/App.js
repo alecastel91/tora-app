@@ -23,6 +23,7 @@ import { StarIcon } from './utils/icons';
 import './styles/App.css';
 import './styles/responsive.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
+import VerificationModal from './components/common/VerificationModal';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -69,6 +70,16 @@ function App() {
     return () => clearTimeout(warmup);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
+  // Identity gate UX: any API call rejected with VERIFICATION_REQUIRED
+  // raises this event (api.js interceptor) and we open the verify prompt.
+  const [verifyPrompt, setVerifyPrompt] = useState(null);
+  useEffect(() => {
+    const onRequired = () => setVerifyPrompt({
+      contextMessage: 'Verify to start booking — this action needs a verified identity.',
+    });
+    window.addEventListener('tora:verification-required', onRequired);
+    return () => window.removeEventListener('tora:verification-required', onRequired);
+  }, []);
   const [activeChatUser, setActiveChatUser] = useState(null);
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
@@ -440,6 +451,12 @@ function App() {
             </div>
           ))}
         </main>
+        {verifyPrompt && (
+          <VerificationModal
+            contextMessage={verifyPrompt.contextMessage}
+            onClose={() => setVerifyPrompt(null)}
+          />
+        )}
         {activeChatUser && !viewingProfile && (
           <ChatScreen
             user={activeChatUser}

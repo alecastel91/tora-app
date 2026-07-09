@@ -4,6 +4,7 @@ import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, Locatio
 import RAEventsModal from '../common/RAEventsModal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
+import VerifiedBadge from '../common/VerifiedBadge';
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { likedProfiles, toggleLike, sentRequests, receivedRequests, sendConnectionRequest, connectedUsers, removeConnection } = useAppContext();
@@ -269,7 +270,10 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </div>
           
           <div className="profile-name-role-container">
-            <h2 className="profile-name">{profile.name}</h2>
+            <h2 className="profile-name">
+              {profile.name}
+              {profile.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" />}
+            </h2>
           </div>
           <p className="profile-location"><LocationIcon />{profile.location}</p>
           <div className="profile-role-centered">
@@ -428,6 +432,14 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           )}
         </div>
         
+        {/* Sender-side alert: counterparty hasn't verified yet */}
+        {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
+          <p className="mx-4 mb-3 px-4 py-3 rounded-2xl border border-white/10 bg-white/[0.03] text-xs leading-relaxed text-white/50 text-center">
+            This profile hasn't verified their identity yet. They must verify
+            before they can accept offers or requests.
+          </p>
+        )}
+
         {/* Action Buttons */}
         <div className="profile-actions-bottom">
           <button

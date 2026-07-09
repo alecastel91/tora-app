@@ -16,6 +16,8 @@ import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { downscaleImageToDataUrl } from '../../utils/image';
 import { getAvatarClass } from '../../utils/roles';
+import VerifiedBadge from '../common/VerifiedBadge';
+import VerificationModal from '../common/VerificationModal';
 
 // --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
 const GridIcon = () => (
@@ -74,6 +76,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const [showAllGenres, setShowAllGenres] = useState(false);
   const [showRAEvents, setShowRAEvents] = useState(false);
   const [showProfileSwitcher, setShowProfileSwitcher] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
   // Action-required dots next to Manage CTAs. `ownHasActions` is true when
   // the active profile has at least one action item; `artistActionsMap`
   // is keyed by artist profile id for the agent's represented-artist cards.
@@ -433,6 +436,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
         <h2 className="text-3xl font-bold text-white font-space-grotesk tracking-[-0.02em] leading-none mb-2">
           {user?.name || t('profile.yourName')}
+          {user?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" />}
         </h2>
         <p className="flex items-center justify-center gap-1.5 text-[13px] text-white/60 mb-3 font-tech [&>svg]:w-3.5 [&>svg]:h-3.5">
           <LocationIcon />{user?.location || t('profile.addLocation')}
@@ -559,6 +563,29 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           onClick={() => setShowProfileSwitcher(true)}
         />
       </div>
+
+      {/* Verification nudge — non-blocking, opens the code screen */}
+      {user?.verifyStatus !== 'VERIFIED' && (
+        <button
+          type="button"
+          onClick={() => setShowVerification(true)}
+          className="w-full flex items-center justify-between gap-3 rounded-2xl border border-infrared/30 bg-infrared/[0.06] p-4 mb-5 text-left cursor-pointer"
+        >
+          <div className="min-w-0">
+            <strong className="block text-sm font-semibold text-white">
+              {user?.verifyStatus === 'PENDING_REVIEW' ? 'Verification in review' : 'Verify your identity'}
+            </strong>
+            <p className="text-xs text-white/50 mt-0.5 m-0">
+              {user?.verifyStatus === 'PENDING_REVIEW'
+                ? "We're matching your DM — your badge appears shortly."
+                : 'DM a one-time code to @tora.verify to unlock sending offers and requests.'}
+            </p>
+          </div>
+          <span className="shrink-0 px-4 py-2 rounded-lg bg-infrared text-white text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
+            {user?.verifyStatus === 'PENDING_REVIEW' ? 'Status' : 'Verify'}
+          </span>
+        </button>
+      )}
 
       {/* Bio Section */}
       {user?.bio && (
@@ -918,6 +945,10 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           </div>
         </div>
       </Modal>
+
+      {showVerification && (
+        <VerificationModal onClose={() => setShowVerification(false)} />
+      )}
 
       {/* RA Events Modal */}
       <RAEventsModal
