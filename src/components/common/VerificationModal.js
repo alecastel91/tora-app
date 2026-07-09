@@ -65,7 +65,16 @@ const VerificationModal = ({ onClose, contextMessage }) => {
           <p className="text-sm text-infrared/90 text-center mt-3 mb-0">{contextMessage}</p>
         )}
 
-        {status === 'PENDING_REVIEW' ? (
+        {!user?.instagram?.trim() && status !== 'PENDING_REVIEW' ? (
+          <div className="mt-5 text-center">
+            <p className="text-sm leading-relaxed text-white/70 m-0">
+              Verification confirms you control the Instagram account on your
+              profile — add your Instagram handle in Edit Profile first, then
+              come back here.
+            </p>
+            <button type="button" className="btn btn-outline w-full mt-5" onClick={onClose}>Close</button>
+          </div>
+        ) : status === 'PENDING_REVIEW' ? (
           <div className="mt-5 text-center">
             <p className="text-sm leading-relaxed text-white/70 m-0">
               Thanks — we're checking your DM. Your badge appears as soon as
