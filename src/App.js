@@ -75,7 +75,7 @@ function App() {
   const [verifyPrompt, setVerifyPrompt] = useState(null);
   useEffect(() => {
     const onRequired = () => setVerifyPrompt({
-      contextMessage: 'Verify to start booking — this action needs a verified identity.',
+      contextMessage: t('verify.blockedContext'),
     });
     window.addEventListener('tora:verification-required', onRequired);
     return () => window.removeEventListener('tora:verification-required', onRequired);
@@ -276,12 +276,12 @@ function App() {
 
     // Validate passwords
     if (passwordChangeData.newPassword !== passwordChangeData.confirmPassword) {
-      setPasswordChangeError('New passwords do not match');
+      setPasswordChangeError(t('auth.passwordsDontMatch'));
       return;
     }
 
     if (passwordChangeData.newPassword.length < 6) {
-      setPasswordChangeError('New password must be at least 6 characters');
+      setPasswordChangeError(t('auth.passwordMinLength'));
       return;
     }
 
@@ -300,7 +300,7 @@ function App() {
         setPasswordChangeSuccess(false);
       }, 2000);
     } catch (error) {
-      setPasswordChangeError(error.message || 'Failed to change password');
+      setPasswordChangeError(error.message || t('settingsExtra.changePasswordFailed'));
     } finally {
       setPasswordChangeLoading(false);
     }
@@ -495,13 +495,13 @@ function App() {
               <h3>{t('settings.account')}</h3>
               {(accountUser?.firstName || accountUser?.lastName) && (
                 <div className="settings-item">
-                  <span>Name</span>
+                  <span>{t('settingsExtra.name')}</span>
                   <span className="settings-value">{[accountUser.firstName, accountUser.lastName].filter(Boolean).join(' ')}</span>
                 </div>
               )}
               {accountUser?.phone && (
                 <div className="settings-item">
-                  <span>Phone</span>
+                  <span>{t('settingsExtra.phone')}</span>
                   <span className="settings-value">{accountUser.phone}</span>
                 </div>
               )}
@@ -514,7 +514,7 @@ function App() {
 
             {/* Subscription & Usage Section */}
             <div className="settings-section subscription-section">
-              <h3>{user?.role === 'AGENT' ? 'Agent plan' : 'Subscription & Usage'}</h3>
+              <h3>{user?.role === 'AGENT' ? t('settingsExtra.agentPlan') : t('settingsExtra.subscriptionUsage')}</h3>
 
               {user?.role === 'AGENT' ? (
                 <AgentTierCard
@@ -556,13 +556,13 @@ function App() {
                 <div className="trial-countdown-settings">
                   <div className="trial-countdown-icon">⏱️</div>
                   <div className="trial-countdown-text">
-                    <strong>Trial Period</strong>
+                    <strong>{t('settingsExtra.trialPeriod')}</strong>
                     <p>
                       {(() => {
                         const now = new Date();
                         const endDate = new Date(user.trialEndDate);
                         const diffTime = endDate - now;
-                        if (diffTime <= 0) return 'Trial expired';
+                        if (diffTime <= 0) return t('settingsExtra.trialExpired');
 
                         const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -580,7 +580,7 @@ function App() {
 
               {/* Usage Stats (per-profile) */}
               <div className="usage-stats">
-                <h4>Usage This Period</h4>
+                <h4>{t('settingsExtra.usageThisPeriod')}</h4>
 
                 {/* Likes Today */}
                 <div className="usage-item">
@@ -616,7 +616,7 @@ function App() {
                     </div>
                   )}
                   <div className="usage-reset">
-                    {user?.subscriptionTier === 'YEARLY' ? 'Unlimited Likes' : 'Resets daily at midnight'}
+                    {user?.subscriptionTier === 'YEARLY' ? t('settingsExtra.unlimitedLikes') : t('settingsExtra.resetsDaily')}
                   </div>
                 </div>
 
@@ -682,7 +682,7 @@ function App() {
             </div>
 
             <div className="settings-section">
-              <h3>Preferred Currency</h3>
+              <h3>{t('settingsExtra.preferredCurrency')}</h3>
               <div className="language-selector">
                 {availableCurrencies.map(curr => (
                   <button
@@ -737,7 +737,7 @@ function App() {
             </div>
 
             <div className="settings-section">
-              <h3>Email Preferences</h3>
+              <h3>{t('settingsExtra.emailPreferences')}</h3>
               <div className="settings-item">
                 <label className="settings-toggle">
                   <input
@@ -745,13 +745,13 @@ function App() {
                     checked={accountUser?.marketingConsent === true}
                     onChange={(e) => handleMarketingConsentChange(e.target.checked)}
                   />
-                  <span>Product updates, new features, and tips for getting the most out of TORA</span>
+                  <span>{t('settingsExtra.marketingToggle')}</span>
                 </label>
               </div>
               <div className="settings-item">
                 <label className="settings-toggle settings-toggle-locked">
                   <input type="checkbox" checked disabled readOnly />
-                  <span>Transactional emails (booking confirmations, security alerts, password resets) — required for the service to work</span>
+                  <span>{t('settingsExtra.transactionalToggle')}</span>
                 </label>
               </div>
             </div>
@@ -787,14 +787,14 @@ function App() {
             setPasswordChangeError('');
             setPasswordChangeSuccess(false);
           }}
-          title="Change Password"
+          title={t('settings.changePassword')}
         >
           <div className="password-change-content">
             {passwordChangeSuccess ? (
               <div className="success-state">
                 <div className="success-icon">✓</div>
-                <h3>Password Changed Successfully</h3>
-                <p>Your password has been updated.</p>
+                <h3>{t('settingsExtra.passwordChanged')}</h3>
+                <p>{t('settingsExtra.passwordUpdatedDesc')}</p>
               </div>
             ) : (
               <>
@@ -805,7 +805,7 @@ function App() {
                 )}
 
                 <div className="form-group">
-                  <label>Current Password</label>
+                  <label>{t('settingsExtra.currentPassword')}</label>
                   <input
                     type="password"
                     value={passwordChangeData.currentPassword}
@@ -813,13 +813,13 @@ function App() {
                       ...passwordChangeData,
                       currentPassword: e.target.value
                     })}
-                    placeholder="Enter current password"
+                    placeholder={t('settingsExtra.enterCurrentPassword')}
                     className="form-input"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>New Password</label>
+                  <label>{t('auth.newPassword')}</label>
                   <input
                     type="password"
                     value={passwordChangeData.newPassword}
@@ -827,13 +827,13 @@ function App() {
                       ...passwordChangeData,
                       newPassword: e.target.value
                     })}
-                    placeholder="Enter new password (min 6 characters)"
+                    placeholder={t('auth.newPasswordPlaceholder')}
                     className="form-input"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Confirm New Password</label>
+                  <label>{t('auth.confirmNewPassword')}</label>
                   <input
                     type="password"
                     value={passwordChangeData.confirmPassword}
@@ -841,7 +841,7 @@ function App() {
                       ...passwordChangeData,
                       confirmPassword: e.target.value
                     })}
-                    placeholder="Re-enter new password"
+                    placeholder={t('settingsExtra.reenterNewPassword')}
                     className="form-input"
                   />
                 </div>
@@ -854,7 +854,7 @@ function App() {
                     !passwordChangeData.newPassword ||
                     !passwordChangeData.confirmPassword}
                 >
-                  {passwordChangeLoading ? 'Changing Password...' : 'Change Password'}
+                  {passwordChangeLoading ? t('settingsExtra.changingPassword') : t('settings.changePassword')}
                 </button>
               </>
             )}
@@ -870,7 +870,7 @@ function App() {
                   <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
               </button>
-              <h1>TORA Premium</h1>
+              <h1>{t('premium.title')}</h1>
               <div style={{ width: '24px' }}></div>
             </div>
 
@@ -886,24 +886,24 @@ function App() {
             </div>
             
             <div className="premium-features">
-              <h3>Compare Plans</h3>
+              <h3>{t('premium.comparePlans')}</h3>
               <div className="features-table">
                 <div className="features-table-header">
-                  <div className="feature-name-col">Feature</div>
-                  <div className="tier-col">Free</div>
-                  <div className="tier-col">Monthly</div>
-                  <div className="tier-col tier-col-highlight">Yearly</div>
+                  <div className="feature-name-col">{t('premium.feature')}</div>
+                  <div className="tier-col">{t('premium.free')}</div>
+                  <div className="tier-col">{t('premium.monthly')}</div>
+                  <div className="tier-col tier-col-highlight">{t('premium.yearly')}</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">Search Visibility</div>
-                  <div className="tier-value">User's city</div>
+                  <div className="feature-name">{t('premium.searchVisibility')}</div>
+                  <div className="tier-value">{t('premium.usersCity')}</div>
                   <div className="tier-value">Global</div>
                   <div className="tier-value tier-value-highlight">Global</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">Professional Dashboard</div>
+                  <div className="feature-name">{t('premium.professionalDashboard')}</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
@@ -911,7 +911,7 @@ function App() {
 
                 {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
                   <div className="features-table-row">
-                    <div className="feature-name">Update Travel Schedule</div>
+                    <div className="feature-name">{t('premium.updateTravelSchedule')}</div>
                     <div className="tier-value">—</div>
                     <div className="tier-value">✓</div>
                     <div className="tier-value tier-value-highlight">✓</div>
@@ -919,14 +919,14 @@ function App() {
                 )}
 
                 <div className="features-table-row">
-                  <div className="feature-name">Calendar Matching</div>
+                  <div className="feature-name">{t('premium.calendarMatching')}</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">Tour Kick-starter</div>
+                  <div className="feature-name">{t('premium.tourKickstarter')}</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
@@ -934,7 +934,7 @@ function App() {
 
                 {(user?.role === 'PROMOTER' || user?.role === 'VENUE') && (
                   <div className="features-table-row">
-                    <div className="feature-name">Artist Travel Alerts</div>
+                    <div className="feature-name">{t('premium.artistTravelAlerts')}</div>
                     <div className="tier-value">—</div>
                     <div className="tier-value">—</div>
                     <div className="tier-value tier-value-highlight">✓</div>
@@ -942,28 +942,28 @@ function App() {
                 )}
 
                 <div className="features-table-row">
-                  <div className="feature-name">Calendar Privacy Controls</div>
+                  <div className="feature-name">{t('premium.calendarPrivacy')}</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">Messaging</div>
+                  <div className="feature-name">{t('premium.messaging')}</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">Priority Search Placement</div>
+                  <div className="feature-name">{t('premium.prioritySearch')}</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">Send Likes</div>
+                  <div className="feature-name">{t('premium.sendLikes')}</div>
                   <div className="tier-value">2 x day</div>
                   <div className="tier-value">5 x day</div>
                   <div className="tier-value tier-value-highlight">Unlimited</div>
@@ -976,7 +976,7 @@ function App() {
 
               <div className="features-table" style={{ marginTop: '0' }}>
                 <div className="features-table-row" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                  <div className="feature-name">Connection Requests</div>
+                  <div className="feature-name">{t('premium.connectionRequests')}</div>
                   <div className="tier-value">3 x month</div>
                   <div className="tier-value">10 x month</div>
                   <div className="tier-value tier-value-highlight">Unlimited</div>
@@ -996,13 +996,13 @@ function App() {
               <>
                 <div className="premium-pricing">
                   <div className="price-card">
-                    <h4>Monthly</h4>
+                    <h4>{t('premium.monthly')}</h4>
                     <div className="price">€19.90<span>/month</span></div>
                     <button className="btn btn-outline" onClick={() => handleSelectPlan('monthly')}>Choose Monthly</button>
                   </div>
                   <div className="price-card featured">
                     <div className="badge">Save 21%</div>
-                    <h4>Yearly</h4>
+                    <h4>{t('premium.yearly')}</h4>
                     <div className="price">€189.90<span>/year</span></div>
                     <button className="btn btn-primary" onClick={() => handleSelectPlan('yearly')}>Choose Yearly</button>
                   </div>
@@ -1021,27 +1021,27 @@ function App() {
         <Modal
           isOpen={showSubscription}
           onClose={() => setShowSubscription(false)}
-          title={subscriptionStep === 'success' ? 'Welcome to TORA Premium!' : 'Complete Your Subscription'}
+          title={subscriptionStep === 'success' ? t('premium.welcomeTitle') : t('premium.completeSubscription')}
         >
           <div className="subscription-content">
             {subscriptionStep === 'payment' && (
               <>
                 <div className="subscription-summary">
-                  <h3>Order Summary</h3>
+                  <h3>{t('premium.orderSummary')}</h3>
                   <div className="summary-item">
-                    <span>TORA Premium</span>
+                    <span>{t('premium.title')}</span>
                     <span className="summary-value">
                       {selectedPlan === 'monthly' ? '€19.90/month' : '€189.90/year'}
                     </span>
                   </div>
                   <div className="summary-item">
-                    <span>Plan Type</span>
+                    <span>{t('premium.planType')}</span>
                     <span className="summary-value">
-                      {selectedPlan === 'monthly' ? 'Monthly' : 'Yearly (Save 21%)'}
+                      {selectedPlan === 'monthly' ? t('premium.monthly') : t('premium.yearlySave')}
                     </span>
                   </div>
                   <div className="summary-total">
-                    <span>Total</span>
+                    <span>{t('premium.total')}</span>
                     <span className="total-value">
                       {selectedPlan === 'monthly' ? '€19.90' : '€189.90'}
                     </span>
@@ -1049,27 +1049,27 @@ function App() {
                 </div>
 
                 <div className="payment-section">
-                  <h3>Payment Method</h3>
+                  <h3>{t('premium.paymentMethod')}</h3>
                   <div className="payment-methods">
                     <label className="payment-option">
                       <input type="radio" name="payment" defaultChecked />
                       <div className="payment-card">
                         <span className="payment-icon">💳</span>
-                        <span>Credit/Debit Card</span>
+                        <span>{t('premium.creditCard')}</span>
                       </div>
                     </label>
                     <label className="payment-option">
                       <input type="radio" name="payment" />
                       <div className="payment-card">
                         <span className="payment-icon">📱</span>
-                        <span>Apple Pay</span>
+                        <span>{t('premium.applePay')}</span>
                       </div>
                     </label>
                     <label className="payment-option">
                       <input type="radio" name="payment" />
                       <div className="payment-card">
                         <span className="payment-icon">🅿️</span>
-                        <span>PayPal</span>
+                        <span>{t('premium.paypal')}</span>
                       </div>
                     </label>
                   </div>
@@ -1077,7 +1077,7 @@ function App() {
                   <div className="card-details">
                     <input 
                       type="text" 
-                      placeholder="Card Number" 
+                      placeholder={t('premium.cardNumber')} 
                       className="input-field"
                       maxLength="19"
                     />
@@ -1097,7 +1097,7 @@ function App() {
                     </div>
                     <input 
                       type="text" 
-                      placeholder="Cardholder Name" 
+                      placeholder={t('premium.cardholderName')} 
                       className="input-field"
                     />
                   </div>
@@ -1119,16 +1119,16 @@ function App() {
             {subscriptionStep === 'processing' && (
               <div className="processing-state">
                 <LoadingGlobe label="" className="py-2" />
-                <h3>Processing Payment...</h3>
-                <p>Please wait while we secure your subscription</p>
+                <h3>{t('premium.processingPayment')}</h3>
+                <p>{t('premium.processingWait')}</p>
               </div>
             )}
 
             {subscriptionStep === 'success' && (
               <div className="success-state">
                 <div className="success-icon">✨</div>
-                <h2>You're Now Premium!</h2>
-                <p>Welcome to TORA Premium. You now have access to all premium features.</p>
+                <h2>{t('premium.nowPremium')}</h2>
+                <p>{t('premium.welcomeDesc')}</p>
                 
                 <div className="success-features">
                   <div className="success-feature">
