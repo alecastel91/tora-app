@@ -1,12 +1,14 @@
 import React, { useMemo } from 'react';
 import { DOC_CATEGORY_KEYS, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment } from '../../utils/paymentSummary';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * Step 3 (documents) completes when each category is shared or skipped.
  * Step 4 (payment) ticks only when the artist has confirmed receipt.
  */
 const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
+  const { t } = useLanguage();
   // Memo keyed on the JSONB blobs that drive every derivation. With many
   // deal cards on screen this avoids redoing reduces + date parsing on every
   // unrelated parent render.
@@ -24,9 +26,9 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
 
     const steps = [
       { key: 'offerAccepted', label: 'Offer Accepted', completed: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED', timestamp: deal.updatedAt },
-      { key: 'contractSigned', label: 'Contract Signed', completed: deal.contract?.status === 'FULLY_SIGNED', timestamp: deal.contract?.fullySignedAt },
-      { key: 'documentsShared', label: 'Documents Shared', completed: allDocsResolved, timestamp: allDocsResolved ? latestDocTs : null },
-      { key: 'paymentReceived', label: 'Payment Received', completed: summary.isFullyConfirmed, timestamp: deal.payment?.fullPaymentProof?.confirmedAt || (summary.isFullyConfirmed ? deal.payment?.fullPaymentDate : null) },
+      { key: 'contractSigned', label: t('bookings.stepContractSigned'), completed: deal.contract?.status === 'FULLY_SIGNED', timestamp: deal.contract?.fullySignedAt },
+      { key: 'documentsShared', label: t('bookings.stepDocumentsShared'), completed: allDocsResolved, timestamp: allDocsResolved ? latestDocTs : null },
+      { key: 'paymentReceived', label: t('bookings.stepPaymentReceived'), completed: summary.isFullyConfirmed, timestamp: deal.payment?.fullPaymentProof?.confirmedAt || (summary.isFullyConfirmed ? deal.payment?.fullPaymentDate : null) },
     ];
     const completedSteps = steps.filter((s) => s.completed).length;
     const showPaymentBar = !summary.isFullyConfirmed && (summary.markedDeposit > 0 || summary.fullPaymentMarked) && summary.totalFee > 0;
@@ -102,7 +104,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
       {showPaymentBar && (
         <div style={{ marginTop: '14px', padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px', fontSize: '12px' }}>
-            <span style={{ color: '#bbb', fontWeight: 600 }}>Payment progress</span>
+            <span style={{ color: '#bbb', fontWeight: 600 }}>{t('bookings.paymentProgress')}</span>
             <span style={{ color: '#888' }}>
               {confirmedDeposit} {currency} confirmed of {totalFee} {currency} ({confirmedPct}%)
             </span>

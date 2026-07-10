@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
 import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated }) => {
+  const { t } = useLanguage();
   const [artistProfile, setArtistProfile] = useState(null);
   const [actionBusy, setActionBusy] = useState(false);
   const [localDeal, setLocalDeal] = useState(deal);
@@ -36,7 +38,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
     <div className="delete-modal-overlay" onClick={onClose}>
       <div className="delete-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
         <div className="delete-modal-header">
-          <h3>Share Documents</h3>
+          <h3>{t('chat.shareDocuments')}</h3>
         </div>
         <div className="delete-modal-content">
           <p style={{ marginBottom: '16px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
@@ -98,7 +100,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                                 })(),
                               });
                             } catch (err) {
-                              alert(err.message || 'Failed to reset');
+                              alert(err.message || t('docs.resetFailed'));
                             } finally {
                               setActionBusy(false);
                             }
@@ -113,10 +115,10 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                             cursor: actionBusy ? 'default' : 'pointer',
                             flexShrink: 0,
                           }}
-                          title={status === 'shared' ? 'Remove this shared document' : 'Unskip — pick a document instead'}
+                          title={status === 'shared' ? t('docs.removeShared') : t('docs.unskipHint')}
                           aria-label={status === 'shared' ? `Delete ${cat.label}` : `Unskip ${cat.label}`}
                         >
-                          {status === 'shared' ? '✕' : 'Unskip'}
+                          {status === 'shared' ? '✕' : t('docs.unskip')}
                         </button>
                       </div>
                     )}
@@ -197,7 +199,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                           setLocalDeal(nextDeal);
                           if (onDealUpdated) onDealUpdated(nextDeal);
                         } catch (err) {
-                          alert(err.message || 'Failed to share document');
+                          alert(err.message || t('docs.shareFailed'));
                         } finally {
                           setActionBusy(false);
                         }
@@ -218,7 +220,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
 
                   {status === 'pending' && !cat.uploadOnly && docsSource.length === 0 && (
                     <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.5 }}>
-                      No {cat.label.toLowerCase()} in your library. Add one in <strong>Profile &gt; Manage &gt; Documents</strong>, then come back here.
+                      {t('docs.noneInLibraryBefore', { label: cat.label.toLowerCase() })} <strong>{t('chat.manageDocsPath')}</strong>{t('docs.noneInLibraryAfter')}
                     </p>
                   )}
                 </div>
@@ -245,11 +247,11 @@ const UploadOnlyPicker = ({ category, actionBusy, profileId, onUploaded }) => {
   const handleFile = async (file) => {
     if (!file) return;
     if (file.type !== 'application/pdf') {
-      setError('Please upload a PDF.');
+      setError(t('docs.uploadPdf'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setError('Max 10 MB.');
+      setError(t('docs.max10mb'));
       return;
     }
     setError('');
@@ -264,7 +266,7 @@ const UploadOnlyPicker = ({ category, actionBusy, profileId, onUploaded }) => {
         storagePath: result.storagePath,
       });
     } catch (err) {
-      setError(err.message || 'Upload failed');
+      setError(err.message || t('docs.uploadFailed'));
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';

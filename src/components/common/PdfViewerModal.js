@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { createPortal } from 'react-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // Lazy so react-pdf and its ~1MB pdf.worker stay out of the entry bundle —
 // they load the first time someone actually opens a PDF.
@@ -10,6 +11,7 @@ const PdfViewer = lazy(() => import('./PdfViewer'));
 // 100dvh, and exposes a header with Download + Open-in-new-tab + Close.
 // Used by BookingsScreen, ChatScreen, ManageProfileScreen, ManageArtistScreen.
 const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
+  const { t } = useLanguage();
   if (!url) return null;
 
   const filename = (() => {
@@ -76,8 +78,8 @@ const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
           <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
             <button
               type="button"
-              title="Download"
-              aria-label="Download"
+              title={t('docs.download')}
+              aria-label={t('docs.download')}
               style={iconBtnStyle}
               onClick={async () => {
                 try {
@@ -93,7 +95,7 @@ const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(blobUrl);
                 } catch {
-                  alert('Download failed. Try "Open in new tab" and save from there.');
+                  alert(t('docs.downloadFailed'));
                 }
               }}
             >
@@ -107,8 +109,8 @@ const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              title="Open in new tab"
-              aria-label="Open in new tab"
+              title={t('docs.openInNewTab')}
+              aria-label={t('docs.openInNewTab')}
               style={{ ...iconBtnStyle, textDecoration: 'none' }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -119,8 +121,8 @@ const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
             </a>
             <button
               type="button"
-              title="Close"
-              aria-label="Close"
+              title={t('common.close')}
+              aria-label={t('common.close')}
               style={iconBtnStyle}
               onClick={onClose}
             >

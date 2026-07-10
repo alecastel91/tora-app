@@ -1,4 +1,47 @@
 const en = {
+  bookings: {
+    stepContractSigned: 'Contract Signed',
+    stepDocumentsShared: 'Documents Shared',
+    stepPaymentReceived: 'Payment Received',
+    paymentProgress: 'Payment progress',
+  },
+
+  docs: {
+    resetFailed: 'Failed to reset',
+    removeShared: 'Remove this shared document',
+    unskipHint: 'Unskip — pick a document instead',
+    unskip: 'Unskip',
+    shareFailed: 'Failed to share document',
+    noneInLibraryBefore: 'No {{label}} in your library. Add one in',
+    noneInLibraryAfter: ', then come back here.',
+    uploadPdf: 'Please upload a PDF.',
+    max10mb: 'Max 10 MB.',
+    uploadFailed: 'Upload failed',
+    onlyPdf: 'Only PDF files are allowed',
+    under10mb: 'File size must be under 10MB',
+    pickOrUpload: 'Pick a contract from your library or upload a new PDF',
+    orUploadNew: 'Or upload a new PDF',
+    uploadAPdf: 'Upload a PDF',
+    dragDrop: 'Drag and drop your PDF here, or',
+    pdfOnlyMax: 'PDF only, max 10MB',
+    download: 'Download',
+    downloadFailed: 'Download failed. Try "Open in new tab" and save from there.',
+    openInNewTab: 'Open in new tab',
+  },
+
+  contract: {
+    reviewFirst: 'Please open and review the contract before signing',
+    enterLegalName: 'Please enter your full legal name',
+    mustConsent: 'You must consent to sign this contract',
+    drawSignature: 'Please draw your signature',
+    signFailed: 'Failed to sign contract. Please try again.',
+    signAndSend: 'Sign & Send Contract',
+    signContract: 'Sign Contract',
+    signFirstNote: 'You will sign first; the contract is then delivered for the other party to countersign.',
+    reviewBeforeSigning: 'Please review the contract before signing',
+    waitingForLoad: 'Waiting for the contract to finish loading…',
+  },
+
   chat: {
     failedToSendDocument: 'Failed to send document. Please try again.',
     fileTooLarge: 'File must be 10 MB or smaller.',

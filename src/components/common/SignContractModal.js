@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const SignContractModal = ({
   isOpen, onClose, onSign, contractUrl, dealId, senderName, onOpenContract,
@@ -10,6 +11,7 @@ const SignContractModal = ({
   onContractViewed, // (optional) called once the contract PDF has actually loaded
   viewConfirmedSignal = 0, // increment from parent to confirm the PDF finished loading
 }) => {
+  const { t } = useLanguage();
   const isSendAndSign = mode === 'sign-and-send';
   // Sender already has the file (they uploaded it); recipient must open it
   // at least once AND have it actually load before signing.
@@ -69,20 +71,20 @@ const SignContractModal = ({
     setError('');
 
     if (!isSendAndSign && !hasViewedContract) {
-      setError('Please open and review the contract before signing');
+      setError(t('contract.reviewFirst'));
       return;
     }
     if (!fullName.trim()) {
-      setError('Please enter your full legal name');
+      setError(t('contract.enterLegalName'));
       return;
     }
     if (!consentGiven) {
-      setError('You must consent to sign this contract');
+      setError(t('contract.mustConsent'));
       return;
     }
 
     if (!sigPadRef.current || sigPadRef.current.isEmpty()) {
-      setError('Please draw your signature');
+      setError(t('contract.drawSignature'));
       return;
     }
     const signatureImage = sigPadRef.current.getCanvas().toDataURL('image/png');
@@ -101,7 +103,7 @@ const SignContractModal = ({
       });
       onClose();
     } catch (err) {
-      setError(err.message || 'Failed to sign contract. Please try again.');
+      setError(err.message || t('contract.signFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -114,7 +116,7 @@ const SignContractModal = ({
       <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-            {isSendAndSign ? 'Sign & Send Contract' : 'Sign Contract'}
+            {isSendAndSign ? t('contract.signAndSend') : t('contract.signContract')}
           </h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
@@ -143,8 +145,8 @@ const SignContractModal = ({
                 </p>
                 <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#999' }}>
                   {isSendAndSign
-                    ? 'You will sign first; the contract is then delivered for the other party to countersign.'
-                    : 'Please review the contract before signing'}
+                    ? t('contract.signFirstNote')
+                    : t('contract.reviewBeforeSigning')}
                 </p>
                 {signerCapacity && (
                   <p style={{ margin: '6px 0 0 0', fontSize: '12px', color: 'rgba(138, 43, 226, 1)', fontWeight: 600 }}>
@@ -175,7 +177,7 @@ const SignContractModal = ({
             {!isSendAndSign && !hasViewedContract && (
               <p style={{ margin: '6px 0 0 0', fontSize: '11px', color: '#888' }}>
                 {openClicked
-                  ? 'Waiting for the contract to finish loading…'
+                  ? t('contract.waitingForLoad')
                   : 'You must open and review the contract before signing.'}
               </p>
             )}

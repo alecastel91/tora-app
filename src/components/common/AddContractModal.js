@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { uploadDocument } from '../../services/contractService';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * AddContractModal — single-screen picker. Two ways to attach a contract PDF:
@@ -26,6 +27,7 @@ const AddContractModal = ({
   submitLabel = 'Continue to sign', // override to "Add" when used from manage-library screens
   submittingLabel = 'Preparing…',
 }) => {
+  const { t } = useLanguage();
   const { user } = useAppContext();
   const [title, setTitle] = useState(initialTitle);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -44,8 +46,8 @@ const AddContractModal = ({
 
   const handleFileSelect = (file) => {
     setError('');
-    if (file.type !== 'application/pdf') { setError('Only PDF files are allowed'); return; }
-    if (file.size > 10 * 1024 * 1024) { setError('File size must be under 10MB'); return; }
+    if (file.type !== 'application/pdf') { setError(t('docs.onlyPdf')); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(t('docs.under10mb')); return; }
     setSelectedFile(file);
     setSelectedExistingContract(null);
     if (!title) setTitle(file.name.replace(/\.pdf$/i, ''));
@@ -66,7 +68,7 @@ const AddContractModal = ({
     setError('');
 
     if (!selectedExistingContract && !selectedFile) {
-      setError('Pick a contract from your library or upload a new PDF');
+      setError(t('docs.pickOrUpload'));
       return;
     }
     if (selectedFile && !title.trim()) {
@@ -171,7 +173,7 @@ const AddContractModal = ({
 
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '10px', fontSize: '13px', fontWeight: '600', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {existingContracts.length > 0 ? 'Or upload a new PDF' : 'Upload a PDF'}
+                {existingContracts.length > 0 ? t('docs.orUploadNew') : t('docs.uploadAPdf')}
               </label>
 
               {selectedFile && (
@@ -226,12 +228,12 @@ const AddContractModal = ({
                       <polyline points="17 8 12 3 7 8"></polyline>
                       <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    <p style={{ fontSize: '13px', marginBottom: '8px' }}>Drag and drop your PDF here, or</p>
+                    <p style={{ fontSize: '13px', marginBottom: '8px' }}>{t('docs.dragDrop')}</p>
                     <label style={{ display: 'inline-block', padding: '7px 14px', backgroundColor: '#FF3366', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
                       Browse Files
                       <input type="file" accept="application/pdf" onChange={(e) => e.target.files[0] && handleFileSelect(e.target.files[0])} style={{ display: 'none' }} disabled={isSubmitting} />
                     </label>
-                    <p style={{ fontSize: '11px', color: '#666', marginTop: '10px' }}>PDF only, max 10MB</p>
+                    <p style={{ fontSize: '11px', color: '#666', marginTop: '10px' }}>{t('docs.pdfOnlyMax')}</p>
                   </>
                 )}
               </div>
