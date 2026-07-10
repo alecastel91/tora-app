@@ -3,7 +3,6 @@ import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
-import RAEventsModal from '../common/RAEventsModal';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, SearchIcon, LocationIcon, GlobeIcon, LinkIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import EditProfileScreen from './EditProfileScreen';
@@ -19,6 +18,7 @@ import { downscaleImageToDataUrl } from '../../utils/image';
 import { getAvatarClass, roleLabel } from '../../utils/roles';
 import VerifiedBadge from '../common/VerifiedBadge';
 import VerificationModal from '../common/VerificationModal';
+import { raProfileUrl } from '../../utils/urls';
 
 // --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
 const GridIcon = () => (
@@ -78,7 +78,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const [showLikersList, setShowLikersList] = useState(false);
   const [showConnectionsList, setShowConnectionsList] = useState(false);
   const [showAllGenres, setShowAllGenres] = useState(false);
-  const [showRAEvents, setShowRAEvents] = useState(false);
   const [showProfileSwitcher, setShowProfileSwitcher] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   // Action-required dots next to Manage CTAs. `ownHasActions` is true when
@@ -686,28 +685,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           </div>
         )}
 
-        {user?.residentAdvisor && (
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">Events</h4>
-            <button
-              onClick={() => setShowRAEvents(true)}
-              className="w-full px-4 py-3 rounded-lg bg-infrared/10 border border-infrared/30 text-infrared text-sm font-semibold uppercase tracking-wider hover:bg-infrared/15 transition-colors mb-3"
-            >
-              {t('profile.viewUpcomingEvents')}
-            </button>
-            <a
-              href={user.residentAdvisor.startsWith('http')
-                ? user.residentAdvisor
-                : `https://ra.co/dj/${user.residentAdvisor.toLowerCase().replace(/\s+\(([^)]+)\)/g, '-$1').replace(/\s+/g, '').replace(/--+/g, '-').replace(/^-|-$/g, '')}`
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center text-xs text-white/50 hover:text-infrared transition-colors"
-            >
-              View Full RA Profile →
-            </a>
-          </div>
-        )}
       </div>
 
       {/* ===== Links ===== */}
@@ -739,6 +716,21 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 <InstagramGlyph />
               </span>
               <span className="flex-1 text-sm font-medium text-white">Instagram</span>
+              <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
+            </a>
+          )}
+
+          {user?.residentAdvisor && (
+            <a
+              href={raProfileUrl(user.residentAdvisor)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors"
+            >
+              <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[10px] font-bold font-tech">
+                RA
+              </span>
+              <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
               <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
             </a>
           )}
@@ -955,12 +947,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       )}
 
       {/* RA Events Modal */}
-      <RAEventsModal
-        isOpen={showRAEvents}
-        onClose={() => setShowRAEvents(false)}
-        artistName={user?.name}
-        raUrl={user?.residentAdvisor}
-      />
 
       {/* Delete Profile Confirmation Modal */}
       {profileToDelete && (

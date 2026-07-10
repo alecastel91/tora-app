@@ -56,3 +56,19 @@ export function buildPaymentProofUrl(dealId, profileId, type, index = null) {
   const idx = index !== null && index !== undefined ? `&index=${index}` : '';
   return `${backendBaseUrl()}/api/deals/${dealId}/payment-proof?type=${type}&profileId=${profileId}&token=${localStorage.getItem('token')}${idx}`;
 }
+
+/**
+ * Resolve a stored Resident Advisor value (full URL or artist name) to the
+ * public RA profile URL. Name form: "DNG (1)" -> https://ra.co/dj/dng-1.
+ */
+export function raProfileUrl(residentAdvisor) {
+  if (!residentAdvisor) return null;
+  if (residentAdvisor.startsWith('http')) return residentAdvisor;
+  const slug = residentAdvisor
+    .toLowerCase()
+    .replace(/\s+\(([^)]+)\)/g, '-$1')
+    .replace(/\s+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-|-$/g, '');
+  return `https://ra.co/dj/${slug}`;
+}

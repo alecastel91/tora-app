@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
-import RAEventsModal from '../common/RAEventsModal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel } from '../../utils/roles';
+import { raProfileUrl } from '../../utils/urls';
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { t } = useLanguage();
@@ -29,7 +29,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [message, setMessage] = useState('');
-  const [showRAEvents, setShowRAEvents] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [showConnectionChoice, setShowConnectionChoice] = useState(false);
   const [showLikeLimitModal, setShowLikeLimitModal] = useState(false);
@@ -377,29 +376,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </div>
           )}
           
-          {profile.residentAdvisor && (
-            <div className="embed-card ra-card">
-              <h4>{t('viewProfile.events')}</h4>
-              <button 
-                className="ra-events-button"
-                onClick={() => setShowRAEvents(true)}
-              >
-                <span className="ra-icon">📅</span>
-                <span>{t('profile.viewUpcomingEvents')}</span>
-              </button>
-              <a
-                href={profile.residentAdvisor.startsWith('http')
-                  ? profile.residentAdvisor
-                  : `https://ra.co/dj/${profile.residentAdvisor.toLowerCase().replace(/\s+\(([^)]+)\)/g, '-$1').replace(/\s+/g, '').replace(/--+/g, '-').replace(/^-|-$/g, '')}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ra-profile-link"
-              >
-                View Full RA Profile →
-              </a>
-            </div>
-          )}
         </div>
 
         {/* Social CTAs */}
@@ -412,6 +388,16 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               className="btn btn-outline btn-social"
             >
               <span>Instagram</span>
+            </a>
+          )}
+          {profile.residentAdvisor && (
+            <a
+              href={raProfileUrl(profile.residentAdvisor)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline btn-social"
+            >
+              <span>RA</span>
             </a>
           )}
           {profile.website && (
@@ -531,12 +517,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </div>
           </div>
         )}
-        
-      {/* RA Events Modal */}
-      {showRAEvents && (
-        <RAEventsModal
-          isOpen={showRAEvents}
-          onClose={() => setShowRAEvents(false)}
           artistName={profile.name}
         />
       )}

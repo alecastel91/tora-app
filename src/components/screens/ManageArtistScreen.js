@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, BriefcaseIcon, PlaneIcon, ListIcon, EditIcon, TrashIcon, ImageIcon, SlidersIcon, FileTextIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
-import RAEventsModal from '../common/RAEventsModal';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
@@ -11,6 +10,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 import { appAlert, appConfirm } from '../../utils/dialogs';
+import { raProfileUrl } from '../../utils/urls';
 
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -47,7 +47,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const [scheduleToDelete, setScheduleToDelete] = useState(null);
 
   // RA Events modal state
-  const [showRAEvents, setShowRAEvents] = useState(false);
 
   // Artist info editing state (full profile edit)
   const [showArtistInfoModal, setShowArtistInfoModal] = useState(false);
@@ -1943,44 +1942,15 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         {/* Events Section - RA Link */}
         {artistProfile?.role === 'ARTIST' && artistProfile?.residentAdvisor && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
-            <h3 style={{
-              color: '#ff3366',
-              fontSize: '12px',
-              fontWeight: '600',
-              letterSpacing: '1px',
-              marginBottom: '12px',
-              textTransform: 'uppercase'
-            }}>
-              {t('manageArtist.eventsHeading')}
-            </h3>
-            <button
-              className="btn btn-outline"
-              onClick={() => setShowRAEvents(true)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <span>{t('manageArtist.viewUpcomingEvents')}</span>
-            </button>
             <a
-              href={artistProfile.residentAdvisor}
+              href={raProfileUrl(artistProfile.residentAdvisor)}
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                display: 'block',
-                marginTop: '16px',
-                textAlign: 'center',
-                color: '#888',
-                fontSize: '14px',
-                textDecoration: 'none'
-              }}
+              className="btn btn-outline"
+              style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none' }}
             >
-              {t('manageArtist.viewFullRaProfile')}
+              <span style={{ fontSize: '10px', fontWeight: 700 }}>RA</span>
+              <span>{t('manageArtist.viewFullRaProfile')}</span>
             </a>
           </div>
         )}
@@ -2839,12 +2809,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       </Modal>
 
       {/* RA Events Modal */}
-      <RAEventsModal
-        isOpen={showRAEvents}
-        onClose={() => setShowRAEvents(false)}
-        artistName={artistProfile?.name}
-        raUrl={artistProfile?.residentAdvisor}
-      />
 
       {/* Add/Edit Document Modal */}
       <AddContractModal
