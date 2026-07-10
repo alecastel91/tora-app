@@ -1,4 +1,27 @@
 const en = {
+  roster: {
+    title: 'Represented Artists',
+    failedToRemove: 'Failed to remove artist. Please try again.',
+    failedToLoadProfile: 'Failed to load artist profile',
+    removeConfirm: 'Remove {{name}} from your represented artists?',
+    loadingProfile: 'Loading profile...',
+    limitReachedTitle: 'Roster limit reached — upgrade to add more',
+    addArtist: 'Add artist',
+    roster: 'Roster',
+    choosePlan: 'Choose plan',
+    upgrade: 'Upgrade',
+    pickPlanSuffix: 'pick a plan to start representing artists',
+    upgradeSuffix: 'upgrade to add more',
+    pickPlanToStart: 'Pick a plan to start',
+    noArtistsYet: 'No Artists Yet',
+    agentPlansIntro: 'Agent plans let you build a roster and act on artists\' behalf. Solo starts at €19.90/month.',
+    startBuilding: 'Start building your roster by adding artists you represent.',
+    seePlans: 'See plans',
+    addFirstArtist: 'Add First Artist',
+    view: 'View',
+    manage: 'Manage',
+  },
+
   auth: {
     loginFailed: 'Login failed. Please try again.',
     email: 'Email',

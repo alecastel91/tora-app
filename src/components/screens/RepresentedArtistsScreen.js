@@ -9,8 +9,10 @@ import { dummyProfiles } from '../../data/profiles';
 import apiService from '../../services/api';
 import { rosterUsage } from '../../utils/agentTiers';
 import LoadingGlobe from '../common/LoadingGlobe';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
+  const { t } = useLanguage();
   const { user, reloadProfileData } = useAppContext();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [viewingProfile, setViewingProfile] = useState(null);
@@ -53,7 +55,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const handleRemoveArtist = async (artist) => {
     const artistId = artist.profileId || artist.id;
     const displayName = artist.name || 'this artist';
-    if (!window.confirm(`Remove ${displayName} from your represented artists?`)) return;
+    if (!window.confirm(t('roster.removeConfirm', { name: displayName }))) return;
 
     setRemovingArtistId(artistId);
     try {
@@ -61,7 +63,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       await reloadProfileData();
     } catch (error) {
       console.error('Error removing artist:', error);
-      alert('Failed to remove artist. Please try again.');
+      alert(t('roster.failedToRemove'));
     } finally {
       setRemovingArtistId(null);
     }
@@ -103,7 +105,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         setViewingProfile(artistId);
       } catch (error) {
         console.error('Error fetching artist profile:', error);
-        alert('Failed to load artist profile');
+        alert(t('roster.failedToLoadProfile'));
       } finally {
         setLoading(false);
       }
@@ -158,9 +160,9 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
           <button className="back-btn" onClick={onClose}>
             <CloseIcon />
           </button>
-          <h1>Represented Artists</h1>
+          <h1>{t('roster.title')}</h1>
         </div>
-        <LoadingGlobe label="Loading profile..." className="h-[60vh]" />
+        <LoadingGlobe label={t('roster.loadingProfile')} className="h-[60vh]" />
       </div>
     );
   }
@@ -171,11 +173,11 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />
         </button>
-        <h1>Represented Artists</h1>
+        <h1>{t('roster.title')}</h1>
         <button
           className="add-artist-btn"
           onClick={() => usage.atLimit ? setShowUpgradeModal(true) : setShowSearchModal(true)}
-          title={usage.atLimit ? 'Roster limit reached — upgrade to add more' : 'Add artist'}
+          title={usage.atLimit ? t('roster.limitReachedTitle') : t('roster.addArtist')}
           style={usage.atLimit ? { opacity: 0.5 } : undefined}
         >
           <AddIcon />
@@ -187,13 +189,13 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                         ${usage.atLimit ? 'border-infrared/30 bg-infrared/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
           <div className="min-w-0 flex items-baseline gap-2">
             <span className={`text-[9px] font-semibold uppercase tracking-[0.2em] font-tech
-                             ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>Roster</span>
+                             ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>{t('roster.roster')}</span>
             <span className={`text-sm font-medium ${usage.atLimit ? 'text-infrared' : 'text-white'}`}>
               {usage.current}/{usage.cap}
               <span className={`font-normal ${usage.atLimit ? 'text-infrared/80' : 'text-white/50'}`}>
                 {usage.atLimit && (usage.cap === 0
-                  ? ' — pick a plan to start representing artists'
-                  : ' — upgrade to add more')}
+                  ? ' — ' + t('roster.pickPlanSuffix')
+                  : ' — ' + t('roster.upgradeSuffix'))}
               </span>
             </span>
           </div>
@@ -202,7 +204,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
             onClick={() => setShowUpgradeModal(true)}
             className="btn btn-outline btn-sm shrink-0"
           >
-            {usage.cap === 0 ? 'Choose plan' : 'Upgrade'}
+            {usage.cap === 0 ? t('roster.choosePlan') : t('roster.upgrade')}
           </button>
         </div>
       )}
@@ -230,14 +232,14 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                     className="btn btn-outline btn-sm"
                     onClick={() => handleViewProfile(artist)}
                   >
-                    View
+                    {t('roster.view')}
                   </button>
                   <button
                     className="btn btn-primary btn-sm"
                     onClick={() => handleManageArtist(artist)}
                     style={{ position: 'relative' }}
                   >
-                    Manage
+                    {t('roster.manage')}
                     {artistActionsMap[artist.profileId || artist.id] && (
                       <span
                         aria-label="Actions required"
@@ -275,17 +277,17 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                 <circle cx="18" cy="16" r="3" />
               </svg>
             </div>
-            <h2>{usage.cap === 0 ? 'Pick a plan to start' : 'No Artists Yet'}</h2>
+            <h2>{usage.cap === 0 ? t('roster.pickPlanToStart') : t('roster.noArtistsYet')}</h2>
             <p>
               {usage.cap === 0
-                ? "Agent plans let you build a roster and act on artists' behalf. Solo starts at €19.90/month."
-                : 'Start building your roster by adding artists you represent.'}
+                ? t('roster.agentPlansIntro')
+                : t('roster.startBuilding')}
             </p>
             <button
               className="btn btn-primary"
               onClick={() => usage.cap === 0 ? setShowUpgradeModal(true) : setShowSearchModal(true)}
             >
-              {usage.cap === 0 ? 'See plans' : <><AddIcon /> Add First Artist</>}
+              {usage.cap === 0 ? t('roster.seePlans') : <><AddIcon /> {t('roster.addFirstArtist')}</>}
             </button>
           </div>
         )}
