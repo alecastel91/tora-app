@@ -369,7 +369,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       const endDate = new Date(scheduleForm.endDate);
 
       if (endDate < startDate) {
-        alert('End date cannot be before start date. Please adjust your dates.');
+        alert(t('calendar.endBeforeStart'));
         return;
       }
 
@@ -389,7 +389,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       });
 
       if (hasOverlap) {
-        alert('This travel schedule overlaps with an existing schedule. Please choose different dates.');
+        alert(t('calendar.scheduleOverlap'));
         return;
       }
 
@@ -455,7 +455,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
         console.error('Failed to save schedule:', error);
         // Revert local state on error
         setSchedules(schedules);
-        alert('Failed to save schedule. Please try again.');
+        alert(t('calendar.saveScheduleFailed'));
       }
     }
   };
@@ -529,7 +529,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       setScheduleToDelete(null);
     } catch (error) {
       console.error('Failed to remove schedule:', error);
-      alert('Failed to remove schedule. Please try again.');
+      alert(t('calendar.removeScheduleFailed'));
       setShowDeleteConfirmation(false);
       setScheduleToDelete(null);
     }
@@ -574,7 +574,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
     }
 
     // Return all parts joined with commas, or fallback
-    return parts.length > 0 ? parts.join(', ') : 'No location';
+    return parts.length > 0 ? parts.join(', ') : t('calendar.noLocation');
   };
 
   const formatDate = (dateString) => {
@@ -588,10 +588,10 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
 
   const getLookingForLabel = (schedule) => {
     const looking = [];
-    if (schedule.lookingFor?.promoter) looking.push('Promoters');
-    if (schedule.lookingFor?.venue) looking.push('Venues');
-    if (schedule.lookingFor?.artist) looking.push('Artists');
-    return looking.length > 0 ? looking.join(', ') : 'Not specified';
+    if (schedule.lookingFor?.promoter) looking.push(t('tour.promoters'));
+    if (schedule.lookingFor?.venue) looking.push(t('tour.venues'));
+    if (schedule.lookingFor?.artist) looking.push(t('tour.artists'));
+    return looking.length > 0 ? looking.join(', ') : t('calendar.notSpecified');
   };
 
   const isDateInSchedule = (day) => {
@@ -772,7 +772,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
           <button className="back-btn" onClick={handleClose}>
             <CloseIcon />
           </button>
-          <h1>{t('calendar.title') || 'Calendar & Schedule'}</h1>
+          <h1>{t('calendar.title')}</h1>
           <div style={{ width: '40px' }}></div>
         </div>
       )}
@@ -810,11 +810,11 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                 <div className="calendar-legend">
                   <div className="legend-item">
                     <span className="legend-dot available"></span>
-                    <span>Available</span>
+                    <span>{t('calendar.available')}</span>
                   </div>
                   <div className="legend-item">
                     <span className="legend-dot has-location"></span>
-                    <span>Scheduled</span>
+                    <span>{t('calendar.scheduled')}</span>
                   </div>
                 </div>
               </div>
@@ -827,7 +827,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
               </div>
               {upcomingEvents.length === 0 ? (
                 <div className="no-events-message">
-                  <p>No upcoming events</p>
+                  <p>{t('calendar.noUpcomingEvents')}</p>
                 </div>
               ) : (
                 <div className="bookings-list">
@@ -973,11 +973,11 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                 <div className="calendar-legend">
                   <div className="legend-item">
                     <span className="legend-dot available"></span>
-                    <span>Available</span>
+                    <span>{t('calendar.available')}</span>
                   </div>
                   <div className="legend-item">
                     <span className="legend-dot has-location"></span>
-                    <span>Scheduled</span>
+                    <span>{t('calendar.scheduled')}</span>
                   </div>
                 </div>
               </div>
@@ -985,7 +985,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
               {/* Travel Schedules inside Calendar View section */}
               <div className="travel-schedules-section">
                 <div className="travel-schedules-header">
-                  <h3>Travel Schedules</h3>
+                  <h3>{t('calendar.travelSchedules')}</h3>
                   <button className="btn btn-primary btn-sm" onClick={openNewScheduleModal}>
                     Add Schedule
                   </button>
@@ -993,7 +993,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
 
                 {schedules.length === 0 ? (
               <div className="no-schedules">
-                <p>No schedules added yet</p>
+                <p>{t('calendar.noSchedulesYet')}</p>
                 <button
                   className="add-travel-schedule-btn"
                   onClick={openNewScheduleModal}
@@ -1038,11 +1038,11 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       <Modal
         isOpen={showLocationModal}
         onClose={() => setShowLocationModal(false)}
-        title={editingScheduleId ? 'Edit Schedule' : 'Add Schedule'}
+        title={editingScheduleId ? t('calendar.editSchedule') : t('calendar.addSchedule')}
       >
         <div className="schedule-form">
           <div className="form-group">
-            <label>Zone</label>
+            <label>{t('calendar.zone')}</label>
             <select
               value={scheduleForm.zone}
               onChange={(e) => {
@@ -1054,7 +1054,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                 });
               }}
             >
-              <option value="">Select Zone</option>
+              <option value="">{t('editProfile.selectZone')}</option>
               {zones.map(zone => (
                 <option key={zone} value={zone}>{zone}</option>
               ))}
@@ -1063,7 +1063,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
 
           {scheduleForm.zone && (
             <div className="form-group">
-              <label>Country</label>
+              <label>{t('calendar.country')}</label>
               <select
                 value={scheduleForm.country}
                 onChange={(e) => {
@@ -1074,7 +1074,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                   });
                 }}
               >
-                <option value="">Select Country</option>
+                <option value="">{t('editProfile.selectCountry')}</option>
                 {countriesByZone[scheduleForm.zone]?.map(country => (
                   <option key={country} value={country}>{country}</option>
                 ))}
@@ -1084,7 +1084,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
 
           {scheduleForm.country && (
             <div className="form-group">
-              <label>City</label>
+              <label>{t('calendar.city')}</label>
               <select
                 value={scheduleForm.city}
                 onChange={(e) => {
@@ -1094,7 +1094,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                   });
                 }}
               >
-                <option value="">Select City</option>
+                <option value="">{t('editProfile.selectCity')}</option>
                 {citiesByCountry[scheduleForm.country]?.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
@@ -1104,7 +1104,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Start Date</label>
+              <label>{t('calendar.startDate')}</label>
               <input
                 type="date"
                 value={scheduleForm.startDate}
@@ -1112,7 +1112,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
               />
             </div>
             <div className="form-group">
-              <label>End Date</label>
+              <label>{t('calendar.endDate')}</label>
               <input
                 type="date"
                 value={scheduleForm.endDate}
@@ -1124,7 +1124,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
           {/* What are you looking for section */}
           {availableOptions.length > 0 && (
             <div className="looking-for-section">
-              <h4>What are you looking for?</h4>
+              <h4>{t('calendar.lookingFor')}</h4>
               <div className="looking-for-options">
                 {availableOptions.includes('promoter') && (
                   <label className="looking-for-option">
@@ -1139,7 +1139,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                         }
                       })}
                     />
-                    <span>Promoters</span>
+                    <span>{t('tour.promoters')}</span>
                   </label>
                 )}
                 {availableOptions.includes('venue') && (
@@ -1155,7 +1155,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                         }
                       })}
                     />
-                    <span>Venues</span>
+                    <span>{t('tour.venues')}</span>
                   </label>
                 )}
                 {availableOptions.includes('artist') && (
@@ -1171,7 +1171,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                         }
                       })}
                     />
-                    <span>Artists</span>
+                    <span>{t('tour.artists')}</span>
                   </label>
                 )}
               </div>
@@ -1189,7 +1189,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
               className="btn btn-primary"
               onClick={handleSaveSchedule}
             >
-              {editingScheduleId ? 'Update' : 'Save'} Schedule
+              {editingScheduleId ? t('calendar.updateSchedule') : t('calendar.saveSchedule')}
             </button>
           </div>
         </div>
@@ -1199,10 +1199,10 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       <Modal
         isOpen={showDeleteConfirmation}
         onClose={cancelDeleteSchedule}
-        title="Delete Travel Schedule"
+        title={t('calendar.deleteScheduleTitle')}
       >
         <div className="delete-confirmation">
-          <p>Are you sure you want to delete this travel schedule?</p>
+          <p>{t('calendar.deleteScheduleConfirm')}</p>
           <div className="form-actions">
             <button
               className="btn btn-secondary"

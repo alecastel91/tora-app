@@ -520,6 +520,23 @@ const en = {
   
   // Calendar
   calendar: {
+    endBeforeStart: 'End date cannot be before start date. Please adjust your dates.',
+    scheduleOverlap: 'This travel schedule overlaps with an existing schedule. Please choose different dates.',
+    saveScheduleFailed: 'Failed to save schedule. Please try again.',
+    removeScheduleFailed: 'Failed to remove schedule. Please try again.',
+    noLocation: 'No location',
+    notSpecified: 'Not specified',
+    noUpcomingEvents: 'No upcoming events',
+    travelSchedules: 'Travel Schedules',
+    noSchedulesYet: 'No schedules added yet',
+    editSchedule: 'Edit Schedule',
+    addSchedule: 'Add Schedule',
+    lookingFor: 'What are you looking for?',
+    updateSchedule: 'Update Schedule',
+    saveSchedule: 'Save Schedule',
+    deleteScheduleTitle: 'Delete Travel Schedule',
+    deleteScheduleConfirm: 'Are you sure you want to delete this travel schedule?',
+    scheduled: 'Scheduled',
     title: 'Calendar',
     addTravel: 'ADD TRAVEL SCHEDULE',
     travelSchedule: 'Travel Schedule',
