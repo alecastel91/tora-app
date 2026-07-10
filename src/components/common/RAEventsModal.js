@@ -43,7 +43,7 @@ const RAEventsModal = ({ isOpen, onClose, artistName }) => {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-    const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+    const month = date.toLocaleDateString(t('dateFormat.locale'), { month: 'short' }).toUpperCase();
     const day = date.getDate();
     return { month, day };
   };

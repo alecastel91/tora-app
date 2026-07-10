@@ -1812,7 +1812,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 <div className="offer-detail-row">
                   <span className="detail-label">{t('chat.dateLabel')}</span>
                   <span className="detail-value">
-                    {new Date(selectedOffer.date).toLocaleDateString('en-US', {
+                    {new Date(selectedOffer.date).toLocaleDateString(t('dateFormat.locale'), {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric'

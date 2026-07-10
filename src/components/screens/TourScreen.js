@@ -16,6 +16,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Helper function to check if user has premium access (per-profile subscription)
   const isPremiumUser = () => {
+    // Agents unlock via their agent plan (roster-based), not subscriptionTier.
+    if (user?.role === 'AGENT') return !!user?.agentTier;
     const tier = user?.subscriptionTier || 'FREE';
     return ['TRIAL', 'MONTHLY', 'YEARLY'].includes(tier);
   };
@@ -43,6 +45,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showGenreDropdown, setShowGenreDropdown] = useState(false);
   const [showZoneDropdown, setShowZoneDropdown] = useState(false);
   const [tourForm, setTourForm] = useState({
+    artistId: '', // agents create tours on behalf of a represented artist
     zone: '',
     country: '', // Optional - if selected, tour is country-specific
     startDate: '',
@@ -170,7 +173,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       console.log('[TourScreen] Fetching tours, user role:', user.role);
 
       try {
-        const isArtist = user.role === 'ARTIST';
+        const isArtist = user.role === 'ARTIST' || user.role === 'AGENT';
         const isPromoterOrVenue = user.role === 'PROMOTER' || user.role === 'VENUE';
 
         if (isArtist) {
@@ -593,6 +596,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const handleCreateTour = async () => {
     if (tourBusy) return;
     // Validation
+    if (user?.role === 'AGENT' && !tourForm.artistId) {
+      alert(t('offer.selectArtistError'));
+      return;
+    }
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
       alert(t('tour.fillRequiredFields'));
       return;
@@ -625,6 +632,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         feeExpectation: feeExpectation,
         additionalNotes: tourForm.additionalNotes
       };
+      if (user?.role === 'AGENT' && tourForm.artistId) {
+        tourData.artistId = tourForm.artistId;
+      }
 
       const response = await apiService.createTour(tourData);
 
@@ -634,6 +644,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
         // Reset form and close modal
         setTourForm({
+          artistId: '',
           zone: '',
           country: '',
           startDate: '',
@@ -835,6 +846,25 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             <button className="modal-close" onClick={() => setShowCreateTourModal(false)}>×</button>
           </div>
           <div className="modal-body">
+            {user?.role === 'AGENT' && (
+              <div className="form-group">
+                <label>{t('manageArtist.artist')} *</label>
+                <select
+                  value={tourForm.artistId}
+                  onChange={(e) => setTourForm({ ...tourForm, artistId: e.target.value })}
+                  className="form-input"
+                >
+                  <option value="">{t('offer.selectAnArtist')}</option>
+                  {(user?.representingArtists || [])
+                    .filter((a) => a.profileId || a.id)
+                    .map((a) => (
+                      <option key={a.profileId || a.id} value={a.profileId || a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
             <div className="form-group">
               <label>{t('calendar.zone')} *</label>
               <select
@@ -1238,11 +1268,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       );
     }
 
-    // Check user role
-    const isArtist = user?.role === 'ARTIST';
+    // Check user role — agents get the artist view, acting for their roster.
+    const isArtist = user?.role === 'ARTIST' || user?.role === 'AGENT';
     const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
 
-    // ARTISTS: Create and manage tours
+    // ARTISTS + AGENTS: Create and manage tours
     if (isArtist) {
       return (
         <div className="tour-kickstart-content">
@@ -1283,10 +1313,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         <h4 className="text-[17px] font-semibold text-white font-space-grotesk tracking-[-0.01em] m-0 truncate">
                           {t('tour.tourTitle', { location: tour.country || tour.zone })}
                         </h4>
+                        {user?.role === 'AGENT' && tour.artist?.name && (
+                          <p className="text-[11px] text-infrared/90 font-tech mt-1 m-0 truncate">
+                            {tour.artist.name}
+                          </p>
+                        )}
                         <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          {new Date(tour.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {new Date(tour.startDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric' })}
                           {' — '}
-                          {new Date(tour.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          {new Date(tour.endDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
                           {tour.zone && tour.country ? ` · ${tour.zone}` : ''}
                         </p>
                       </div>
@@ -1578,7 +1613,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     <div className="tour-dates-section">
                       <CalendarIcon />
                       <span>
-                        {new Date(tour.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(tour.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(tour.startDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric' })} - {new Date(tour.endDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                     </div>
                     <div className="tour-card-body">
@@ -1789,7 +1824,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   {t('tour.tourTitle', { location: myProposalData.tour?.zone })}
                 </h3>
                 <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
-                  {new Date(myProposalData.tour?.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(myProposalData.tour?.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {new Date(myProposalData.tour?.startDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric' })} - {new Date(myProposalData.tour?.endDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
 
@@ -1930,7 +1965,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         <div>
                           <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>{t('tour.date')}</p>
                           <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)' }}>
-                            {new Date(deal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            {new Date(deal.date).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
                         <div>

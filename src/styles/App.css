@@ -12402,6 +12402,16 @@ textarea.form-textarea:focus {
   padding: 0 !important;
 }
 
+/* The restyle's relative/isolate wrapper sits between .tour-screen (fixed
+   height, overflow hidden) and .tour-tab-content; it must join the flex chain
+   or the scroll container never gets a height limit and wheel scroll dies. */
+.tour-screen.screen.active > .relative.isolate {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .tour-tab-content {
   flex: 1;
   overflow-y: scroll;
