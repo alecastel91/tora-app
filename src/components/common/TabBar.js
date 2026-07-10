@@ -9,7 +9,7 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
   const tabs = [
     { id: 'profile', icon: ProfileIcon, label: t('nav.profile') },
     { id: 'search', icon: SearchIcon, label: t('nav.search') },
-    { id: 'tour', icon: PlaneIcon, label: 'Tour' },
+    { id: 'tour', icon: PlaneIcon, label: t('nav.tour') },
     { id: 'bookings', icon: BookingsIcon, label: t('nav.bookings') },
     { id: 'messages', icon: MessageIcon, label: t('nav.messages') }
   ];

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // Verified identity seal. Tap opens the explainer with the deliberately
 // modest claim: we verified Instagram control, nothing more.
 const VerifiedBadge = ({ size = 16, className = '' }) => {
+  const { t } = useLanguage();
   const [showExplainer, setShowExplainer] = useState(false);
 
   return (
     <>
       <button
         type="button"
-        aria-label="Verified profile — tap for details"
+        aria-label={t('verify.badgeAria')}
         onClick={(e) => { e.stopPropagation(); setShowExplainer(true); }}
         className={`inline-flex items-center justify-center align-middle bg-transparent border-none p-0 cursor-pointer text-infrared ${className}`}
       >
@@ -35,19 +37,17 @@ const VerifiedBadge = ({ size = 16, className = '' }) => {
                   <path d="M9 12.2l2.1 2.1 4-4.4" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              <h3 className="m-0 text-[15px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em]">Verified</h3>
+              <h3 className="m-0 text-[15px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em]">{t('verify.badgeTitle')}</h3>
             </div>
             <p className="m-0 text-sm leading-relaxed text-white/70">
-              This member confirmed control of their official Instagram account.
-              It doesn't mean TORA endorses them or vouches for their
-              professional standing.
+              {t('verify.badgeExplainer')}
             </p>
             <button
               type="button"
               className="btn btn-outline w-full mt-4"
               onClick={() => setShowExplainer(false)}
             >
-              Got it
+              {t('verify.gotIt')}
             </button>
           </div>
         </div>,

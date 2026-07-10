@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 
 /**
@@ -9,6 +10,7 @@ import apiService from '../../services/api';
  * interceptor fires `tora:verification-required` → App.js opens this).
  */
 const VerificationModal = ({ onClose, contextMessage }) => {
+  const { t } = useLanguage();
   const { user, reloadProfileData } = useAppContext();
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState(user?.verifyCode || null);
@@ -58,7 +60,7 @@ const VerificationModal = ({ onClose, contextMessage }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="m-0 text-[15px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em] text-center">
-          Verify your identity
+          {t('verify.verifyTitle')}
         </h3>
 
         {contextMessage && (
@@ -68,26 +70,23 @@ const VerificationModal = ({ onClose, contextMessage }) => {
         {!user?.instagram?.trim() && status !== 'PENDING_REVIEW' ? (
           <div className="mt-5 text-center">
             <p className="text-sm leading-relaxed text-white/70 m-0">
-              Verification confirms you control the Instagram account on your
-              profile — add your Instagram handle in Edit Profile first, then
-              come back here.
+              {t('verify.addInstagramFirst')}
             </p>
-            <button type="button" className="btn btn-outline w-full mt-5" onClick={onClose}>Close</button>
+            <button type="button" className="btn btn-outline w-full mt-5" onClick={onClose}>{t('common.close')}</button>
           </div>
         ) : status === 'PENDING_REVIEW' ? (
           <div className="mt-5 text-center">
             <p className="text-sm leading-relaxed text-white/70 m-0">
-              Thanks — we're checking your DM. Your badge appears as soon as
-              the code is matched.
+              {t('verify.inReviewLong')}
             </p>
-            <button type="button" className="btn btn-outline w-full mt-5" onClick={onClose}>Close</button>
+            <button type="button" className="btn btn-outline w-full mt-5" onClick={onClose}>{t('common.close')}</button>
           </div>
         ) : (
           <div className="mt-5">
             <ol className="m-0 pl-5 text-sm leading-relaxed text-white/70 flex flex-col gap-2">
-              <li>Get your one-time code below.</li>
+              <li>{t('verify.step1')}</li>
               <li>
-                Open Instagram from the account on your profile and DM the code to{' '}
+                {t('verify.step2Before')}{' '}
                 <a
                   href="https://instagram.com/tora.verify"
                   target="_blank"
@@ -95,7 +94,7 @@ const VerificationModal = ({ onClose, contextMessage }) => {
                   className="text-infrared no-underline hover:underline"
                 >@tora.verify</a>.
               </li>
-              <li>Come back and tap "I've sent it".</li>
+              <li>{t('verify.step3')}</li>
             </ol>
 
             {code ? (
@@ -103,26 +102,26 @@ const VerificationModal = ({ onClose, contextMessage }) => {
                 type="button"
                 onClick={copyCode}
                 className="w-full mt-5 rounded-2xl border border-white/15 bg-black/40 py-4 text-center cursor-pointer"
-                title="Tap to copy"
+                title={t('verify.tapToCopy')}
               >
                 <span className="block text-2xl font-semibold text-white font-space-grotesk tracking-[0.15em]">{code}</span>
                 <span className="block text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1 font-tech">
-                  {copied ? 'Copied' : 'Tap to copy'}
+                  {copied ? t('verify.copied') : t('verify.tapToCopy')}
                 </span>
               </button>
             ) : (
               <button type="button" className="btn btn-primary w-full mt-5" disabled={busy} onClick={issue}>
-                {busy ? '...' : 'Get my code'}
+                {busy ? '...' : t('verify.getMyCode')}
               </button>
             )}
 
             {code && (
               <div className="flex gap-2.5 mt-4">
                 <button type="button" className="btn btn-outline flex-1" disabled={busy} onClick={issue}>
-                  New code
+                  {t('verify.newCode')}
                 </button>
                 <button type="button" className="btn btn-primary flex-1" disabled={busy} onClick={markSent}>
-                  I've sent it
+                  {t('verify.iveSentIt')}
                 </button>
               </div>
             )}
@@ -132,7 +131,7 @@ const VerificationModal = ({ onClose, contextMessage }) => {
               className="block w-full mt-4 bg-transparent border-none text-white/40 text-xs cursor-pointer hover:text-white/60"
               onClick={onClose}
             >
-              Not now
+              {t('verify.notNow')}
             </button>
           </div>
         )}

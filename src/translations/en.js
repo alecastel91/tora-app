@@ -202,6 +202,21 @@ const en = {
   },
 
   verify: {
+    badgeAria: 'Verified profile — tap for details',
+    badgeTitle: 'Verified',
+    badgeExplainer: 'This member confirmed control of their official Instagram account. It doesn\'t mean TORA endorses them or vouches for their professional standing.',
+    gotIt: 'Got it',
+    addInstagramFirst: 'Verification confirms you control the Instagram account on your profile — add your Instagram handle in Edit Profile first, then come back here.',
+    inReviewLong: 'Thanks — we\'re checking your DM. Your badge appears as soon as the code is matched.',
+    step1: 'Get your one-time code below.',
+    step2Before: 'Open Instagram from the account on your profile and DM the code to',
+    step3: 'Come back and tap "I\'ve sent it".',
+    tapToCopy: 'Tap to copy',
+    copied: 'Copied',
+    getMyCode: 'Get my code',
+    newCode: 'New code',
+    iveSentIt: 'I\'ve sent it',
+    notNow: 'Not now',
     blockedContext: 'Verify to start booking — this action needs a verified identity.',
     inReviewTitle: 'Verification in review',
     verifyTitle: 'Verify your identity',
@@ -448,6 +463,7 @@ const en = {
 
   // Navigation
   nav: {
+    tour: 'Tour',
     profile: 'Profile',
     search: 'Search',
     matches: 'Matches',
