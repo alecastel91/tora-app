@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
 import RAEventsModal from '../common/RAEventsModal';
@@ -98,7 +99,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           : (artistContext.representedBy ? [artistContext.representedBy] : []);
         targetName = repArray[0]?.name || repArray[0]?.agentName || 'Agent';
       }
-      alert(t('search.connectionRequestSent', { name: targetName }));
+      appAlert(t('search.connectionRequestSent', { name: targetName }));
     } catch (error) {
       console.error('Error sending connection request:', error);
       console.error('Error details:', {
@@ -121,7 +122,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
       // Only show alert for non-limit errors
       console.error('Connection request failed:', error);
-      alert(t('search.failedToSendRequest'));
+      appAlert(t('search.failedToSendRequest'));
     } finally {
       setActionBusy(false);
     }
@@ -151,7 +152,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         setLikeLimitData({ limit, tier });
         setShowLikeLimitModal(true);
       } else {
-        alert(t('search.failedToLike'));
+        appAlert(t('search.failedToLike'));
       }
     }
   };
@@ -159,7 +160,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   const handleSendMessage = async () => {
     if (actionBusy) return;
     if (!message.trim()) {
-      alert(t('search.pleaseWriteMessage'));
+      appAlert(t('search.pleaseWriteMessage'));
       return;
     }
     setActionBusy(true);
@@ -192,7 +193,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       }
 
       // Only show alert for non-limit errors
-      alert(t('search.failedToSendRequest'));
+      appAlert(t('search.failedToSendRequest'));
     } finally {
       setActionBusy(false);
     }
@@ -211,7 +212,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       }
     } catch (error) {
       console.error('Error removing connection:', error);
-      alert(t('viewProfile.failedToRemove'));
+      appAlert(t('viewProfile.failedToRemove'));
     } finally {
       setActionBusy(false);
     }

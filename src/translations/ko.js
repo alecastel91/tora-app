@@ -1308,6 +1308,8 @@ const ko = {
     zoomIn: '확대',
     zoomOut: '축소',
     resetView: '보기 초기화',
+    ok: '확인',
+    confirm: '확인',
   },
 };
 

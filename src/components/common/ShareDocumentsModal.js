@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
 import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
@@ -80,7 +81,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                           disabled={actionBusy}
                           onClick={async () => {
                             if (actionBusy) return;
-                                                        if (!window.confirm(t(status === 'shared' ? 'docs.deleteDocConfirm' : 'docs.unskipDocConfirm', { label: cat.label }))) return;
+                                                        if (!(await appConfirm(t(status === 'shared' ? 'docs.deleteDocConfirm' : 'docs.unskipDocConfirm', { label: cat.label }), { danger: status === 'shared' }))) return;
                             setActionBusy(true);
                             try {
                               await apiService.resetDocument(localDeal.id, currentUser.id, cat.key);
@@ -99,7 +100,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                                 })(),
                               });
                             } catch (err) {
-                              alert(err.message || t('docs.resetFailed'));
+                              appAlert(err.message || t('docs.resetFailed'));
                             } finally {
                               setActionBusy(false);
                             }
@@ -163,7 +164,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                           setLocalDeal(nextDeal);
                           if (onDealUpdated) onDealUpdated(nextDeal);
                         } catch (err) {
-                          alert(err.message || `Failed to share ${cat.label.toLowerCase()}`);
+                          appAlert(err.message || `Failed to share ${cat.label.toLowerCase()}`);
                         } finally {
                           setActionBusy(false);
                         }
@@ -198,7 +199,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                           setLocalDeal(nextDeal);
                           if (onDealUpdated) onDealUpdated(nextDeal);
                         } catch (err) {
-                          alert(err.message || t('docs.shareFailed'));
+                          appAlert(err.message || t('docs.shareFailed'));
                         } finally {
                           setActionBusy(false);
                         }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { genresList, zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { roleLabel } from '../../utils/roles';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -164,83 +165,34 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
           <div style={{ width: '24px' }}></div>
         </div>
         <div className="edit-profile-content">
-          <div style={{ textAlign: 'center', padding: '40px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-            {/* Animated check icon — matching landing page */}
-            <div style={{
-              width: '96px',
-              height: '96px',
-              borderRadius: '50%',
-              background: 'rgba(255, 51, 102, 0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '28px',
-            }}>
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <path
-                  d="M10 24L18 32L38 12"
-                  stroke="#FF3366"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+          <div className="flex flex-col items-center text-center px-5 py-10">
+            {/* Animated check icon */}
+            <div className="w-24 h-24 rounded-full bg-infrared/10 ring-1 ring-infrared/30 flex items-center justify-center mb-7">
+              <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                <path d="M10 24L18 32L38 12" stroke="var(--primary-pink)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
-            {/* Title */}
-            <h2 style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '24px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.15em',
-              marginBottom: '16px',
-              color: '#fff',
-            }}>
+            <h2 className="m-0 mb-3 text-[19px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em]">
               {t('addProfile.applicationSubmitted')}
             </h2>
 
-            {/* Message */}
-            <p style={{
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: '14px',
-              lineHeight: '1.7',
-              marginBottom: '24px',
-              maxWidth: '320px',
-            }}>
-              {t('addProfile.submittedBefore')} <strong style={{ color: '#FF3366' }}>{role}</strong> {t('addProfile.submittedAfter')}
+            <p className="m-0 mb-6 max-w-[320px] text-sm leading-relaxed text-white/60">
+              {t('addProfile.submittedBefore')} <strong className="text-infrared">{roleLabel(role, t)}</strong> {t('addProfile.submittedAfter')}
             </p>
 
             {/* What happens next */}
-            <div style={{
-              borderTop: '1px solid rgba(255,255,255,0.1)',
-              paddingTop: '20px',
-              marginBottom: '32px',
-              width: '100%',
-              maxWidth: '320px',
-            }}>
-              <p style={{
-                color: 'rgba(255,255,255,0.5)',
-                fontSize: '12px',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '12px',
-              }}>
+            <div className="w-full max-w-[340px] rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left mb-8">
+              <p className="m-0 mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 font-tech">
                 {t('addProfile.whatHappensNext')}
               </p>
-              <div style={{ textAlign: 'left', fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)' }}>
-                <p><span style={{ color: '#FF3366', fontWeight: 600 }}>1. {t('addProfile.stepReview')}</span> — {t('addProfile.stepReviewDesc')}</p>
-                <p><span style={{ color: '#FF3366', fontWeight: 600 }}>2. {t('addProfile.stepApproval')}</span> — {t('addProfile.stepApprovalDesc')}</p>
+              <div className="flex flex-col gap-2.5 text-[13px] leading-relaxed text-white/50">
+                <p className="m-0"><span className="text-infrared font-semibold">1. {t('addProfile.stepReview')}</span> — {t('addProfile.stepReviewDesc')}</p>
+                <p className="m-0"><span className="text-infrared font-semibold">2. {t('addProfile.stepApproval')}</span> — {t('addProfile.stepApprovalDesc')}</p>
               </div>
             </div>
 
-            <button
-              className="btn btn-primary"
-              onClick={onClose}
-              style={{ width: '100%', maxWidth: '280px' }}
-            >
+            <button className="btn btn-primary w-full max-w-[280px]" onClick={onClose}>
               {t('common.done')}
             </button>
           </div>
@@ -255,18 +207,30 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       case 1:
         return (
           <div className="form-group">
-            <label style={labelStyle}>{t('addProfile.selectRole')}</label>
-            <div className="role-selector">
-              {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].map(r => (
-                <button
-                  key={r}
-                  type="button"
-                  className={`role-option ${role === r ? 'active' : ''}`}
-                  onClick={() => setRole(r)}
-                >
-                  {r}
-                </button>
-              ))}
+            <label className={labelClass}>{t('addProfile.selectRole')}</label>
+            <div className="grid grid-cols-2 gap-2.5">
+              {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].map(r => {
+                const dot = {
+                  ARTIST: 'bg-role-artist', PROMOTER: 'bg-role-promoter',
+                  VENUE: 'bg-role-venue', AGENT: 'bg-role-agent',
+                }[r];
+                const active = role === r;
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={`flex items-center justify-center gap-2 rounded-2xl border px-3 py-4 min-h-[58px]
+                                text-[11px] font-semibold uppercase tracking-[0.12em] font-tech transition-colors
+                                ${active
+                                  ? 'border-infrared/60 bg-infrared/10 text-white shadow-[0_0_14px_rgba(255,51,102,0.15)]'
+                                  : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/25'}`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+                    {roleLabel(r, t)}
+                  </button>
+                );
+              })}
             </div>
           </div>
         );
@@ -274,7 +238,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       case 2:
         return (
           <div className="form-group">
-            <label style={labelStyle}>
+            <label className={labelClass}>
               {role === 'VENUE' ? t('addProfile.venueName') :
                role === 'PROMOTER' ? t('addProfile.promoterName') :
                role === 'AGENT' ? t('addProfile.agentName') :
@@ -300,7 +264,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         return (
           <>
             <div className="form-group">
-              <label style={labelStyle}>{t('editProfile.zone')}</label>
+              <label className={labelClass}>{t('editProfile.zone')}</label>
               <select
                 className="form-input"
                 value={zone}
@@ -315,7 +279,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {zone && (
               <div className="form-group">
-                <label style={labelStyle}>{t('editProfile.country')}</label>
+                <label className={labelClass}>{t('editProfile.country')}</label>
                 <select
                   className="form-input"
                   value={country}
@@ -331,7 +295,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {country && (
               <div className="form-group">
-                <label style={labelStyle}>{t('editProfile.city')}</label>
+                <label className={labelClass}>{t('editProfile.city')}</label>
                 <select
                   className="form-input"
                   value={showCustomCityInput ? 'Other' : city}
@@ -347,7 +311,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {showCustomCityInput && (
               <div className="form-group">
-                <label style={labelStyle}>{t('editProfile.enterCityName')}</label>
+                <label className={labelClass}>{t('editProfile.enterCityName')}</label>
                 <input
                   type="text"
                   className="form-input"
@@ -363,12 +327,8 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       case 4:
         return (
           <div className="form-group">
-            <label style={labelStyle}>{t('addProfile.selectGenresOptional')}</label>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '8px',
-            }}>
+            <label className={labelClass}>{t('addProfile.selectGenresOptional')}</label>
+            <div className="grid grid-cols-2 gap-2">
               {genresList.map(genre => {
                 const isSelected = genres.includes(genre);
                 return (
@@ -376,19 +336,10 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                     key={genre}
                     type="button"
                     onClick={() => toggleGenre(genre)}
-                    style={{
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      border: isSelected ? '1px solid #FF3366' : '1px solid rgba(255,255,255,0.15)',
-                      background: isSelected ? 'rgba(255,51,102,0.15)' : 'rgba(255,255,255,0.05)',
-                      color: isSelected ? '#FF3366' : 'rgba(255,255,255,0.7)',
-                      fontSize: '13px',
-                      fontFamily: 'Inter, sans-serif',
-                      fontWeight: 500,
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      transition: 'all 0.2s ease',
-                    }}
+                    className={`rounded-full border px-3 py-2.5 text-[12px] font-medium text-center transition-colors
+                                ${isSelected
+                                  ? 'border-infrared/60 bg-infrared/10 text-infrared'
+                                  : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/25'}`}
                   >
                     {genre}
                   </button>
@@ -402,7 +353,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         return (
           <>
             <div className="form-group">
-              <label style={labelStyle}>{t('editProfile.instagram')}</label>
+              <label className={labelClass}>{t('editProfile.instagram')}</label>
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
@@ -428,7 +379,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {role === 'ARTIST' && (
               <>
                 <div className="form-group">
-                  <label style={labelStyle}>{t('addProfile.raOptional')}</label>
+                  <label className={labelClass}>{t('addProfile.raOptional')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -438,7 +389,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label style={labelStyle}>{t('addProfile.soundcloudOptional')}</label>
+                  <label className={labelClass}>{t('addProfile.soundcloudOptional')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -454,7 +405,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {role === 'AGENT' && (
               <>
                 <div className="form-group">
-                  <label style={labelStyle}>{t('editProfile.agencyName')} *</label>
+                  <label className={labelClass}>{t('editProfile.agencyName')} *</label>
                   <input
                     type="text"
                     className="form-input"
@@ -464,7 +415,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label style={labelStyle}>{t('addProfile.linkedinOptional')}</label>
+                  <label className={labelClass}>{t('addProfile.linkedinOptional')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -480,7 +431,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {role === 'VENUE' && (
               <>
                 <div className="form-group">
-                  <label style={labelStyle}>{t('editProfile.venueCapacity')} *</label>
+                  <label className={labelClass}>{t('editProfile.venueCapacity')} *</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -497,7 +448,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {/* Promoter-specific */}
             {role === 'PROMOTER' && (
               <div className="form-group">
-                <label style={labelStyle}>{t('addProfile.websiteOptional')}</label>
+                <label className={labelClass}>{t('addProfile.websiteOptional')}</label>
                 <input
                   type="text"
                   className="form-input"
@@ -511,7 +462,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {/* Website for non-promoter roles that don't already show it */}
             {role !== 'PROMOTER' && (
               <div className="form-group">
-                <label style={labelStyle}>{t('addProfile.websiteOptional')}</label>
+                <label className={labelClass}>{t('addProfile.websiteOptional')}</label>
                 <input
                   type="text"
                   className="form-input"
@@ -550,32 +501,22 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         <div style={{ width: '24px' }}></div>
       </div>
       <div className="edit-profile-content">
-        {/* Sub-header */}
-        <div style={{ marginBottom: '20px' }}>
-          <p style={{
-            color: 'rgba(255,255,255,0.5)',
-            fontSize: '13px',
-          }}>
-            {t('addProfile.stepOf', { n: step, m: TOTAL_STEPS })} — {stepTitles[step]}
+        {/* Step header */}
+        <div className="mb-4">
+          <p className="m-0 text-[10px] uppercase tracking-[0.2em] text-white/40 font-tech">
+            {t('addProfile.stepOf', { n: step, m: TOTAL_STEPS })}
           </p>
+          <h2 className="m-0 mt-1 text-[20px] font-semibold text-white font-space-grotesk tracking-[-0.01em]">
+            {stepTitles[step]}
+          </h2>
         </div>
 
-        {/* Progress bar */}
-        <div style={{
-          width: '100%',
-          height: '3px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '2px',
-          marginBottom: '24px',
-          overflow: 'hidden',
-        }}>
-          <div style={{
-            width: `${(step / TOTAL_STEPS) * 100}%`,
-            height: '100%',
-            background: '#FF3366',
-            borderRadius: '2px',
-            transition: 'width 0.3s ease',
-          }} />
+        {/* Progress line */}
+        <div className="w-full h-[3px] rounded-full bg-white/10 overflow-hidden mb-6">
+          <div
+            className="h-full rounded-full bg-infrared transition-[width] duration-300"
+            style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+          />
         </div>
 
         {/* Error */}
@@ -640,16 +581,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
   );
 };
 
-// Shared label style
-const labelStyle = {
-  fontFamily: 'Inter, sans-serif',
-  fontSize: '13px',
-  fontWeight: 500,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  color: 'rgba(255,255,255,0.6)',
-  marginBottom: '8px',
-  display: 'block',
-};
+// Shared label class (Obsidian Neon micro-label)
+const labelClass = 'block text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40 font-tech mb-2';
 
 export default AddProfileScreen;

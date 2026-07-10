@@ -24,6 +24,7 @@ import './styles/App.css';
 import './styles/responsive.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import VerificationModal from './components/common/VerificationModal';
+import AppDialogHost from './components/common/AppDialogHost';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -432,6 +433,7 @@ function App() {
   return (
     <Router>
       <div className="app-container">
+      <AppDialogHost />
         <Header
           onOpenSettings={() => setShowSettings(true)}
           onOpenPremium={() => setShowPremium(true)}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
@@ -111,7 +112,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       if (hasLocationFilters) {
         const tierName = user?.subscriptionTier === 'TRIAL' ? t('search.trialTierName') : t('search.freeTierName');
         // Show alert and clear location filters
-        alert(t('search.locationFiltersAlert', { tierName, city: user.city }));
+        appAlert(t('search.locationFiltersAlert', { tierName, city: user.city }));
 
         // Clear location filters but keep other filters
         setFilters({
@@ -237,7 +238,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         setShowLikeLimitModal(true);
       } else {
         console.log('Not a like limit error, showing generic alert');
-        alert(t('search.failedToLike'));
+        appAlert(t('search.failedToLike'));
       }
     }
   };
@@ -287,7 +288,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           : (artistContext.representedBy ? [artistContext.representedBy] : []);
         targetName = repArray[0]?.name || repArray[0]?.agentName || t('search.agent');
       }
-      alert(t('search.connectionRequestSent', { name: targetName }));
+      appAlert(t('search.connectionRequestSent', { name: targetName }));
     } catch (error) {
       console.error('Error sending connection request:', error);
       console.error('Error details:', {
@@ -310,7 +311,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       // Only show alert for non-limit errors
       console.error('Connection request failed:', error);
-      alert(t('search.failedToSendRequest'));
+      appAlert(t('search.failedToSendRequest'));
     }
   };
 
@@ -359,7 +360,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         await fetchProfiles();
       } catch (error) {
         console.error('Error accepting request:', error);
-        alert(t('search.failedToAcceptRequest'));
+        appAlert(t('search.failedToAcceptRequest'));
       }
     }
   };
@@ -377,7 +378,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         await fetchProfiles();
       } catch (error) {
         console.error('Error declining request:', error);
-        alert(t('search.failedToDeclineRequest'));
+        appAlert(t('search.failedToDeclineRequest'));
       }
     }
   };
@@ -385,7 +386,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const handleSendMessage = async () => {
     if (selectedProfile) {
       if (!message.trim()) {
-        alert(t('search.pleaseWriteMessage'));
+        appAlert(t('search.pleaseWriteMessage'));
         return;
       }
       const profileId = selectedProfile.id;
@@ -423,7 +424,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         }
 
         // Only show alert for non-limit errors
-        alert(t('search.failedToSendRequest'));
+        appAlert(t('search.failedToSendRequest'));
       }
     }
   };

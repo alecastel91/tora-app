@@ -14,6 +14,7 @@ import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
 import { getAuthedBackendUrl } from '../../utils/urls';
 import { roleLabel, getAvatarClass } from '../../utils/roles';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 
 const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const { user: currentUser, sendMessage, connectedUsers, reloadProfileData } = useAppContext();
@@ -310,7 +311,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       await fetchMessages();
     } catch (error) {
       console.error('Error sending document:', error);
-      alert(t('chat.failedToSendDocument'));
+      appAlert(t('chat.failedToSendDocument'));
     }
   };
 
@@ -321,7 +322,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const handleSendOtherFile = async (file) => {
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert(t('chat.fileTooLarge'));
+      appAlert(t('chat.fileTooLarge'));
       return;
     }
     try {
@@ -342,7 +343,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       await fetchMessages();
     } catch (error) {
       console.error('Error uploading chat attachment:', error);
-      alert(error.message || t('chat.failedToUploadFile'));
+      appAlert(error.message || t('chat.failedToUploadFile'));
     }
   };
 
@@ -399,7 +400,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error accepting offer:', error);
-      alert(error.message || t('chat.failedToAcceptOffer'));
+      appAlert(error.message || t('chat.failedToAcceptOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -409,7 +410,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     if (actionBusy || !selectedOffer) return;
 
     if (!offerDeclineComment.trim()) {
-      alert(t('chat.provideDeclineReason'));
+      appAlert(t('chat.provideDeclineReason'));
       return;
     }
 
@@ -426,7 +427,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error declining offer:', error);
-      alert(error.message || t('chat.failedToDeclineOffer'));
+      appAlert(error.message || t('chat.failedToDeclineOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -457,7 +458,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     console.log('[ChatScreen] dealId from message:', msg.dealId);
 
     if (!msg.dealId) {
-      alert(t('chat.counterOfferOldVersion'));
+      appAlert(t('chat.counterOfferOldVersion'));
       return;
     }
 
@@ -518,7 +519,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const handleAcceptCounterOffer = async () => {
     if (actionBusy) return;
     if (!counterOfferData?.dealId) {
-      alert(t('chat.dealInfoNotFound'));
+      appAlert(t('chat.dealInfoNotFound'));
       return;
     }
 
@@ -529,7 +530,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error accepting counter-offer:', error);
-      alert(error.message || t('chat.failedToAcceptCounterOffer'));
+      appAlert(error.message || t('chat.failedToAcceptCounterOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -538,11 +539,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const handleDeclineCounterOffer = async () => {
     if (actionBusy) return;
     if (!declineComment.trim()) {
-      alert(t('chat.provideDeclineReason'));
+      appAlert(t('chat.provideDeclineReason'));
       return;
     }
     if (!counterOfferData?.dealId) {
-      alert(t('chat.dealInfoNotFound'));
+      appAlert(t('chat.dealInfoNotFound'));
       return;
     }
 
@@ -555,7 +556,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error declining counter-offer:', error);
-      alert(error.message || t('chat.failedToDeclineCounterOffer'));
+      appAlert(error.message || t('chat.failedToDeclineCounterOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -569,7 +570,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       setSelectedOffer(deal);
     } catch (error) {
       console.error('Error fetching deal for counter-offer review:', error);
-      alert(t('chat.failedToLoadDealInfo'));
+      appAlert(t('chat.failedToLoadDealInfo'));
       return;
     }
 
@@ -613,7 +614,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       await reloadProfileData();
     } catch (error) {
       console.error('Error accepting representation request:', error);
-      alert(error.message || t('chat.failedToAcceptRepresentation'));
+      appAlert(error.message || t('chat.failedToAcceptRepresentation'));
     } finally {
       setActionBusy(false);
     }
@@ -637,7 +638,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       }));
     } catch (error) {
       console.error('Error declining representation request:', error);
-      alert(error.message || t('chat.failedToDeclineRepresentation'));
+      appAlert(error.message || t('chat.failedToDeclineRepresentation'));
     } finally {
       setActionBusy(false);
     }
@@ -648,13 +649,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
 
     const dealId = selectedOffer?.id || counterOfferData?.dealId;
     if (!dealId) {
-      alert(t('chat.dealInfoNotFoundRetry'));
+      appAlert(t('chat.dealInfoNotFoundRetry'));
       return;
     }
 
     const feeStr = String(reviewData.fee || '').trim();
     if (!feeStr || isNaN(parseFloat(feeStr)) || parseFloat(feeStr) <= 0) {
-      alert(t('chat.enterValidFee'));
+      appAlert(t('chat.enterValidFee'));
       return;
     }
 
@@ -684,7 +685,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error submitting counter-offer:', error);
-      alert(error.message || t('chat.failedToSubmitCounterOffer'));
+      appAlert(error.message || t('chat.failedToSubmitCounterOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -1137,11 +1138,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               try {
                                 // Send modification request as a chat message
                                 await sendMessage(user.id, `Contract Modification Request: ${comment}`);
-                                alert(t('chat.modificationRequestSentTo', { name: user.name }));
+                                appAlert(t('chat.modificationRequestSentTo', { name: user.name }));
                                 // Refresh messages to show the new request
                                 await fetchMessages();
                               } catch (err) {
-                                alert(err.message || t('chat.failedToSendModificationRequest'));
+                                appAlert(err.message || t('chat.failedToSendModificationRequest'));
                               }
                             }
                           }}
@@ -1187,7 +1188,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         className="btn btn-skip"
                         onClick={async () => {
                           const list = pendingDocCategories.map(labelForCategory).join(', ');
-                          if (!window.confirm(t('chat.skipDocsConfirm', { list }))) return;
+                          if (!(await appConfirm(t('chat.skipDocsConfirm', { list })))) return;
                           try {
                             for (const cat of pendingDocCategories) {
                               // eslint-disable-next-line no-await-in-loop
@@ -1195,7 +1196,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             }
                             await fetchMessages();
                           } catch (err) {
-                            alert(err.message || t('chat.failedToSkipDocuments'));
+                            appAlert(err.message || t('chat.failedToSkipDocuments'));
                           }
                         }}
                       >
@@ -1373,12 +1374,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           <button
                             className="btn btn-skip"
                             onClick={async () => {
-                              if (!window.confirm(t('chat.skipContractConfirm'))) return;
+                              if (!(await appConfirm(t('chat.skipContractConfirm')))) return;
                               try {
                                 await apiService.skipContract(msg.dealId, currentUser.id);
                                 await fetchMessages();
                               } catch (err) {
-                                alert(err.message || t('chat.failedToSkipContract'));
+                                appAlert(err.message || t('chat.failedToSkipContract'));
                               }
                             }}
                           >
@@ -1395,7 +1396,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                 }
                                 setShowAddContractModal(true);
                               } catch (err) {
-                                alert(err.message || t('chat.failedToOpenContractFlow'));
+                                appAlert(err.message || t('chat.failedToOpenContractFlow'));
                               }
                             }}
                           >
@@ -1457,7 +1458,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             onClick={async () => {
                               try {
                                 await apiService.signContract(msg.dealId, currentUser.id);
-                                alert(t('chat.contractSignedSuccess'));
+                                appAlert(t('chat.contractSignedSuccess'));
                                 // Refresh messages
                                 const response = await apiService.getMessageThread(currentUser.id, user.id);
                                 const transformedMessages = (response.messages || []).map(m => ({
@@ -1472,7 +1473,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                 }));
                                 setUserMessages(transformedMessages);
                               } catch (err) {
-                                alert(err.message || t('chat.failedToSignContract'));
+                                appAlert(err.message || t('chat.failedToSignContract'));
                               }
                             }}
                           >
@@ -1491,7 +1492,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               const comment = prompt(t('chat.modificationPromptDetails'));
                               if (comment && comment.trim()) {
                                 // TODO: Send modification request to backend
-                                alert(t('chat.modificationRequestSent', { comment }));
+                                appAlert(t('chat.modificationRequestSent', { comment }));
                               }
                             }}
                           >
@@ -1507,10 +1508,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               color: 'rgba(255, 51, 51, 1)'
                             }}
                             onClick={async () => {
-                              if (window.confirm(t('chat.cancelBookingConfirm'))) {
+                              if (await appConfirm(t('chat.cancelBookingConfirm'), { danger: true })) {
                                 try {
                                   await apiService.cancelDeal(msg.dealId, currentUser.id);
-                                  alert(t('chat.bookingCancelled'));
+                                  appAlert(t('chat.bookingCancelled'));
                                   // Refresh messages
                                   const response = await apiService.getMessageThread(currentUser.id, user.id);
                                   const transformedMessages = (response.messages || []).map(m => ({
@@ -1524,7 +1525,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                   }));
                                   setUserMessages(transformedMessages);
                                 } catch (err) {
-                                  alert(err.message || t('chat.failedToCancelBooking'));
+                                  appAlert(err.message || t('chat.failedToCancelBooking'));
                                 }
                               }
                             }}
@@ -1578,7 +1579,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           onClick={async () => {
                             try {
                               await apiService.signContract(msg.dealId, currentUser.id);
-                              alert(t('chat.contractSignedSuccess'));
+                              appAlert(t('chat.contractSignedSuccess'));
                               // Refresh messages
                               const response = await apiService.getMessageThread(currentUser.id, user.id);
                               const transformedMessages = (response.messages || []).map(m => ({
@@ -1592,7 +1593,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               }));
                               setUserMessages(transformedMessages);
                             } catch (err) {
-                              alert(err.message || t('chat.failedToSignContract'));
+                              appAlert(err.message || t('chat.failedToSignContract'));
                             }
                           }}
                         >
@@ -1611,7 +1612,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             const comment = prompt(t('chat.modificationPromptDetails'));
                             if (comment && comment.trim()) {
                               // TODO: Send modification request to backend
-                              alert(t('chat.modificationRequestSent', { comment }));
+                              appAlert(t('chat.modificationRequestSent', { comment }));
                             }
                           }}
                         >
@@ -1627,10 +1628,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             color: 'rgba(255, 51, 51, 1)'
                           }}
                           onClick={async () => {
-                            if (window.confirm(t('chat.cancelBookingConfirm'))) {
+                            if (await appConfirm(t('chat.cancelBookingConfirm'), { danger: true })) {
                               try {
                                 await apiService.cancelDeal(msg.dealId, currentUser.id);
-                                alert(t('chat.bookingCancelled'));
+                                appAlert(t('chat.bookingCancelled'));
                                 // Refresh messages
                                 const response = await apiService.getMessageThread(currentUser.id, user.id);
                                 const transformedMessages = (response.messages || []).map(m => ({
@@ -1644,7 +1645,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                 }));
                                 setUserMessages(transformedMessages);
                               } catch (err) {
-                                alert(err.message || t('chat.failedToCancelBooking'));
+                                appAlert(err.message || t('chat.failedToCancelBooking'));
                               }
                             }
                           }}
@@ -2037,14 +2038,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       disabled={actionBusy}
                       onClick={async () => {
                         if (actionBusy) return;
-                        if (!window.confirm(t('chat.skipContractConfirmBooking'))) return;
+                        if (!(await appConfirm(t('chat.skipContractConfirmBooking')))) return;
                         setActionBusy(true);
                         try {
                           await apiService.skipContract(selectedOffer.id, currentUser.id);
                           setShowOfferDetails(false);
                           fetchMessages();
                         } catch (err) {
-                          alert(err.message || t('chat.failedToSkipContract'));
+                          appAlert(err.message || t('chat.failedToSkipContract'));
                         } finally {
                           setActionBusy(false);
                         }
@@ -2064,7 +2065,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             setShowOfferDetails(false);
                           } catch (err) {
                             console.error('Failed to fetch artist profile:', err);
-                            alert(t('chat.failedToLoadArtistProfile'));
+                            appAlert(t('chat.failedToLoadArtistProfile'));
                           }
                         } else {
                           setShowAddContractModal(true);
@@ -2711,7 +2712,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 signatureData,
                 token
               );
-              alert(t('chat.contractSignedSuccess'));
+              appAlert(t('chat.contractSignedSuccess'));
               await fetchMessages();
               setShowSignContractModal(false);
               setSelectedContractData(null);
@@ -2830,7 +2831,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               );
               setPendingContractToSign(null);
               await fetchMessages();
-              alert(t('chat.contractSentAndSignedSuccess'));
+              appAlert(t('chat.contractSentAndSignedSuccess'));
             } catch (err) {
               throw new Error(err.message || t('chat.failedToSendAndSignContract'));
             }

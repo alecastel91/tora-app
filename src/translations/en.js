@@ -1320,6 +1320,8 @@ const en = {
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
     resetView: 'Reset view',
+    ok: 'OK',
+    confirm: 'Confirm',
   }
 };
 

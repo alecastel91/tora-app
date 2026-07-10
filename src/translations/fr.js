@@ -1308,6 +1308,8 @@ const fr = {
     zoomIn: 'Zoomer',
     zoomOut: 'Dézoomer',
     resetView: 'Réinitialiser la vue',
+    ok: 'OK',
+    confirm: 'Confirmer',
   },
 };
 

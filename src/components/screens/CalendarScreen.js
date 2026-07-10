@@ -5,6 +5,7 @@ import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { CloseIcon, CalendarIcon, ListIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
 import apiService from '../../services/api';
+import { appAlert } from '../../utils/dialogs';
 
 const CalendarScreen = ({ onClose, embedded = false }) => {
   const { t } = useLanguage();
@@ -371,7 +372,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       const endDate = new Date(scheduleForm.endDate);
 
       if (endDate < startDate) {
-        alert(t('calendar.endBeforeStart'));
+        appAlert(t('calendar.endBeforeStart'));
         return;
       }
 
@@ -391,7 +392,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       });
 
       if (hasOverlap) {
-        alert(t('calendar.scheduleOverlap'));
+        appAlert(t('calendar.scheduleOverlap'));
         return;
       }
 
@@ -457,7 +458,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
         console.error('Failed to save schedule:', error);
         // Revert local state on error
         setSchedules(schedules);
-        alert(t('calendar.saveScheduleFailed'));
+        appAlert(t('calendar.saveScheduleFailed'));
       }
     }
   };
@@ -531,7 +532,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       setScheduleToDelete(null);
     } catch (error) {
       console.error('Failed to remove schedule:', error);
-      alert(t('calendar.removeScheduleFailed'));
+      appAlert(t('calendar.removeScheduleFailed'));
       setShowDeleteConfirmation(false);
       setScheduleToDelete(null);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
@@ -164,7 +165,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
     selectedDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
-      alert(t('offer.dateInPast'));
+      appAlert(t('offer.dateInPast'));
       return;
     }
 
@@ -195,7 +196,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
       // Check if set time is within event time
       if (setStartTotalMin < eventStartTotalMin || setEndTotalMin > eventEndTotalMin) {
-        alert(t('offer.setTimeRange'));
+        appAlert(t('offer.setTimeRange'));
         return;
       }
     }

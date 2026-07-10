@@ -15,6 +15,7 @@ import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -195,7 +196,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
       fetchDeals();
     } catch (err) {
       console.error('Error accepting deal:', err);
-      alert(err.message || t('chat.failedToAcceptOffer'));
+      appAlert(err.message || t('chat.failedToAcceptOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -205,7 +206,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
     if (actionBusy || !dealToDecline) return;
 
     if (!declineReason.trim()) {
-      alert(t('chat.provideDeclineReason'));
+      appAlert(t('chat.provideDeclineReason'));
       return;
     }
 
@@ -217,7 +218,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
       fetchDeals();
     } catch (err) {
       console.error('Error declining deal:', err);
-      alert(err.message || t('chat.failedToDeclineOffer'));
+      appAlert(err.message || t('chat.failedToDeclineOffer'));
       setDealToDecline(null);
       setDeclineReason('');
     } finally {
@@ -234,7 +235,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
       fetchDeals();
     } catch (err) {
       console.error('Error deleting deal:', err);
-      alert(err.message || t('bookings.deleteOfferFailed'));
+      appAlert(err.message || t('bookings.deleteOfferFailed'));
       setDealToDelete(null);
     } finally {
       setActionBusy(false);
@@ -249,10 +250,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
       setDealToWithdraw(null);
       setShowWithdrawConfirmation(false);
       fetchDeals();
-      alert(t('bookings.contractWithdrawnSuccess'));
+      appAlert(t('bookings.contractWithdrawnSuccess'));
     } catch (err) {
       console.error('Error withdrawing contract:', err);
-      alert(err.message || t('bookings.withdrawFailed'));
+      appAlert(err.message || t('bookings.withdrawFailed'));
       setDealToWithdraw(null);
       setShowWithdrawConfirmation(false);
     } finally {
@@ -727,7 +728,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                             setShowAddContractModal(true);
                           } catch (err) {
                             console.error('Failed to fetch artist profile:', err);
-                            alert(t('chat.failedToLoadArtistProfile'));
+                            appAlert(t('chat.failedToLoadArtistProfile'));
                           }
                         } else {
                           // Not an agent booking, open modal directly
@@ -749,13 +750,13 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       disabled={actionBusy}
                       onClick={async () => {
                         if (actionBusy) return;
-                        if (window.confirm(t('chat.skipContractConfirmBooking'))) {
+                        if (await appConfirm(t('chat.skipContractConfirmBooking'))) {
                           setActionBusy(true);
                           try {
                             await apiService.skipContract(deal.id, currentUser.id);
                             fetchDeals();
                           } catch (err) {
-                            alert(err.message || t('chat.failedToSkipContract'));
+                            appAlert(err.message || t('chat.failedToSkipContract'));
                           } finally {
                             setActionBusy(false);
                           }
@@ -973,7 +974,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                     onClick={async () => {
                       if (actionBusy) return;
                       const labels = pendingDocCategories.map(c => docCatLabel(c)).join(', ');
-                      if (!window.confirm(t('bookings.skipDocsStagesConfirm', { list: labels }))) return;
+                      if (!(await appConfirm(t('bookings.skipDocsStagesConfirm', { list: labels })))) return;
                       setActionBusy(true);
                       try {
                         for (const cat of pendingDocCategories) {
@@ -982,7 +983,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         }
                         fetchDeals();
                       } catch (err) {
-                        alert(err.message || t('chat.failedToSkipDocuments'));
+                        appAlert(err.message || t('chat.failedToSkipDocuments'));
                       } finally {
                         setActionBusy(false);
                       }
@@ -1490,7 +1491,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         const file = e.target.files && e.target.files[0];
                         if (!file) return;
                         const err = validatePaymentProof(file);
-                        if (err) { alert(err); return; }
+                        if (err) { appAlert(err); return; }
                         setPaymentProofFile(file);
                       }}
                       style={{ display: 'none' }}
@@ -1537,16 +1538,16 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       if (actionBusy) return;
                       const amount = parseFloat(depositInput);
                       if (!Number.isFinite(amount) || amount <= 0) {
-                        alert(t('bookings.depositGreaterThanZero'));
+                        appAlert(t('bookings.depositGreaterThanZero'));
                         return;
                       }
                       const totalFee = Number(selectedDealForWorkflow.currentFee) || 0;
                       if (totalFee && amount > totalFee) {
-                        alert(t('bookings.depositExceedsFee', { fee: totalFee }));
+                        appAlert(t('bookings.depositExceedsFee', { fee: totalFee }));
                         return;
                       }
                       const proofErr = validatePaymentProof(paymentProofFile);
-                      if (proofErr) { alert(proofErr); return; }
+                      if (proofErr) { appAlert(proofErr); return; }
                       setActionBusy(true);
                       try {
                         await apiService.updatePayment(
@@ -1564,7 +1565,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         setPaymentProofFile(null);
                         fetchDeals();
                       } catch (err) {
-                        alert(err.message || t('bookings.updatePaymentFailed'));
+                        appAlert(err.message || t('bookings.updatePaymentFailed'));
                       } finally {
                         setActionBusy(false);
                       }
@@ -1584,7 +1585,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   onClick={async () => {
                     if (actionBusy) return;
                     const proofErr = validatePaymentProof(paymentProofFile);
-                    if (proofErr) { alert(proofErr); return; }
+                    if (proofErr) { appAlert(proofErr); return; }
                     setActionBusy(true);
                     try {
                       await apiService.updatePayment(
@@ -1601,7 +1602,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       setPaymentProofFile(null);
                       fetchDeals();
                     } catch (err) {
-                      alert(err.message || t('bookings.updatePaymentFailed'));
+                      appAlert(err.message || t('bookings.updatePaymentFailed'));
                     } finally {
                       setActionBusy(false);
                     }
@@ -1693,7 +1694,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
               );
               setRecipientSignData(null);
               fetchDeals();
-              alert(t('chat.contractSignedSuccess'));
+              appAlert(t('chat.contractSignedSuccess'));
             } catch (err) {
               throw new Error(err.message || t('chat.failedToSignContract'));
             }
@@ -1725,7 +1726,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
               setPendingContractToSign(null);
               setSelectedDealForWorkflow(null);
               fetchDeals();
-              alert(t('chat.contractSentAndSignedSuccess'));
+              appAlert(t('chat.contractSentAndSignedSuccess'));
             } catch (err) {
               throw new Error(err.message || t('chat.failedToSendAndSignContract'));
             }
@@ -1820,7 +1821,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         setDepositHistoryDeal(updated.deal || depositHistoryDeal);
                         fetchDeals();
                       } catch (err) {
-                        alert(err.message || t('bookings.confirmReceiptFailed'));
+                        appAlert(err.message || t('bookings.confirmReceiptFailed'));
                       } finally {
                         setActionBusy(false);
                       }
@@ -1842,7 +1843,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         setDepositHistoryDeal(updated.deal || depositHistoryDeal);
                         fetchDeals();
                       } catch (err) {
-                        alert(err.message || t('bookings.confirmReceiptFailed'));
+                        appAlert(err.message || t('bookings.confirmReceiptFailed'));
                       } finally {
                         setActionBusy(false);
                       }

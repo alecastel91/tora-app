@@ -9,6 +9,7 @@ import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -352,7 +353,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
 
   const handleSaveDocument = async () => {
     if (!newDoc.title || !newDoc.url) {
-      alert(t('manage.provideTitleAndUrl'));
+      appAlert(t('manage.provideTitleAndUrl'));
       return;
     }
 
@@ -415,7 +416,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
       console.log('[ManageProfileScreen] Profile data reloaded');
     } catch (error) {
       console.error('[ManageProfileScreen] Error saving document:', error);
-      alert(t('manage.saveDocumentFailed'));
+      appAlert(t('manage.saveDocumentFailed'));
     }
 
     setShowAddDocModal(false);
@@ -424,7 +425,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   };
 
   const handleDeleteDocument = async (category, docId) => {
-    if (!window.confirm(t('manage.deleteDocumentConfirm'))) {
+    if (!(await appConfirm(t('manage.deleteDocumentConfirm'), { danger: true }))) {
       return;
     }
 
@@ -928,10 +929,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
             await apiService.updateProfile(user.id, { documents: documentsToSave });
             setDocuments(updatedDocuments);
             await reloadProfileData();
-            alert(t('manage.documentAddedSuccess'));
+            appAlert(t('manage.documentAddedSuccess'));
           } catch (error) {
             console.error('[ManageProfileScreen] Failed to save document:', error);
-            alert(t('manage.saveDocumentFailed'));
+            appAlert(t('manage.saveDocumentFailed'));
           }
 
           setShowAddDocModal(false);

@@ -10,6 +10,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -570,7 +571,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         const endDate = new Date(travelFilter.endDate);
 
         if (endDate < startDate) {
-          alert(t('manageArtist.endDateBeforeStart'));
+          appAlert(t('manageArtist.endDateBeforeStart'));
           return;
         }
 
@@ -590,7 +591,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         });
 
         if (hasOverlap) {
-          alert(t('manageArtist.scheduleOverlap'));
+          appAlert(t('manageArtist.scheduleOverlap'));
           return;
         }
       }
@@ -664,11 +665,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
         // Check if it's an authentication error
         if (error.message && error.message.includes('Token expired')) {
-          alert(t('manageArtist.sessionExpired'));
+          appAlert(t('manageArtist.sessionExpired'));
         } else if (error.message && error.message.includes('Unauthorized')) {
-          alert(t('manageArtist.authError'));
+          appAlert(t('manageArtist.authError'));
         } else {
-          alert(t('manageArtist.saveScheduleFailed', { error: error.message || t('manageArtist.pleaseTryAgain') }));
+          appAlert(t('manageArtist.saveScheduleFailed', { error: error.message || t('manageArtist.pleaseTryAgain') }));
         }
       }
     }
@@ -755,11 +756,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
       // Check if it's an authentication error
       if (error.message && error.message.includes('Token expired')) {
-        alert(t('manageArtist.sessionExpired'));
+        appAlert(t('manageArtist.sessionExpired'));
       } else if (error.message && error.message.includes('Unauthorized')) {
-        alert(t('manageArtist.authError'));
+        appAlert(t('manageArtist.authError'));
       } else {
-        alert(t('manageArtist.deleteScheduleFailed', { error: error.message || t('manageArtist.pleaseTryAgain') }));
+        appAlert(t('manageArtist.deleteScheduleFailed', { error: error.message || t('manageArtist.pleaseTryAgain') }));
       }
 
       // Close confirmation dialog
@@ -779,7 +780,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       const artistId = artistProfile?.profileId || artistProfile?.id || artistProfile?.id;
 
       if (!artistId) {
-        alert(t('manageArtist.artistIdNotFound'));
+        appAlert(t('manageArtist.artistIdNotFound'));
         return;
       }
 
@@ -826,10 +827,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
       // Close edit screen
       setIsEditingArtistInfo(false);
-      alert(t('manageArtist.artistInfoUpdated'));
+      appAlert(t('manageArtist.artistInfoUpdated'));
     } catch (error) {
       console.error('Failed to update artist info:', error);
-      alert(t('manageArtist.artistInfoUpdateFailed'));
+      appAlert(t('manageArtist.artistInfoUpdateFailed'));
     }
   };
 
@@ -1583,7 +1584,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   const handleSaveDocument = async () => {
     if (!newDoc.title || !newDoc.url) {
-      alert(t('manageArtist.provideTitleUrl'));
+      appAlert(t('manageArtist.provideTitleUrl'));
       return;
     }
 
@@ -1648,7 +1649,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       }
     } catch (error) {
       console.error('[ManageArtistScreen] Error saving documents:', error);
-      alert(t('manageArtist.saveDocumentFailed'));
+      appAlert(t('manageArtist.saveDocumentFailed'));
     }
 
     setShowAddDocModal(false);
@@ -1657,7 +1658,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   };
 
   const handleDeleteDocument = async (category, docId) => {
-    if (!window.confirm(t('manageArtist.deleteDocumentConfirm'))) {
+    if (!(await appConfirm(t('manageArtist.deleteDocumentConfirm'), { danger: true }))) {
       return;
     }
 
@@ -2056,7 +2057,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               setIsEditingArtistInfo(true);
             } catch (error) {
               console.error('[ManageArtistScreen] Error fetching fresh profile:', error);
-              alert(t('manageArtist.loadArtistFailed'));
+              appAlert(t('manageArtist.loadArtistFailed'));
             }
           }}
         >
@@ -2906,11 +2907,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               await apiService.updateProfile(artistId, { documents: updatedDocuments });
               const freshProfile = await apiService.getProfile(artistId);
               setArtistProfile(freshProfile);
-              alert(t('manageArtist.documentAdded'));
+              appAlert(t('manageArtist.documentAdded'));
             }
           } catch (error) {
             console.error('[ManageArtistScreen] Error saving document:', error);
-            alert(t('manageArtist.saveDocumentFailed'));
+            appAlert(t('manageArtist.saveDocumentFailed'));
           }
 
           setShowAddDocModal(false);

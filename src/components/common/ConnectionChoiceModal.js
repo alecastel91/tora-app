@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import Modal from './Modal';
 import { InfoIcon, HandshakeIcon, UserIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -50,7 +51,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
 
   const handleSendRequest = async () => {
     if (!message.trim()) {
-      alert(t('search.pleaseWriteMessage'));
+      appAlert(t('search.pleaseWriteMessage'));
       return;
     }
     console.log('Sending request with message:', message);

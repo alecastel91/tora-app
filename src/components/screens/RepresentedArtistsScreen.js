@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import { CloseIcon, AddIcon, TrashIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
@@ -55,7 +56,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const handleRemoveArtist = async (artist) => {
     const artistId = artist.profileId || artist.id;
     const displayName = artist.name || 'this artist';
-    if (!window.confirm(t('roster.removeConfirm', { name: displayName }))) return;
+    if (!(await appConfirm(t('roster.removeConfirm', { name: displayName }), { danger: true }))) return;
 
     setRemovingArtistId(artistId);
     try {
@@ -63,7 +64,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       await reloadProfileData();
     } catch (error) {
       console.error('Error removing artist:', error);
-      alert(t('roster.failedToRemove'));
+      appAlert(t('roster.failedToRemove'));
     } finally {
       setRemovingArtistId(null);
     }
@@ -105,7 +106,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         setViewingProfile(artistId);
       } catch (error) {
         console.error('Error fetching artist profile:', error);
-        alert(t('roster.failedToLoadProfile'));
+        appAlert(t('roster.failedToLoadProfile'));
       } finally {
         setLoading(false);
       }

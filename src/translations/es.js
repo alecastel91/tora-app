@@ -1308,6 +1308,8 @@ const es = {
     zoomIn: 'Acercar',
     zoomOut: 'Alejar',
     resetView: 'Restablecer vista',
+    ok: 'Aceptar',
+    confirm: 'Confirmar',
   },
 };
 

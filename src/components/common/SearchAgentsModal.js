@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import ViewProfileScreen from '../screens/ViewProfileScreen';
@@ -277,7 +278,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     } catch (error) {
       console.error('Error sending connection request:', error);
-      alert(t('findAgent.failedToSendConnection'));
+      appAlert(t('findAgent.failedToSendConnection'));
     } finally {
       setSending(false);
     }
@@ -299,8 +300,9 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
     const agentId = agent.id;
 
     // Show confirmation dialog
-    const confirmed = window.confirm(
-      t('findAgent.cancelRepresentationConfirm', { name: agent.name })
+    const confirmed = await appConfirm(
+      t('findAgent.cancelRepresentationConfirm', { name: agent.name }),
+      { danger: true }
     );
 
     if (!confirmed) return;
@@ -331,11 +333,11 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       await fetchSentRequests();
       await fetchAgents(searchQuery);
 
-      alert(t('findAgent.representationCancelled'));
+      appAlert(t('findAgent.representationCancelled'));
 
     } catch (error) {
       console.error('Error cancelling representation:', error);
-      alert(t('findAgent.failedToCancelRepresentation'));
+      appAlert(t('findAgent.failedToCancelRepresentation'));
     } finally {
       setSending(false);
     }
@@ -407,7 +409,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     } catch (error) {
       console.error('Error accepting request:', error);
-      alert(t('findAgent.failedToAccept'));
+      appAlert(t('findAgent.failedToAccept'));
     } finally {
       setSending(false);
     }
@@ -447,7 +449,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     } catch (error) {
       console.error('Error declining representation request:', error);
-      alert(t('findAgent.failedToDecline'));
+      appAlert(t('findAgent.failedToDecline'));
     } finally {
       setSending(false);
     }

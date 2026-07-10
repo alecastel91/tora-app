@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
@@ -269,7 +270,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       updateUser(updatedProfile);
     } catch (error) {
       console.error('Failed to upload avatar:', error);
-      alert(error.message || t('profile.uploadFailed'));
+      appAlert(error.message || t('profile.uploadFailed'));
     }
   };
 
@@ -295,7 +296,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       setShowProfileSwitcher(false);
     } catch (error) {
       console.error('Failed to delete profile:', error);
-      alert(error.message || t('profile.deleteFailed'));
+      appAlert(error.message || t('profile.deleteFailed'));
     }
   };
 

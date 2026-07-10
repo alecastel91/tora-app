@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -95,7 +96,7 @@ const PdfViewerModal = ({ url, onClose, title, onLoaded }) => {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(blobUrl);
                 } catch {
-                  alert(t('docs.downloadFailed'));
+                  appAlert(t('docs.downloadFailed'));
                 }
               }}
             >

@@ -1308,6 +1308,8 @@ const zh = {
     zoomIn: '放大',
     zoomOut: '缩小',
     resetView: '重置视图',
+    ok: '确定',
+    confirm: '确认',
   },
 };
 

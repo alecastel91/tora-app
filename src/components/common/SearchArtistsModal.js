@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import ViewProfileScreen from '../screens/ViewProfileScreen';
@@ -246,7 +247,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
     } catch (error) {
       console.error('Error sending connection request:', error);
-      alert(t('findArtist.failedToSendConnection'));
+      appAlert(t('findArtist.failedToSendConnection'));
     } finally {
       setSending(false);
     }
@@ -330,7 +331,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
     } catch (error) {
       console.error('Error accepting request:', error);
-      alert(t('findArtist.failedToAccept'));
+      appAlert(t('findArtist.failedToAccept'));
     } finally {
       setSending(false);
     }
@@ -370,7 +371,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
     } catch (error) {
       console.error('Error declining representation request:', error);
-      alert(t('findArtist.failedToDecline'));
+      appAlert(t('findArtist.failedToDecline'));
     } finally {
       setSending(false);
     }

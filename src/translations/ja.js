@@ -1308,6 +1308,8 @@ const ja = {
     zoomIn: '拡大',
     zoomOut: '縮小',
     resetView: '表示をリセット',
+    ok: 'OK',
+    confirm: '確認',
   },
 };
 

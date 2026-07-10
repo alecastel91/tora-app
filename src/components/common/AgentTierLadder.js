@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { appAlert } from '../../utils/dialogs';
 import { AGENT_TIER_PRICING, AGENT_TIER_KEYS, BILLING_INTERVAL, formatEur } from '../../utils/agentTiers';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -7,7 +8,7 @@ const requestTierActivation = (tierKey) => {
     window.location.href = 'mailto:support@torahub.io?subject=Enterprise plan inquiry';
     return;
   }
-  alert(
+  appAlert(
     'Self-serve checkout is coming soon.\n\n'
     + `To activate ${AGENT_TIER_PRICING[tierKey].label} now, email support@torahub.io and we'll set it up manually.`
   );

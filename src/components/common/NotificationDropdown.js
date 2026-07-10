@@ -36,9 +36,9 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 1) return t('notifications.justNow') || 'Just now';
-    if (diffMins < 60) return `${diffMins} ${t('notifications.minAgo') || 'min ago'}`;
-    if (diffHours < 24) return `${diffHours} ${t('notifications.hourAgo') || 'h ago'}`;
-    return `${diffDays} ${t('notifications.daysAgo') || 'd ago'}`;
+    if (diffMins < 60) return `${diffMins} ${t('notifications.minAgo')}`;
+    if (diffHours < 24) return `${diffHours} ${t('notifications.hourAgo')}`;
+    return t('notifications.daysAgo', { n: diffDays });
   };
 
   const handleNotificationClick = (notif) => {

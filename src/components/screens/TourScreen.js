@@ -8,6 +8,7 @@ import { CalendarIcon, PlaneIcon, LocationIcon, HandshakeIcon, DollarIcon, Targe
 import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { citiesByCountry, countriesByZone, genresList } from '../../data/profiles';
+import { appAlert, appConfirm } from '../../utils/dialogs';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -597,11 +598,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (tourBusy) return;
     // Validation
     if (user?.role === 'AGENT' && !tourForm.artistId) {
-      alert(t('offer.selectArtistError'));
+      appAlert(t('offer.selectArtistError'));
       return;
     }
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
-      alert(t('tour.fillRequiredFields'));
+      appAlert(t('tour.fillRequiredFields'));
       return;
     }
 
@@ -609,7 +610,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const startDate = new Date(tourForm.startDate);
     const endDate = new Date(tourForm.endDate);
     if (endDate <= startDate) {
-      alert(t('tour.endDateAfterStart'));
+      appAlert(t('tour.endDateAfterStart'));
       return;
     }
 
@@ -658,11 +659,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         });
         setShowCreateTourModal(false);
 
-        alert(t('tour.tourCreated'));
+        appAlert(t('tour.tourCreated'));
       }
     } catch (error) {
       console.error('Error creating tour:', error);
-      alert(error.message || t('tour.createTourFailed'));
+      appAlert(error.message || t('tour.createTourFailed'));
     } finally {
       setTourBusy(false);
     }
@@ -698,7 +699,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (tourBusy) return;
     // Validation
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
-      alert(t('tour.fillRequiredFields'));
+      appAlert(t('tour.fillRequiredFields'));
       return;
     }
 
@@ -706,7 +707,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const startDate = new Date(tourForm.startDate);
     const endDate = new Date(tourForm.endDate);
     if (endDate <= startDate) {
-      alert(t('tour.endDateAfterStart'));
+      appAlert(t('tour.endDateAfterStart'));
       return;
     }
 
@@ -752,10 +753,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       });
       setSelectedTour(null);
 
-      alert(t('tour.tourUpdated'));
+      appAlert(t('tour.tourUpdated'));
     } catch (error) {
       console.error('Error updating tour:', error);
-      alert(t('tour.updateTourFailed'));
+      appAlert(t('tour.updateTourFailed'));
     } finally {
       setTourBusy(false);
     }
@@ -763,8 +764,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Handle Delete Tour
   const handleDeleteTour = async (tour) => {
-    const confirmed = window.confirm(
-      t('tour.deleteTourConfirm', { location: tour.country || tour.zone })
+    const confirmed = await appConfirm(
+      t('tour.deleteTourConfirm', { location: tour.country || tour.zone }),
+      { danger: true }
     );
 
     if (!confirmed) return;
@@ -785,10 +787,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       // Remove tour from myTours state
       setMyTours(prevTours => prevTours.filter(t => t.id !== tour.id));
 
-      alert(t('tour.tourDeleted'));
+      appAlert(t('tour.tourDeleted'));
     } catch (error) {
       console.error('Error deleting tour:', error);
-      alert(t('tour.deleteTourFailed'));
+      appAlert(t('tour.deleteTourFailed'));
     }
   };
 
@@ -804,7 +806,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       setTourGigs(response.deals || []);
     } catch (error) {
       console.error('Error fetching tour gigs:', error);
-      alert(t('tour.loadGigsFailed'));
+      appAlert(t('tour.loadGigsFailed'));
     } finally {
       setLoadingTourGigs(false);
     }
@@ -821,7 +823,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       const myProposal = response.proposals?.find(p => p.id === tour.myProposal.id);
 
       if (!myProposal) {
-        alert(t('tour.proposalNotFound'));
+        appAlert(t('tour.proposalNotFound'));
         return;
       }
 
@@ -830,7 +832,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       setShowMyProposalModal(true);
     } catch (error) {
       console.error('Error fetching proposal:', error);
-      alert(t('tour.loadProposalFailed'));
+      appAlert(t('tour.loadProposalFailed'));
     }
   };
 
@@ -1684,7 +1686,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                             setViewingProfile(fullProfile);
                           } catch (error) {
                             console.error('Error fetching artist profile:', error);
-                            alert(t('tour.loadArtistProfileFailed'));
+                            appAlert(t('tour.loadArtistProfileFailed'));
                           }
                         }}
                       >
