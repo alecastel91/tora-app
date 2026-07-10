@@ -14,6 +14,7 @@ import { summarizeDealPayment } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
 import LoadingGlobe from '../common/LoadingGlobe';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -25,6 +26,7 @@ function validatePaymentProof(file) {
 }
 
 const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) => {
+  const { t } = useLanguage();
   const { user: currentUser, reloadProfileData } = useAppContext();
   const getFullUrl = (url) => getAuthedBackendUrl(url, currentUser?.id);
 
