@@ -266,7 +266,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       updateUser(updatedProfile);
     } catch (error) {
       console.error('Failed to upload avatar:', error);
-      alert(error.message || 'Failed to upload image. Please try again.');
+      alert(error.message || t('profile.uploadFailed'));
     }
   };
 
@@ -292,7 +292,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       setShowProfileSwitcher(false);
     } catch (error) {
       console.error('Failed to delete profile:', error);
-      alert(error.message || 'Failed to delete profile. Please try again.');
+      alert(error.message || t('profile.deleteFailed'));
     }
   };
 
@@ -490,15 +490,15 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                   </svg>
                 </span>
                 <div>
-                  <strong className="block text-sm font-semibold text-amber-300">Your trial has expired</strong>
-                  <p className="text-xs text-white/50 mt-0.5">Upgrade to Premium to keep access to all features</p>
+                  <strong className="block text-sm font-semibold text-amber-300">{t('profile.trialExpired')}</strong>
+                  <p className="text-xs text-white/50 mt-0.5">{t('profile.trialExpiredDesc')}</p>
                 </div>
               </div>
               <button
                 onClick={() => onOpenPremium && onOpenPremium()}
                 className="shrink-0 px-4 py-2 rounded-lg bg-infrared text-white text-xs font-semibold uppercase tracking-wider whitespace-nowrap hover:bg-infrared-dim transition-colors"
               >
-                Upgrade Now
+                {t('search.upgradeNow')}
               </button>
             </div>
           );
@@ -513,11 +513,11 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 </svg>
               </span>
               <div>
-                <strong className="block text-sm font-semibold text-emerald-300">Premium Trial Active</strong>
+                <strong className="block text-sm font-semibold text-emerald-300">{t('profile.trialActive')}</strong>
                 <p className="text-xs text-white/50 mt-0.5">
                   {trialInfo.days
-                    ? `${trialInfo.days} ${trialInfo.days === 1 ? 'day' : 'days'} remaining`
-                    : `${trialInfo.hours} ${trialInfo.hours === 1 ? 'hour' : 'hours'} remaining`}
+                    ? t(trialInfo.days === 1 ? 'profile.dayRemaining' : 'profile.daysRemaining', { n: trialInfo.days })
+                    : t(trialInfo.hours === 1 ? 'profile.hourRemaining' : 'profile.hoursRemaining', { n: trialInfo.hours })}
                 </p>
               </div>
             </div>
@@ -550,16 +550,16 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       <div className="grid grid-cols-2 gap-2.5 mb-6">
         <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => setShowEditProfile(true)} />
         {user?.role === 'AGENT' ? (
-          <ActionCard icon={<ListIcon />} label="Represented Artists" onClick={() => setShowRepresentedArtists(true)} />
+          <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => setShowRepresentedArtists(true)} />
         ) : (
-          <ActionCard icon={<GridIcon />} label="Manage" onClick={() => setShowManageProfile(true)} dot={ownHasActions} />
+          <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => setShowManageProfile(true)} dot={ownHasActions} />
         )}
         {user?.role === 'ARTIST' && (
-          <ActionCard icon={<SearchIcon />} label="Find Agent" onClick={() => setShowFindAgent(true)} />
+          <ActionCard icon={<SearchIcon />} label={t('profile.findAgentLabel')} onClick={() => setShowFindAgent(true)} />
         )}
         <ActionCard
           icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}
-          label={userProfiles.length > 1 ? 'Switch Profile' : 'Add Profile'}
+          label={userProfiles.length > 1 ? t('profile.switchProfileLabel') : t('profile.addProfileLabel')}
           onClick={() => setShowProfileSwitcher(true)}
         />
       </div>
@@ -573,16 +573,16 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         >
           <div className="min-w-0">
             <strong className="block text-sm font-semibold text-white">
-              {user?.verifyStatus === 'PENDING_REVIEW' ? 'Verification in review' : 'Verify your identity'}
+              {user?.verifyStatus === 'PENDING_REVIEW' ? t('verify.inReviewTitle') : t('verify.verifyTitle')}
             </strong>
             <p className="text-xs text-white/50 mt-0.5 m-0">
               {user?.verifyStatus === 'PENDING_REVIEW'
-                ? "We're matching your DM — your badge appears shortly."
-                : 'DM a one-time code to @tora.verify to unlock sending offers and requests.'}
+                ? t('verify.inReviewDesc')
+                : t('verify.verifyDesc')}
             </p>
           </div>
           <span className="shrink-0 px-4 py-2 rounded-lg bg-infrared text-white text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
-            {user?.verifyStatus === 'PENDING_REVIEW' ? 'Status' : 'Verify'}
+            {user?.verifyStatus === 'PENDING_REVIEW' ? t('verify.statusButton') : t('verify.verifyButton')}
           </span>
         </button>
       )}
@@ -597,7 +597,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       {/* Agent Artists Representing Section */}
       {user?.role === 'AGENT' && (
         <div className="mb-8 text-left">
-          <h3 className="text-lg font-bold text-white font-space-grotesk mb-4">Artists Representing</h3>
+          <h3 className="text-lg font-bold text-white font-space-grotesk mb-4">{t('profile.artistsRepresenting')}</h3>
           <div className="flex flex-col gap-3">
             {user?.representingArtists && user.representingArtists.length > 0 ? user.representingArtists.map(artist => (
               <div
@@ -642,7 +642,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       <div className="flex flex-col gap-3 mb-6 text-left">
         {user?.mixtape && (
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">Latest Mix</h4>
+            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.latestMix')}</h4>
             {resolvedSoundCloudUrl ? (
               <iframe
                 src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(resolvedSoundCloudUrl)}&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`}
@@ -652,7 +652,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               />
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
-                <p className="text-sm text-white/70 mb-1">Please use the full SoundCloud URL</p>
+                <p className="text-sm text-white/70 mb-1">{t('profile.useFullSoundcloudUrl')}</p>
                 <p className="text-xs text-white/40 mb-3">Example: https://soundcloud.com/artist/track-name</p>
                 <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
@@ -662,7 +662,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
         {user?.spotify && (
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">Spotify Artist</h4>
+            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.spotifyArtist')}</h4>
             {resolvedSpotifyId ? (
               <iframe
                 src={`https://open.spotify.com/embed/artist/${resolvedSpotifyId}`}
@@ -674,7 +674,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               />
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
-                <p className="text-sm text-white/70 mb-1">Please use the full Spotify URL</p>
+                <p className="text-sm text-white/70 mb-1">{t('profile.useFullSpotifyUrl')}</p>
                 <p className="text-xs text-white/40 mb-3">Example: https://open.spotify.com/artist/XXXXX</p>
                 <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
@@ -708,7 +708,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
       {/* ===== Links ===== */}
       <div className="mb-6 text-left">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">Links</p>
+        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{t('profile.links')}</p>
         <div className="flex flex-col gap-3">
           <button
             type="button"
@@ -720,7 +720,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
             <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
               <GlobeIcon />
             </span>
-            <span className="flex-1 text-sm font-medium text-white">Official Website</span>
+            <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
             <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
           </button>
 
@@ -780,7 +780,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       <Modal
         isOpen={showLikesList}
         onClose={() => setShowLikesList(false)}
-        title="Profiles You Liked"
+        title={t('profile.profilesYouLiked')}
       >
         <div className="profiles-list">
           {likedProfilesList.length > 0 ? (
@@ -799,7 +799,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               </div>
             ))
           ) : (
-            <p>No liked profiles yet</p>
+            <p>{t('profile.noLikedProfiles')}</p>
           )}
         </div>
       </Modal>
@@ -808,7 +808,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       <Modal
         isOpen={showLikersList}
         onClose={() => setShowLikersList(false)}
-        title="Profiles That Liked You"
+        title={t('profile.profilesThatLikedYou')}
       >
         <div className="profiles-list">
           {likerProfilesList.length > 0 ? (
@@ -827,7 +827,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               </div>
             ))
           ) : (
-            <p>No one has liked you yet</p>
+            <p>{t('profile.noLikersYet')}</p>
           )}
         </div>
       </Modal>
@@ -855,7 +855,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               </div>
             ))
           ) : (
-            <p>No connections yet</p>
+            <p>{t('profile.noConnectionsYet')}</p>
           )}
         </div>
       </Modal>
@@ -864,12 +864,12 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       <Modal
         isOpen={showProfileSwitcher}
         onClose={() => setShowProfileSwitcher(false)}
-        title={userProfiles.length > 1 ? "Switch Profile" : "Add Profile"}
+        title={userProfiles.length > 1 ? t('profile.switchProfileLabel') : t('profile.addProfileLabel')}
       >
         <div className="text-left">
           {userProfiles.length > 1 && (
             <p className="text-sm text-white/50 mb-4">
-              Select which profile you want to manage:
+              {t('profile.selectProfileToManage')}
             </p>
           )}
           <div className="flex flex-col gap-2.5">
@@ -938,8 +938,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 <AddIcon />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-[15px] font-medium text-white">Add New Profile</h4>
-                <p className="text-xs text-white/50 mt-1">Create another professional profile</p>
+                <h4 className="text-[15px] font-medium text-white">{t('profile.addNewProfile')}</h4>
+                <p className="text-xs text-white/50 mt-1">{t('profile.createAnotherProfile')}</p>
               </div>
             </div>
           </div>
@@ -963,14 +963,14 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         <Modal
           isOpen={!!profileToDelete}
           onClose={() => setProfileToDelete(null)}
-          title="Delete Profile"
+          title={t('profile.deleteProfileTitle')}
         >
           <div className="text-left">
             <p className="text-sm leading-relaxed text-white/70 m-0">
-              Are you sure you want to delete the profile{' '}
+              {t('profile.deleteConfirmBefore')}{' '}
               <span className="font-semibold text-white">{profileToDelete.name}</span>?
             </p>
-            <p className="text-xs text-red-400/80 mt-2 mb-5">This action cannot be undone.</p>
+            <p className="text-xs text-red-400/80 mt-2 mb-5">{t('profile.cannotBeUndone')}</p>
             <div className="flex gap-2.5">
               <button
                 className="btn btn-outline flex-1"
@@ -982,7 +982,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 className="btn btn-danger flex-1"
                 onClick={handleDeleteProfile}
               >
-                Delete Profile
+                {t('profile.deleteProfileTitle')}
               </button>
             </div>
           </div>
