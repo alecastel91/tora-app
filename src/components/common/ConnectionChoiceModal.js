@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 import { InfoIcon, HandshakeIcon, UserIcon } from '../../utils/icons';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
+  const { t } = useLanguage();
   // This modal should only be shown when artist has a representedBy agent
   // The parent component (ViewProfileScreen) handles the check
 
@@ -48,7 +50,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
 
   const handleSendRequest = async () => {
     if (!message.trim()) {
-      alert('Please write a message to introduce yourself');
+      alert(t('search.pleaseWriteMessage'));
       return;
     }
     console.log('Sending request with message:', message);
@@ -89,10 +91,10 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
     return (
       <div className="message-modal-overlay" onClick={onClose}>
         <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
-          <h2 className="message-modal-title">Send message to {targetName}</h2>
+          <h2 className="message-modal-title">{t('search.sendMessageTo')} {targetName}</h2>
 
           <textarea
-            placeholder="Write a message..."
+            placeholder={t('messages.writeMessage')}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows="5"
@@ -123,7 +125,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
     return (
       <Modal isOpen={true} onClose={onClose}>
         <div className="connection-choice-modal">
-          <h2>Select Agent</h2>
+          <h2>{t('connect.selectAgent')}</h2>
           <p className="modal-description">
             This artist has multiple agents. Who would you like to connect with?
           </p>
@@ -140,7 +142,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
               <div className="option-content">
                 <div className="option-name">{agent.name || agent.agentName || 'Agent'}</div>
                 <div className="option-description">
-                  For booking inquiries
+                  {t('connect.forBooking')}
                 </div>
               </div>
             </button>
@@ -162,7 +164,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
   return (
     <Modal isOpen={true} onClose={onClose}>
       <div className="connection-choice-modal">
-        <h2>Connect with {artist.name}</h2>
+        <h2>{t('tour.connectWith', { name: artist.name })}</h2>
 
         <div className="info-banner">
           <InfoIcon />
@@ -182,10 +184,10 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
             <HandshakeIcon />
           </div>
           <div className="option-content">
-            <div className="option-title">Connect with Agent</div>
+            <div className="option-title">{t('connect.withAgent')}</div>
             <div className="option-name">{agentDisplayName}</div>
             <div className="option-description">
-              For booking inquiries
+              {t('connect.forBooking')}
             </div>
           </div>
         </button>
@@ -199,16 +201,16 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
             <UserIcon />
           </div>
           <div className="option-content">
-            <div className="option-title">Connect with Artist</div>
+            <div className="option-title">{t('connect.withArtist')}</div>
             <div className="option-name">{artist.name}</div>
             <div className="option-description">
-              For personal collaboration matters
+              {t('connect.forCollaboration')}
             </div>
           </div>
         </button>
 
         <button className="btn btn-secondary btn-full" onClick={onClose}>
-          Cancel
+          {t('editProfile.cancel')}
         </button>
       </div>
     </Modal>

@@ -1,4 +1,25 @@
 const en = {
+  agentPlans: {
+    title: 'Agent plans',
+    savePct: '· save ~20%',
+    current: 'Current',
+    unlimitedArtists: 'Unlimited artists · custom limits',
+    upToArtists: 'Up to {{n}} artists',
+    custom: 'Custom',
+    currentPlan: 'Current plan',
+    contactSales: 'Contact sales',
+    select: 'Select',
+    checkoutSoon: 'Self-serve checkout is coming soon. Email',
+  },
+
+  connect: {
+    selectAgent: 'Select Agent',
+    withAgent: 'Connect with Agent',
+    withArtist: 'Connect with Artist',
+    forBooking: 'For booking inquiries',
+    forCollaboration: 'For personal collaboration matters',
+  },
+
   offer: {
     selectArtistError: 'Please select an artist to book',
     venueRequired: 'Venue name is required',
@@ -63,6 +84,7 @@ const en = {
   },
 
   contract: {
+    loadingContract: 'Loading contract...',
     reviewFirst: 'Please open and review the contract before signing',
     enterLegalName: 'Please enter your full legal name',
     mustConsent: 'You must consent to sign this contract',

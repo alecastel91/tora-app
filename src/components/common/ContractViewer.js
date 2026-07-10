@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * ContractViewer Component
  * Displays PDF contracts in an iframe with viewing time tracking
  */
 const ContractViewer = ({ isOpen, onClose, contractUrl, dealId, onTrackView }) => {
+  const { t } = useLanguage();
   const [viewingStartTime, setViewingStartTime] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -82,7 +84,7 @@ const ContractViewer = ({ isOpen, onClose, contractUrl, dealId, onTrackView }) =
                 animation: 'spin 1s linear infinite',
                 margin: '0 auto 12px'
               }}></div>
-              <p style={{ color: '#999', fontSize: '14px' }}>Loading contract...</p>
+              <p style={{ color: '#999', fontSize: '14px' }}>{t('contract.loadingContract')}</p>
             </div>
           )}
 

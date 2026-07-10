@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AGENT_TIER_PRICING, AGENT_TIER_KEYS, BILLING_INTERVAL, formatEur } from '../../utils/agentTiers';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const requestTierActivation = (tierKey) => {
   if (tierKey === 'ENTERPRISE') {
@@ -13,13 +14,14 @@ const requestTierActivation = (tierKey) => {
 };
 
 const AgentTierLadder = ({ currentTier, scrollable = false }) => {
+  const { t } = useLanguage();
   const [billingInterval, setBillingInterval] = useState(BILLING_INTERVAL.MONTHLY);
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h3 style={{ margin: 0 }}>Agent plans</h3>
+          <h3 style={{ margin: 0 }}>{t('agentPlans.title')}</h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
             Pricing scales with roster size. Pick the plan that fits how many artists you represent.
           </p>
@@ -41,7 +43,7 @@ const AgentTierLadder = ({ currentTier, scrollable = false }) => {
                 color: billingInterval === iv ? '#fff' : 'rgba(255,255,255,0.6)',
               }}
             >
-              {iv === BILLING_INTERVAL.MONTHLY ? 'Monthly' : <>Yearly <span style={{ opacity: 0.7, fontSize: '10px' }}>· save ~20%</span></>}
+              {iv === BILLING_INTERVAL.MONTHLY ? t('premium.monthly') : <>{t('premium.yearly')} <span style={{ opacity: 0.7, fontSize: '10px' }}>{t('agentPlans.savePct')}</span></>}
             </button>
           ))}
         </div>
@@ -88,16 +90,16 @@ const AgentTierLadder = ({ currentTier, scrollable = false }) => {
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
                       fontWeight: 700,
-                    }}>Current</span>
+                    }}>{t('agentPlans.current')}</span>
                   )}
                 </div>
                 <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>
-                  {tier.artistCap === null ? 'Unlimited artists · custom limits' : `Up to ${tier.artistCap} artists`}
+                  {tier.artistCap === null ? t('agentPlans.unlimitedArtists') : t('agentPlans.upToArtists', { n: tier.artistCap })}
                 </div>
               </div>
               <div style={{ minWidth: '110px', textAlign: 'right' }}>
                 {isEnterprise ? (
-                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>Custom</div>
+                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>{t('agentPlans.custom')}</div>
                 ) : (
                   <>
                     <div style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>
@@ -121,7 +123,7 @@ const AgentTierLadder = ({ currentTier, scrollable = false }) => {
                 className={isCurrent ? 'btn btn-outline btn-sm' : 'btn btn-primary btn-sm'}
                 style={{ minWidth: '110px' }}
               >
-                {isCurrent ? 'Current plan' : isEnterprise ? 'Contact sales' : 'Select'}
+                {isCurrent ? t('agentPlans.currentPlan') : isEnterprise ? t('agentPlans.contactSales') : t('agentPlans.select')}
               </button>
             </div>
           );
@@ -129,7 +131,7 @@ const AgentTierLadder = ({ currentTier, scrollable = false }) => {
       </div>
 
       <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '16px 0 0 0', textAlign: 'center' }}>
-        Self-serve checkout is coming soon. Email <a href="mailto:support@torahub.io" style={{ color: '#FF3366' }}>support@torahub.io</a> to activate a plan today.
+        {t('agentPlans.checkoutSoon')} <a href="mailto:support@torahub.io" style={{ color: '#FF3366' }}>support@torahub.io</a> to activate a plan today.
       </p>
     </div>
   );
