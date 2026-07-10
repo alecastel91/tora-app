@@ -109,9 +109,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       const hasLocationFilters = filters.zones.length > 0 || filters.countries.length > 0 || filters.cities.length > 0;
 
       if (hasLocationFilters) {
-        const tierName = user?.subscriptionTier === 'TRIAL' ? 'Your 48h trial' : 'FREE tier';
+        const tierName = user?.subscriptionTier === 'TRIAL' ? t('search.trialTierName') : t('search.freeTierName');
         // Show alert and clear location filters
-        alert(`Location filters require a paid subscription.\n\n${tierName} search is restricted to ${user.city} only.\n\nUpgrade to search worldwide!`);
+        alert(t('search.locationFiltersAlert', { tierName, city: user.city }));
 
         // Clear location filters but keep other filters
         setFilters({
@@ -237,7 +237,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         setShowLikeLimitModal(true);
       } else {
         console.log('Not a like limit error, showing generic alert');
-        alert('Failed to like profile. Please try again.');
+        alert(t('search.failedToLike'));
       }
     }
   };
@@ -285,9 +285,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         const repArray = Array.isArray(artistContext.representedBy)
           ? artistContext.representedBy
           : (artistContext.representedBy ? [artistContext.representedBy] : []);
-        targetName = repArray[0]?.name || repArray[0]?.agentName || 'Agent';
+        targetName = repArray[0]?.name || repArray[0]?.agentName || t('search.agent');
       }
-      alert(`Connection request sent to ${targetName}!`);
+      alert(t('search.connectionRequestSent', { name: targetName }));
     } catch (error) {
       console.error('Error sending connection request:', error);
       console.error('Error details:', {
@@ -310,7 +310,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       // Only show alert for non-limit errors
       console.error('Connection request failed:', error);
-      alert('Failed to send connection request. Please try again.');
+      alert(t('search.failedToSendRequest'));
     }
   };
 
@@ -359,7 +359,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         await fetchProfiles();
       } catch (error) {
         console.error('Error accepting request:', error);
-        alert('Failed to accept request');
+        alert(t('search.failedToAcceptRequest'));
       }
     }
   };
@@ -377,7 +377,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         await fetchProfiles();
       } catch (error) {
         console.error('Error declining request:', error);
-        alert('Failed to decline request');
+        alert(t('search.failedToDeclineRequest'));
       }
     }
   };
@@ -385,7 +385,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const handleSendMessage = async () => {
     if (selectedProfile) {
       if (!message.trim()) {
-        alert('Please write a message to introduce yourself');
+        alert(t('search.pleaseWriteMessage'));
         return;
       }
       const profileId = selectedProfile.id;
@@ -423,7 +423,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         }
 
         // Only show alert for non-limit errors
-        alert('Failed to send connection request. Please try again.');
+        alert(t('search.failedToSendRequest'));
       }
     }
   };
@@ -490,7 +490,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               </svg>
             </span>
             <span>
-              {user?.subscriptionTier === 'TRIAL' ? 'Searching worldwide with 48h trial' : 'Searching worldwide with Premium'}
+              {user?.subscriptionTier === 'TRIAL' ? t('profile.searchingWorldwideTrial') : t('profile.searchingWorldwidePremium')}
             </span>
           </div>
         )}
@@ -506,11 +506,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 </svg>
               </span>
               <div className="upgrade-text">
-                <strong>Search limited to {user.city}</strong>
-                <p>Upgrade to search worldwide and unlock premium features</p>
+                <strong>{t('profile.searchLimitedTo')} {user.city}</strong>
+                <p>{t('search.upgradeWorldwide')}</p>
               </div>
               <button className="btn btn-upgrade-banner" onClick={onOpenPremium}>
-                Upgrade Now
+                {t('search.upgradeNow')}
               </button>
             </div>
           </div>
@@ -521,7 +521,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       {/* Search Results */}
       <div className="search-results">
         {loading ? (
-          <LoadingGlobe label="Loading profiles..." />
+          <LoadingGlobe label={t('search.loadingProfiles')} />
         ) : searchResults.length > 0 ? (
           searchResults.map(profile => {
             const profileId = profile.id;
@@ -551,7 +551,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                     <div className="result-header">
                       <h3>{profile.name}</h3>
                       <span className={`role-badge badge-${profile.role.toLowerCase()}`}>
-                        {profile.role}
+                        {t(`editProfile.${profile.role.toLowerCase()}`)}
                       </span>
                     </div>
                     <p className="result-location">{profile.location}</p>
@@ -569,14 +569,14 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                       className="btn btn-message btn-connect"
                       onClick={() => handleMessage(profile)}
                     >
-                      Message
+                      {t('search.message')}
                     </button>
                   ) : hasReceivedRequest || isRequested ? (
                     <button
                       className="btn btn-disabled btn-connect"
                       disabled={true}
                     >
-                      Pending
+                      {t('search.pending')}
                     </button>
                   ) : (
                     <button
@@ -593,9 +593,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         ) : (
           <div className="flex flex-col items-center py-20 text-center">
             <span aria-hidden className="text-white/15 [&>svg]:w-9 [&>svg]:h-9 mb-4"><SearchIcon /></span>
-            <p className="text-sm text-white/50">{hasSearched ? 'No results found' : 'Start searching to find profiles'}</p>
+            <p className="text-sm text-white/50">{hasSearched ? t('search.noResults') : t('search.startSearching')}</p>
             <p className="text-xs text-white/30 mt-1.5">
-              {hasSearched ? 'Try different keywords or filters' : 'Search by name or use the filters'}
+              {hasSearched ? t('search.tryDifferentKeywords') : t('search.searchByNameOrFilters')}
             </p>
           </div>
         )}
@@ -626,9 +626,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             >
               <span>{t('search.roles')}</span>
               <span className="dropdown-value">
-                {filters.roles.length > 0 
-                  ? `${filters.roles.length} selected`
-                  : 'Select roles'
+                {filters.roles.length > 0
+                  ? t('search.nSelected', { n: filters.roles.length })
+                  : t('search.selectRoles')
                 }
               </span>
               <span className="dropdown-arrow">{openDropdown === 'roles' ? '▲' : '▼'}</span>
@@ -642,7 +642,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                       checked={filters.roles.includes(role)}
                       onChange={() => toggleFilterItem('roles', role)}
                     />
-                    <span>{role}</span>
+                    <span>{t(`editProfile.${role.toLowerCase()}`)}</span>
                   </label>
                 ))}
               </div>
@@ -657,9 +657,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             >
               <span>{t('search.zones')}</span>
               <span className="dropdown-value">
-                {filters.zones.length > 0 
-                  ? `${filters.zones.length} selected`
-                  : 'Select zones'
+                {filters.zones.length > 0
+                  ? t('search.nSelected', { n: filters.zones.length })
+                  : t('search.selectZones')
                 }
               </span>
               <span className="dropdown-arrow">{openDropdown === 'zones' ? '▲' : '▼'}</span>
@@ -688,9 +688,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             >
               <span>{t('search.countries')}</span>
               <span className="dropdown-value">
-                {filters.countries.length > 0 
-                  ? `${filters.countries.length} selected`
-                  : 'Select countries'
+                {filters.countries.length > 0
+                  ? t('search.nSelected', { n: filters.countries.length })
+                  : t('search.selectCountries')
                 }
               </span>
               <span className="dropdown-arrow">{openDropdown === 'countries' ? '▲' : '▼'}</span>
@@ -719,9 +719,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             >
               <span>{t('search.cities')}</span>
               <span className="dropdown-value">
-                {filters.cities.length > 0 
-                  ? `${filters.cities.length} selected`
-                  : 'Select cities'
+                {filters.cities.length > 0
+                  ? t('search.nSelected', { n: filters.cities.length })
+                  : t('search.selectCities')
                 }
               </span>
               <span className="dropdown-arrow">{openDropdown === 'cities' ? '▲' : '▼'}</span>
@@ -750,9 +750,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             >
               <span>{t('search.genres')}</span>
               <span className="dropdown-value">
-                {filters.genres.length > 0 
-                  ? `${filters.genres.length} selected`
-                  : 'Select genres'
+                {filters.genres.length > 0
+                  ? t('search.nSelected', { n: filters.genres.length })
+                  : t('search.selectGenres')
                 }
               </span>
               <span className="dropdown-arrow">{openDropdown === 'genres' ? '▲' : '▼'}</span>
@@ -847,7 +847,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           setReviewingRequest(null);
         }}>
           <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
-            <h2 className="message-modal-title">Connection Request from {selectedProfile.name}</h2>
+            <h2 className="message-modal-title">{t('search.connectionRequestFrom', { name: selectedProfile.name })}</h2>
 
             <div className="review-modal-profile">
               <div className={`result-avatar avatar-${selectedProfile.role.toLowerCase()}`}>
@@ -861,19 +861,19 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 <h3>{selectedProfile.name}</h3>
                 <p className="result-location">{selectedProfile.location}</p>
                 <span className={`role-badge badge-${selectedProfile.role.toLowerCase()}`}>
-                  {selectedProfile.role}
+                  {t(`editProfile.${selectedProfile.role.toLowerCase()}`)}
                 </span>
               </div>
             </div>
 
             {reviewingRequest.message && reviewingRequest.message.trim() ? (
               <div className="review-modal-message">
-                <label>Message:</label>
+                <label>{t('search.messageLabel')}</label>
                 <div className="message-content">{reviewingRequest.message}</div>
               </div>
             ) : (
               <div className="review-modal-message">
-                <p className="system-message-text">{selectedProfile.name} wants to connect</p>
+                <p className="system-message-text">{t('search.wantsToConnect', { name: selectedProfile.name })}</p>
               </div>
             )}
 
@@ -882,13 +882,13 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 className="btn btn-outline btn-modal-cancel"
                 onClick={handleDeclineRequest}
               >
-                Decline
+                {t('search.decline')}
               </button>
               <button
                 className="btn btn-primary btn-modal-send"
                 onClick={handleAcceptRequest}
               >
-                Accept
+                {t('search.accept')}
               </button>
             </div>
           </div>
@@ -900,7 +900,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         <div className="modal-overlay" onClick={() => setShowLikeLimitModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Daily Like Limit Reached</h3>
+              <h3>{t('search.dailyLikeLimitReached')}</h3>
               <button className="modal-close" onClick={() => setShowLikeLimitModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -908,11 +908,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 <div className="limit-icon">
                   <SlashCircleIcon />
                 </div>
-                <p className="limit-main-text">You've reached your daily limit. Upgrade to Premium for unlimited likes!</p>
+                <p className="limit-main-text">{t('search.dailyLikeLimitMessage')}</p>
               </div>
 
               <div className="tier-info-box">
-                <p className="tier-details">Current plan: <strong>{likeLimitData.tier}</strong> • {likeLimitData.limit} likes per day</p>
+                <p className="tier-details">{t('search.currentPlan')} <strong>{likeLimitData.tier}</strong> • {t('search.likesPerDay', { n: likeLimitData.limit })}</p>
               </div>
             </div>
             <div className="modal-footer">
@@ -920,7 +920,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 className="btn btn-outline"
                 onClick={() => setShowLikeLimitModal(false)}
               >
-                Close
+                {t('common.close')}
               </button>
               <button
                 className="btn btn-upgrade"
@@ -931,7 +931,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                   }
                 }}
               >
-                Upgrade
+                {t('search.upgrade')}
               </button>
             </div>
           </div>
@@ -943,7 +943,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         <div className="modal-overlay" onClick={() => setShowConnectionLimitModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Monthly Connection Limit Reached</h3>
+              <h3>{t('search.monthlyConnectionLimitReached')}</h3>
               <button className="modal-close" onClick={() => setShowConnectionLimitModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -951,11 +951,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 <div className="limit-icon">
                   <SlashCircleIcon />
                 </div>
-                <p className="limit-main-text">You've reached your monthly limit. Upgrade to Premium for unlimited connections!</p>
+                <p className="limit-main-text">{t('search.monthlyConnectionLimitMessage')}</p>
               </div>
 
               <div className="tier-info-box">
-                <p className="tier-details">Current plan: <strong>{connectionLimitData.tier}</strong> • {connectionLimitData.limit} connections per month</p>
+                <p className="tier-details">{t('search.currentPlan')} <strong>{connectionLimitData.tier}</strong> • {t('search.connectionsPerMonth', { n: connectionLimitData.limit })}</p>
               </div>
             </div>
             <div className="modal-footer">
@@ -963,7 +963,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 className="btn btn-outline"
                 onClick={() => setShowConnectionLimitModal(false)}
               >
-                Close
+                {t('common.close')}
               </button>
               <button
                 className="btn btn-upgrade"
@@ -974,7 +974,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                   }
                 }}
               >
-                Upgrade
+                {t('search.upgrade')}
               </button>
             </div>
           </div>

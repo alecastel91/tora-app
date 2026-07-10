@@ -28,23 +28,30 @@ export const LanguageProvider = ({ children }) => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
-  const t = (key) => {
+  const t = (key, vars) => {
     const keys = key.split('.');
     let translation = translations[language];
-    
+
     for (const k of keys) {
       translation = translation?.[k];
     }
-    
+
     // If translation not found, try English as fallback
     if (!translation) {
       let fallback = translations.en;
       for (const k of keys) {
         fallback = fallback?.[k];
       }
-      return fallback || key;
+      translation = fallback || key;
     }
-    
+
+    // {{var}} interpolation: t('trial.daysRemaining', { n: 3 })
+    if (vars && typeof translation === 'string') {
+      translation = translation.replace(/\{\{(\w+)\}\}/g, (m, name) =>
+        vars[name] !== undefined ? String(vars[name]) : m
+      );
+    }
+
     return translation;
   };
 

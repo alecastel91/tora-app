@@ -96,9 +96,9 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 1) return t('messages.justNow');
-    if (diffMins < 60) return `${diffMins}m`;
-    if (diffHours < 24) return `${diffHours}h`;
-    if (diffDays < 7) return `${diffDays}d`;
+    if (diffMins < 60) return t('messages.minutesShort', { n: diffMins });
+    if (diffHours < 24) return t('messages.hoursShort', { n: diffHours });
+    if (diffDays < 7) return t('messages.daysShort', { n: diffDays });
     return messageTime.toLocaleDateString();
   };
 
@@ -145,7 +145,7 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
       <div className="flex border-b border-white/10 mb-5 px-1">
         <TabButton
           id="messages"
-          label="Messages"
+          label={t('messages.title')}
           count={totalUnread}
           icon={(
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -155,7 +155,7 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
         />
         <TabButton
           id="requests"
-          label="Requests"
+          label={t('messages.requests')}
           count={connectionRequests.length}
           icon={(
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -250,8 +250,8 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
                     <h3 className="text-[15px] font-medium text-white truncate">{request.profile.name}</h3>
                     <p className="text-xs text-white/50 truncate mt-0.5">
                       {request.type === 'REPRESENTATION_REQUEST'
-                        ? 'Representation Request'
-                        : (request.message || 'Connection request')}
+                        ? t('messages.representationRequest')
+                        : (request.message || t('messages.connectionRequest'))}
                     </p>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
                       await fetchData(); // Refresh the requests list
                     }}
                   >
-                    Accept
+                    {t('messages.accept')}
                   </button>
                   <button
                     className="btn btn-sm btn-outline flex-1"
@@ -282,13 +282,13 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
                       await fetchData(); // Refresh the requests list
                     }}
                   >
-                    Decline
+                    {t('messages.decline')}
                   </button>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-center text-sm text-white/40 py-16">No pending requests</p>
+            <p className="text-center text-sm text-white/40 py-16">{t('messages.noPendingRequests')}</p>
           )
         )}
       </div>
