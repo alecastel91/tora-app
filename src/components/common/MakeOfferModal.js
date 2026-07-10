@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
+  const { t } = useLanguage();
 
   const { user: currentUser } = useAppContext();
   const [loading, setLoading] = useState(false);
@@ -131,27 +133,27 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
     // Validation
     if (recipientProfile.role === 'AGENT' && !formData.selectedArtistId) {
-      setError('Please select an artist to book');
+      setError(t('offer.selectArtistError'));
       return;
     }
     if (!formData.venueName.trim()) {
-      setError('Venue name is required');
+      setError(t('offer.venueRequired'));
       return;
     }
     if (!formData.zone) {
-      setError('Zone is required');
+      setError(t('offer.zoneRequired'));
       return;
     }
     if (!formData.country) {
-      setError('Country is required');
+      setError(t('offer.countryRequired'));
       return;
     }
     if (!formData.city) {
-      setError('City is required');
+      setError(t('offer.cityRequired'));
       return;
     }
     if (!formData.date) {
-      setError('Event date is required');
+      setError(t('offer.dateRequired'));
       return;
     }
 
@@ -162,12 +164,12 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
     selectedDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
-      alert('Event date cannot be in the past');
+      alert(t('offer.dateInPast'));
       return;
     }
 
     if (!formData.fee || parseFloat(formData.fee) <= 0) {
-      setError('Please enter a valid fee amount');
+      setError(t('chat.enterValidFee'));
       return;
     }
 
@@ -193,7 +195,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
       // Check if set time is within event time
       if (setStartTotalMin < eventStartTotalMin || setEndTotalMin > eventEndTotalMin) {
-        alert('Set time must be within the event time range');
+        alert(t('offer.setTimeRange'));
         return;
       }
     }
@@ -277,7 +279,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
         mealsNote: ''
       });
     } catch (err) {
-      setError(err.message || 'Failed to create offer');
+      setError(err.message || t('offer.createFailed'));
       setLoading(false);
     }
   };
@@ -293,7 +295,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <h2>Make an Offer</h2>
+          <h2>{t('tour.makeAnOffer')}</h2>
           <div style={{ width: '24px' }}></div>
         </div>
 
@@ -320,17 +322,17 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
           {recipientProfile.role === 'AGENT' && (
             <div className="form-section">
-              <h4>Artist Selection</h4>
+              <h4>{t('offer.artistSelection')}</h4>
 
               <div className="form-group">
-                <label>Select Artist to Book *</label>
+                <label>{t('offer.selectArtistToBook')} *</label>
                 <select
                   value={formData.selectedArtistId}
                   onChange={handleArtistChange}
                   className="form-input"
                   required
                 >
-                  <option value="">Select an artist</option>
+                  <option value="">{t('offer.selectAnArtist')}</option>
                   {representedArtists.map(artist => (
                     <option key={artist.profileId} value={artist.profileId}>
                       {artist.name}
@@ -342,10 +344,10 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
           )}
 
           <div className="form-section">
-            <h4>Event Details</h4>
+            <h4>{t('offer.eventDetails')}</h4>
 
             <div className="form-group">
-              <label>Event Name</label>
+              <label>{t('offer.eventName')}</label>
               <input
                 type="text"
                 value={formData.eventName}
@@ -356,12 +358,12 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
             </div>
 
             <div className="form-group">
-              <label>Venue Name *</label>
+              <label>{t('offer.venueName')} *</label>
               <input
                 type="text"
                 value={formData.venueName}
                 onChange={(e) => handleChange('venueName', e.target.value)}
-                placeholder={isArtistOrAgent ? recipientProfile.name : "Your venue name"}
+                placeholder={isArtistOrAgent ? recipientProfile.name : t('offer.yourVenueName')}
                 className="form-input"
                 required
               />
@@ -369,14 +371,14 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Zone *</label>
+                <label>{t('editProfile.zone')} *</label>
                 <select
                   value={formData.zone}
                   onChange={(e) => handleZoneChange(e.target.value)}
                   className="form-input"
                   required
                 >
-                  <option value="">Select Zone</option>
+                  <option value="">{t('editProfile.selectZone')}</option>
                   {zones.map(zone => (
                     <option key={zone} value={zone}>{zone}</option>
                   ))}
@@ -384,7 +386,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Country *</label>
+                <label>{t('editProfile.country')} *</label>
                 <select
                   value={formData.country}
                   onChange={(e) => handleCountryChange(e.target.value)}
@@ -392,7 +394,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                   disabled={!formData.zone}
                   required
                 >
-                  <option value="">Select Country</option>
+                  <option value="">{t('editProfile.selectCountry')}</option>
                   {availableCountries.map(country => (
                     <option key={country} value={country}>{country}</option>
                   ))}
@@ -401,7 +403,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
             </div>
 
             <div className="form-group">
-              <label>City *</label>
+              <label>{t('editProfile.city')} *</label>
               <select
                 value={formData.city}
                 onChange={(e) => handleCityChange(e.target.value)}
@@ -409,7 +411,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                 disabled={!formData.country}
                 required
               >
-                <option value="">Select City</option>
+                <option value="">{t('editProfile.selectCity')}</option>
                 {availableCities.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
@@ -417,7 +419,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
             </div>
 
             <div className="form-group">
-              <label>Date *</label>
+              <label>{t('tour.date')} *</label>
               <input
                 type="date"
                 value={formData.date}
@@ -429,7 +431,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Event Start Time</label>
+                <label>{t('offer.eventStartTime')}</label>
                 <input
                   type="time"
                   value={formData.eventStartTime}
@@ -439,7 +441,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Event End Time</label>
+                <label>{t('offer.eventEndTime')}</label>
                 <input
                   type="time"
                   value={formData.eventEndTime}
@@ -451,11 +453,11 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
           </div>
 
           <div className="form-section">
-            <h4>Financial Terms</h4>
+            <h4>{t('offer.financialTerms')}</h4>
 
             <div className="form-row">
               <div className="form-group" style={{ flex: 2 }}>
-                <label>Fee *</label>
+                <label>{t('tour.fee')} *</label>
                 <input
                   type="number"
                   step="1"
@@ -470,7 +472,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               </div>
 
               <div className="form-group" style={{ flex: 1 }}>
-                <label>Currency</label>
+                <label>{t('chat.currency')}</label>
                 <select
                   value={formData.currency}
                   onChange={(e) => handleChange('currency', e.target.value)}
@@ -487,7 +489,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
           </div>
 
           <div className="form-section">
-            <h4>Extras</h4>
+            <h4>{t('chat.extras')}</h4>
 
             <div className="extras-grid">
               <div className="extra-item">
@@ -497,7 +499,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     checked={formData.includeTravelIn}
                     onChange={(e) => handleChange('includeTravelIn', e.target.checked)}
                   />
-                  <span>Travel In</span>
+                  <span>{t('chat.travelIn')}</span>
                 </label>
                 {formData.includeTravelIn && (
                   <input
@@ -517,7 +519,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     checked={formData.includeTravelOut}
                     onChange={(e) => handleChange('includeTravelOut', e.target.checked)}
                   />
-                  <span>Travel Out</span>
+                  <span>{t('chat.travelOut')}</span>
                 </label>
                 {formData.includeTravelOut && (
                   <input
@@ -537,7 +539,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     checked={formData.includeTransportation}
                     onChange={(e) => handleChange('includeTransportation', e.target.checked)}
                   />
-                  <span>Ground Transportation</span>
+                  <span>{t('offer.groundTransportation')}</span>
                 </label>
                 {formData.includeTransportation && (
                   <input
@@ -557,7 +559,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     checked={formData.includeAccommodation}
                     onChange={(e) => handleChange('includeAccommodation', e.target.checked)}
                   />
-                  <span>Accommodation</span>
+                  <span>{t('chat.accommodation')}</span>
                 </label>
                 {formData.includeAccommodation && (
                   <input
@@ -577,7 +579,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     checked={formData.includeMeals}
                     onChange={(e) => handleChange('includeMeals', e.target.checked)}
                   />
-                  <span>Meals</span>
+                  <span>{t('chat.meals')}</span>
                 </label>
                 {formData.includeMeals && (
                   <input
@@ -593,11 +595,11 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
           </div>
 
           <div className="form-section">
-            <h4>Performance Details</h4>
+            <h4>{t('offer.performanceDetails')}</h4>
 
             <div className="form-row">
               <div className="form-group">
-                <label>Performance Type</label>
+                <label>{t('offer.performanceType')}</label>
                 <select
                   value={formData.performanceType}
                   onChange={(e) => handleChange('performanceType', e.target.value)}
@@ -614,7 +616,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Set Start Time</label>
+                <label>{t('offer.setStartTime')}</label>
                 <input
                   type="time"
                   value={formData.setStartTime}
@@ -624,7 +626,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Set End Time</label>
+                <label>{t('offer.setEndTime')}</label>
                 <input
                   type="time"
                   value={formData.setEndTime}
@@ -634,7 +636,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Set Duration</label>
+                <label>{t('offer.setDuration')}</label>
                 <div className="form-input" style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
                   color: setDuration > 0 ? 'var(--text-white)' : 'rgba(255, 255, 255, 0.3)',
@@ -647,14 +649,14 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
           </div>
 
           <div className="form-section">
-            <h4>Additional Information</h4>
+            <h4>{t('offer.additionalInfo')}</h4>
 
             <div className="form-group">
-              <label>Notes (optional)</label>
+              <label>{t('offer.notesOptional')}</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}
-                placeholder="Private notes about this offer..."
+                placeholder={t('offer.notesPlaceholder')}
                 className="form-textarea"
                 rows="2"
               />
@@ -670,7 +672,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               className="btn btn-primary"
               disabled={loading}
             >
-              {loading ? 'Sending Offer...' : 'Send Offer'}
+              {loading ? t('offer.sendingOffer') : t('offer.sendOffer')}
             </button>
           </div>
         </form>
