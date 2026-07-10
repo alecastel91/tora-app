@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import AuthScreenShell from '../common/AuthScreenShell';
 import apiService from '../../services/api';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ForgotPasswordScreen = ({ onBackToLogin }) => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,26 +19,25 @@ const ForgotPasswordScreen = ({ onBackToLogin }) => {
       await apiService.forgotPassword(email);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || t('auth.somethingWentWrong'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthScreenShell subtitle="RESET YOUR PASSWORD">
+    <AuthScreenShell subtitle={t('auth.resetYourPassword')}>
       {submitted ? (
         <div className="bg-transparent">
           <div className="bg-white/5 border border-white/10 rounded-lg px-5 py-6 mb-6 text-white text-[14px] leading-relaxed">
-            If an account exists for <strong>{email}</strong>, we've sent a reset link.
-            Check your inbox — the link expires in 60 minutes.
+            {t('auth.resetLinkSentBefore')} <strong>{email}</strong>{t('auth.resetLinkSentAfter')}
           </div>
           <button
             type="button"
             onClick={onBackToLogin}
             className="w-full px-8 py-4 bg-[#1a1a1a] text-white text-sm font-bold uppercase tracking-widest rounded-xs border border-white/15 cursor-pointer transition-all duration-300 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98]"
           >
-            Back to Log In
+            {t('auth.backToLogin')}
           </button>
         </div>
       ) : (
@@ -48,15 +49,15 @@ const ForgotPasswordScreen = ({ onBackToLogin }) => {
           )}
 
           <p className="text-gray-400 text-[13px] leading-relaxed mb-6">
-            Enter your account email and we'll send you a link to choose a new password.
+            {t('auth.forgotIntro')}
           </p>
 
           <div className="mb-6">
             <input
               type="email"
               name="email"
-              placeholder="Email"
-              aria-label="Email"
+              placeholder={t('auth.email')}
+              aria-label={t('auth.email')}
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -70,7 +71,7 @@ const ForgotPasswordScreen = ({ onBackToLogin }) => {
             disabled={loading}
             className="w-full px-8 py-4 bg-[#1a1a1a] text-white text-sm font-bold uppercase tracking-widest rounded-xs border border-white/15 cursor-pointer transition-all duration-300 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'SENDING…' : 'SEND RESET LINK'}
+            {loading ? t('auth.sending') : t('auth.sendResetLink')}
           </button>
 
           <div className="text-center mt-5 text-[13px] font-normal">
@@ -79,7 +80,7 @@ const ForgotPasswordScreen = ({ onBackToLogin }) => {
               onClick={onBackToLogin}
               className="text-gray-400 hover:text-white underline bg-transparent border-none cursor-pointer font-normal transition-colors duration-200"
             >
-              Back to Log In
+              {t('auth.backToLogin')}
             </button>
           </div>
         </form>

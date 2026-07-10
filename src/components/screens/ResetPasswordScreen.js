@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import AuthScreenShell from '../common/AuthScreenShell';
 import apiService from '../../services/api';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ResetPasswordScreen = ({ token, onBackToLogin }) => {
+  const { t } = useLanguage();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,11 +16,11 @@ const ResetPasswordScreen = ({ token, onBackToLogin }) => {
     if (loading) return;
     setError('');
     if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t('auth.passwordMinLength'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Passwords don't match.");
+      setError(t('auth.passwordsDontMatch'));
       return;
     }
     setLoading(true);
@@ -26,25 +28,25 @@ const ResetPasswordScreen = ({ token, onBackToLogin }) => {
       await apiService.resetPassword(token, newPassword);
       setSuccess(true);
     } catch (err) {
-      setError(err.message || 'Reset failed. The link may have expired — request a new one.');
+      setError(err.message || t('auth.resetFailed'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthScreenShell subtitle="CHOOSE A NEW PASSWORD">
+    <AuthScreenShell subtitle={t('auth.chooseNewPassword')}>
       {success ? (
         <div className="bg-transparent">
           <div className="bg-green-500/10 border border-green-500/40 rounded-lg px-5 py-6 mb-6 text-white text-[14px] leading-relaxed">
-            Password updated. You can log in with your new password now.
+            {t('auth.passwordUpdated')}
           </div>
           <button
             type="button"
             onClick={onBackToLogin}
             className="w-full px-8 py-4 bg-[#1a1a1a] text-white text-sm font-bold uppercase tracking-widest rounded-xs border border-white/15 cursor-pointer transition-all duration-300 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98]"
           >
-            Go to Log In
+            {t('auth.goToLogin')}
           </button>
         </div>
       ) : (
@@ -59,8 +61,8 @@ const ResetPasswordScreen = ({ token, onBackToLogin }) => {
             <input
               type="password"
               name="newPassword"
-              placeholder="New password (min 6 characters)"
-              aria-label="New password"
+              placeholder={t('auth.newPasswordPlaceholder')}
+              aria-label={t('auth.newPassword')}
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -74,8 +76,8 @@ const ResetPasswordScreen = ({ token, onBackToLogin }) => {
             <input
               type="password"
               name="confirmPassword"
-              placeholder="Confirm new password"
-              aria-label="Confirm new password"
+              placeholder={t('auth.confirmNewPassword')}
+              aria-label={t('auth.confirmNewPassword')}
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -89,7 +91,7 @@ const ResetPasswordScreen = ({ token, onBackToLogin }) => {
             disabled={loading}
             className="w-full px-8 py-4 bg-[#1a1a1a] text-white text-sm font-bold uppercase tracking-widest rounded-xs border border-white/15 cursor-pointer transition-all duration-300 hover:border-white/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'RESETTING…' : 'RESET PASSWORD'}
+            {loading ? t('auth.resetting') : t('auth.resetPassword')}
           </button>
 
           <div className="text-center mt-5 text-[13px] font-normal">
@@ -98,7 +100,7 @@ const ResetPasswordScreen = ({ token, onBackToLogin }) => {
               onClick={onBackToLogin}
               className="text-gray-400 hover:text-white underline bg-transparent border-none cursor-pointer font-normal transition-colors duration-200"
             >
-              Back to Log In
+              {t('auth.backToLogin')}
             </button>
           </div>
         </form>

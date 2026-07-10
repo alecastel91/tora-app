@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import apiService from '../../services/api';
 import IntroSplash from '../common/IntroSplash';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPassword }) => {
+  const { t } = useLanguage();
   const [showIntro, setShowIntro] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,7 +43,7 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
       const data = await apiService.login(formData.email, formData.password);
       onLoginSuccess(data);
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      setError(err.message || t('auth.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -109,8 +111,8 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
               <input
                 type="email"
                 name="email"
-                placeholder="Email"
-                aria-label="Email"
+                placeholder={t('auth.email')}
+                aria-label={t('auth.email')}
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -126,8 +128,8 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
               <input
                 type="password"
                 name="password"
-                placeholder="Password"
-                aria-label="Password"
+                placeholder={t('auth.password')}
+                aria-label={t('auth.password')}
                 autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
@@ -145,7 +147,7 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
                 onClick={onSwitchToForgotPassword}
                 className="text-[12px] text-white/40 hover:text-infrared bg-transparent border-none cursor-pointer transition-colors duration-200"
               >
-                Forgot password?
+                {t('auth.forgotPassword')}
               </button>
             </div>
 
@@ -158,31 +160,31 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
                          hover:bg-infrared/15 hover:border-infrared/70 active:scale-[0.98]
                          disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Logging in...' : 'Log In'}
+              {loading ? t('auth.loggingIn') : t('auth.logIn')}
             </button>
 
           {/* Activate (with invitation code) */}
           <div className="text-center mt-6 text-[13px] font-normal">
-            <span className="text-white/40">Have an invitation? </span>
+            <span className="text-white/40">{t('auth.haveInvitation')} </span>
             <button
               type="button"
               onClick={onSwitchToSignup}
               className="text-infrared hover:opacity-80 underline underline-offset-2 bg-transparent border-none cursor-pointer font-normal transition-opacity duration-200"
             >
-              Activate your account
+              {t('auth.activateAccount')}
             </button>
           </div>
 
           {/* Apply (no invitation yet) */}
           <div className="text-center mt-2 text-[13px] font-normal">
-            <span className="text-white/40">New to TORA? </span>
+            <span className="text-white/40">{t('auth.newToTora')} </span>
             <a
               href={import.meta.env.VITE_APPLY_URL || 'https://torahub.io/apply'}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/60 hover:text-white underline underline-offset-2 cursor-pointer font-normal transition-colors duration-200"
             >
-              Apply for membership
+              {t('auth.applyMembership')}
             </a>
           </div>
 
