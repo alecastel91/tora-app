@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import en from '../translations/en';
-import ja from '../translations/ja';
-import zh from '../translations/zh';
-import ko from '../translations/ko';
-import es from '../translations/es';
-import fr from '../translations/fr';
-import it from '../translations/it';
-import pt from '../translations/pt';
 
 const LanguageContext = createContext();
 
-// Missing keys in any language fall back to English (see t below), so a
-// partially-translated file degrades gracefully rather than breaking.
-const translations = { en, ja, zh, ko, es, fr, it, pt };
+// English ships in the entry bundle (it's also the per-key fallback); the
+// other seven load on demand so ~400KB of translations stay out of the
+// initial chunk. Vite code-splits the dynamic import below per language.
+const translations = { en };
+
+const loadLanguage = async (code) => {
+  if (translations[code]) return translations[code];
+  const mod = await import(`../translations/${code}.js`);
+  translations[code] = mod.default;
+  return translations[code];
+};
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
@@ -27,14 +28,27 @@ export const LanguageProvider = ({ children }) => {
     // Get saved language from localStorage or default to English
     return localStorage.getItem('appLanguage') || 'en';
   });
+  // Bumped when an async language file lands so consumers re-render.
+  const [, setLoadedTick] = useState(0);
 
   useEffect(() => {
     // Save language preference to localStorage
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
+  useEffect(() => {
+    if (translations[language]) return;
+    let cancelled = false;
+    loadLanguage(language)
+      .then(() => { if (!cancelled) setLoadedTick((n) => n + 1); })
+      .catch(() => {}); // stay on the EN fallback if the chunk fails
+    return () => { cancelled = true; };
+  }, [language]);
+
   const t = (key, vars) => {
     const keys = key.split('.');
+    // Until the language chunk arrives, translations[language] is undefined
+    // and every key falls through to English below.
     let translation = translations[language];
 
     for (const k of keys) {
@@ -61,7 +75,7 @@ export const LanguageProvider = ({ children }) => {
   };
 
   const changeLanguage = (newLanguage) => {
-    if (translations[newLanguage]) {
+    if (availableLanguages.some((l) => l.code === newLanguage)) {
       setLanguage(newLanguage);
     }
   };
