@@ -619,9 +619,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </div>
           </div>
         )}
-          artistName={profile.name}
-        />
-      )}
 
       {/* Remove Connection Confirmation Modal */}
       {showRemoveModal && (
