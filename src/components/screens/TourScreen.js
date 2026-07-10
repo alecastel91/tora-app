@@ -2034,4 +2034,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   );
 };
 
-export default TourScreen;
+// Keep-mounted tabs re-render on every App state change; memo keeps
+// hidden tabs cheap when their props are unchanged.
+export default React.memo(TourScreen);

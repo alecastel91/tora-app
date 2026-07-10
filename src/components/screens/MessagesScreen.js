@@ -296,4 +296,6 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
   );
 };
 
-export default MessagesScreen;
+// Keep-mounted tabs re-render on every App state change; memo keeps
+// hidden tabs cheap when their props are unchanged.
+export default React.memo(MessagesScreen);

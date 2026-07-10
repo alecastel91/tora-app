@@ -4,7 +4,6 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, SearchIcon, LocationIcon, GlobeIcon, LinkIcon } from '../../utils/icons';
-import CalendarScreen from './CalendarScreen';
 import EditProfileScreen from './EditProfileScreen';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
 import AddProfileScreen from './AddProfileScreen';
@@ -69,7 +68,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const { user, updateUser, userProfiles, switchProfile, addProfile, deleteProfile, likedProfiles, likedProfilesData, connectedUsers, connectedUsersData, likerProfilesData } = useAppContext();
   const { t } = useLanguage();
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
   const [showManageProfile, setShowManageProfile] = useState(false);
   const [showRepresentedArtists, setShowRepresentedArtists] = useState(false);
   const [showFindAgent, setShowFindAgent] = useState(false);
@@ -340,9 +338,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   }
 
   // Show full-screen calendar if requested
-  if (showCalendar) {
-    return <CalendarScreen onClose={() => setShowCalendar(false)} />;
-  }
 
   // Show full-screen manage profile if requested
   if (showManageProfile) {
@@ -1004,4 +999,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   );
 };
 
-export default ProfileScreen;
+// Keep-mounted tabs re-render on every App state change; memo keeps
+// hidden tabs cheap when their props are unchanged.
+export default React.memo(ProfileScreen);

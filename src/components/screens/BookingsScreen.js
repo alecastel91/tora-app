@@ -1969,4 +1969,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
   );
 };
 
-export default BookingsScreen;
+// Keep-mounted tabs re-render on every App state change; memo keeps
+// hidden tabs cheap when their props are unchanged.
+export default React.memo(BookingsScreen);

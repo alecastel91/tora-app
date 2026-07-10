@@ -985,4 +985,6 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   );
 };
 
-export default SearchScreen;
+// Keep-mounted tabs re-render on every App state change; memo keeps
+// hidden tabs cheap when their props are unchanged.
+export default React.memo(SearchScreen);
