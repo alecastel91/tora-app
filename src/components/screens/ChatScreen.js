@@ -310,7 +310,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       await fetchMessages();
     } catch (error) {
       console.error('Error sending document:', error);
-      alert('Failed to send document. Please try again.');
+      alert(t('chat.failedToSendDocument'));
     }
   };
 
@@ -321,7 +321,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const handleSendOtherFile = async (file) => {
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert('File must be 10 MB or smaller.');
+      alert(t('chat.fileTooLarge'));
       return;
     }
     try {
@@ -342,7 +342,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       await fetchMessages();
     } catch (error) {
       console.error('Error uploading chat attachment:', error);
-      alert(error.message || 'Failed to upload file. Please try again.');
+      alert(error.message || t('chat.failedToUploadFile'));
     }
   };
 
@@ -399,7 +399,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error accepting offer:', error);
-      alert(error.message || 'Failed to accept offer');
+      alert(error.message || t('chat.failedToAcceptOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -409,7 +409,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     if (actionBusy || !selectedOffer) return;
 
     if (!offerDeclineComment.trim()) {
-      alert('Please provide a reason for declining');
+      alert(t('chat.provideDeclineReason'));
       return;
     }
 
@@ -426,7 +426,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error declining offer:', error);
-      alert(error.message || 'Failed to decline offer');
+      alert(error.message || t('chat.failedToDeclineOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -457,7 +457,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     console.log('[ChatScreen] dealId from message:', msg.dealId);
 
     if (!msg.dealId) {
-      alert('This counter-offer was created with an old version and cannot be accepted/declined. Please send a new counter-offer.');
+      alert(t('chat.counterOfferOldVersion'));
       return;
     }
 
@@ -518,7 +518,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const handleAcceptCounterOffer = async () => {
     if (actionBusy) return;
     if (!counterOfferData?.dealId) {
-      alert('Deal information not found');
+      alert(t('chat.dealInfoNotFound'));
       return;
     }
 
@@ -529,7 +529,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error accepting counter-offer:', error);
-      alert(error.message || 'Failed to accept counter-offer');
+      alert(error.message || t('chat.failedToAcceptCounterOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -538,11 +538,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const handleDeclineCounterOffer = async () => {
     if (actionBusy) return;
     if (!declineComment.trim()) {
-      alert('Please provide a reason for declining');
+      alert(t('chat.provideDeclineReason'));
       return;
     }
     if (!counterOfferData?.dealId) {
-      alert('Deal information not found');
+      alert(t('chat.dealInfoNotFound'));
       return;
     }
 
@@ -555,7 +555,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error declining counter-offer:', error);
-      alert(error.message || 'Failed to decline counter-offer');
+      alert(error.message || t('chat.failedToDeclineCounterOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -569,7 +569,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       setSelectedOffer(deal);
     } catch (error) {
       console.error('Error fetching deal for counter-offer review:', error);
-      alert('Failed to load deal information');
+      alert(t('chat.failedToLoadDealInfo'));
       return;
     }
 
@@ -613,7 +613,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       await reloadProfileData();
     } catch (error) {
       console.error('Error accepting representation request:', error);
-      alert(error.message || 'Failed to accept representation request');
+      alert(error.message || t('chat.failedToAcceptRepresentation'));
     } finally {
       setActionBusy(false);
     }
@@ -637,7 +637,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       }));
     } catch (error) {
       console.error('Error declining representation request:', error);
-      alert(error.message || 'Failed to decline representation request');
+      alert(error.message || t('chat.failedToDeclineRepresentation'));
     } finally {
       setActionBusy(false);
     }
@@ -648,13 +648,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
 
     const dealId = selectedOffer?.id || counterOfferData?.dealId;
     if (!dealId) {
-      alert('Deal information not found. Please close and try again.');
+      alert(t('chat.dealInfoNotFoundRetry'));
       return;
     }
 
     const feeStr = String(reviewData.fee || '').trim();
     if (!feeStr || isNaN(parseFloat(feeStr)) || parseFloat(feeStr) <= 0) {
-      alert('Please enter a valid fee amount');
+      alert(t('chat.enterValidFee'));
       return;
     }
 
@@ -684,7 +684,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       fetchMessages();
     } catch (error) {
       console.error('Error submitting counter-offer:', error);
-      alert(error.message || 'Failed to submit counter-offer');
+      alert(error.message || t('chat.failedToSubmitCounterOffer'));
     } finally {
       setActionBusy(false);
     }
@@ -897,7 +897,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       {/* Banner for deleted profiles */}
       {(user.isDeleted || user.deleted) && (
         <div className="chat-deleted-banner">
-          <span>This profile is no longer active</span>
+          <span>{t('chat.profileNoLongerActive')}</span>
         </div>
       )}
 
@@ -911,7 +911,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                        uppercase tracking-[0.12em] text-white/60 font-tech cursor-pointer hover:text-white
                        hover:border-white/30 transition-colors disabled:opacity-50"
           >
-            {loadingOlder ? 'Loading…' : 'Load earlier messages'}
+            {loadingOlder ? t('chat.loading') : t('chat.loadEarlierMessages')}
           </button>
         )}
         {filteredMessages.length === 0 && (
@@ -940,9 +940,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       </svg>
                     </div>
                     <div className="offer-card-text">
-                      <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
+                      <p className="offer-card-name">{msg.isMe ? t('chat.you') : user.name}</p>
                       <p className="offer-card-action">
-                        counter-offered{msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
+                        {t('chat.counterOffered')}{msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
                       </p>
                     </div>
                   </div>
@@ -950,7 +950,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     className="btn btn-outline btn-view-offer"
                     onClick={() => handleViewCounterOffer(msg)}
                   >
-                    View Details
+                    {t('chat.viewDetails')}
                   </button>
                 </div>
                 <span className="message-timestamp">{formatMessageTime(msg.timestamp)}</span>
@@ -964,7 +964,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 const isDeclined = request.status === 'REJECTED';
                 const isPending = request.status === 'PENDING';
                 const isRepresentationRequest = request.type === 'REPRESENTATION_REQUEST';
-                const displayName = msg.isMe ? 'You' : user.name;
+                const displayName = msg.isMe ? t('chat.you') : user.name;
 
                 // Check if the current user is the recipient (not the sender)
                 const isRecipient = !msg.isMe;
@@ -1000,7 +1000,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         <div className="offer-card-text">
                           <p className="offer-card-name">{displayName}</p>
                           <p className="offer-card-action">
-                            {isDeclined ? 'declined representation' : isAccepted ? 'accepted representation' : 'sent representation request'}
+                            {isDeclined ? t('chat.declinedRepresentation') : isAccepted ? t('chat.acceptedRepresentation') : t('chat.sentRepresentationRequest')}
                           </p>
                         </div>
                       </div>
@@ -1008,7 +1008,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         className="btn btn-outline btn-view-offer"
                         onClick={() => handleViewRepresentation(msg.connectionRequestId)}
                       >
-                        View
+                        {t('roster.view')}
                       </button>
                     </div>
                     <span className="message-timestamp">{formatMessageTime(msg.timestamp)}</span>
@@ -1062,12 +1062,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         )}
                       </div>
                       <div className="offer-card-text">
-                        <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
+                        <p className="offer-card-name">{msg.isMe ? t('chat.you') : user.name}</p>
                         <p className="offer-card-action">
-                          {msg._withdrawn ? 'sent a contract — later withdrawn'
-                            : msg._fullySigned ? 'contract fully signed'
-                            : msg._signedByOne ? 'contract signed — waiting for the other party'
-                            : 'sent a contract'}
+                          {msg._withdrawn ? t('chat.sentContractWithdrawn')
+                            : msg._fullySigned ? t('chat.contractFullySigned')
+                            : msg._signedByOne ? t('chat.contractSignedWaiting')
+                            : t('chat.sentContract')}
                           {msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
                         </p>
                       </div>
@@ -1093,7 +1093,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           className="btn btn-outline btn-card-action"
                           style={{ flex: 1 }}
                         >
-                          Open
+                          {t('chat.open')}
                         </button>
                         <button
                           className="btn btn-primary btn-card-action"
@@ -1122,7 +1122,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             setShowSignContractModal(true);
                           }}
                         >
-                          ✓ Sign
+                          {t('chat.sign')}
                         </button>
                         <button
                           className="btn btn-outline btn-card-action"
@@ -1132,21 +1132,21 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             color: 'rgba(255, 165, 0, 1)'
                           }}
                           onClick={async () => {
-                            const comment = prompt('Please provide details about the modifications you need:');
+                            const comment = prompt(t('chat.modificationPromptDetails'));
                             if (comment && comment.trim()) {
                               try {
                                 // Send modification request as a chat message
                                 await sendMessage(user.id, `Contract Modification Request: ${comment}`);
-                                alert('Modification request sent to ' + user.name);
+                                alert(t('chat.modificationRequestSentTo', { name: user.name }));
                                 // Refresh messages to show the new request
                                 await fetchMessages();
                               } catch (err) {
-                                alert(err.message || 'Failed to send modification request');
+                                alert(err.message || t('chat.failedToSendModificationRequest'));
                               }
                             }
                           }}
                         >
-                          ✎ Edit
+                          {t('chat.editContract')}
                         </button>
                       </div>
                     )}
@@ -1157,7 +1157,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       onClick={() => setPdfViewerUrl(getFullUrl(msg.documentAttachment.url))}
                       className="btn btn-outline btn-view-offer"
                     >
-                      View Contract
+                      {t('chat.viewContract')}
                     </button>
                   )}
                   {(msg._fullySigned || msg._signedByOne) && !msg.isMe && (
@@ -1166,7 +1166,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       onClick={() => setPdfViewerUrl(getFullUrl(msg.documentAttachment.url))}
                       className="btn btn-outline btn-view-offer"
                     >
-                      View Contract
+                      {t('chat.viewContract')}
                     </button>
                   )}
                   </div>
@@ -1181,13 +1181,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       borderTop: '1px solid rgba(255,255,255,0.08)',
                     }}>
                       <span style={{ fontSize: '11px', color: '#888', marginRight: 'auto' }}>
-                        Documents pending
+                        {t('chat.documentsPending')}
                       </span>
                       <button
                         className="btn btn-skip"
                         onClick={async () => {
                           const list = pendingDocCategories.map(labelForCategory).join(', ');
-                          if (!window.confirm(`Skip ${list} for this booking?`)) return;
+                          if (!window.confirm(t('chat.skipDocsConfirm', { list }))) return;
                           try {
                             for (const cat of pendingDocCategories) {
                               // eslint-disable-next-line no-await-in-loop
@@ -1195,17 +1195,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             }
                             await fetchMessages();
                           } catch (err) {
-                            alert(err.message || 'Failed to skip documents');
+                            alert(err.message || t('chat.failedToSkipDocuments'));
                           }
                         }}
                       >
-                        Skip
+                        {t('chat.skip')}
                       </button>
                       <button
                         className="btn btn-primary btn-card-action"
                         onClick={() => setShareDocsDeal(cachedDealForDocs)}
                       >
-                        Share Documents
+                        {t('chat.shareDocuments')}
                       </button>
                     </div>
                   )}
@@ -1226,8 +1226,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           </svg>
                         </div>
                         <div className="offer-card-text">
-                          <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
-                          <p className="offer-card-action">shared {labelForCategory(msg.documentAttachment.category)}{msg.documentAttachment.title ? ` · ${msg.documentAttachment.title}` : ''}</p>
+                          <p className="offer-card-name">{msg.isMe ? t('chat.you') : user.name}</p>
+                          <p className="offer-card-action">{t('chat.sharedDoc', { label: labelForCategory(msg.documentAttachment.category) })}{msg.documentAttachment.title ? ` · ${msg.documentAttachment.title}` : ''}</p>
                         </div>
                       </div>
                       <button
@@ -1235,7 +1235,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         onClick={() => setPdfViewerUrl(getFullUrl(msg.documentAttachment.url))}
                         className="btn btn-outline btn-card-action"
                       >
-                        Open
+                        {t('chat.open')}
                       </button>
                     </div>
                     <span className="message-timestamp">{formatMessageTime(msg.timestamp)}</span>
@@ -1244,7 +1244,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               })()
             ) : msg.isSystem && msg.dealId && msg.text && (msg.text.includes('marked Press Kit as not needed') || msg.text.includes('marked Technical Rider as not needed') || msg.text.includes('marked Hospitality Rider as not needed')) ? (
               (() => {
-                const which = msg.text.includes('Press Kit') ? 'Press Kit' : msg.text.includes('Technical Rider') ? 'Technical Rider' : 'Hospitality Rider';
+                const which = msg.text.includes('Press Kit') ? t('chat.pressKit') : msg.text.includes('Technical Rider') ? t('chat.technicalRider') : t('chat.hospitalityRider');
                 return (
                   <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message">
@@ -1255,8 +1255,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           </svg>
                         </div>
                         <div className="offer-card-text">
-                          <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
-                          <p className="offer-card-action">skipped {which} for this booking</p>
+                          <p className="offer-card-name">{msg.isMe ? t('chat.you') : user.name}</p>
+                          <p className="offer-card-action">{t('chat.skippedDocForBooking', { label: which })}</p>
                         </div>
                       </div>
                     </div>
@@ -1278,8 +1278,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           </svg>
                         </div>
                         <div className="offer-card-text">
-                          <p className="offer-card-name">{msg.isMe ? 'You' : user.name}</p>
-                          <p className="offer-card-action">{isFull ? 'recorded full payment' : 'recorded a deposit payment'}</p>
+                          <p className="offer-card-name">{msg.isMe ? t('chat.you') : user.name}</p>
+                          <p className="offer-card-action">{isFull ? t('chat.recordedFullPayment') : t('chat.recordedDepositPayment')}</p>
                           <p style={{ margin: '3px 0 0', fontSize: '10px', color: 'rgba(255,255,255,0.45)' }}>{msg.previewText || (msg.text.split('\n').pop() || '')}</p>
                         </div>
                       </div>
@@ -1298,7 +1298,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 const isAccepted = isAcceptCard;
 
                 // For decline/accept cards, sender of the message is the one who acted
-                const displayName = msg.isMe ? 'You' : user.name;
+                const displayName = msg.isMe ? t('chat.you') : user.name;
 
                 const cachedDeal = dealStatuses[msg.dealId]?.deal;
                 const showContractActions = isAccepted
@@ -1339,7 +1339,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           <div className="offer-card-text">
                             <p className="offer-card-name">{displayName}</p>
                             <p className="offer-card-action">
-                              {isDeclined ? 'declined offer' : isAccepted ? 'accepted offer' : 'sent an offer'}
+                              {isDeclined ? t('chat.declinedOffer') : isAccepted ? t('chat.acceptedOffer') : t('chat.sentAnOffer')}
                               {msg.deal?.eventName ? ` · ${msg.deal.eventName}` : ''}
                             </p>
                           </div>
@@ -1354,7 +1354,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             }
                           }}
                         >
-                          {isDeclined ? 'View Reason' : 'View Details'}
+                          {isDeclined ? t('chat.viewReason') : t('chat.viewDetails')}
                         </button>
                       </div>
                       {showContractActions && (
@@ -1368,21 +1368,21 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           borderTop: '1px solid rgba(255,255,255,0.08)',
                         }}>
                           <span style={{ fontSize: '11px', color: '#888', marginRight: 'auto' }}>
-                            Contract pending
+                            {t('chat.contractPending')}
                           </span>
                           <button
                             className="btn btn-skip"
                             onClick={async () => {
-                              if (!window.confirm('Skip contract stage? You can still share documents and proceed.')) return;
+                              if (!window.confirm(t('chat.skipContractConfirm'))) return;
                               try {
                                 await apiService.skipContract(msg.dealId, currentUser.id);
                                 await fetchMessages();
                               } catch (err) {
-                                alert(err.message || 'Failed to skip contract');
+                                alert(err.message || t('chat.failedToSkipContract'));
                               }
                             }}
                           >
-                            Skip
+                            {t('chat.skip')}
                           </button>
                           <button
                             className="btn btn-primary btn-card-action"
@@ -1395,11 +1395,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                 }
                                 setShowAddContractModal(true);
                               } catch (err) {
-                                alert(err.message || 'Failed to open contract flow');
+                                alert(err.message || t('chat.failedToOpenContractFlow'));
                               }
                             }}
                           >
-                            Send Contract
+                            {t('chat.sendContract')}
                           </button>
                         </div>
                       )}
@@ -1425,8 +1425,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         <div>
                           <p style={{ fontWeight: '600', marginBottom: '2px' }}>{msg.documentAttachment.title}</p>
                           <p style={{ fontSize: '11px', opacity: 0.7, textTransform: 'capitalize' }}>
-                            {msg.documentAttachment.category === 'pressKit' ? 'Press Kit' :
-                             msg.documentAttachment.category === 'technicalRider' ? 'Technical Rider' : 'Contract'}
+                            {msg.documentAttachment.category === 'pressKit' ? t('chat.pressKit') :
+                             msg.documentAttachment.category === 'technicalRider' ? t('chat.technicalRider') : t('chat.contract')}
                           </p>
                         </div>
                       </div>
@@ -1443,7 +1443,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           fontWeight: '600'
                         }}
                       >
-                        Open Document
+                        {t('chat.openDocument')}
                       </button>
                       {!msg.isMe && msg.documentAttachment.category === 'contracts' && msg.dealId && (
                         <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexDirection: 'column' }}>
@@ -1457,7 +1457,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             onClick={async () => {
                               try {
                                 await apiService.signContract(msg.dealId, currentUser.id);
-                                alert('Contract signed successfully!');
+                                alert(t('chat.contractSignedSuccess'));
                                 // Refresh messages
                                 const response = await apiService.getMessageThread(currentUser.id, user.id);
                                 const transformedMessages = (response.messages || []).map(m => ({
@@ -1472,11 +1472,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                 }));
                                 setUserMessages(transformedMessages);
                               } catch (err) {
-                                alert(err.message || 'Failed to sign contract');
+                                alert(err.message || t('chat.failedToSignContract'));
                               }
                             }}
                           >
-                            ✓ Sign Contract
+                            {t('chat.signContract')}
                           </button>
                           <button
                             className="btn btn-outline"
@@ -1488,14 +1488,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               color: 'rgba(255, 165, 0, 1)'
                             }}
                             onClick={() => {
-                              const comment = prompt('Please provide details about the modifications you need:');
+                              const comment = prompt(t('chat.modificationPromptDetails'));
                               if (comment && comment.trim()) {
                                 // TODO: Send modification request to backend
-                                alert('Modification request sent: ' + comment);
+                                alert(t('chat.modificationRequestSent', { comment }));
                               }
                             }}
                           >
-                            ✎ Request Modification
+                            {t('chat.requestModification')}
                           </button>
                           <button
                             className="btn btn-outline"
@@ -1507,10 +1507,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               color: 'rgba(255, 51, 51, 1)'
                             }}
                             onClick={async () => {
-                              if (window.confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+                              if (window.confirm(t('chat.cancelBookingConfirm'))) {
                                 try {
                                   await apiService.cancelDeal(msg.dealId, currentUser.id);
-                                  alert('Booking cancelled');
+                                  alert(t('chat.bookingCancelled'));
                                   // Refresh messages
                                   const response = await apiService.getMessageThread(currentUser.id, user.id);
                                   const transformedMessages = (response.messages || []).map(m => ({
@@ -1524,12 +1524,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                   }));
                                   setUserMessages(transformedMessages);
                                 } catch (err) {
-                                  alert(err.message || 'Failed to cancel booking');
+                                  alert(err.message || t('chat.failedToCancelBooking'));
                                 }
                               }
                             }}
                           >
-                            × Cancel Booking
+                            {t('chat.cancelBooking')}
                           </button>
                         </div>
                       )}
@@ -1546,8 +1546,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       <div>
                         <p style={{ fontWeight: '600', marginBottom: '2px' }}>{msg.documentAttachment.title}</p>
                         <p style={{ fontSize: '11px', opacity: 0.7, textTransform: 'capitalize' }}>
-                          {msg.documentAttachment.category === 'pressKit' ? 'Press Kit' :
-                           msg.documentAttachment.category === 'technicalRider' ? 'Technical Rider' : 'Contract'}
+                          {msg.documentAttachment.category === 'pressKit' ? t('chat.pressKit') :
+                           msg.documentAttachment.category === 'technicalRider' ? t('chat.technicalRider') : t('chat.contract')}
                         </p>
                       </div>
                     </div>
@@ -1564,7 +1564,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         fontWeight: '600'
                       }}
                     >
-                      Open Document
+                      {t('chat.openDocument')}
                     </button>
                     {!msg.isMe && msg.documentAttachment.category === 'contracts' && msg.dealId && (
                       <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexDirection: 'column' }}>
@@ -1578,7 +1578,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           onClick={async () => {
                             try {
                               await apiService.signContract(msg.dealId, currentUser.id);
-                              alert('Contract signed successfully!');
+                              alert(t('chat.contractSignedSuccess'));
                               // Refresh messages
                               const response = await apiService.getMessageThread(currentUser.id, user.id);
                               const transformedMessages = (response.messages || []).map(m => ({
@@ -1592,11 +1592,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                               }));
                               setUserMessages(transformedMessages);
                             } catch (err) {
-                              alert(err.message || 'Failed to sign contract');
+                              alert(err.message || t('chat.failedToSignContract'));
                             }
                           }}
                         >
-                          ✓ Sign Contract
+                          {t('chat.signContract')}
                         </button>
                         <button
                           className="btn btn-outline"
@@ -1608,14 +1608,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             color: 'rgba(255, 165, 0, 1)'
                           }}
                           onClick={() => {
-                            const comment = prompt('Please provide details about the modifications you need:');
+                            const comment = prompt(t('chat.modificationPromptDetails'));
                             if (comment && comment.trim()) {
                               // TODO: Send modification request to backend
-                              alert('Modification request sent: ' + comment);
+                              alert(t('chat.modificationRequestSent', { comment }));
                             }
                           }}
                         >
-                          ✎ Request Modification
+                          {t('chat.requestModification')}
                         </button>
                         <button
                           className="btn btn-outline"
@@ -1627,10 +1627,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             color: 'rgba(255, 51, 51, 1)'
                           }}
                           onClick={async () => {
-                            if (window.confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+                            if (window.confirm(t('chat.cancelBookingConfirm'))) {
                               try {
                                 await apiService.cancelDeal(msg.dealId, currentUser.id);
-                                alert('Booking cancelled');
+                                alert(t('chat.bookingCancelled'));
                                 // Refresh messages
                                 const response = await apiService.getMessageThread(currentUser.id, user.id);
                                 const transformedMessages = (response.messages || []).map(m => ({
@@ -1644,12 +1644,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                                 }));
                                 setUserMessages(transformedMessages);
                               } catch (err) {
-                                alert(err.message || 'Failed to cancel booking');
+                                alert(err.message || t('chat.failedToCancelBooking'));
                               }
                             }
                           }}
                         >
-                          × Cancel Booking
+                          {t('chat.cancelBooking')}
                         </button>
                       </div>
                     )}
@@ -1689,7 +1689,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         if (user.isDeleted || user.deleted) {
           return (
             <div className="chat-input-disabled">
-              <p>You cannot send messages to inactive profiles</p>
+              <p>{t('chat.cannotMessageInactive')}</p>
             </div>
           );
         }
@@ -1711,7 +1711,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       <line x1="16" y1="2" x2="16" y2="6"></line>
                       <path d="M9 16l2 2 4-4"></path>
                     </svg>
-                    Make an Offer
+                    {t('tour.makeAnOffer')}
                   </button>
                 </div>
               )}
@@ -1720,7 +1720,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   <button
                     className="attachment-btn"
                     onClick={() => setShowDocumentPicker(true)}
-                    title="Attach document"
+                    title={t('chat.attachDocument')}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
@@ -1755,7 +1755,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         if (hasPendingRequest) {
           return (
             <div className="chat-input-disabled">
-              <p>Connection request pending. You can send messages once {user.name} accepts your request.</p>
+              <p>{t('chat.pendingRequestNotice', { name: user.name })}</p>
             </div>
           );
         }
@@ -1763,7 +1763,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         // Not connected - show cannot send message
         return (
           <div className="chat-input-disabled">
-            <p>You are not connected with {user.name}. You cannot send messages unless you connect.</p>
+            <p>{t('chat.notConnectedNotice', { name: user.name })}</p>
           </div>
         );
       })()}
@@ -1783,7 +1783,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         <div className="modal-overlay" onClick={() => setShowOfferDetails(false)}>
           <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Offer Details</h3>
+              <h3>{t('chat.offerDetails')}</h3>
               <button className="modal-close" onClick={() => setShowOfferDetails(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -1794,12 +1794,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               <div className="offer-detail-section">
                 {selectedOffer.eventName && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Event:</span>
+                    <span className="detail-label">{t('chat.eventLabel')}</span>
                     <span className="detail-value">{selectedOffer.eventName}</span>
                   </div>
                 )}
                 <div className="offer-detail-row">
-                  <span className="detail-label">Venue:</span>
+                  <span className="detail-label">{t('chat.venueLabel')}</span>
                   <span className="detail-value">
                     <div>{selectedOffer.venueName}</div>
                     {(selectedOffer.city || selectedOffer.venue?.location) && (
@@ -1810,7 +1810,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   </span>
                 </div>
                 <div className="offer-detail-row">
-                  <span className="detail-label">Date:</span>
+                  <span className="detail-label">{t('chat.dateLabel')}</span>
                   <span className="detail-value">
                     {new Date(selectedOffer.date).toLocaleDateString('en-US', {
                       month: 'short',
@@ -1821,7 +1821,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 </div>
                 {selectedOffer.startTime && selectedOffer.endTime && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Event Time:</span>
+                    <span className="detail-label">{t('chat.eventTimeLabel')}</span>
                     <span className="detail-value">
                       {selectedOffer.startTime} - {selectedOffer.endTime}
                     </span>
@@ -1829,23 +1829,23 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 )}
                 {selectedOffer.performanceType && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Type:</span>
+                    <span className="detail-label">{t('chat.typeLabel')}</span>
                     <span className="detail-value">{selectedOffer.performanceType}</span>
                   </div>
                 )}
                 {selectedOffer.setStartTime && selectedOffer.setEndTime && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Set Time:</span>
+                    <span className="detail-label">{t('chat.setTimeLabel')}</span>
                     <span className="detail-value">
                       <div>{selectedOffer.setStartTime} - {selectedOffer.setEndTime}</div>
                       {selectedOffer.setDuration && (
-                        <div className="detail-subtext">({selectedOffer.setDuration} minutes)</div>
+                        <div className="detail-subtext">{t('chat.durationMinutes', { n: selectedOffer.setDuration })}</div>
                       )}
                     </span>
                   </div>
                 )}
                 <div className="offer-detail-row">
-                  <span className="detail-label">Fee:</span>
+                  <span className="detail-label">{t('chat.feeLabel')}</span>
                   <span className="detail-value offer-fee">
                     {Number.isInteger(selectedOffer.currentFee)
                       ? selectedOffer.currentFee.toLocaleString()
@@ -1854,7 +1854,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 </div>
                 {selectedOffer.extras && Object.keys(selectedOffer.extras).length > 0 && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Extras:</span>
+                    <span className="detail-label">{t('chat.extrasLabel')}</span>
                     <div className="detail-value extras-list">
                       {Object.entries(selectedOffer.extras).map(([key, value]) => (
                         <div key={key} className="extra-item">
@@ -1882,7 +1882,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
 
                   return parsedTerms ? (
                     <div className="offer-detail-row">
-                      <span className="detail-label">Extras:</span>
+                      <span className="detail-label">{t('chat.extrasLabel')}</span>
                       <div className="detail-value extras-list">
                         {Object.entries(parsedTerms).filter(([, v]) => v).map(([key, value]) => (
                           <div key={key} className="extra-item">
@@ -1898,26 +1898,26 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     </div>
                   ) : (
                     <div className="offer-detail-row">
-                      <span className="detail-label">Additional Terms:</span>
+                      <span className="detail-label">{t('chat.additionalTermsLabel')}</span>
                       <span className="detail-value">{selectedOffer.additionalTerms}</span>
                     </div>
                   );
                 })()}
                 {selectedOffer.technicalRequirements && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Technical:</span>
+                    <span className="detail-label">{t('chat.technicalLabel')}</span>
                     <span className="detail-value">{selectedOffer.technicalRequirements}</span>
                   </div>
                 )}
                 {selectedOffer.paymentTerms && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Payment Terms:</span>
+                    <span className="detail-label">{t('chat.paymentTermsLabel')}</span>
                     <span className="detail-value">{selectedOffer.paymentTerms}</span>
                   </div>
                 )}
                 {selectedOffer.notes && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Notes:</span>
+                    <span className="detail-label">{t('chat.notesLabel')}</span>
                     <span className="detail-value">{selectedOffer.notes}</span>
                   </div>
                 )}
@@ -1947,11 +1947,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 showOfferDeclineComment ? (
                   <div className="decline-comment-container">
                     <div className="decline-comment-textarea-wrapper">
-                      <label className="decline-comment-label">Please provide a reason for declining:</label>
+                      <label className="decline-comment-label">{t('chat.declineReasonLabel')}</label>
                       <textarea
                         value={offerDeclineComment}
                         onChange={(e) => setOfferDeclineComment(e.target.value)}
-                        placeholder="Enter your reason here..."
+                        placeholder={t('chat.declineReasonPlaceholder')}
                         className="form-textarea decline-comment-textarea"
                         rows="5"
                       />
@@ -1964,14 +1964,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           setOfferDeclineComment('');
                         }}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                       <button
                         className="btn btn-primary"
                         onClick={handleDeclineOffer}
                         disabled={actionBusy}
                       >
-                        {actionBusy ? '...' : 'Submit'}
+                        {actionBusy ? '...' : t('chat.submit')}
                       </button>
                     </div>
                   </div>
@@ -1982,21 +1982,21 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       onClick={() => setShowOfferDeclineComment(true)}
                       disabled={actionBusy}
                     >
-                      Decline
+                      {t('messages.decline')}
                     </button>
                     <button
                       className="btn btn-outline"
                       onClick={handleOpenReview}
                       disabled={actionBusy}
                     >
-                      Review
+                      {t('chat.review')}
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={handleAcceptOffer}
                       disabled={actionBusy}
                     >
-                      {actionBusy ? '...' : 'Accept'}
+                      {actionBusy ? '...' : t('messages.accept')}
                     </button>
                   </>
                 )
@@ -2009,13 +2009,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 const isFullySigned = contractStatus === 'FULLY_SIGNED';
                 const onArtistSide = isArtistSideForDeal(selectedOffer, currentUser);
                 const otherName = onArtistSide
-                  ? (selectedOffer.venue?.name || 'the other party')
-                  : (selectedOffer.artist?.name || 'the artist side');
+                  ? (selectedOffer.venue?.name || t('chat.theOtherParty'))
+                  : (selectedOffer.artist?.name || t('chat.theArtistSide'));
 
                 if (isFullySigned) {
                   return (
                     <span style={{ color: '#888', fontSize: '13px', textAlign: 'center', width: '100%' }}>
-                      Contract fully signed — see the contract card in the chat.
+                      {t('chat.contractFullySignedNotice')}
                     </span>
                   );
                 }
@@ -2023,8 +2023,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   return (
                     <span style={{ color: '#888', fontSize: '13px', textAlign: 'center', width: '100%' }}>
                       {onArtistSide
-                        ? `Contract sent — waiting for ${otherName} to countersign.`
-                        : `Contract awaiting your signature — open the contract card in the chat to sign.`}
+                        ? t('chat.contractSentWaiting', { name: otherName })
+                        : t('chat.contractAwaitingSignature')}
                     </span>
                   );
                 }
@@ -2037,20 +2037,20 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       disabled={actionBusy}
                       onClick={async () => {
                         if (actionBusy) return;
-                        if (!window.confirm('Skip contract stage? You can still share documents and proceed with the booking.')) return;
+                        if (!window.confirm(t('chat.skipContractConfirmBooking'))) return;
                         setActionBusy(true);
                         try {
                           await apiService.skipContract(selectedOffer.id, currentUser.id);
                           setShowOfferDetails(false);
                           fetchMessages();
                         } catch (err) {
-                          alert(err.message || 'Failed to skip contract');
+                          alert(err.message || t('chat.failedToSkipContract'));
                         } finally {
                           setActionBusy(false);
                         }
                       }}
                     >
-                      Skip Contract
+                      {t('chat.skipContract')}
                     </button>
                     <button
                       className="btn btn-primary"
@@ -2064,7 +2064,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             setShowOfferDetails(false);
                           } catch (err) {
                             console.error('Failed to fetch artist profile:', err);
-                            alert('Failed to load artist profile. Please try again.');
+                            alert(t('chat.failedToLoadArtistProfile'));
                           }
                         } else {
                           setShowAddContractModal(true);
@@ -2072,12 +2072,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                         }
                       }}
                     >
-                      Send Contract
+                      {t('chat.sendContract')}
                     </button>
                   </>
                 ) : (
                   <span style={{ color: '#888', fontSize: '13px', textAlign: 'center', width: '100%' }}>
-                    Waiting for the contract from the artist side
+                    {t('chat.waitingForContractArtistSide')}
                   </span>
                 );
               })() : (
@@ -2086,7 +2086,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   className="btn btn-outline"
                   onClick={() => setShowOfferDetails(false)}
                 >
-                  Close
+                  {t('common.close')}
                 </button>
               )}
             </div>
@@ -2099,13 +2099,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         <div className="modal active review-modal-wrapper" onClick={() => setShowReviewModal(false)}>
           <div className="review-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Review Offer</h3>
+              <h3>{t('chat.reviewOffer')}</h3>
               <button className="modal-close" onClick={() => setShowReviewModal(false)}>×</button>
             </div>
             <div className="modal-body">
               <div className="review-form">
                 <div className="form-group">
-                  <label>Fee Amount *</label>
+                  <label>{t('chat.feeAmountRequired')}</label>
                   <input
                     type="number"
                     step="1"
@@ -2119,7 +2119,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Currency</label>
+                  <label>{t('chat.currency')}</label>
                   <select
                     value={reviewData.currency}
                     onChange={(e) => setReviewData({ ...reviewData, currency: e.target.value })}
@@ -2133,7 +2133,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Extras</label>
+                  <label>{t('chat.extras')}</label>
                   <div className="extras-list">
                     <div className="extra-item">
                       <div className="extra-checkbox-row">
@@ -2146,7 +2146,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             extras: { ...reviewData.extras, travelIn: e.target.checked ? (reviewData.extras.travelIn || 'Included') : '' }
                           })}
                         />
-                        <label htmlFor="travelIn">Travel In</label>
+                        <label htmlFor="travelIn">{t('chat.travelIn')}</label>
                       </div>
                       {!!reviewData.extras.travelIn && (
                         <input
@@ -2156,7 +2156,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             ...reviewData,
                             extras: { ...reviewData.extras, travelIn: e.target.value }
                           })}
-                          placeholder="Add details..."
+                          placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
                         />
                       )}
@@ -2173,7 +2173,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             extras: { ...reviewData.extras, travelOut: e.target.checked ? (reviewData.extras.travelOut || 'Included') : '' }
                           })}
                         />
-                        <label htmlFor="travelOut">Travel Out</label>
+                        <label htmlFor="travelOut">{t('chat.travelOut')}</label>
                       </div>
                       {!!reviewData.extras.travelOut && (
                         <input
@@ -2183,7 +2183,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             ...reviewData,
                             extras: { ...reviewData.extras, travelOut: e.target.value }
                           })}
-                          placeholder="Add details..."
+                          placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
                         />
                       )}
@@ -2200,7 +2200,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             extras: { ...reviewData.extras, transportation: e.target.checked ? (reviewData.extras.transportation || 'Included') : '' }
                           })}
                         />
-                        <label htmlFor="transportation">Transportation</label>
+                        <label htmlFor="transportation">{t('chat.transportation')}</label>
                       </div>
                       {!!reviewData.extras.transportation && (
                         <input
@@ -2210,7 +2210,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             ...reviewData,
                             extras: { ...reviewData.extras, transportation: e.target.value }
                           })}
-                          placeholder="Add details..."
+                          placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
                         />
                       )}
@@ -2227,7 +2227,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             extras: { ...reviewData.extras, accommodation: e.target.checked ? (reviewData.extras.accommodation || 'Included') : '' }
                           })}
                         />
-                        <label htmlFor="accommodation">Accommodation</label>
+                        <label htmlFor="accommodation">{t('chat.accommodation')}</label>
                       </div>
                       {!!reviewData.extras.accommodation && (
                         <input
@@ -2237,7 +2237,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             ...reviewData,
                             extras: { ...reviewData.extras, accommodation: e.target.value }
                           })}
-                          placeholder="Add details..."
+                          placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
                         />
                       )}
@@ -2254,7 +2254,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             extras: { ...reviewData.extras, meals: e.target.checked ? (reviewData.extras.meals || 'Included') : '' }
                           })}
                         />
-                        <label htmlFor="meals">Meals</label>
+                        <label htmlFor="meals">{t('chat.meals')}</label>
                       </div>
                       {!!reviewData.extras.meals && (
                         <input
@@ -2264,7 +2264,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                             ...reviewData,
                             extras: { ...reviewData.extras, meals: e.target.value }
                           })}
-                          placeholder="Add details..."
+                          placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
                         />
                       )}
@@ -2273,11 +2273,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>General Notes</label>
+                  <label>{t('chat.generalNotes')}</label>
                   <textarea
                     value={reviewData.notes}
                     onChange={(e) => setReviewData({ ...reviewData, notes: e.target.value })}
-                    placeholder="Add any additional comments or conditions..."
+                    placeholder={t('chat.notesPlaceholder')}
                     className="form-textarea"
                     rows="3"
                   />
@@ -2286,7 +2286,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             </div>
             <div className="modal-footer">
               <button className="btn btn-primary btn-full-width" onClick={handleSubmitReview} disabled={actionBusy}>
-                {actionBusy ? 'Sending...' : 'Send Counter-Offer'}
+                {actionBusy ? t('chat.sending') : t('chat.sendCounterOffer')}
               </button>
             </div>
           </div>
@@ -2298,7 +2298,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         <div className="modal-overlay" onClick={() => setShowCounterOfferDetails(false)}>
           <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Counter-Offer Details</h3>
+              <h3>{t('chat.counterOfferDetails')}</h3>
               <button className="modal-close" onClick={() => setShowCounterOfferDetails(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -2308,14 +2308,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             <div className="modal-body">
               <div className="offer-detail-section">
                 <div className="offer-detail-row">
-                  <span className="detail-label">Fee:</span>
+                  <span className="detail-label">{t('chat.feeLabel')}</span>
                   <span className="detail-value offer-fee">
                     {counterOfferData.fee} {counterOfferData.currency}
                   </span>
                 </div>
                 {counterOfferData.extras && Object.keys(counterOfferData.extras).length > 0 && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Extras:</span>
+                    <span className="detail-label">{t('chat.extrasLabel')}</span>
                     <div className="detail-value extras-list">
                       {Object.entries(counterOfferData.extras).map(([key, value]) => (
                         <div key={key} className="extra-item">
@@ -2332,7 +2332,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 )}
                 {counterOfferData.notes && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Notes:</span>
+                    <span className="detail-label">{t('chat.notesLabel')}</span>
                     <span className="detail-value">{counterOfferData.notes}</span>
                   </div>
                 )}
@@ -2343,11 +2343,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 showDeclineComment ? (
                   <div className="decline-comment-container">
                     <div className="decline-comment-textarea-wrapper">
-                      <label className="decline-comment-label">Please provide a reason for declining:</label>
+                      <label className="decline-comment-label">{t('chat.declineReasonLabel')}</label>
                       <textarea
                         value={declineComment}
                         onChange={(e) => setDeclineComment(e.target.value)}
-                        placeholder="Enter your reason here..."
+                        placeholder={t('chat.declineReasonPlaceholder')}
                         className="form-textarea decline-comment-textarea"
                         rows="5"
                       />
@@ -2360,14 +2360,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           setDeclineComment('');
                         }}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                       <button
                         className="btn btn-primary"
                         onClick={handleDeclineCounterOffer}
                         disabled={actionBusy}
                       >
-                        {actionBusy ? '...' : 'Submit'}
+                        {actionBusy ? '...' : t('chat.submit')}
                       </button>
                     </div>
                   </div>
@@ -2378,21 +2378,21 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       onClick={() => setShowDeclineComment(true)}
                       disabled={actionBusy}
                     >
-                      Decline
+                      {t('messages.decline')}
                     </button>
                     <button
                       className="btn btn-outline"
                       onClick={handleReviewCounterOffer}
                       disabled={actionBusy}
                     >
-                      Review
+                      {t('chat.review')}
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={handleAcceptCounterOffer}
                       disabled={actionBusy}
                     >
-                      {actionBusy ? '...' : 'Accept'}
+                      {actionBusy ? '...' : t('messages.accept')}
                     </button>
                   </>
                 )
@@ -2401,7 +2401,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                   className="btn btn-outline"
                   onClick={() => setShowCounterOfferDetails(false)}
                 >
-                  Close
+                  {t('common.close')}
                 </button>
               )}
             </div>
@@ -2414,7 +2414,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         <div className="modal-overlay" onClick={() => setShowDeclineReasonModal(false)}>
           <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Decline Reason</h3>
+              <h3>{t('chat.declineReason')}</h3>
               <button className="modal-close" onClick={() => setShowDeclineReasonModal(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -2424,17 +2424,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             <div className="modal-body">
               <div className="offer-detail-section">
                 <div className="offer-detail-row">
-                  <span className="detail-label">Declined By:</span>
+                  <span className="detail-label">{t('chat.declinedByLabel')}</span>
                   <span className="detail-value">
                     {declineReasonData.declinedBy && declineReasonData.declinedBy.id === currentUser.id
-                      ? 'You'
-                      : (declineReasonData.declinedBy?.name || 'Unknown')}
+                      ? t('chat.you')
+                      : (declineReasonData.declinedBy?.name || t('chat.unknown'))}
                   </span>
                 </div>
                 <div className="offer-detail-row">
-                  <span className="detail-label">Reason:</span>
+                  <span className="detail-label">{t('chat.reasonLabel')}</span>
                   <span className="detail-value">
-                    {declineReasonData.declineReason || 'No reason provided'}
+                    {declineReasonData.declineReason || t('chat.noReasonProvided')}
                   </span>
                 </div>
               </div>
@@ -2444,7 +2444,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 className="btn btn-outline"
                 onClick={() => setShowDeclineReasonModal(false)}
               >
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
@@ -2456,7 +2456,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         <div className="modal-overlay" onClick={() => setShowRepresentationDetails(false)}>
           <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Representation Request</h3>
+              <h3>{t('messages.representationRequest')}</h3>
               <button className="modal-close" onClick={() => setShowRepresentationDetails(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -2467,7 +2467,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               <div className="offer-detail-section" style={{ marginBottom: '24px' }}>
                 {selectedRepresentationRequest.message && (
                   <div className="offer-detail-row">
-                    <span className="detail-label">Message:</span>
+                    <span className="detail-label">{t('search.messageLabel')}</span>
                     <span className="detail-value representation-message">
                       {selectedRepresentationRequest.message}
                     </span>
@@ -2476,7 +2476,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 {!selectedRepresentationRequest.message && (
                   <div className="offer-detail-row">
                     <span className="detail-value representation-no-message" style={{ textAlign: 'center', color: '#888' }}>
-                      No message included with this request.
+                      {t('chat.noMessageIncluded')}
                     </span>
                   </div>
                 )}
@@ -2489,19 +2489,19 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       onClick={handleDeclineRepresentation}
                       disabled={actionBusy}
                     >
-                      {actionBusy ? '...' : 'Decline'}
+                      {actionBusy ? '...' : t('messages.decline')}
                     </button>
                     <button
                       className="btn btn-primary"
                       onClick={handleAcceptRepresentation}
                       disabled={actionBusy}
                     >
-                      {actionBusy ? '...' : 'Accept'}
+                      {actionBusy ? '...' : t('messages.accept')}
                     </button>
                   </div>
                 ) : (
                   <div className="offer-status-message" style={{ justifyContent: 'center' }}>
-                    <span>Awaiting response from {selectedRepresentationRequest.to?.name || 'the other party'}</span>
+                    <span>{t('chat.awaitingResponseFrom', { name: selectedRepresentationRequest.to?.name || t('chat.theOtherParty') })}</span>
                   </div>
                 )
               )}
@@ -2511,7 +2511,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="9 12 11 14 15 10"></polyline>
                   </svg>
-                  <span>This request has been accepted</span>
+                  <span>{t('chat.requestAccepted')}</span>
                 </div>
               )}
               {selectedRepresentationRequest.status === 'REJECTED' && (
@@ -2521,7 +2521,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <line x1="15" y1="9" x2="9" y2="15"></line>
                     <line x1="9" y1="9" x2="15" y2="15"></line>
                   </svg>
-                  <span>This request has been declined</span>
+                  <span>{t('chat.requestDeclined')}</span>
                 </div>
               )}
             </div>
@@ -2547,7 +2547,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content offer-details-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
               <div className="modal-header">
-                <h3>Share with {user.name}</h3>
+                <h3>{t('chat.shareWith', { name: user.name })}</h3>
                 <button className="modal-close" onClick={closeModal}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 6L6 18M6 6l12 12" />
@@ -2558,11 +2558,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 {needsArtistSelector && (
                   <div>
                     <p style={{ fontSize: '14px', marginBottom: '16px', color: '#999' }}>
-                      Select an artist to send their documents:
+                      {t('chat.selectArtistForDocs')}
                     </p>
                     {(currentUser.representingArtists || []).length === 0 ? (
                       <p style={{ fontSize: '13px', color: '#888' }}>
-                        You don't represent any artists yet. Add one in <strong>Profile &gt; Represented Artists</strong>.
+                        {t('chat.noRepresentedArtistsYet')} <strong>{t('chat.representedArtistsPath')}</strong>.
                       </p>
                     ) : (
                       <div>
@@ -2592,14 +2592,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 )}
 
                 {loadingArtistDocs && (
-                  <p style={{ fontSize: '13px', color: '#888', textAlign: 'center', padding: '20px' }}>Loading…</p>
+                  <p style={{ fontSize: '13px', color: '#888', textAlign: 'center', padding: '20px' }}>{t('chat.loading')}</p>
                 )}
 
                 {!needsArtistSelector && !loadingArtistDocs && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     {currentUser.role === 'AGENT' && selectedArtistForDocs && (
                       <div style={{ fontSize: '12px', color: '#888' }}>
-                        Sharing on behalf of <strong style={{ color: '#fff' }}>{selectedArtistForDocs.name}</strong> · <button onClick={() => setSelectedArtistForDocs(null)} style={{ background: 'transparent', border: 'none', color: '#FF3366', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>change</button>
+                        {t('chat.sharingOnBehalfOf')} <strong style={{ color: '#fff' }}>{selectedArtistForDocs.name}</strong> · <button onClick={() => setSelectedArtistForDocs(null)} style={{ background: 'transparent', border: 'none', color: '#FF3366', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>{t('chat.change')}</button>
                       </div>
                     )}
                     {categories.map((cat) => {
@@ -2614,7 +2614,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>{cat.label}</strong>
                           {docs.length === 0 ? (
                             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-                              No {cat.label.toLowerCase()} in {currentUser.role === 'AGENT' ? `${selectedArtistForDocs?.name || 'their'} library` : 'your library'}. Add one in <strong>Profile &gt; Manage &gt; Documents</strong>.
+                              {t('chat.noDocsInLibrary', {
+                                label: cat.label.toLowerCase(),
+                                library: currentUser.role === 'AGENT'
+                                  ? t('chat.libraryOf', { name: selectedArtistForDocs?.name || t('chat.their') })
+                                  : t('chat.yourLibrary'),
+                              })} <strong>{t('chat.manageDocsPath')}</strong>.
                             </p>
                           ) : (
                             docs.map((doc) => (
@@ -2652,7 +2657,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       padding: '14px',
                       background: 'rgba(255,255,255,0.02)',
                     }}>
-                      <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>Other file</strong>
+                      <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>{t('chat.otherFile')}</strong>
                       <input
                         type="file"
                         accept="application/pdf,image/*"
@@ -2675,10 +2680,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           cursor: 'pointer',
                         }}
                       >
-                        Upload PDF or image
+                        {t('chat.uploadPdfOrImage')}
                       </button>
                       <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', margin: '6px 0 0 0' }}>
-                        Ad-hoc file — sent only in this conversation. Max 10 MB.
+                        {t('chat.adHocFileNote')}
                       </p>
                     </div>
                   </div>
@@ -2706,12 +2711,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 signatureData,
                 token
               );
-              alert('Contract signed successfully!');
+              alert(t('chat.contractSignedSuccess'));
               await fetchMessages();
               setShowSignContractModal(false);
               setSelectedContractData(null);
             } catch (err) {
-              throw new Error(err.message || 'Failed to sign contract');
+              throw new Error(err.message || t('chat.failedToSignContract'));
             }
           }}
           contractUrl={selectedContractData.contractUrl}
@@ -2825,9 +2830,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               );
               setPendingContractToSign(null);
               await fetchMessages();
-              alert('Contract sent and signed successfully!');
+              alert(t('chat.contractSentAndSignedSuccess'));
             } catch (err) {
-              throw new Error(err.message || 'Failed to send and sign contract');
+              throw new Error(err.message || t('chat.failedToSendAndSignContract'));
             }
           }}
         />
