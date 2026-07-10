@@ -110,7 +110,7 @@ const EditProfileScreen = ({ onClose }) => {
       const profileId = user.id;
 
       if (!profileId) {
-        setError('Profile ID is missing. Please log out and log back in.');
+        setError(t('editProfile.profileIdMissing'));
         setSaving(false);
         return;
       }
@@ -127,7 +127,7 @@ const EditProfileScreen = ({ onClose }) => {
     } catch (err) {
       console.error('Failed to save profile:', err);
       console.error('Error details:', { message: err.message, stack: err.stack });
-      setError(err.message || 'Failed to save profile. Please try again.');
+      setError(err.message || t('editProfile.saveFailed'));
       setSaving(false);
     }
   };
@@ -167,7 +167,7 @@ const EditProfileScreen = ({ onClose }) => {
         />
         {/* Basic Info Section */}
         <div className="edit-section">
-          <h3>Basic Information</h3>
+          <h3>{t('editProfile.basicInformation')}</h3>
           
           <div className="form-group">
             <label>{t('editProfile.name')}</label>
@@ -175,7 +175,7 @@ const EditProfileScreen = ({ onClose }) => {
               type="text"
               value={editedUser.name || ''}
               onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
-              placeholder="Your name"
+              placeholder={t('editProfile.yourNamePlaceholder')}
             />
           </div>
 
@@ -185,21 +185,21 @@ const EditProfileScreen = ({ onClose }) => {
               value={editedUser.role || ''}
               onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}
             >
-              <option value="ARTIST">Artist</option>
-              <option value="VENUE">Venue</option>
-              <option value="PROMOTER">Promoter</option>
-              <option value="AGENT">Agent</option>
+              <option value="ARTIST">{t('search.roleArtist')}</option>
+              <option value="VENUE">{t('search.roleVenue')}</option>
+              <option value="PROMOTER">{t('search.rolePromoter')}</option>
+              <option value="AGENT">{t('search.roleAgent')}</option>
             </select>
           </div>
 
           {/* Cascading Location Dropdowns */}
           <div className="form-group">
-            <label>Zone</label>
+            <label>{t('editProfile.zone')}</label>
             <select
               value={editedUser.zone || ''}
               onChange={(e) => handleZoneChange(e.target.value)}
             >
-              <option value="">Select Zone</option>
+              <option value="">{t('editProfile.selectZone')}</option>
               {zones.map(zone => (
                 <option key={zone} value={zone}>{zone}</option>
               ))}
@@ -208,12 +208,12 @@ const EditProfileScreen = ({ onClose }) => {
 
           {editedUser.zone && (
             <div className="form-group">
-              <label>Country</label>
+              <label>{t('editProfile.country')}</label>
               <select
                 value={editedUser.country || ''}
                 onChange={(e) => handleCountryChange(e.target.value)}
               >
-                <option value="">Select Country</option>
+                <option value="">{t('editProfile.selectCountry')}</option>
                 {availableCountries.map(country => (
                   <option key={country} value={country}>{country}</option>
                 ))}
@@ -223,12 +223,12 @@ const EditProfileScreen = ({ onClose }) => {
 
           {editedUser.country && (
             <div className="form-group">
-              <label>City</label>
+              <label>{t('editProfile.city')}</label>
               <select
                 value={editedUser.city || ''}
                 onChange={(e) => handleCityChange(e.target.value)}
               >
-                <option value="">Select City</option>
+                <option value="">{t('editProfile.selectCity')}</option>
                 {availableCities.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
@@ -238,38 +238,38 @@ const EditProfileScreen = ({ onClose }) => {
 
           {showCustomCityInput && (
             <div className="form-group">
-              <label>Enter City Name</label>
+              <label>{t('editProfile.enterCityName')}</label>
               <input
                 type="text"
                 value={customCity}
                 onChange={(e) => handleCustomCityChange(e.target.value)}
-                placeholder="Enter city name"
+                placeholder={t('editProfile.enterCityPlaceholder')}
               />
             </div>
           )}
 
           {editedUser.role === 'VENUE' && (
             <div className="form-group">
-              <label>Venue Capacity</label>
+              <label>{t('editProfile.venueCapacity')}</label>
               <input
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
                 value={editedUser.venueCapacity || ''}
                 onChange={(e) => setEditedUser({ ...editedUser, venueCapacity: e.target.value.replace(/[^0-9]/g, '') })}
-                placeholder="Maximum capacity"
+                placeholder={t('editProfile.maxCapacity')}
               />
             </div>
           )}
 
           {editedUser.role === 'AGENT' && (
             <div className="form-group">
-              <label>Agency Name</label>
+              <label>{t('editProfile.agencyName')}</label>
               <input
                 type="text"
                 value={editedUser.agencyName || ''}
                 onChange={(e) => setEditedUser({ ...editedUser, agencyName: e.target.value })}
-                placeholder="Your agency name"
+                placeholder={t('editProfile.agencyNamePlaceholder')}
               />
             </div>
           )}
@@ -279,7 +279,7 @@ const EditProfileScreen = ({ onClose }) => {
             <textarea
               value={editedUser.bio || ''}
               onChange={(e) => setEditedUser({ ...editedUser, bio: e.target.value })}
-              placeholder="Tell us about yourself..."
+              placeholder={t('editProfile.bioPlaceholder')}
               rows="4"
             />
           </div>
@@ -288,7 +288,7 @@ const EditProfileScreen = ({ onClose }) => {
         {/* Genres Section */}
         <div className="edit-section" style={{ marginTop: '8px' }}>
           <div className="form-group">
-            <label>Genres</label>
+            <label>{t('editProfile.genres')}</label>
             {/* Chip cloud: every genre is a tappable pill; selected = crimson. */}
             <div className="flex flex-wrap gap-2 mt-1">
               {displayedGenres.map(genre => {
@@ -324,17 +324,17 @@ const EditProfileScreen = ({ onClose }) => {
             <p className="mt-2 mb-0 text-[10px] text-white/30">
               {selectedGenres.size > 0
                 ? `${selectedGenres.size} selected`
-                : 'Tap the genres you play'}
+                : t('editProfile.tapGenres')}
             </p>
           </div>
         </div>
 
         {/* Social Links Section */}
         <div className="edit-section">
-          <h3>Social Links</h3>
+          <h3>{t('editProfile.socialLinks')}</h3>
           
           <div className="form-group">
-            <label>SoundCloud/Mixtape</label>
+            <label>{t('editProfile.soundcloudMixtape')}</label>
             <input
               type="url"
               value={editedUser.mixtape || ''}
@@ -353,7 +353,7 @@ const EditProfileScreen = ({ onClose }) => {
 
           {editedUser.role === 'ARTIST' && (
             <div className="form-group">
-              <label>Spotify Artist</label>
+              <label>{t('editProfile.spotifyArtist')}</label>
               <input
                 type="url"
                 value={editedUser.spotify || ''}
@@ -373,18 +373,18 @@ const EditProfileScreen = ({ onClose }) => {
 
           {editedUser.role === 'ARTIST' && (
             <div className="form-group">
-              <label>Resident Advisor</label>
+              <label>{t('editProfile.residentAdvisorLabel')}</label>
               <input
                 type="text"
                 value={editedUser.residentAdvisor || ''}
                 onChange={(e) => setEditedUser({ ...editedUser, residentAdvisor: e.target.value })}
-                placeholder="RA artist name"
+                placeholder={t('editProfile.raArtistName')}
               />
             </div>
           )}
 
           <div className="form-group">
-            <label>Instagram</label>
+            <label>{t('editProfile.instagram')}</label>
             <input
               type="text"
               value={editedUser.instagram || ''}
@@ -394,7 +394,7 @@ const EditProfileScreen = ({ onClose }) => {
           </div>
 
           <div className="form-group">
-            <label>Website</label>
+            <label>{t('editProfile.website')}</label>
             <input
               type="url"
               value={editedUser.website || ''}
@@ -405,7 +405,7 @@ const EditProfileScreen = ({ onClose }) => {
 
           {editedUser.role === 'AGENT' && (
             <div className="form-group">
-              <label>LinkedIn</label>
+              <label>{t('editProfile.linkedin')}</label>
               <input
                 type="url"
                 value={editedUser.linkedin || ''}
@@ -446,10 +446,10 @@ const EditProfileScreen = ({ onClose }) => {
         {/* Action Buttons */}
         <div className="edit-actions">
           <button className="btn btn-secondary btn-full" onClick={onClose} disabled={saving}>
-            Cancel
+            {t('editProfile.cancel')}
           </button>
           <button className="btn btn-primary btn-full" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? t('editProfile.saving') : t('editProfile.saveChanges')}
           </button>
         </div>
       </div>

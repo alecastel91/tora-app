@@ -94,6 +94,27 @@ const en = {
   
   // Edit Profile
   editProfile: {
+    profileIdMissing: 'Profile ID is missing. Please log out and log back in.',
+    saveFailed: 'Failed to save profile. Please try again.',
+    basicInformation: 'Basic Information',
+    yourNamePlaceholder: 'Your name',
+    zone: 'Zone',
+    selectZone: 'Select Zone',
+    selectCountry: 'Select Country',
+    selectCity: 'Select City',
+    enterCityName: 'Enter City Name',
+    enterCityPlaceholder: 'Enter city name',
+    venueCapacity: 'Venue Capacity',
+    maxCapacity: 'Maximum capacity',
+    agencyName: 'Agency Name',
+    agencyNamePlaceholder: 'Your agency name',
+    tapGenres: 'Tap the genres you play',
+    soundcloudMixtape: 'SoundCloud/Mixtape',
+    residentAdvisorLabel: 'Resident Advisor',
+    raArtistName: 'RA artist name',
+    linkedin: 'LinkedIn',
+    saving: 'Saving...',
+    saveChanges: 'Save Changes',
     title: 'Edit Profile',
     name: 'Name',
     role: 'Role',
@@ -132,6 +153,10 @@ const en = {
   
   // Search Screen
   search: {
+    roleArtist: 'Artist',
+    roleVenue: 'Venue',
+    rolePromoter: 'Promoter',
+    roleAgent: 'Agent',
     trialTierName: 'Your 48h trial',
     freeTierName: 'FREE tier',
     locationFiltersAlert: 'Location filters require a paid subscription.\n\n{{tierName}} search is restricted to {{city}} only.\n\nUpgrade to search worldwide!',
