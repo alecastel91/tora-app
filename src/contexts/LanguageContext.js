@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import en from '../translations/en';
 import ja from '../translations/ja';
+import zh from '../translations/zh';
+import ko from '../translations/ko';
+import es from '../translations/es';
+import fr from '../translations/fr';
+import it from '../translations/it';
+import pt from '../translations/pt';
 
 const LanguageContext = createContext();
 
-const translations = {
-  en: en,
-  ja: ja
-};
+// Missing keys in any language fall back to English (see t below), so a
+// partially-translated file degrades gracefully rather than breaking.
+const translations = { en, ja, zh, ko, es, fr, it, pt };
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
@@ -61,9 +66,16 @@ export const LanguageProvider = ({ children }) => {
     }
   };
 
+  // Same set as torahub.io. nativeName is what users see in the picker.
   const availableLanguages = [
     { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ja', name: 'Japanese', nativeName: '日本語' }
+    { code: 'ja', name: 'Japanese', nativeName: '日本語' },
+    { code: 'zh', name: 'Chinese', nativeName: '中文' },
+    { code: 'ko', name: 'Korean', nativeName: '한국어' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+    { code: 'it', name: 'Italian', nativeName: 'Italiano' },
+    { code: 'pt', name: 'Portuguese', nativeName: 'Português' }
   ];
 
   const value = {
