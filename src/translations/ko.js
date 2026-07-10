@@ -479,6 +479,7 @@ const ko = {
     agencyPlaceholder: '예: Coda Agency',
     usernamePlaceholder: '사용자명',
     stepOf: '{{m}}단계 중 {{n}}단계',
+    missingFields: '다음 항목을 입력해 주세요: {{list}}',
   },
 
   tour: {

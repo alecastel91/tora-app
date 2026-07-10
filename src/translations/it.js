@@ -479,6 +479,7 @@ const it = {
     agencyPlaceholder: 'es. Coda Agency',
     usernamePlaceholder: 'nome utente',
     stepOf: 'Passo {{n}} di {{m}}',
+    missingFields: 'Completa: {{list}}',
   },
 
   tour: {

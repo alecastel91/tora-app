@@ -14,6 +14,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   // Form state
   const [role, setRole] = useState('');
@@ -49,6 +50,30 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
     }
   };
 
+  // Labels of the required fields still empty on the current step — drives
+  // the red "Please complete: …" notice after a blocked Next/Submit.
+  const missingFields = () => {
+    const nameLabel = role === 'VENUE' ? t('addProfile.venueName')
+      : role === 'PROMOTER' ? t('addProfile.promoterName')
+      : role === 'AGENT' ? t('addProfile.agentName')
+      : t('addProfile.artistName');
+    switch (step) {
+      case 1: return role ? [] : [t('addProfile.selectRole')];
+      case 2: return profileName.trim() ? [] : [nameLabel];
+      case 3: return (zone && country && city) ? [] : [t('editProfile.city')];
+      case 5: {
+        const missing = [];
+        if (!instagram.trim()) missing.push(t('editProfile.instagram'));
+        if (role === 'AGENT' && !agencyName.trim()) missing.push(t('editProfile.agencyName'));
+        if (role === 'VENUE' && !venueCapacity.trim()) missing.push(t('editProfile.venueCapacity'));
+        return missing;
+      }
+      default: return [];
+    }
+  };
+  const missingNow = attempted ? missingFields() : [];
+  const missingStyle = { border: '1px solid rgba(255, 51, 102, 0.65)' };
+
   // --- Genre toggle ---
   const toggleGenre = (genre) => {
     setGenres(prev =>
@@ -58,8 +83,13 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
   // --- Navigation ---
   const goNext = () => {
-    if (canAdvance() && step < TOTAL_STEPS) {
+    if (!canAdvance()) {
+      setAttempted(true);
+      return;
+    }
+    if (step < TOTAL_STEPS) {
       setError('');
+      setAttempted(false);
       setStep(step + 1);
     }
   };
@@ -67,12 +97,17 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
   const goBack = () => {
     if (step > 1) {
       setError('');
+      setAttempted(false);
       setStep(step - 1);
     }
   };
 
   // --- Submit ---
   const handleSubmit = async () => {
+    if (!canAdvance()) {
+      setAttempted(true);
+      return;
+    }
     setError('');
     setLoading(true);
 
@@ -213,6 +248,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             <input
               type="text"
               className="form-input"
+              style={missingNow.length && !profileName.trim() ? missingStyle : undefined}
               placeholder={
                 role === 'VENUE' ? 'e.g. Berghain' :
                 role === 'PROMOTER' ? 'e.g. Awakenings' :
@@ -286,7 +322,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                 <input
                   type="text"
                   className="form-input"
-                  style={{ paddingLeft: '28px' }}
+                  style={{ paddingLeft: '28px', ...(missingNow.length && !instagram.trim() ? missingStyle : {}) }}
                   placeholder={t('addProfile.usernamePlaceholder')}
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
@@ -328,6 +364,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                   <input
                     type="text"
                     className="form-input"
+                    style={missingNow.length && !agencyName.trim() ? missingStyle : undefined}
                     placeholder={t('addProfile.agencyPlaceholder')}
                     value={agencyName}
                     onChange={(e) => setAgencyName(e.target.value)}
@@ -356,6 +393,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     className="form-input"
+                    style={missingNow.length && !venueCapacity.trim() ? missingStyle : undefined}
                     placeholder="e.g. 500"
                     value={venueCapacity}
                     onChange={(e) => setVenueCapacity(e.target.value.replace(/[^0-9]/g, ''))}
@@ -438,6 +476,13 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
           />
         </div>
 
+        {/* Missing required fields (after a blocked Next/Submit) */}
+        {missingNow.length > 0 && (
+          <div className="error-message" style={{ marginBottom: '16px' }}>
+            {t('addProfile.missingFields', { list: missingNow.join(', ') })}
+          </div>
+        )}
+
         {/* Error */}
         {error && (
           <div className="error-message" style={{ marginBottom: '16px' }}>
@@ -480,7 +525,6 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               type="button"
               className="btn btn-primary"
               onClick={goNext}
-              disabled={!canAdvance()}
             >
               {t('signup.next')}
             </button>
@@ -489,7 +533,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               type="button"
               className="btn btn-primary"
               onClick={handleSubmit}
-              disabled={loading || !canAdvance()}
+              disabled={loading}
             >
               {loading ? t('addProfile.submitting') : t('addProfile.submitApplication')}
             </button>

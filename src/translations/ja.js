@@ -479,6 +479,7 @@ const ja = {
     agencyPlaceholder: '例：Coda Agency',
     usernamePlaceholder: 'ユーザー名',
     stepOf: 'ステップ {{n}}/{{m}}',
+    missingFields: '入力してください：{{list}}',
   },
 
   tour: {

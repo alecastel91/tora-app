@@ -479,6 +479,7 @@ const zh = {
     agencyPlaceholder: '例如：Coda Agency',
     usernamePlaceholder: '用户名',
     stepOf: '第{{n}}步，共{{m}}步',
+    missingFields: '请填写：{{list}}',
   },
 
   tour: {
