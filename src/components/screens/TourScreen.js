@@ -47,6 +47,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showZoneDropdown, setShowZoneDropdown] = useState(false);
   const [tourForm, setTourForm] = useState({
     artistId: '', // agents create tours on behalf of a represented artist
+    hideFee: false,
     zone: '',
     country: '', // Optional - if selected, tour is country-specific
     startDate: '',
@@ -633,6 +634,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         feeExpectation: feeExpectation,
         additionalNotes: tourForm.additionalNotes
       };
+      tourData.hideFee = !!tourForm.hideFee;
       if (user?.role === 'AGENT' && tourForm.artistId) {
         tourData.artistId = tourForm.artistId;
       }
@@ -646,6 +648,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         // Reset form and close modal
         setTourForm({
           artistId: '',
+          hideFee: false,
           zone: '',
           country: '',
           startDate: '',
@@ -686,6 +689,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       endDate: tour.endDate.split('T')[0],
       minRevenue: tour.minRevenue?.toString() || '',
       revenueCurrency: tour.revenueCurrency || 'EUR',
+      hideFee: !!tour.hideFee,
       feeCurrency: tour.feeExpectation ? tour.feeExpectation.split(' ')[0] : 'EUR',
       feeMin: tour.feeExpectation ? tour.feeExpectation.split(' ')[1]?.split('-')[0] || '' : '',
       feeMax: tour.feeExpectation ? tour.feeExpectation.split(' ')[1]?.split('-')[1] || '' : '',
@@ -728,7 +732,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         revenueCurrency: tourForm.revenueCurrency,
         targetCities: [], // Always empty - feature removed
         feeExpectation: feeExpectation,
-        additionalNotes: tourForm.additionalNotes
+        additionalNotes: tourForm.additionalNotes,
+        hideFee: !!tourForm.hideFee
       };
 
       const response = await apiService.updateTour(selectedTour.id, tourData);
@@ -1015,6 +1020,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
 
             <div className="form-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={!!tourForm.hideFee}
+                  onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
+                />
+                <span>{t('tour.hideFeeLabel')}</span>
+              </label>
+            </div>
+
+            <div className="form-group">
               <label>{t('tour.additionalNotesOptional')}</label>
               <textarea
                 value={tourForm.additionalNotes}
@@ -1189,6 +1205,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 </div>
               </div>
               <small className="form-hint">{t('tour.feeRangeHint')}</small>
+            </div>
+
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={!!tourForm.hideFee}
+                  onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
+                />
+                <span>{t('tour.hideFeeLabel')}</span>
+              </label>
             </div>
 
             <div className="form-group">
@@ -1638,10 +1665,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       </div>
 
                       <div className="tour-stats-row">
-                        {tour.feeExpectation && (
+                        {(tour.feeExpectation || tour.priceOnRequest) && (
                           <div className="tour-stat">
                             <span className="tour-stat-label">{t('tour.feeRangeLabel')}</span>
-                            <span className="tour-stat-value">{tour.feeExpectation}</span>
+                            <span className="tour-stat-value">{tour.priceOnRequest ? t('tour.priceOnRequest') : tour.feeExpectation}</span>
                           </div>
                         )}
                       </div>

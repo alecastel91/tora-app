@@ -445,6 +445,10 @@ const ko = {
     removeConnectionTitle: '연결을 해제할까요?',
     removeConnectionBody: '{{name}} 님과의 연결을 정말 해제하시겠습니까? 나중에 다시 연결할 수 있습니다.',
     remove: '해제',
+    gigs: '공연',
+    memberSince: '{{date}}부터 멤버',
+    mutualConnections: '함께 아는 연결 {{n}}명',
+    pastHighlights: '지난 하이라이트',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const ko = {
     statusActive: '진행 중',
     statusCompleted: '완료',
     statusCancelled: '취소됨',
+    hideFeeLabel: '개런티 숨기기 — "가격 문의"로 표시',
+    priceOnRequest: '가격 문의',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const ko = {
     enterCityPlaceholder: '도시 이름',
     searchCityPlaceholder: '도시 이름을 입력하세요...',
     cityNotFound: '내 도시가 목록에 없어요',
+    pastHighlights: '지난 하이라이트',
+    pastHighlightsHint: '주목할 만한 과거 공연을 추가하세요 — 베뉴, 도시, 연도. 공개 프로필에 표시됩니다.',
+    addHighlight: '하이라이트 추가',
+    venuePlaceholder: '베뉴',
+    yearPlaceholder: '연도',
     venueCapacity: '베뉴 수용 인원',
     maxCapacity: '최대 수용 인원',
     agencyName: '에이전시 이름',

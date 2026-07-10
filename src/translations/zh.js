@@ -445,6 +445,10 @@ const zh = {
     removeConnectionTitle: '解除联系？',
     removeConnectionBody: '确定要解除与{{name}}的联系吗？之后可以重新建立联系。',
     remove: '解除',
+    gigs: '演出',
+    memberSince: '{{date}}加入',
+    mutualConnections: '{{n}}个共同联系人',
+    pastHighlights: '过往亮点',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const zh = {
     statusActive: '进行中',
     statusCompleted: '已完成',
     statusCancelled: '已取消',
+    hideFeeLabel: '隐藏费用——显示"价格面议"',
+    priceOnRequest: '价格面议',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const zh = {
     enterCityPlaceholder: '城市名称',
     searchCityPlaceholder: '输入你的城市...',
     cityNotFound: '我的城市不在列表中',
+    pastHighlights: '过往亮点',
+    pastHighlightsHint: '添加值得展示的过往演出——场地、城市和年份。会显示在你的公开档案上。',
+    addHighlight: '添加亮点',
+    venuePlaceholder: '场地',
+    yearPlaceholder: '年份',
     venueCapacity: '场地容量',
     maxCapacity: '最大容量',
     agencyName: '经纪公司名称',

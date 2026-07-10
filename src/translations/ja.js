@@ -445,6 +445,10 @@ const ja = {
     removeConnectionTitle: 'コネクションを解除しますか？',
     removeConnectionBody: '{{name}}とのコネクションを解除してもよろしいですか？後で再度つながることもできます。',
     remove: '解除',
+    gigs: '出演',
+    memberSince: '{{date}}からのメンバー',
+    mutualConnections: '共通のコネクション{{n}}件',
+    pastHighlights: '過去のハイライト',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const ja = {
     statusActive: '進行中',
     statusCompleted: '完了',
     statusCancelled: 'キャンセル',
+    hideFeeLabel: '料金を非表示 —「応相談」と表示',
+    priceOnRequest: '応相談',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const ja = {
     enterCityPlaceholder: '都市名を入力',
     searchCityPlaceholder: '都市名を入力...',
     cityNotFound: '都市が見つからない場合',
+    pastHighlights: '過去のハイライト',
+    pastHighlightsHint: '注目の過去の出演を追加 — 会場、都市、年。公開プロフィールに表示されます。',
+    addHighlight: 'ハイライトを追加',
+    venuePlaceholder: '会場',
+    yearPlaceholder: '年',
     venueCapacity: '収容人数',
     maxCapacity: '最大収容人数',
     agencyName: 'エージェンシー名',

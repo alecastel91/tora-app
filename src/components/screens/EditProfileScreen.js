@@ -27,6 +27,7 @@ const EditProfileScreen = ({ onClose }) => {
   const [editedUser, setEditedUser] = useState({
     ...user,
     genres: user?.genres || [],
+    pastHighlights: Array.isArray(user?.pastHighlights) ? user.pastHighlights : [],
     city: initialLocation.city,
     country: initialLocation.country,
     zone: initialLocation.zone
@@ -440,6 +441,78 @@ const EditProfileScreen = ({ onClose }) => {
             color: '#dc3545'
           }}>
             {error}
+          </div>
+        )}
+
+        {/* Past highlights — artist-curated gigs shown on the public profile */}
+        {user?.role === 'ARTIST' && (
+          <div className="edit-section">
+            <h3>{t('editProfile.pastHighlights')}</h3>
+            <p className="m-0 mb-3 text-xs text-white/40">{t('editProfile.pastHighlightsHint')}</p>
+            <div className="flex flex-col gap-2.5">
+              {(editedUser.pastHighlights || []).map((h, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    className="form-input flex-[2]"
+                    placeholder={t('editProfile.venuePlaceholder')}
+                    value={h.venue || ''}
+                    onChange={(e) => {
+                      const next = [...editedUser.pastHighlights];
+                      next[i] = { ...next[i], venue: e.target.value };
+                      setEditedUser({ ...editedUser, pastHighlights: next });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    className="form-input flex-[2]"
+                    placeholder={t('editProfile.city')}
+                    value={h.city || ''}
+                    onChange={(e) => {
+                      const next = [...editedUser.pastHighlights];
+                      next[i] = { ...next[i], city: e.target.value };
+                      setEditedUser({ ...editedUser, pastHighlights: next });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="form-input flex-1 min-w-[64px]"
+                    placeholder={t('editProfile.yearPlaceholder')}
+                    maxLength={4}
+                    value={h.year || ''}
+                    onChange={(e) => {
+                      const next = [...editedUser.pastHighlights];
+                      next[i] = { ...next[i], year: e.target.value.replace(/[^0-9]/g, '') };
+                      setEditedUser({ ...editedUser, pastHighlights: next });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    aria-label={t('common.delete')}
+                    className="shrink-0 w-8 h-8 rounded-full border border-white/15 bg-transparent text-white/50 hover:text-role-venue hover:border-role-venue/50 cursor-pointer"
+                    onClick={() => {
+                      const next = editedUser.pastHighlights.filter((_, j) => j !== i);
+                      setEditedUser({ ...editedUser, pastHighlights: next });
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              {(editedUser.pastHighlights || []).length < 20 && (
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => setEditedUser({
+                    ...editedUser,
+                    pastHighlights: [...(editedUser.pastHighlights || []), { venue: '', city: '', year: '' }],
+                  })}
+                >
+                  + {t('editProfile.addHighlight')}
+                </button>
+              )}
+            </div>
           </div>
         )}
 

@@ -445,6 +445,10 @@ const es = {
     removeConnectionTitle: '¿Eliminar la conexión?',
     removeConnectionBody: '¿Seguro que quieres eliminar la conexión con {{name}}? Podréis volver a conectar más adelante.',
     remove: 'Eliminar',
+    gigs: 'Bolos',
+    memberSince: 'Miembro desde {{date}}',
+    mutualConnections: '{{n}} conexiones en común',
+    pastHighlights: 'Momentos destacados',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const es = {
     statusActive: 'ACTIVO',
     statusCompleted: 'COMPLETADO',
     statusCancelled: 'CANCELADO',
+    hideFeeLabel: 'Ocultar caché — mostrar "precio a consultar"',
+    priceOnRequest: 'Precio a consultar',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const es = {
     enterCityPlaceholder: 'Nombre de la ciudad',
     searchCityPlaceholder: 'Empieza a escribir tu ciudad...',
     cityNotFound: 'Mi ciudad no aparece',
+    pastHighlights: 'Momentos destacados',
+    pastHighlightsHint: 'Añade bolos destacados del pasado — sala, ciudad y año. Se muestran en tu perfil público.',
+    addHighlight: 'Añadir destacado',
+    venuePlaceholder: 'Sala',
+    yearPlaceholder: 'Año',
     venueCapacity: 'Aforo del local',
     maxCapacity: 'Aforo máximo',
     agencyName: 'Nombre de la agencia',

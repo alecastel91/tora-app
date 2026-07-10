@@ -445,6 +445,10 @@ const pt = {
     removeConnectionTitle: 'Remover a ligação?',
     removeConnectionBody: 'Queres mesmo remover a ligação com {{name}}? Podem voltar a ligar-se mais tarde.',
     remove: 'Remover',
+    gigs: 'Atuações',
+    memberSince: 'Membro desde {{date}}',
+    mutualConnections: '{{n}} ligações em comum',
+    pastHighlights: 'Destaques passados',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const pt = {
     statusActive: 'ATIVO',
     statusCompleted: 'CONCLUÍDO',
     statusCancelled: 'CANCELADO',
+    hideFeeLabel: 'Ocultar cachet — mostrar "preço sob consulta"',
+    priceOnRequest: 'Preço sob consulta',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const pt = {
     enterCityPlaceholder: 'Nome da cidade',
     searchCityPlaceholder: 'Começa a escrever a tua cidade...',
     cityNotFound: 'A minha cidade não está na lista',
+    pastHighlights: 'Destaques passados',
+    pastHighlightsHint: 'Adiciona atuações passadas de destaque — espaço, cidade e ano. Visíveis no teu perfil público.',
+    addHighlight: 'Adicionar destaque',
+    venuePlaceholder: 'Espaço',
+    yearPlaceholder: 'Ano',
     venueCapacity: 'Lotação do espaço',
     maxCapacity: 'Lotação máxima',
     agencyName: 'Nome da agência',

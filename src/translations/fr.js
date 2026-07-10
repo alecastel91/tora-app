@@ -445,6 +445,10 @@ const fr = {
     removeConnectionTitle: 'Supprimer la connexion ?',
     removeConnectionBody: 'Voulez-vous vraiment supprimer la connexion avec {{name}} ? Vous pourrez vous reconnecter plus tard.',
     remove: 'Supprimer',
+    gigs: 'Dates',
+    memberSince: 'Membre depuis {{date}}',
+    mutualConnections: '{{n}} connexions en commun',
+    pastHighlights: 'Dates marquantes',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const fr = {
     statusActive: 'ACTIF',
     statusCompleted: 'TERMINÉ',
     statusCancelled: 'ANNULÉ',
+    hideFeeLabel: 'Masquer le cachet — afficher "prix sur demande"',
+    priceOnRequest: 'Prix sur demande',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const fr = {
     enterCityPlaceholder: 'Nom de la ville',
     searchCityPlaceholder: 'Commencez à taper votre ville...',
     cityNotFound: 'Ma ville n\'est pas listée',
+    pastHighlights: 'Dates marquantes',
+    pastHighlightsHint: 'Ajoutez vos dates marquantes — salle, ville et année. Visibles sur votre profil public.',
+    addHighlight: 'Ajouter une date',
+    venuePlaceholder: 'Salle',
+    yearPlaceholder: 'Année',
     venueCapacity: 'Capacité de la salle',
     maxCapacity: 'Capacité maximale',
     agencyName: "Nom de l'agence",

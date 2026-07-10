@@ -202,8 +202,9 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getProfile(profileId) {
-    const response = await fetch(`${API_URL}/profiles/${profileId}`, {
+  async getProfile(profileId, viewerProfileId) {
+    const qs = viewerProfileId ? `?viewerProfileId=${viewerProfileId}` : '';
+    const response = await fetch(`${API_URL}/profiles/${profileId}${qs}`, {
       method: 'GET',
       headers: this.getHeaders()
     });

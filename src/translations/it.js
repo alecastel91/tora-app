@@ -445,6 +445,10 @@ const it = {
     removeConnectionTitle: 'Rimuovere il collegamento?',
     removeConnectionBody: 'Vuoi davvero rimuovere il collegamento con {{name}}? Potrete ricollegarvi in seguito.',
     remove: 'Rimuovi',
+    gigs: 'Serate',
+    memberSince: 'Membro da {{date}}',
+    mutualConnections: '{{n}} collegamenti in comune',
+    pastHighlights: 'Highlight passati',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const it = {
     statusActive: 'ATTIVO',
     statusCompleted: 'COMPLETATO',
     statusCancelled: 'ANNULLATO',
+    hideFeeLabel: 'Nascondi il compenso — mostra "prezzo su richiesta"',
+    priceOnRequest: 'Prezzo su richiesta',
   },
 
   signup: {
@@ -757,6 +763,11 @@ const it = {
     enterCityPlaceholder: 'Nome della città',
     searchCityPlaceholder: 'Inizia a digitare la tua città...',
     cityNotFound: 'La mia città non è nell\'elenco',
+    pastHighlights: 'Highlight passati',
+    pastHighlightsHint: 'Aggiungi serate passate di rilievo — locale, città e anno. Visibili sul tuo profilo pubblico.',
+    addHighlight: 'Aggiungi highlight',
+    venuePlaceholder: 'Locale',
+    yearPlaceholder: 'Anno',
     venueCapacity: 'Capienza del locale',
     maxCapacity: 'Capienza massima',
     agencyName: "Nome dell'agenzia",

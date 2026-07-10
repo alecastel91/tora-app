@@ -11,7 +11,7 @@ import { raProfileUrl } from '../../utils/urls';
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { t } = useLanguage();
-  const { likedProfiles, toggleLike, sentRequests, receivedRequests, sendConnectionRequest, connectedUsers, removeConnection } = useAppContext();
+  const { user: currentUser, likedProfiles, toggleLike, sentRequests, receivedRequests, sendConnectionRequest, connectedUsers, removeConnection } = useAppContext();
   // Callers pass whatever row object they have (search result, conversation
   // partner, roster entry) — those are list projections and may lack detail
   // fields like bio. Enrich with the full profile; the passed object renders
@@ -21,11 +21,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     let cancelled = false;
     setFullProfile(null);
     if (!passedProfile?.id) return undefined;
-    apiService.getProfile(passedProfile.id)
+    apiService.getProfile(passedProfile.id, currentUser?.id)
       .then((data) => { if (!cancelled) setFullProfile(data.profile || data); })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [passedProfile?.id]);
+  }, [passedProfile?.id, currentUser?.id]);
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [message, setMessage] = useState('');
@@ -301,33 +301,73 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         </div>
         
         {/* Stats */}
-        {(profile.followers || profile.connections) && (
+        {(profile.followers || profile.connections || profile.venueCapacity
+          || profile.gigsCompleted > 0 || profile.rosterSize > 0) && (
           <div className="profile-stats">
             {profile.followers && (
               <div className="stat-item">
                 <span className="stat-value">{profile.followers.toLocaleString()}</span>
-                <span className="stat-label">Likes</span>
+                <span className="stat-label">{t('profile.likes')}</span>
               </div>
             )}
             {profile.connections && (
               <div className="stat-item">
                 <span className="stat-value">{profile.connections}</span>
-                <span className="stat-label">Connections</span>
+                <span className="stat-label">{t('profile.connections')}</span>
+              </div>
+            )}
+            {profile.role === 'ARTIST' && profile.gigsCompleted > 0 && (
+              <div className="stat-item">
+                <span className="stat-value">{profile.gigsCompleted}</span>
+                <span className="stat-label">{t('viewProfile.gigs')}</span>
+              </div>
+            )}
+            {profile.role === 'AGENT' && profile.rosterSize > 0 && (
+              <div className="stat-item">
+                <span className="stat-value">{profile.rosterSize}</span>
+                <span className="stat-label">{t('roster.roster')}</span>
               </div>
             )}
             {profile.venueCapacity && (
               <div className="stat-item">
                 <span className="stat-value">{profile.venueCapacity.toLocaleString()}</span>
-                <span className="stat-label">Capacity</span>
+                <span className="stat-label">{t('profile.capacity')}</span>
               </div>
             )}
           </div>
+        )}
+
+        {/* Member-since + mutual connections meta line */}
+        {(profile.memberSince || profile.mutualConnections > 0) && (
+          <p className="m-0 mt-2 mb-1 text-center text-[10px] uppercase tracking-[0.15em] text-white/35 font-tech">
+            {profile.memberSince && t('viewProfile.memberSince', {
+              date: new Date(profile.memberSince).toLocaleDateString(t('dateFormat.locale'), { month: 'short', year: 'numeric' }),
+            })}
+            {profile.memberSince && profile.mutualConnections > 0 && ' · '}
+            {profile.mutualConnections > 0 && t('viewProfile.mutualConnections', { n: profile.mutualConnections })}
+          </p>
         )}
         
         {/* Bio */}
         {profile.bio && (
           <div className="profile-bio">
             <p>{profile.bio}</p>
+          </div>
+        )}
+
+        {/* Past highlights — artist-curated gigs (roadmap item 10) */}
+        {profile.role === 'ARTIST' && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0 && (
+          <div className="px-5 mb-5 text-left">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.pastHighlights')}</p>
+            <div className="flex flex-col gap-2">
+              {profile.pastHighlights.map((h, i) => (
+                <div key={i} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-infrared shrink-0" />
+                  <span className="flex-1 text-sm text-white truncate">{h.venue}{h.city ? <span className="text-white/40"> · {h.city}</span> : null}</span>
+                  {h.year && <span className="text-[11px] text-white/40 font-tech shrink-0">{h.year}</span>}
+                </div>
+              ))}
+            </div>
           </div>
         )}
         

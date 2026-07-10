@@ -445,6 +445,10 @@ const en = {
     removeConnectionTitle: 'Remove Connection?',
     removeConnectionBody: 'Are you sure you want to remove your connection with {{name}}? You can always reconnect later.',
     remove: 'Remove',
+    gigs: 'Gigs',
+    memberSince: 'Member since {{date}}',
+    mutualConnections: '{{n}} mutual connections',
+    pastHighlights: 'Past Highlights',
   },
 
   addProfile: {
@@ -593,6 +597,8 @@ const en = {
     statusActive: 'ACTIVE',
     statusCompleted: 'COMPLETED',
     statusCancelled: 'CANCELLED',
+    hideFeeLabel: 'Hide fee — show "price on request"',
+    priceOnRequest: 'Price on request',
   },
 
   signup: {
@@ -760,6 +766,11 @@ const en = {
     enterCityPlaceholder: 'Enter city name',
     searchCityPlaceholder: 'Start typing your city...',
     cityNotFound: 'My city isn\'t listed',
+    pastHighlights: 'Past highlights',
+    pastHighlightsHint: 'Add notable past gigs — venue, city and year. Shown on your public profile.',
+    addHighlight: 'Add highlight',
+    venuePlaceholder: 'Venue',
+    yearPlaceholder: 'Year',
     venueCapacity: 'Venue Capacity',
     maxCapacity: 'Maximum capacity',
     agencyName: 'Agency Name',
