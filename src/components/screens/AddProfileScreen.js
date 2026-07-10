@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { genresList, zones, countriesByZone, citiesByCountry } from '../../data/profiles';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const TOTAL_STEPS = 5;
 
 const AddProfileScreen = ({ onClose, onSuccess }) => {
+  const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -137,12 +139,12 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to submit application');
+        throw new Error(data.error || data.message || t('addProfile.submitFailed'));
       }
 
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || t('auth.somethingWentWrong'));
     } finally {
       setLoading(false);
     }
@@ -158,7 +160,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
           </button>
-          <h1>ADD PROFILE</h1>
+          <h1>{t('addProfile.title')}</h1>
           <div style={{ width: '24px' }}></div>
         </div>
         <div className="edit-profile-content">
@@ -196,7 +198,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               marginBottom: '16px',
               color: '#fff',
             }}>
-              Application Submitted
+              {t('addProfile.applicationSubmitted')}
             </h2>
 
             {/* Message */}
@@ -207,7 +209,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               marginBottom: '24px',
               maxWidth: '320px',
             }}>
-              Your application for a new <strong style={{ color: '#FF3366' }}>{role}</strong> profile has been submitted successfully.
+              {t('addProfile.submittedBefore')} <strong style={{ color: '#FF3366' }}>{role}</strong> {t('addProfile.submittedAfter')}
             </p>
 
             {/* What happens next */}
@@ -226,11 +228,11 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                 letterSpacing: '0.1em',
                 marginBottom: '12px',
               }}>
-                What happens next
+                {t('addProfile.whatHappensNext')}
               </p>
               <div style={{ textAlign: 'left', fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.5)' }}>
-                <p><span style={{ color: '#FF3366', fontWeight: 600 }}>1. Review</span> — We'll review your application</p>
-                <p><span style={{ color: '#FF3366', fontWeight: 600 }}>2. Approval</span> — If approved, your new profile will appear in your account</p>
+                <p><span style={{ color: '#FF3366', fontWeight: 600 }}>1. {t('addProfile.stepReview')}</span> — {t('addProfile.stepReviewDesc')}</p>
+                <p><span style={{ color: '#FF3366', fontWeight: 600 }}>2. {t('addProfile.stepApproval')}</span> — {t('addProfile.stepApprovalDesc')}</p>
               </div>
             </div>
 
@@ -239,7 +241,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               onClick={onClose}
               style={{ width: '100%', maxWidth: '280px' }}
             >
-              Done
+              {t('common.done')}
             </button>
           </div>
         </div>
@@ -253,7 +255,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       case 1:
         return (
           <div className="form-group">
-            <label style={labelStyle}>Select Role</label>
+            <label style={labelStyle}>{t('addProfile.selectRole')}</label>
             <div className="role-selector">
               {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].map(r => (
                 <button
@@ -273,10 +275,10 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         return (
           <div className="form-group">
             <label style={labelStyle}>
-              {role === 'VENUE' ? 'Venue Name' :
-               role === 'PROMOTER' ? 'Promoter / Event Name' :
-               role === 'AGENT' ? 'Agent Name' :
-               'Artist / DJ Name'}
+              {role === 'VENUE' ? t('addProfile.venueName') :
+               role === 'PROMOTER' ? t('addProfile.promoterName') :
+               role === 'AGENT' ? t('addProfile.agentName') :
+               t('addProfile.artistName')}
             </label>
             <input
               type="text"
@@ -298,13 +300,13 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         return (
           <>
             <div className="form-group">
-              <label style={labelStyle}>Zone</label>
+              <label style={labelStyle}>{t('editProfile.zone')}</label>
               <select
                 className="form-input"
                 value={zone}
                 onChange={(e) => handleZoneChange(e.target.value)}
               >
-                <option value="">Select Zone</option>
+                <option value="">{t('editProfile.selectZone')}</option>
                 {zones.map(z => (
                   <option key={z} value={z}>{z}</option>
                 ))}
@@ -313,13 +315,13 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {zone && (
               <div className="form-group">
-                <label style={labelStyle}>Country</label>
+                <label style={labelStyle}>{t('editProfile.country')}</label>
                 <select
                   className="form-input"
                   value={country}
                   onChange={(e) => handleCountryChange(e.target.value)}
                 >
-                  <option value="">Select Country</option>
+                  <option value="">{t('editProfile.selectCountry')}</option>
                   {availableCountries.map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
@@ -329,13 +331,13 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {country && (
               <div className="form-group">
-                <label style={labelStyle}>City</label>
+                <label style={labelStyle}>{t('editProfile.city')}</label>
                 <select
                   className="form-input"
                   value={showCustomCityInput ? 'Other' : city}
                   onChange={(e) => handleCityChange(e.target.value)}
                 >
-                  <option value="">Select City</option>
+                  <option value="">{t('editProfile.selectCity')}</option>
                   {availableCities.map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
@@ -345,13 +347,13 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
             {showCustomCityInput && (
               <div className="form-group">
-                <label style={labelStyle}>Enter City Name</label>
+                <label style={labelStyle}>{t('editProfile.enterCityName')}</label>
                 <input
                   type="text"
                   className="form-input"
                   value={customCity}
                   onChange={(e) => handleCustomCityChange(e.target.value)}
-                  placeholder="Enter city name"
+                  placeholder={t('editProfile.enterCityPlaceholder')}
                 />
               </div>
             )}
@@ -361,7 +363,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       case 4:
         return (
           <div className="form-group">
-            <label style={labelStyle}>Select Genres (optional)</label>
+            <label style={labelStyle}>{t('addProfile.selectGenresOptional')}</label>
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
@@ -400,7 +402,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         return (
           <>
             <div className="form-group">
-              <label style={labelStyle}>Instagram</label>
+              <label style={labelStyle}>{t('editProfile.instagram')}</label>
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
@@ -426,21 +428,21 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {role === 'ARTIST' && (
               <>
                 <div className="form-group">
-                  <label style={labelStyle}>Resident Advisor (optional)</label>
+                  <label style={labelStyle}>{t('addProfile.raOptional')}</label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="RA artist name"
+                    placeholder={t('editProfile.raArtistName')}
                     value={residentAdvisor}
                     onChange={(e) => setResidentAdvisor(e.target.value)}
                   />
                 </div>
                 <div className="form-group">
-                  <label style={labelStyle}>SoundCloud (optional)</label>
+                  <label style={labelStyle}>{t('addProfile.soundcloudOptional')}</label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="SoundCloud username or URL"
+                    placeholder={t('addProfile.soundcloudPlaceholder')}
                     value={soundcloud}
                     onChange={(e) => setSoundcloud(e.target.value)}
                   />
@@ -452,7 +454,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {role === 'AGENT' && (
               <>
                 <div className="form-group">
-                  <label style={labelStyle}>Agency Name *</label>
+                  <label style={labelStyle}>{t('editProfile.agencyName')} *</label>
                   <input
                     type="text"
                     className="form-input"
@@ -462,11 +464,11 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label style={labelStyle}>LinkedIn (optional)</label>
+                  <label style={labelStyle}>{t('addProfile.linkedinOptional')}</label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="LinkedIn profile URL"
+                    placeholder={t('addProfile.linkedinPlaceholder')}
                     value={linkedin}
                     onChange={(e) => setLinkedin(e.target.value)}
                   />
@@ -478,7 +480,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {role === 'VENUE' && (
               <>
                 <div className="form-group">
-                  <label style={labelStyle}>Venue Capacity *</label>
+                  <label style={labelStyle}>{t('editProfile.venueCapacity')} *</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -495,7 +497,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {/* Promoter-specific */}
             {role === 'PROMOTER' && (
               <div className="form-group">
-                <label style={labelStyle}>Website (optional)</label>
+                <label style={labelStyle}>{t('addProfile.websiteOptional')}</label>
                 <input
                   type="text"
                   className="form-input"
@@ -509,7 +511,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             {/* Website for non-promoter roles that don't already show it */}
             {role !== 'PROMOTER' && (
               <div className="form-group">
-                <label style={labelStyle}>Website (optional)</label>
+                <label style={labelStyle}>{t('addProfile.websiteOptional')}</label>
                 <input
                   type="text"
                   className="form-input"
@@ -529,11 +531,11 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
   // Step titles
   const stepTitles = {
-    1: 'Role',
-    2: 'Profile Name',
-    3: 'Location',
-    4: 'Genres',
-    5: 'Links & Details',
+    1: t('editProfile.role'),
+    2: t('addProfile.profileName'),
+    3: t('addProfile.location'),
+    4: t('editProfile.genres'),
+    5: t('addProfile.linksDetails'),
   };
 
   return (
@@ -544,7 +546,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </button>
-        <h1>ADD PROFILE</h1>
+        <h1>{t('addProfile.title')}</h1>
         <div style={{ width: '24px' }}></div>
       </div>
       <div className="edit-profile-content">
@@ -601,7 +603,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               className="btn btn-secondary"
               onClick={onClose}
             >
-              Cancel
+              {t('editProfile.cancel')}
             </button>
           ) : (
             <button
@@ -609,7 +611,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               className="btn btn-secondary"
               onClick={goBack}
             >
-              Back
+              {t('addProfile.back')}
             </button>
           )}
 
@@ -620,7 +622,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               onClick={goNext}
               disabled={!canAdvance()}
             >
-              Next
+              {t('signup.next')}
             </button>
           ) : (
             <button
@@ -629,7 +631,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
               onClick={handleSubmit}
               disabled={loading || !canAdvance()}
             >
-              {loading ? 'Submitting...' : 'Submit Application'}
+              {loading ? t('addProfile.submitting') : t('addProfile.submitApplication')}
             </button>
           )}
         </div>
