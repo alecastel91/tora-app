@@ -202,6 +202,19 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async uploadAvatar(profileId, blob) {
+    const formData = new FormData();
+    formData.append('avatar', blob, 'avatar.webp');
+    const headers = {};
+    if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
+    const response = await fetch(`${API_URL}/profiles/${profileId}/avatar`, {
+      method: 'POST',
+      headers, // no Content-Type — the browser sets the multipart boundary
+      body: formData,
+    });
+    return this.handleResponse(response);
+  }
+
   async getProfile(profileId, viewerProfileId) {
     const qs = viewerProfileId ? `?viewerProfileId=${viewerProfileId}` : '';
     const response = await fetch(`${API_URL}/profiles/${profileId}${qs}`, {

@@ -37,6 +37,13 @@ export async function downscaleImageToDataUrl(file, { maxDimension = 1024, quali
   return dataUrl;
 }
 
+/** Same downscale, but returns a Blob for multipart upload. */
+export async function downscaleImageToBlob(file, opts = {}) {
+  const dataUrl = await downscaleImageToDataUrl(file, opts);
+  const res = await fetch(dataUrl);
+  return res.blob();
+}
+
 function loadBitmap(file) {
   if (typeof createImageBitmap === 'function') {
     return createImageBitmap(file);

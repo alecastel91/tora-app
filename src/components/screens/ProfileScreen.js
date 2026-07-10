@@ -14,7 +14,7 @@ import ViewProfileScreen from './ViewProfileScreen';
 import SearchAgentsModal from '../common/SearchAgentsModal';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
-import { downscaleImageToDataUrl } from '../../utils/image';
+import { downscaleImageToBlob } from '../../utils/image';
 import { getAvatarClass, roleLabel } from '../../utils/roles';
 import VerifiedBadge from '../common/VerifiedBadge';
 import VerificationModal from '../common/VerificationModal';
@@ -264,8 +264,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     try {
       // Downscale on-device before upload (backend re-normalizes to 512px
       // webp and stores it in object storage — the profile keeps a URL).
-      const avatarData = await downscaleImageToDataUrl(file);
-      const updatedProfile = await apiService.updateProfile(user.id, { avatar: avatarData });
+      const avatarBlob = await downscaleImageToBlob(file);
+      const updatedProfile = await apiService.uploadAvatar(user.id, avatarBlob);
       updateUser(updatedProfile);
     } catch (error) {
       console.error('Failed to upload avatar:', error);
