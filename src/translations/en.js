@@ -1,15 +1,4 @@
 const en = {
-  notifications: {
-    justNow: 'Just now',
-    daysAgo: '{{n}}d ago',
-    noNotifications: 'No notifications yet',
-  },
-
-  ra: {
-    events: 'Events',
-    noPastEvents: 'No past events found',
-  },
-
   tour: {
     allMonths: 'All Months',
     unlockCalendarMatching: 'Unlock Calendar Matching',
@@ -417,6 +406,9 @@ const en = {
   
   // Notifications
   notifications: {
+    justNow: 'Just now',
+    daysAgo: '{{n}}d ago',
+    noNotifications: 'No notifications yet',
     title: 'Notifications',
     clearAll: 'Clear all',
     likedProfile: 'liked your profile',
@@ -479,6 +471,8 @@ const en = {
   
   // RA Events
   ra: {
+    events: 'Events',
+    noPastEvents: 'No past events found',
     upcomingEvents: 'Upcoming Events',
     sourceRA: 'Source: Resident Advisor',
     viewOnRA: 'View on RA',
