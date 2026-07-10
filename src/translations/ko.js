@@ -449,6 +449,7 @@ const ko = {
     memberSince: '{{date}}부터 멤버',
     mutualConnections: '함께 아는 연결 {{n}}명',
     pastHighlights: '지난 하이라이트',
+    activeTours: '진행 중인 투어',
   },
 
   addProfile: {

@@ -449,6 +449,7 @@ const it = {
     memberSince: 'Membro da {{date}}',
     mutualConnections: '{{n}} collegamenti in comune',
     pastHighlights: 'Highlight passati',
+    activeTours: 'Tour attivi',
   },
 
   addProfile: {

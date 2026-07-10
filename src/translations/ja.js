@@ -449,6 +449,7 @@ const ja = {
     memberSince: '{{date}}からのメンバー',
     mutualConnections: '共通のコネクション{{n}}件',
     pastHighlights: '過去のハイライト',
+    activeTours: '進行中のツアー',
   },
 
   addProfile: {

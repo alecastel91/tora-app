@@ -8,6 +8,7 @@ import VerifiedBadge from '../common/VerifiedBadge';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
+import MakeOfferModal from '../common/MakeOfferModal';
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { t } = useLanguage();
@@ -27,6 +28,20 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     return () => { cancelled = true; };
   }, [passedProfile?.id, currentUser?.id]);
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
+
+  // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
+  const [artistTours, setArtistTours] = useState([]);
+  const [showTourOffer, setShowTourOffer] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    setArtistTours([]);
+    if (!passedProfile?.id) return undefined;
+    if ((passedProfile.role || fullProfile?.role) !== 'ARTIST') return undefined;
+    apiService.getTours({ artistId: passedProfile.id })
+      .then((data) => { if (!cancelled) setArtistTours(data.tours || []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [passedProfile?.id, passedProfile?.role, fullProfile?.role]);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [message, setMessage] = useState('');
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -370,6 +385,43 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </div>
           </div>
         )}
+
+        {/* Active tours — promoters/venues can respond with an offer */}
+        {profile.role === 'ARTIST' && artistTours.length > 0 && (
+          <div className="px-5 mb-5 text-left">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.activeTours')}</p>
+            <div className="flex flex-col gap-2">
+              {artistTours.map((tour) => (
+                <div key={tour.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="m-0 text-sm font-medium text-white truncate">
+                        {t('tour.tourTitle', { location: tour.country || tour.zone })}
+                      </p>
+                      <p className="m-0 mt-1 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">
+                        {new Date(tour.startDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric' })}
+                        {' — '}
+                        {new Date(tour.endDate).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {(tour.feeExpectation || tour.priceOnRequest)
+                          ? ` · ${tour.priceOnRequest ? t('tour.priceOnRequest') : tour.feeExpectation}`
+                          : ''}
+                      </p>
+                    </div>
+                    {(currentUser?.role === 'PROMOTER' || currentUser?.role === 'VENUE') && (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-small shrink-0"
+                        onClick={() => setShowTourOffer(true)}
+                      >
+                        {t('tour.makeAnOffer')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Embedded Media Section */}
         <div className="profile-embeds">
@@ -528,7 +580,17 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       </div>
         
       {/* Message Modal */}
-        {showMessageModal && (
+        <MakeOfferModal
+        isOpen={showTourOffer}
+        onClose={() => setShowTourOffer(false)}
+        recipientProfile={profile}
+        onSuccess={() => {
+          setShowTourOffer(false);
+          onNavigateToMessages && onNavigateToMessages();
+        }}
+      />
+
+      {showMessageModal && (
           <div className="message-modal-overlay" onClick={() => setShowMessageModal(false)}>
             <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
               <h2 className="message-modal-title">{t('search.sendMessageTo')} {profile.name}</h2>

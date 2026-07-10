@@ -449,6 +449,7 @@ const zh = {
     memberSince: '{{date}}加入',
     mutualConnections: '{{n}}个共同联系人',
     pastHighlights: '过往亮点',
+    activeTours: '进行中的巡演',
   },
 
   addProfile: {

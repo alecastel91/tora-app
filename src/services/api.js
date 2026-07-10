@@ -803,6 +803,7 @@ class ApiService {
     if (filters.zone) queryParams.append('zone', filters.zone);
     if (filters.genre) queryParams.append('genre', filters.genre);
     if (filters.role) queryParams.append('role', filters.role);
+    if (filters.artistId) queryParams.append('artistId', filters.artistId);
 
     const response = await fetch(`${API_URL}/tours?${queryParams}`, {
       method: 'GET',
