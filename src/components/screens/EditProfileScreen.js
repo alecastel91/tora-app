@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { genresList, zones, countriesByZone, citiesByCountry, getZoneFromCountry } from '../../data/profiles';
+import { genresList, getZoneFromCountry } from '../../data/profiles';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
+import CitySearch from '../common/CitySearch';
 
 const EditProfileScreen = ({ onClose }) => {
   const { user, updateUser } = useAppContext();
@@ -37,52 +38,7 @@ const EditProfileScreen = ({ onClose }) => {
   const [showGenresDropdown, setShowGenresDropdown] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [customCity, setCustomCity] = useState('');
-  const [showCustomCityInput, setShowCustomCityInput] = useState(false);
 
-  // Cascading dropdown handlers
-  const handleZoneChange = (zone) => {
-    setEditedUser({
-      ...editedUser,
-      zone,
-      country: '', // Reset country when zone changes
-      city: ''     // Reset city when zone changes
-    });
-    setShowCustomCityInput(false);
-    setCustomCity('');
-  };
-
-  const handleCountryChange = (country) => {
-    setEditedUser({
-      ...editedUser,
-      country,
-      city: '' // Reset city when country changes
-    });
-    setShowCustomCityInput(false);
-    setCustomCity('');
-  };
-
-  const handleCityChange = (city) => {
-    if (city === 'Other') {
-      setShowCustomCityInput(true);
-      setEditedUser({ ...editedUser, city: customCity });
-    } else {
-      setShowCustomCityInput(false);
-      setCustomCity('');
-      setEditedUser({ ...editedUser, city });
-    }
-  };
-
-  const handleCustomCityChange = (value) => {
-    setCustomCity(value);
-    setEditedUser({ ...editedUser, city: value });
-  };
-
-  // Get available countries based on selected zone
-  const availableCountries = editedUser.zone ? countriesByZone[editedUser.zone] || [] : [];
-
-  // Get available cities based on selected country
-  const availableCities = editedUser.country ? citiesByCountry[editedUser.country] || [] : [];
 
   const handleSave = async () => {
     try {
@@ -100,10 +56,8 @@ const EditProfileScreen = ({ onClose }) => {
         genres: Array.from(selectedGenres)
       };
 
-      // Remove zone, city, country from the payload as we only store location
-      delete updatedProfile.zone;
-      delete updatedProfile.city;
-      delete updatedProfile.country;
+      // city/country/zone are real profile columns (search filters read
+      // them) — keep them in the payload alongside the display location.
       // This screen never edits the avatar — don't echo it back. Avatar
       // uploads go through ProfileScreen, which sends only { avatar }.
       delete updatedProfile.avatar;
@@ -193,61 +147,18 @@ const EditProfileScreen = ({ onClose }) => {
             </select>
           </div>
 
-          {/* Cascading Location Dropdowns */}
+          {/* City-first location picker (same UX as the apply form) */}
           <div className="form-group">
-            <label>{t('editProfile.zone')}</label>
-            <select
-              value={editedUser.zone || ''}
-              onChange={(e) => handleZoneChange(e.target.value)}
-            >
-              <option value="">{t('editProfile.selectZone')}</option>
-              {zones.map(zone => (
-                <option key={zone} value={zone}>{zone}</option>
-              ))}
-            </select>
+            <label>{t('editProfile.city')}</label>
+            <CitySearch
+              city={editedUser.city || ''}
+              country={editedUser.country || ''}
+              zone={editedUser.zone || ''}
+              onSelect={(nextCity, nextCountry, nextZone) => {
+                setEditedUser({ ...editedUser, city: nextCity, country: nextCountry, zone: nextZone });
+              }}
+            />
           </div>
-
-          {editedUser.zone && (
-            <div className="form-group">
-              <label>{t('editProfile.country')}</label>
-              <select
-                value={editedUser.country || ''}
-                onChange={(e) => handleCountryChange(e.target.value)}
-              >
-                <option value="">{t('editProfile.selectCountry')}</option>
-                {availableCountries.map(country => (
-                  <option key={country} value={country}>{country}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {editedUser.country && (
-            <div className="form-group">
-              <label>{t('editProfile.city')}</label>
-              <select
-                value={editedUser.city || ''}
-                onChange={(e) => handleCityChange(e.target.value)}
-              >
-                <option value="">{t('editProfile.selectCity')}</option>
-                {availableCities.map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {showCustomCityInput && (
-            <div className="form-group">
-              <label>{t('editProfile.enterCityName')}</label>
-              <input
-                type="text"
-                value={customCity}
-                onChange={(e) => handleCustomCityChange(e.target.value)}
-                placeholder={t('editProfile.enterCityPlaceholder')}
-              />
-            </div>
-          )}
 
           {editedUser.role === 'VENUE' && (
             <div className="form-group">
@@ -318,7 +229,7 @@ const EditProfileScreen = ({ onClose }) => {
                              bg-transparent transition-colors"
                   onClick={() => setShowAllGenres(!showAllGenres)}
                 >
-                  {showAllGenres ? '− Show less' : `+ ${genresList.length - 12} more`}
+                  {showAllGenres ? t('manageArtist.showLess') : t('manageArtist.showAllGenres', { count: genresList.length })}
                 </button>
               )}
             </div>
