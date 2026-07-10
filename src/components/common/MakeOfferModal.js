@@ -352,7 +352,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                 type="text"
                 value={formData.eventName}
                 onChange={(e) => handleChange('eventName', e.target.value)}
-                placeholder="e.g., Saturday Night Session"
+                placeholder={t('offer.eventNamePlaceholder')}
                 className="form-input"
               />
             </div>
@@ -506,7 +506,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     type="text"
                     value={formData.travelInNote}
                     onChange={(e) => handleChange('travelInNote', e.target.value)}
-                    placeholder="e.g., Flight from NYC"
+                    placeholder={t('offer.travelInPlaceholder')}
                     className="form-input extra-note"
                   />
                 )}
@@ -526,7 +526,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     type="text"
                     value={formData.travelOutNote}
                     onChange={(e) => handleChange('travelOutNote', e.target.value)}
-                    placeholder="e.g., Return flight"
+                    placeholder={t('offer.travelOutPlaceholder')}
                     className="form-input extra-note"
                   />
                 )}
@@ -546,7 +546,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     type="text"
                     value={formData.transportationNote}
                     onChange={(e) => handleChange('transportationNote', e.target.value)}
-                    placeholder="e.g., Airport pickup & dropoff"
+                    placeholder={t('offer.transportationPlaceholder')}
                     className="form-input extra-note"
                   />
                 )}
@@ -566,7 +566,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     type="text"
                     value={formData.accommodationNote}
                     onChange={(e) => handleChange('accommodationNote', e.target.value)}
-                    placeholder="e.g., Hotel for 2 nights"
+                    placeholder={t('offer.accommodationPlaceholder')}
                     className="form-input extra-note"
                   />
                 )}
@@ -586,7 +586,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                     type="text"
                     value={formData.mealsNote}
                     onChange={(e) => handleChange('mealsNote', e.target.value)}
-                    placeholder="e.g., Dinner before show"
+                    placeholder={t('offer.mealsPlaceholder')}
                     className="form-input extra-note"
                   />
                 )}
@@ -642,7 +642,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                   color: setDuration > 0 ? 'var(--text-white)' : 'rgba(255, 255, 255, 0.3)',
                   cursor: 'not-allowed'
                 }}>
-                  {setDuration > 0 ? `${setDuration} minutes` : '--'}
+                  {setDuration > 0 ? t('offer.durationMinutes', { n: setDuration }) : '--'}
                 </div>
               </div>
             </div>

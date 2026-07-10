@@ -7,11 +7,13 @@ import PdfViewerModal from '../common/PdfViewerModal';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
-import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, events, info, documents
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
   const [selectedDates, setSelectedDates] = useState(new Set(artist?.availableDates || []));
@@ -568,7 +570,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         const endDate = new Date(travelFilter.endDate);
 
         if (endDate < startDate) {
-          alert('End date cannot be before start date. Please adjust your dates.');
+          alert(t('manageArtist.endDateBeforeStart'));
           return;
         }
 
@@ -588,7 +590,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         });
 
         if (hasOverlap) {
-          alert('This travel schedule overlaps with an existing schedule. Please choose different dates.');
+          alert(t('manageArtist.scheduleOverlap'));
           return;
         }
       }
@@ -662,11 +664,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
         // Check if it's an authentication error
         if (error.message && error.message.includes('Token expired')) {
-          alert('Your session has expired. Please log out and log back in.');
+          alert(t('manageArtist.sessionExpired'));
         } else if (error.message && error.message.includes('Unauthorized')) {
-          alert('Authentication error. Please log out and log back in.');
+          alert(t('manageArtist.authError'));
         } else {
-          alert('Failed to save travel schedule: ' + (error.message || 'Please try again'));
+          alert(t('manageArtist.saveScheduleFailed', { error: error.message || t('manageArtist.pleaseTryAgain') }));
         }
       }
     }
@@ -753,11 +755,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
       // Check if it's an authentication error
       if (error.message && error.message.includes('Token expired')) {
-        alert('Your session has expired. Please log out and log back in.');
+        alert(t('manageArtist.sessionExpired'));
       } else if (error.message && error.message.includes('Unauthorized')) {
-        alert('Authentication error. Please log out and log back in.');
+        alert(t('manageArtist.authError'));
       } else {
-        alert('Failed to delete travel schedule: ' + (error.message || 'Please try again'));
+        alert(t('manageArtist.deleteScheduleFailed', { error: error.message || t('manageArtist.pleaseTryAgain') }));
       }
 
       // Close confirmation dialog
@@ -777,7 +779,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       const artistId = artistProfile?.profileId || artistProfile?.id || artistProfile?.id;
 
       if (!artistId) {
-        alert('Artist ID not found');
+        alert(t('manageArtist.artistIdNotFound'));
         return;
       }
 
@@ -824,10 +826,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
       // Close edit screen
       setIsEditingArtistInfo(false);
-      alert('Artist information updated successfully!');
+      alert(t('manageArtist.artistInfoUpdated'));
     } catch (error) {
       console.error('Failed to update artist info:', error);
-      alert('Failed to update artist information. Please try again.');
+      alert(t('manageArtist.artistInfoUpdateFailed'));
     }
   };
 
@@ -857,7 +859,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     }
 
     // Return all parts joined with commas, or fallback
-    return parts.length > 0 ? parts.join(', ') : 'No location';
+    return parts.length > 0 ? parts.join(', ') : t('manageArtist.noLocation');
   };
 
   const formatScheduleDate = (dateString) => {
@@ -928,14 +930,14 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           <div className="metric-value">
             {thisYearGigs === null ? '...' : thisYearGigs}
           </div>
-          <div className="metric-label">This Year Bookings</div>
+          <div className="metric-label">{t('manageArtist.thisYearBookings')}</div>
         </div>
         <div className="metric-card">
           <div className="metric-icon"><DollarIcon /></div>
           <div className="metric-value">
             {ytdRevenue === null ? '...' : formatCurrencyWithSymbol(ytdRevenue, preferredCurrency)}
           </div>
-          <div className="metric-label">This Year Revenue</div>
+          <div className="metric-label">{t('manageArtist.thisYearRevenue')}</div>
         </div>
         {/* Bottom Row */}
         <div className="metric-card">
@@ -944,26 +946,26 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             {upcomingGigs === null ? '...' : upcomingGigs}
             {gigsError && <span style={{ fontSize: '12px', color: '#999' }}>*</span>}
           </div>
-          <div className="metric-label">Upcoming Bookings</div>
+          <div className="metric-label">{t('manageArtist.upcomingBookings')}</div>
         </div>
         <div className="metric-card">
           <div className="metric-icon"><DollarIcon /></div>
           <div className="metric-value">
             {expectedRevenue === null ? '...' : formatCurrencyWithSymbol(expectedRevenue, preferredCurrency)}
           </div>
-          <div className="metric-label">Expected Revenue</div>
+          <div className="metric-label">{t('manageArtist.expectedRevenue')}</div>
         </div>
       </div>
 
       {/* Action Items */}
       <div className="dashboard-section">
         <div className="section-header">
-          <h3><AlertIcon /> Actions Required</h3>
+          <h3><AlertIcon /> {t('manageArtist.actionsRequired')}</h3>
           <span className="badge">{actionItems.length}</span>
         </div>
         <div className="action-items">
           {actionItems.length === 0 ? (
-            <div className="action-empty">Nothing needs your attention for this artist right now.</div>
+            <div className="action-empty">{t('manageArtist.nothingNeedsAttention')}</div>
           ) : (
             actionItems.map(item => {
               const Icon = getActionIcon(item.type);
@@ -971,11 +973,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 <div key={item.id} className="action-item">
                   <div className="action-icon"><Icon /></div>
                   <div className="action-content">
-                    <div className="action-title">{item.title}</div>
+                    <div className="action-title">{localizeActionItem(item, t).title}</div>
                     {item.subtitle && <div className="action-description">{item.subtitle}</div>}
                   </div>
                   <button className="btn btn-outline btn-sm" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
-                    {item.actionLabel}
+                    {localizeActionItem(item, t).actionLabel}
                   </button>
                 </div>
               );
@@ -986,7 +988,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
       {/* Revenue Chart */}
       <div className="dashboard-section revenue-overview-section">
-        <h3><TrendingUpIcon /> Revenue Overview</h3>
+        <h3><TrendingUpIcon /> {t('manageArtist.revenueOverview')}</h3>
         <div className="revenue-chart-scroll">
           <div className="revenue-chart" style={{ minHeight: '200px' }}>
             {revenueChartData.length > 0 ? (
@@ -1016,7 +1018,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 });
               })()
             ) : (
-              <div className="no-revenue-data">Loading revenue data...</div>
+              <div className="no-revenue-data">{t('manageArtist.loadingRevenueData')}</div>
             )}
           </div>
         </div>
@@ -1271,7 +1273,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           <div className="calendar-month-info">
             <h4>{monthNames[currentMonth]} {currentYear}</h4>
             <p className="calendar-instructions">
-              Tap dates to mark availability. Drag to select multiple dates.
+              {t('manageArtist.calendarInstructions')}
             </p>
           </div>
           <button className="calendar-nav-btn" onClick={goToNextMonth}>
@@ -1288,11 +1290,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         <div className="calendar-legend">
           <div className="legend-item">
             <span className="legend-dot available"></span>
-            <span>Available</span>
+            <span>{t('manageArtist.available')}</span>
           </div>
           <div className="legend-item">
             <span className="legend-dot unavailable"></span>
-            <span>Unavailable</span>
+            <span>{t('manageArtist.unavailable')}</span>
           </div>
         </div>
       </div>
@@ -1314,7 +1316,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     const clusters = {};
     upcomingDeals.forEach(deal => {
       const date = new Date(deal.date);
-      const monthYear = `${date.toLocaleString('en-US', { month: 'long' })} ${date.getFullYear()}`;
+      const monthYear = `${date.toLocaleString(t('dateFormat.locale'), { month: 'long' })} ${date.getFullYear()}`;
 
       if (!clusters[monthYear]) {
         clusters[monthYear] = {
@@ -1336,7 +1338,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString(t('dateFormat.locale'), {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
@@ -1365,9 +1367,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     if (upcomingDeals.length === 0) {
       return (
         <div className="no-events-message">
-          <p>Coming Soon</p>
+          <p>{t('manageArtist.comingSoon')}</p>
           <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
-            This feature is currently in development
+            {t('manageArtist.featureInDevelopment')}
           </p>
         </div>
       );
@@ -1413,21 +1415,21 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                         style={{ cursor: 'pointer', flex: 1 }}
                       >
                         <div className="party-name-role">
-                          <h3>{otherParty.name || 'Unknown'}</h3>
+                          <h3>{otherParty.name || t('manageArtist.unknown')}</h3>
                           {otherParty.role && (
                             <span className={`role-badge ${otherParty.role.toLowerCase()}`}>
                               {otherParty.role}
                             </span>
                           )}
                         </div>
-                        <p className="party-location">{otherParty.location || 'Location TBD'}</p>
+                        <p className="party-location">{otherParty.location || t('manageArtist.locationTbd')}</p>
                         <div className="party-status-row">
                           <span className={getStatusBadgeClass(deal.status)}>
                             {deal.status}
                           </span>
                           {isViaAgent && (
                             <span className="via-agent-badge">
-                              via agent
+                              {t('manageArtist.viaAgent')}
                             </span>
                           )}
                         </div>
@@ -1447,18 +1449,18 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                       <div className="booking-details">
                         {deal.eventName && (
                           <div className="booking-detail-row">
-                            <span className="detail-label">Event:</span>
+                            <span className="detail-label">{t('manageArtist.event')}:</span>
                             <span className="detail-value">{deal.eventName}</span>
                           </div>
                         )}
                         {deal.artistName && (
                           <div className="booking-detail-row">
-                            <span className="detail-label">Artist:</span>
+                            <span className="detail-label">{t('manageArtist.artist')}:</span>
                             <span className="detail-value">{deal.artistName}</span>
                           </div>
                         )}
                         <div className="booking-detail-row">
-                          <span className="detail-label">Venue:</span>
+                          <span className="detail-label">{t('manageArtist.venue')}:</span>
                           <span className="detail-value">
                             <div>{deal.venueName}</div>
                             {deal.venue?.location && (
@@ -1467,12 +1469,12 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                           </span>
                         </div>
                         <div className="booking-detail-row">
-                          <span className="detail-label">Date:</span>
+                          <span className="detail-label">{t('manageArtist.date')}:</span>
                           <span className="detail-value">{formatDate(deal.date)}</span>
                         </div>
                         {deal.startTime && deal.endTime && (
                           <div className="booking-detail-row">
-                            <span className="detail-label">Event Time:</span>
+                            <span className="detail-label">{t('manageArtist.eventTime')}:</span>
                             <span className="detail-value">
                               {deal.startTime} - {deal.endTime}
                             </span>
@@ -1480,20 +1482,20 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                         )}
                         {deal.performanceType && (
                           <div className="booking-detail-row">
-                            <span className="detail-label">Type:</span>
+                            <span className="detail-label">{t('manageArtist.type')}:</span>
                             <span className="detail-value">{deal.performanceType}</span>
                           </div>
                         )}
                         {deal.setStartTime && deal.setEndTime && (
                           <div className="booking-detail-row">
-                            <span className="detail-label">Set Time:</span>
+                            <span className="detail-label">{t('manageArtist.setTime')}:</span>
                             <span className="detail-value">
                               {deal.setStartTime} - {deal.setEndTime}
                             </span>
                           </div>
                         )}
                         <div className="booking-detail-row">
-                          <span className="detail-label">Fee:</span>
+                          <span className="detail-label">{t('manageArtist.fee')}:</span>
                           <span className="detail-value">
                             {deal.currency}{parseInt(deal.currentFee).toLocaleString()}
                           </span>
@@ -1514,21 +1516,21 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     <div className="events-tab">
       {/* Calendar View */}
       <div className="dashboard-section">
-        <h3><CalendarIcon /> Calendar View</h3>
+        <h3><CalendarIcon /> {t('manageArtist.calendarView')}</h3>
         {renderInlineCalendar()}
 
         {/* Travel Schedules */}
         <div className="travel-schedules-section">
           <div className="travel-schedules-header">
-            <h3><PlaneIcon /> Travel Schedules</h3>
-            <button className="btn btn-primary btn-sm" onClick={openTravelModal}>Add Schedule</button>
+            <h3><PlaneIcon /> {t('manageArtist.travelSchedules')}</h3>
+            <button className="btn btn-primary btn-sm" onClick={openTravelModal}>{t('manageArtist.addSchedule')}</button>
           </div>
 
           {travelSchedule.length === 0 ? (
             <div className="travel-schedules-empty">
-              <p>No schedules added yet</p>
+              <p>{t('manageArtist.noSchedulesYet')}</p>
               <button className="btn-add-travel-schedule" onClick={openTravelModal}>
-                + ADD TRAVEL SCHEDULE
+                {t('manageArtist.addTravelScheduleCta')}
               </button>
             </div>
           ) : (
@@ -1540,10 +1542,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                   </div>
                   <div className="schedule-bottom-row">
                     {formatScheduleDate(schedule.startDate)} - {formatScheduleDate(schedule.endDate)}
-                    <button className="icon-btn-edit" onClick={() => editTravelSchedule(index)} title="Edit schedule">
+                    <button className="icon-btn-edit" onClick={() => editTravelSchedule(index)} title={t('manageArtist.editSchedule')}>
                       <EditIcon />
                     </button>
-                    <button className="icon-btn-delete" onClick={() => deleteTravelSchedule(index)} title="Delete schedule">
+                    <button className="icon-btn-delete" onClick={() => deleteTravelSchedule(index)} title={t('manageArtist.deleteSchedule')}>
                       <TrashIcon />
                     </button>
                   </div>
@@ -1557,7 +1559,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       {/* Event List */}
       <div className="dashboard-section">
         <div className="section-header">
-          <h3><ListIcon /> Upcoming Events</h3>
+          <h3><ListIcon /> {t('manageArtist.upcomingEvents')}</h3>
         </div>
         {renderUpcomingEvents()}
       </div>
@@ -1581,7 +1583,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   const handleSaveDocument = async () => {
     if (!newDoc.title || !newDoc.url) {
-      alert('Please provide both title and URL');
+      alert(t('manageArtist.provideTitleUrl'));
       return;
     }
 
@@ -1646,7 +1648,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       }
     } catch (error) {
       console.error('[ManageArtistScreen] Error saving documents:', error);
-      alert('Failed to save document. Please try again.');
+      alert(t('manageArtist.saveDocumentFailed'));
     }
 
     setShowAddDocModal(false);
@@ -1655,7 +1657,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   };
 
   const handleDeleteDocument = async (category, docId) => {
-    if (!window.confirm('Are you sure you want to delete this document link?')) {
+    if (!window.confirm(t('manageArtist.deleteDocumentConfirm'))) {
       return;
     }
 
@@ -1690,10 +1692,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      pressKit: 'Press Kit',
-      technicalRider: 'Technical Rider',
-      hospitalityRider: 'Hospitality Rider',
-      contracts: 'Contract'
+      pressKit: t('manageArtist.pressKit'),
+      technicalRider: t('manageArtist.technicalRider'),
+      hospitalityRider: t('manageArtist.hospitalityRider'),
+      contracts: t('manageArtist.contract')
     };
     return labels[category] || category;
   };
@@ -1707,7 +1709,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           {documents[category].length > 0 && (
             <button
               onClick={() => handleAddDocument(category)}
-              aria-label={`Add ${title}`}
+              aria-label={t('manageArtist.addCategory', { title })}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -1735,7 +1737,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               className="btn btn-primary btn-small"
               onClick={() => handleAddDocument(category)}
             >
-              + Add
+              + {t('manageArtist.add')}
             </button>
           </div>
         ) : (
@@ -1760,12 +1762,12 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                           cursor: 'pointer',
                         }}
                       >
-                        {isBackendFileUrl(doc) ? 'View file' : 'Open link ↗'}
+                        {isBackendFileUrl(doc) ? t('manageArtist.viewFile') : t('manageArtist.openLink')}
                       </button>
                     )}
                     {doc.addedDate && (
                       <div className="text-[10px] uppercase tracking-[0.08em] text-white/30">
-                        Added {new Date(doc.addedDate).toLocaleDateString()}
+                        {t('manageArtist.addedDate', { date: new Date(doc.addedDate).toLocaleDateString() })}
                       </div>
                     )}
                   </div>
@@ -1775,14 +1777,14 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                     className="btn btn-outline btn-sm"
                     onClick={() => handleEditDocument(category, doc)}
                   >
-                    Edit
+                    {t('manageArtist.edit')}
                   </button>
                   <button
                     className="bg-transparent border-none cursor-pointer text-[10px] uppercase tracking-[0.1em]
                                font-tech text-white/35 hover:text-role-venue transition-colors"
                     onClick={() => handleDeleteDocument(category, doc.id)}
                   >
-                    Delete
+                    {t('manageArtist.delete')}
                   </button>
                 </div>
               </div>
@@ -1794,10 +1796,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
     return (
       <div className="artist-info-tab">
-        {renderDocCategory('pressKit', <ImageIcon />, 'Press Kit', 'Add press photos, bio, EPK, or music samples')}
-        {renderDocCategory('technicalRider', <SlidersIcon />, 'Technical Rider', 'Add stage plot, sound + lighting requirements, equipment list')}
-        {renderDocCategory('hospitalityRider', <SlidersIcon />, 'Hospitality Rider', 'Add accommodation, meals, transport, dressing room requirements')}
-        {renderDocCategory('contracts', <FileTextIcon />, 'Contracts', 'Add contract templates. These can be customized per booking.')}
+        {renderDocCategory('pressKit', <ImageIcon />, t('manageArtist.pressKit'), t('manageArtist.pressKitNote'))}
+        {renderDocCategory('technicalRider', <SlidersIcon />, t('manageArtist.technicalRider'), t('manageArtist.technicalRiderNote'))}
+        {renderDocCategory('hospitalityRider', <SlidersIcon />, t('manageArtist.hospitalityRider'), t('manageArtist.hospitalityRiderNote'))}
+        {renderDocCategory('contracts', <FileTextIcon />, t('manageArtist.contracts'), t('manageArtist.contractsNote'))}
       </div>
     );
   };
@@ -1841,7 +1843,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             marginBottom: '4px',
             color: '#fff'
           }}>
-            {artistProfile?.name || 'Artist Name'}
+            {artistProfile?.name || t('manageArtist.artistName')}
           </div>
 
           {/* Location */}
@@ -1889,7 +1891,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           lineHeight: '1.6'
         }}>
           <p style={{ margin: 0, color: '#e0e0e0' }}>
-            {artistProfile?.bio || 'No bio available'}
+            {artistProfile?.bio || t('manageArtist.noBioAvailable')}
           </p>
         </div>
 
@@ -1904,12 +1906,12 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginBottom: '12px',
               textTransform: 'uppercase'
             }}>
-              LATEST MIX
+              {t('manageArtist.latestMix')}
             </h3>
             <iframe
               src={getSoundCloudEmbedUrl(artistProfile.mixtape)}
               className="embed-iframe soundcloud-embed"
-              title="SoundCloud Mix"
+              title={t('manageArtist.soundcloudMix')}
               allow="autoplay"
             />
           </div>
@@ -1926,12 +1928,12 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginBottom: '12px',
               textTransform: 'uppercase'
             }}>
-              SPOTIFY ARTIST
+              {t('manageArtist.spotifyArtistHeading')}
             </h3>
             <iframe
               src={getSpotifyEmbedUrl(artistProfile.spotify)}
               className="embed-iframe spotify-embed"
-              title="Spotify Artist Profile"
+              title={t('manageArtist.spotifyArtistProfile')}
               allow="encrypted-media"
             />
           </div>
@@ -1948,7 +1950,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginBottom: '12px',
               textTransform: 'uppercase'
             }}>
-              EVENTS
+              {t('manageArtist.eventsHeading')}
             </h3>
             <button
               className="btn btn-outline"
@@ -1962,7 +1964,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 gap: '8px'
               }}
             >
-              <span>View Upcoming Events</span>
+              <span>{t('manageArtist.viewUpcomingEvents')}</span>
             </button>
             <a
               href={artistProfile.residentAdvisor}
@@ -1977,7 +1979,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 textDecoration: 'none'
               }}
             >
-              View Full RA Profile →
+              {t('manageArtist.viewFullRaProfile')}
             </a>
           </div>
         )}
@@ -1997,7 +1999,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               className="btn btn-outline"
               style={{ flex: '1', minWidth: '140px' }}
             >
-              <span>Instagram</span>
+              <span>{t('manageArtist.instagram')}</span>
             </a>
           )}
           {artistProfile?.website && (
@@ -2008,7 +2010,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               className="btn btn-outline"
               style={{ flex: '1', minWidth: '140px' }}
             >
-              <span>Website</span>
+              <span>{t('manageArtist.website')}</span>
             </a>
           )}
         </div>
@@ -2054,11 +2056,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               setIsEditingArtistInfo(true);
             } catch (error) {
               console.error('[ManageArtistScreen] Error fetching fresh profile:', error);
-              alert('Failed to load artist data. Please try again.');
+              alert(t('manageArtist.loadArtistFailed'));
             }
           }}
         >
-          Edit Artist Info
+          {t('manageArtist.editArtistInfo')}
         </button>
       </div>
     );
@@ -2070,13 +2072,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       <>
         <div className="edit-section">
           <div className="form-group">
-            <label>Name</label>
+            <label>{t('manageArtist.name')}</label>
             <input
               type="text"
               className="form-input"
               value={editedArtistInfo.name}
               disabled
-              placeholder="Artist Name"
+              placeholder={t('manageArtist.artistName')}
               style={{
                 backgroundColor: '#0d0d0d',
                 cursor: 'not-allowed',
@@ -2089,11 +2091,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginTop: '4px',
               fontStyle: 'italic'
             }}>
-              Name cannot be changed by agents
+              {t('manageArtist.nameCannotBeChanged')}
             </p>
           </div>
           <div className="form-group">
-            <label>Role</label>
+            <label>{t('manageArtist.role')}</label>
             <select
               className="form-input"
               value={editedArtistInfo.role}
@@ -2104,10 +2106,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 opacity: 0.6
               }}
             >
-              <option value="ARTIST">Artist</option>
-              <option value="VENUE">Venue</option>
-              <option value="PROMOTER">Promoter</option>
-              <option value="AGENT">Agent</option>
+              <option value="ARTIST">{t('manageArtist.artist')}</option>
+              <option value="VENUE">{t('manageArtist.venue')}</option>
+              <option value="PROMOTER">{t('manageArtist.promoter')}</option>
+              <option value="AGENT">{t('manageArtist.agent')}</option>
             </select>
             <p style={{
               fontSize: '11px',
@@ -2115,17 +2117,17 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginTop: '4px',
               fontStyle: 'italic'
             }}>
-              Role cannot be changed by agents
+              {t('manageArtist.roleCannotBeChanged')}
             </p>
           </div>
           <div className="form-group">
-            <label>Zone</label>
+            <label>{t('manageArtist.zone')}</label>
             <select
               className="form-input"
               value={editedArtistInfo.zone}
               onChange={(e) => handleArtistZoneChange(e.target.value)}
             >
-              <option value="">Select Zone</option>
+              <option value="">{t('manageArtist.selectZone')}</option>
               {zones.map(zone => (
                 <option key={zone} value={zone}>{zone}</option>
               ))}
@@ -2133,13 +2135,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           </div>
           {editedArtistInfo.zone && (
             <div className="form-group">
-              <label>Country</label>
+              <label>{t('manageArtist.country')}</label>
               <select
                 className="form-input"
                 value={editedArtistInfo.country}
                 onChange={(e) => handleArtistCountryChange(e.target.value)}
               >
-                <option value="">Select Country</option>
+                <option value="">{t('manageArtist.selectCountry')}</option>
                 {countriesByZone[editedArtistInfo.zone]?.map(country => (
                   <option key={country} value={country}>{country}</option>
                 ))}
@@ -2148,13 +2150,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           )}
           {editedArtistInfo.country && (
             <div className="form-group">
-              <label>City</label>
+              <label>{t('manageArtist.city')}</label>
               <select
                 className="form-input"
                 value={editedArtistInfo.city}
                 onChange={(e) => handleArtistCityChange(e.target.value)}
               >
-                <option value="">Select City</option>
+                <option value="">{t('manageArtist.selectCity')}</option>
                 {citiesByCountry[editedArtistInfo.country]?.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
@@ -2163,39 +2165,41 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           )}
           {editedArtistInfo.role === 'VENUE' && (
             <div className="form-group">
-              <label>Capacity</label>
+              <label>{t('manageArtist.capacity')}</label>
               <input
                 type="number"
                 className="form-input"
                 value={editedArtistInfo.capacity}
                 onChange={(e) => setEditedArtistInfo({...editedArtistInfo, capacity: e.target.value})}
-                placeholder="Max capacity"
+                placeholder={t('manageArtist.maxCapacity')}
               />
             </div>
           )}
           <div className="form-group" style={{ marginBottom: '0' }}>
-            <label>Bio</label>
+            <label>{t('manageArtist.bio')}</label>
             <textarea
               className="form-input"
               rows="4"
               value={editedArtistInfo.bio}
               onChange={(e) => setEditedArtistInfo({...editedArtistInfo, bio: e.target.value})}
-              placeholder="Tell us about the artist..."
+              placeholder={t('manageArtist.bioPlaceholder')}
             />
           </div>
         </div>
 
         <div className="edit-section" style={{ marginTop: '8px' }}>
           <div className="form-group">
-            <label>Genres</label>
+            <label>{t('manageArtist.genres')}</label>
             <div
               className="genres-dropdown-trigger"
               onClick={() => setShowGenresDropdown(!showGenresDropdown)}
             >
               <span className="genres-selected-text">
                 {selectedGenres.size > 0
-                  ? `${selectedGenres.size} genre${selectedGenres.size > 1 ? 's' : ''} selected`
-                  : 'Select genres'}
+                  ? (selectedGenres.size > 1
+                      ? t('manageArtist.genresSelected', { count: selectedGenres.size })
+                      : t('manageArtist.genreSelected', { count: selectedGenres.size }))
+                  : t('manageArtist.selectGenres')}
               </span>
               <span className="dropdown-arrow">{showGenresDropdown ? '▲' : '▼'}</span>
             </div>
@@ -2224,7 +2228,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                       setShowAllGenres(!showAllGenres);
                     }}
                   >
-                    {showAllGenres ? 'Show less' : `Show all ${genresList.length} genres`}
+                    {showAllGenres ? t('manageArtist.showLess') : t('manageArtist.showAllGenres', { count: genresList.length })}
                   </button>
                 )}
               </div>
@@ -2233,9 +2237,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         </div>
 
         <div className="edit-section">
-          <h3>Social Links</h3>
+          <h3>{t('manageArtist.socialLinks')}</h3>
           <div className="form-group">
-            <label>SoundCloud/Mixtape</label>
+            <label>{t('manageArtist.soundcloudMixtape')}</label>
             <input
               type="url"
               className="form-input"
@@ -2249,13 +2253,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginTop: '4px',
               lineHeight: '1.4'
             }}>
-              💡 If using a share link: Open it in your web browser, then copy the full URL from the address bar
+              {t('manageArtist.shareLinkHint')}
             </p>
           </div>
           {editedArtistInfo.role === 'ARTIST' && (
             <>
               <div className="form-group">
-                <label>Spotify Artist</label>
+                <label>{t('manageArtist.spotifyArtist')}</label>
                 <input
                   type="url"
                   className="form-input"
@@ -2269,11 +2273,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                   marginTop: '4px',
                   lineHeight: '1.4'
                 }}>
-                  💡 If using a share link: Open it in your web browser, then copy the full URL from the address bar
+                  {t('manageArtist.shareLinkHint')}
                 </p>
               </div>
               <div className="form-group">
-                <label>Resident Advisor</label>
+                <label>{t('manageArtist.residentAdvisor')}</label>
                 <input
                   type="url"
                   className="form-input"
@@ -2285,7 +2289,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             </>
           )}
           <div className="form-group">
-            <label>Instagram</label>
+            <label>{t('manageArtist.instagram')}</label>
             <input
               type="text"
               className="form-input"
@@ -2295,7 +2299,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             />
           </div>
           <div className="form-group">
-            <label>Website</label>
+            <label>{t('manageArtist.website')}</label>
             <input
               type="url"
               className="form-input"
@@ -2320,14 +2324,14 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             onClick={() => setIsEditingArtistInfo(false)}
             style={{ flex: 'none', minWidth: '120px' }}
           >
-            Cancel
+            {t('manageArtist.cancel')}
           </button>
           <button
             className="btn btn-primary"
             onClick={handleSaveArtistInfo}
             style={{ flex: 'none', minWidth: '140px' }}
           >
-            Save Changes
+            {t('manageArtist.saveChanges')}
           </button>
         </div>
       </>
@@ -2342,7 +2346,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           <button className="back-btn" onClick={() => setIsEditingArtistInfo(false)}>
             <CloseIcon />
           </button>
-          <h1>Edit Artist Info</h1>
+          <h1>{t('manageArtist.editArtistInfo')}</h1>
           <div style={{ width: '24px' }}></div>
         </div>
         <div className="edit-profile-content">
@@ -2358,7 +2362,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />
         </button>
-        <h1>Manage</h1>
+        <h1>{t('manageArtist.manage')}</h1>
       </div>
 
       {/* Artist Info Bar */}
@@ -2382,25 +2386,25 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
         >
-          Dashboard
+          {t('manageArtist.dashboard')}
         </button>
         <button
           className={`tab-button ${activeTab === 'events' ? 'active' : ''}`}
           onClick={() => setActiveTab('events')}
         >
-          Calendar
+          {t('manageArtist.calendar')}
         </button>
         <button
           className={`tab-button ${activeTab === 'info' ? 'active' : ''}`}
           onClick={() => setActiveTab('info')}
         >
-          Info
+          {t('manageArtist.info')}
         </button>
         <button
           className={`tab-button ${activeTab === 'documents' ? 'active' : ''}`}
           onClick={() => setActiveTab('documents')}
         >
-          Documents
+          {t('manageArtist.documents')}
         </button>
       </div>
 
@@ -2425,17 +2429,17 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           setShowTravelModal(false);
           setEditingScheduleIndex(null);
         }}
-        title="Add Travel Schedule"
+        title={t('manageArtist.addTravelSchedule')}
         className="location-filter-modal"
       >
         <div className="location-filter-form">
           <div className="form-group">
-            <label>Zone</label>
+            <label>{t('manageArtist.zone')}</label>
             <select
               value={travelFilter.zone}
               onChange={(e) => handleZoneChange(e.target.value)}
             >
-              <option value="">All Zones</option>
+              <option value="">{t('manageArtist.allZones')}</option>
               {zones.map(zone => (
                 <option key={zone} value={zone}>{zone}</option>
               ))}
@@ -2444,12 +2448,12 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
           {travelFilter.zone && (
             <div className="form-group">
-              <label>Country</label>
+              <label>{t('manageArtist.country')}</label>
               <select
                 value={travelFilter.country}
                 onChange={(e) => handleCountryChange(e.target.value)}
               >
-                <option value="">All Countries</option>
+                <option value="">{t('manageArtist.allCountries')}</option>
                 {countriesByZone[travelFilter.zone]?.map(country => (
                   <option key={country} value={country}>{country}</option>
                 ))}
@@ -2459,12 +2463,12 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
           {travelFilter.country && (
             <div className="form-group">
-              <label>City</label>
+              <label>{t('manageArtist.city')}</label>
               <select
                 value={travelFilter.city}
                 onChange={(e) => handleCityChange(e.target.value)}
               >
-                <option value="">All Cities</option>
+                <option value="">{t('manageArtist.allCities')}</option>
                 {citiesByCountry[travelFilter.country]?.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
@@ -2473,7 +2477,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           )}
 
           <div className="form-group">
-            <label>Start Date</label>
+            <label>{t('manageArtist.startDate')}</label>
             <input
               type="date"
               value={travelFilter.startDate}
@@ -2482,7 +2486,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           </div>
 
           <div className="form-group">
-            <label>End Date</label>
+            <label>{t('manageArtist.endDate')}</label>
             <input
               type="date"
               value={travelFilter.endDate}
@@ -2492,7 +2496,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
           {/* Looking For Section */}
           <div className="looking-for-section">
-            <h4>What are you looking for?</h4>
+            <h4>{t('manageArtist.whatAreYouLookingFor')}</h4>
             <div className="looking-for-options">
               <label className="looking-for-option">
                 <input
@@ -2500,7 +2504,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                   checked={lookingFor.promoter}
                   onChange={(e) => setLookingFor({...lookingFor, promoter: e.target.checked})}
                 />
-                <span>Promoters</span>
+                <span>{t('manageArtist.promoters')}</span>
               </label>
               <label className="looking-for-option">
                 <input
@@ -2508,7 +2512,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                   checked={lookingFor.venue}
                   onChange={(e) => setLookingFor({...lookingFor, venue: e.target.checked})}
                 />
-                <span>Venues</span>
+                <span>{t('manageArtist.venues')}</span>
               </label>
             </div>
           </div>
@@ -2521,13 +2525,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 setEditingScheduleIndex(null);
               }}
             >
-              Cancel
+              {t('manageArtist.cancel')}
             </button>
             <button
               className="btn btn-primary"
               onClick={saveTravelSchedule}
             >
-              + Add Schedule
+              + {t('manageArtist.addSchedule')}
             </button>
           </div>
         </div>
@@ -2538,19 +2542,19 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         key={modalKey}
         isOpen={showArtistInfoModal}
         onClose={() => setShowArtistInfoModal(false)}
-        title="Edit Artist Information"
+        title={t('manageArtist.editArtistInformation')}
       >
         <div className="contact-edit-form" style={{maxHeight: '70vh', overflowY: 'auto', padding: '0 4px'}}>
           <div className="edit-section">
-            <h3>Basic Information</h3>
+            <h3>{t('manageArtist.basicInformation')}</h3>
             <div className="form-group">
-              <label>Name</label>
+              <label>{t('manageArtist.name')}</label>
             <input
               type="text"
               className="form-input"
               value={editedArtistInfo.name}
               disabled
-              placeholder="Artist Name"
+              placeholder={t('manageArtist.artistName')}
               style={{
                 backgroundColor: '#0d0d0d',
                 cursor: 'not-allowed',
@@ -2563,11 +2567,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginTop: '4px',
               fontStyle: 'italic'
             }}>
-              Name cannot be changed by agents
+              {t('manageArtist.nameCannotBeChanged')}
             </p>
           </div>
           <div className="form-group">
-            <label>Role</label>
+            <label>{t('manageArtist.role')}</label>
             <select
               className="form-input"
               value={editedArtistInfo.role}
@@ -2578,10 +2582,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 opacity: 0.6
               }}
             >
-              <option value="ARTIST">Artist</option>
-              <option value="VENUE">Venue</option>
-              <option value="PROMOTER">Promoter</option>
-              <option value="AGENT">Agent</option>
+              <option value="ARTIST">{t('manageArtist.artist')}</option>
+              <option value="VENUE">{t('manageArtist.venue')}</option>
+              <option value="PROMOTER">{t('manageArtist.promoter')}</option>
+              <option value="AGENT">{t('manageArtist.agent')}</option>
             </select>
             <p style={{
               fontSize: '11px',
@@ -2589,17 +2593,17 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginTop: '4px',
               fontStyle: 'italic'
             }}>
-              Role cannot be changed by agents
+              {t('manageArtist.roleCannotBeChanged')}
             </p>
           </div>
           <div className="form-group">
-            <label>Zone</label>
+            <label>{t('manageArtist.zone')}</label>
             <select
               className="form-input"
               value={editedArtistInfo.zone}
               onChange={(e) => handleArtistZoneChange(e.target.value)}
             >
-              <option value="">Select Zone</option>
+              <option value="">{t('manageArtist.selectZone')}</option>
               {zones.map(zone => (
                 <option key={zone} value={zone}>{zone}</option>
               ))}
@@ -2607,13 +2611,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           </div>
           {editedArtistInfo.zone && (
             <div className="form-group">
-              <label>Country</label>
+              <label>{t('manageArtist.country')}</label>
               <select
                 className="form-input"
                 value={editedArtistInfo.country}
                 onChange={(e) => handleArtistCountryChange(e.target.value)}
               >
-                <option value="">Select Country</option>
+                <option value="">{t('manageArtist.selectCountry')}</option>
                 {countriesByZone[editedArtistInfo.zone]?.map(country => (
                   <option key={country} value={country}>{country}</option>
                 ))}
@@ -2622,13 +2626,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           )}
           {editedArtistInfo.country && (
             <div className="form-group">
-              <label>City</label>
+              <label>{t('manageArtist.city')}</label>
               <select
                 className="form-input"
                 value={editedArtistInfo.city}
                 onChange={(e) => handleArtistCityChange(e.target.value)}
               >
-                <option value="">Select City</option>
+                <option value="">{t('manageArtist.selectCity')}</option>
                 {citiesByCountry[editedArtistInfo.country]?.map(city => (
                   <option key={city} value={city}>{city}</option>
                 ))}
@@ -2637,39 +2641,41 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           )}
           {editedArtistInfo.role === 'VENUE' && (
             <div className="form-group">
-              <label>Capacity</label>
+              <label>{t('manageArtist.capacity')}</label>
               <input
                 type="number"
                 className="form-input"
                 value={editedArtistInfo.capacity}
                 onChange={(e) => setEditedArtistInfo({...editedArtistInfo, capacity: e.target.value})}
-                placeholder="Max capacity"
+                placeholder={t('manageArtist.maxCapacity')}
               />
             </div>
           )}
           <div className="form-group" style={{ marginBottom: '0' }}>
-            <label>Bio</label>
+            <label>{t('manageArtist.bio')}</label>
             <textarea
               className="form-input"
               rows="4"
               value={editedArtistInfo.bio}
               onChange={(e) => setEditedArtistInfo({...editedArtistInfo, bio: e.target.value})}
-              placeholder="Tell us about the artist..."
+              placeholder={t('manageArtist.bioPlaceholder')}
             />
           </div>
         </div>
 
         <div className="edit-section" style={{ marginTop: '8px' }}>
           <div className="form-group">
-            <label>Genres</label>
+            <label>{t('manageArtist.genres')}</label>
             <div
               className="genres-dropdown-trigger"
               onClick={() => setShowGenresDropdown(!showGenresDropdown)}
             >
               <span className="genres-selected-text">
                 {selectedGenres.size > 0
-                  ? `${selectedGenres.size} genre${selectedGenres.size > 1 ? 's' : ''} selected`
-                  : 'Select genres'}
+                  ? (selectedGenres.size > 1
+                      ? t('manageArtist.genresSelected', { count: selectedGenres.size })
+                      : t('manageArtist.genreSelected', { count: selectedGenres.size }))
+                  : t('manageArtist.selectGenres')}
               </span>
               <span className="dropdown-arrow">{showGenresDropdown ? '▲' : '▼'}</span>
             </div>
@@ -2698,7 +2704,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                       setShowAllGenres(!showAllGenres);
                     }}
                   >
-                    {showAllGenres ? 'Show less' : `Show all ${genresList.length} genres`}
+                    {showAllGenres ? t('manageArtist.showLess') : t('manageArtist.showAllGenres', { count: genresList.length })}
                   </button>
                 )}
               </div>
@@ -2707,9 +2713,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         </div>
 
         <div className="edit-section">
-          <h3>Social Links</h3>
+          <h3>{t('manageArtist.socialLinks')}</h3>
           <div className="form-group">
-            <label>SoundCloud/Mixtape</label>
+            <label>{t('manageArtist.soundcloudMixtape')}</label>
             <input
               type="url"
               className="form-input"
@@ -2723,13 +2729,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               marginTop: '4px',
               lineHeight: '1.4'
             }}>
-              💡 If using a share link: Open it in your web browser, then copy the full URL from the address bar
+              {t('manageArtist.shareLinkHint')}
             </p>
           </div>
           {editedArtistInfo.role === 'ARTIST' && (
             <>
               <div className="form-group">
-                <label>Spotify Artist</label>
+                <label>{t('manageArtist.spotifyArtist')}</label>
                 <input
                   type="url"
                   className="form-input"
@@ -2743,11 +2749,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                   marginTop: '4px',
                   lineHeight: '1.4'
                 }}>
-                  💡 If using a share link: Open it in your web browser, then copy the full URL from the address bar
+                  {t('manageArtist.shareLinkHint')}
                 </p>
               </div>
               <div className="form-group">
-                <label>Resident Advisor</label>
+                <label>{t('manageArtist.residentAdvisor')}</label>
                 <input
                   type="url"
                   className="form-input"
@@ -2759,7 +2765,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             </>
           )}
           <div className="form-group">
-            <label>Instagram</label>
+            <label>{t('manageArtist.instagram')}</label>
             <input
               type="text"
               className="form-input"
@@ -2769,7 +2775,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             />
           </div>
           <div className="form-group">
-            <label>Website</label>
+            <label>{t('manageArtist.website')}</label>
             <input
               type="url"
               className="form-input"
@@ -2794,14 +2800,14 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             onClick={() => setShowArtistInfoModal(false)}
             style={{ flex: 'none', minWidth: '120px' }}
           >
-            Cancel
+            {t('manageArtist.cancel')}
           </button>
           <button
             className="btn btn-primary"
             onClick={handleSaveArtistInfo}
             style={{ flex: 'none', minWidth: '140px' }}
           >
-            Save Changes
+            {t('manageArtist.saveChanges')}
           </button>
         </div>
       </Modal>
@@ -2810,22 +2816,22 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       <Modal
         isOpen={showDeleteConfirmation}
         onClose={cancelDeleteSchedule}
-        title="Delete Travel Schedule"
+        title={t('manageArtist.deleteTravelSchedule')}
       >
         <div className="delete-confirmation">
-          <p>Are you sure you want to delete this travel schedule?</p>
+          <p>{t('manageArtist.deleteScheduleConfirm')}</p>
           <div className="form-actions">
             <button
               className="btn btn-secondary"
               onClick={cancelDeleteSchedule}
             >
-              Cancel
+              {t('manageArtist.cancel')}
             </button>
             <button
               className="btn btn-danger"
               onClick={confirmDeleteSchedule}
             >
-              Delete
+              {t('manageArtist.delete')}
             </button>
           </div>
         </div>
@@ -2848,8 +2854,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         initialUrl={editingDoc?.url || ''}
         initialType={editingDoc?.type || 'upload'}
         existingFileName={editingDoc?.file?.name || editingDoc?.title || ''}
-        submitLabel={editingDoc ? 'Save' : 'Add'}
-        submittingLabel="Saving…"
+        submitLabel={editingDoc ? t('manageArtist.save') : t('manageArtist.add')}
+        submittingLabel={t('manageArtist.saving')}
         onClose={() => {
           setShowAddDocModal(false);
           setNewDoc({ title: '', url: '' });
@@ -2900,11 +2906,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               await apiService.updateProfile(artistId, { documents: updatedDocuments });
               const freshProfile = await apiService.getProfile(artistId);
               setArtistProfile(freshProfile);
-              alert('Document added successfully!');
+              alert(t('manageArtist.documentAdded'));
             }
           } catch (error) {
             console.error('[ManageArtistScreen] Error saving document:', error);
-            alert('Failed to save document. Please try again.');
+            alert(t('manageArtist.saveDocumentFailed'));
           }
 
           setShowAddDocModal(false);

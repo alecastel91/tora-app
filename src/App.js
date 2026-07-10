@@ -534,7 +534,7 @@ function App() {
                         setShowPremium(true);
                       }}
                     >
-                      Upgrade to Premium
+                      {t('premium.upgradeToPremium')}
                     </button>
                   )}
                   {user?.subscriptionTier === 'MONTHLY' && (
@@ -545,7 +545,7 @@ function App() {
                         setShowPremium(true);
                       }}
                     >
-                      Upgrade to Yearly
+                      {t('premium.upgradeToYearly')}
                     </button>
                   )}
                 </div>
@@ -585,7 +585,7 @@ function App() {
                 {/* Likes Today */}
                 <div className="usage-item">
                   <div className="usage-header">
-                    <span className="usage-label">Likes Today</span>
+                    <span className="usage-label">{t('settingsExtra.likesToday')}</span>
                     <span className="usage-count">
                       {user?.likesSentToday || 0} / {(() => {
                         const tier = user?.subscriptionTier || 'FREE';
@@ -623,7 +623,7 @@ function App() {
                 {/* Connections This Month */}
                 <div className="usage-item">
                   <div className="usage-header">
-                    <span className="usage-label">Connections This Month</span>
+                    <span className="usage-label">{t('settingsExtra.connectionsThisMonth')}</span>
                     <span className="usage-count">
                       {user?.connectionsSentThisMonth || 0} / {(() => {
                         const tier = user?.subscriptionTier || 'FREE';
@@ -654,11 +654,11 @@ function App() {
                     </div>
                   )}
                   <div className="usage-reset">
-                    {user?.subscriptionTier === 'YEARLY' ? 'Unlimited Connections' : (() => {
+                    {user?.subscriptionTier === 'YEARLY' ? t('settingsExtra.unlimitedConnections') : (() => {
                       const now = new Date();
                       const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
                       const daysUntil = Math.ceil((nextMonth - now) / (1000 * 60 * 60 * 24));
-                      return `Resets in ${daysUntil} day${daysUntil !== 1 ? 's' : ''} (${nextMonth.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+                      return t(daysUntil === 1 ? 'settingsExtra.resetsInDay' : 'settingsExtra.resetsInDays', { n: daysUntil, date: nextMonth.toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric' }) });
                     })()}
                   </div>
                 </div>
@@ -879,9 +879,9 @@ function App() {
               <div className="premium-icon-large">
                 <StarIcon />
               </div>
-              <h2 className="premium-title">Unlock Global Access</h2>
+              <h2 className="premium-title">{t('premium.unlockGlobalAccess')}</h2>
               <p className="premium-description">
-                Connect with music professionals worldwide and access exclusive features
+                {t('premium.subtitle')}
               </p>
             </div>
             
@@ -1009,7 +1009,7 @@ function App() {
                 </div>
 
                 <p className="premium-note">
-                  Cancel anytime. All prices in EUR.
+                  {t('premium.cancelAnytime')}
                 </p>
               </>
             )}
@@ -1106,7 +1106,7 @@ function App() {
                     className="btn btn-primary btn-full"
                     onClick={handlePaymentSubmit}
                   >
-                    Subscribe Now
+                    {t('premium.subscribeNow')}
                   </button>
                   
                   <p className="payment-note">
@@ -1149,7 +1149,7 @@ function App() {
                   className="btn btn-primary btn-full"
                   onClick={handleSubscriptionComplete}
                 >
-                  Start Exploring
+                  {t('premium.startExploring')}
                 </button>
               </div>
             )}

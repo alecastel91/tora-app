@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const IntroSplash = ({ onComplete }) => {
+  const { t } = useLanguage();
   const [showContent, setShowContent] = useState(false);
   const [dissolve, setDissolve] = useState(false);
 
@@ -51,7 +53,7 @@ const IntroSplash = ({ onComplete }) => {
           className="text-center mt-2"
         >
           <p className="text-white text-[10px] md:text-[12px] tracking-[0.22em] font-normal uppercase whitespace-nowrap">
-            WHERE MUSIC MEETS
+            {t('auth.tagline')}
           </p>
         </motion.div>
       </div>

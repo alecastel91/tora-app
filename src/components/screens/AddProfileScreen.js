@@ -417,7 +417,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                   type="text"
                   className="form-input"
                   style={{ paddingLeft: '28px' }}
-                  placeholder="username"
+                  placeholder={t('addProfile.usernamePlaceholder')}
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
                 />
@@ -458,7 +458,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Coda Agency"
+                    placeholder={t('addProfile.agencyPlaceholder')}
                     value={agencyName}
                     onChange={(e) => setAgencyName(e.target.value)}
                   />
@@ -556,7 +556,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             color: 'rgba(255,255,255,0.5)',
             fontSize: '13px',
           }}>
-            Step {step} of {TOTAL_STEPS} — {stepTitles[step]}
+            {t('addProfile.stepOf', { n: step, m: TOTAL_STEPS })} — {stepTitles[step]}
           </p>
         </div>
 

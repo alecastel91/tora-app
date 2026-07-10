@@ -42,7 +42,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
         </div>
         <div className="delete-modal-content">
           <p style={{ marginBottom: '16px', fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
-            Pick which document to share for each category. You can come back to this any time before the booking.
+            {t('docs.sharePickIntro')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '60vh', overflowY: 'auto' }}>
             {DOC_CATEGORIES.map((cat) => {
@@ -80,8 +80,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                           disabled={actionBusy}
                           onClick={async () => {
                             if (actionBusy) return;
-                            const verb = status === 'shared' ? 'Delete' : 'Unskip';
-                            if (!window.confirm(`${verb} ${cat.label} for this booking?`)) return;
+                                                        if (!window.confirm(t(status === 'shared' ? 'docs.deleteDocConfirm' : 'docs.unskipDocConfirm', { label: cat.label }))) return;
                             setActionBusy(true);
                             try {
                               await apiService.resetDocument(localDeal.id, currentUser.id, cat.key);
@@ -229,7 +228,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
           </div>
         </div>
         <div className="delete-modal-actions">
-          <button className="btn btn-outline" onClick={onClose}>Done</button>
+          <button className="btn btn-outline" onClick={onClose}>{t('common.done')}</button>
         </div>
       </div>
     </div>
@@ -240,6 +239,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
 // the same /api/contracts/upload-document endpoint used by the contract
 // modal, then bubbles the resulting metadata up to share it on the deal.
 const UploadOnlyPicker = ({ category, actionBusy, profileId, onUploaded }) => {
+  const { t } = useLanguage();
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');

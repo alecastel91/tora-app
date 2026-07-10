@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { dummyProfiles } from '../../data/profiles';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const InteractiveMap = ({ onCountryClick, selectedCountries = [], searchResults = [] }) => {
+  const { t } = useLanguage();
   const [hoveredCountry, setHoveredCountry] = useState(null);
   const [mapView, setMapView] = useState({ x: 0, y: 0, scale: 1 });
   const [isDragging, setIsDragging] = useState(false);
@@ -133,13 +135,13 @@ const InteractiveMap = ({ onCountryClick, selectedCountries = [], searchResults 
   return (
     <div className="interactive-map-container">
       <div className="map-controls">
-        <button onClick={zoomIn} className="map-control-btn" title="Zoom In">
+        <button onClick={zoomIn} className="map-control-btn" title={t('common.zoomIn')}>
           +
         </button>
-        <button onClick={zoomOut} className="map-control-btn" title="Zoom Out">
+        <button onClick={zoomOut} className="map-control-btn" title={t('common.zoomOut')}>
           -
         </button>
-        <button onClick={resetView} className="map-control-btn" title="Reset View">
+        <button onClick={resetView} className="map-control-btn" title={t('common.resetView')}>
           ⟲
         </button>
       </div>

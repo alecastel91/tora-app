@@ -4,13 +4,15 @@ import CalendarScreen from './CalendarScreen';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import { useAppContext } from '../../contexts/AppContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import { uploadDocument } from '../../services/contractService';
-import { getActionIcon, handleActionTarget } from '../../utils/actionItems';
+import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, calendar, documents
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
@@ -350,7 +352,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
 
   const handleSaveDocument = async () => {
     if (!newDoc.title || !newDoc.url) {
-      alert('Please provide both title and URL');
+      alert(t('manage.provideTitleAndUrl'));
       return;
     }
 
@@ -413,7 +415,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
       console.log('[ManageProfileScreen] Profile data reloaded');
     } catch (error) {
       console.error('[ManageProfileScreen] Error saving document:', error);
-      alert('Failed to save document. Please try again.');
+      alert(t('manage.saveDocumentFailed'));
     }
 
     setShowAddDocModal(false);
@@ -422,7 +424,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   };
 
   const handleDeleteDocument = async (category, docId) => {
-    if (!window.confirm('Are you sure you want to delete this document link?')) {
+    if (!window.confirm(t('manage.deleteDocumentConfirm'))) {
       return;
     }
 
@@ -452,12 +454,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      pressKit: 'Press Kit',
-      technicalRider: 'Technical Rider',
-      hospitalityRider: 'Hospitality Rider',
-      contracts: 'Contract'
+      pressKit: t('manage.pressKit'),
+      technicalRider: t('manage.technicalRider'),
+      hospitalityRider: t('manage.hospitalityRider'),
+      contracts: t('manage.contract')
     };
-    return labels[category] || 'Document';
+    return labels[category] || t('manage.document');
   };
 
   // Handle tab change with fresh data fetch for documents
@@ -476,7 +478,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
   // Dashboard Tab
   const renderDashboardTab = () => {
     const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
-    const revenueLabel = isPromoterOrVenue ? 'Costs' : 'Revenue';
+    const revenueLabel = isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
 
     return (
     <div className="dashboard-tab">
@@ -488,14 +490,14 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           <div className="metric-value">
             {thisYearGigs === null ? '...' : thisYearGigs}
           </div>
-          <div className="metric-label">This Year Bookings</div>
+          <div className="metric-label">{t('manage.thisYearBookings')}</div>
         </div>
         <div className="metric-card">
           <div className="metric-icon"><DollarIcon /></div>
           <div className="metric-value">
             {ytdRevenue === null ? '...' : formatCurrencyWithSymbol(ytdRevenue, preferredCurrency)}
           </div>
-          <div className="metric-label">{`This Year ${revenueLabel}`}</div>
+          <div className="metric-label">{t('manage.thisYearMetric', { label: revenueLabel })}</div>
         </div>
         {/* Bottom Row */}
         <div className="metric-card">
@@ -503,23 +505,23 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           <div className="metric-value">
             {upcomingGigs === null ? '...' : upcomingGigs}
           </div>
-          <div className="metric-label">Upcoming Bookings</div>
+          <div className="metric-label">{t('manage.upcomingBookings')}</div>
         </div>
         <div className="metric-card">
           <div className="metric-icon"><DollarIcon /></div>
           <div className="metric-value">
             {expectedRevenue === null ? '...' : formatCurrencyWithSymbol(expectedRevenue, preferredCurrency)}
           </div>
-          <div className="metric-label">{`Expected ${revenueLabel}`}</div>
+          <div className="metric-label">{t('manage.expectedMetric', { label: revenueLabel })}</div>
         </div>
       </div>
 
       {/* Actions Required Section */}
       <div className="dashboard-section actions-required-section">
-        <h3><AlertIcon /> Actions Required {actionItems.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
+        <h3><AlertIcon /> {t('manage.actionsRequired')} {actionItems.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
         <div className="action-items">
           {actionItems.length === 0 ? (
-            <div className="action-empty">Nothing needs your attention right now.</div>
+            <div className="action-empty">{t('manage.nothingNeedsAttention')}</div>
           ) : (
             actionItems.map((item) => {
               const Icon = getActionIcon(item.type);
@@ -527,11 +529,11 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                 <div key={item.id} className="action-item">
                   <div className="action-icon"><Icon /></div>
                   <div className="action-content">
-                    <div className="action-title">{item.title}</div>
+                    <div className="action-title">{localizeActionItem(item, t).title}</div>
                     {item.subtitle && <div className="action-subtitle">{item.subtitle}</div>}
                   </div>
                   <button className="btn btn-sm btn-primary" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
-                    {item.actionLabel}
+                    {localizeActionItem(item, t).actionLabel}
                   </button>
                 </div>
               );
@@ -542,7 +544,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
 
       {/* Revenue/Costs Chart */}
       <div className="dashboard-section revenue-overview-section">
-        <h3><TrendingUpIcon /> {revenueLabel} Overview</h3>
+        <h3><TrendingUpIcon /> {t('manage.overviewTitle', { label: revenueLabel })}</h3>
         <div className="revenue-chart-scroll">
           <div className="revenue-chart" style={{ minHeight: '200px' }}>
             {revenueChartData.length > 0 ? (
@@ -564,7 +566,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                         )}
                       </div>
                       <div className="chart-label">
-                        {item.month}
+                        {t(`manage.month${item.month}`)}
                         <div className="chart-year">{item.year}</div>
                       </div>
                     </div>
@@ -572,7 +574,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                 });
               })()
             ) : (
-              <div className="no-revenue-data">Loading revenue data...</div>
+              <div className="no-revenue-data">{t('manage.loadingRevenueData')}</div>
             )}
           </div>
         </div>
@@ -592,14 +594,14 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           <div className="dashboard-section">
             <div className="section-header">
               <div>
-                <h3><FileIcon /> Documents</h3>
+                <h3><FileIcon /> {t('manage.documents')}</h3>
                 <p style={{ color: '#888', fontSize: '13px', margin: '4px 0 0 0' }}>
-                  Add important documents like contracts, licenses, permits, insurance, financial records, technical specs, etc.
+                  {t('manage.documentsHint')}
                 </p>
               </div>
               <button
                 onClick={() => handleAddDocument()}
-                aria-label="Add document"
+                aria-label={t('manage.addDocument')}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -622,12 +624,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                 color: '#888'
               }}>
                 <FileIcon style={{ width: '48px', height: '48px', margin: '0 auto 16px', opacity: 0.5 }} />
-                <p style={{ marginBottom: '16px' }}>No documents added yet</p>
+                <p style={{ marginBottom: '16px' }}>{t('manage.noDocumentsYet')}</p>
                 <button
                   className="btn btn-primary"
                   onClick={() => handleAddDocument()}
                 >
-                  + Add Your First Document
+                  + {t('manage.addFirstDocument')}
                 </button>
               </div>
             ) : (
@@ -652,7 +654,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                               cursor: 'pointer',
                             }}
                           >
-                            {isBackendFileUrl(doc) ? 'View file' : 'Open link ↗'}
+                            {isBackendFileUrl(doc) ? t('manage.viewFile') : t('manage.openLink')}
                           </button>
                         )}
                         {doc.addedDate && (
@@ -660,7 +662,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                             color: '#666',
                             fontSize: '12px'
                           }}>
-                            Added {new Date(doc.addedDate).toLocaleDateString()}
+                            {t('manage.addedDate', { date: new Date(doc.addedDate).toLocaleDateString() })}
                           </div>
                         )}
                       </div>
@@ -670,14 +672,14 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                         className="btn btn-outline btn-sm"
                         onClick={() => handleEditDocument(doc)}
                       >
-                        Edit
+                        {t('manage.edit')}
                       </button>
                       <button
                         className="btn btn-outline btn-sm"
                         onClick={() => handleDeleteDocument(doc.id)}
                         style={{ color: '#ff4444' }}
                       >
-                        Delete
+                        {t('manage.delete')}
                       </button>
                     </div>
                   </div>
@@ -699,7 +701,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           {documents[category].length > 0 && (
             <button
               onClick={() => handleAddDocument(category)}
-              aria-label={`Add ${title}`}
+              aria-label={t('manage.addCategory', { title })}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -727,7 +729,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
               className="btn btn-primary btn-small"
               onClick={() => handleAddDocument(category)}
             >
-              + Add
+              + {t('manage.add')}
             </button>
           </div>
         ) : (
@@ -752,12 +754,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                           cursor: 'pointer',
                         }}
                       >
-                        {doc.type === 'upload' || doc.url.startsWith('/api/') ? 'View file' : 'Open link ↗'}
+                        {doc.type === 'upload' || doc.url.startsWith('/api/') ? t('manage.viewFile') : t('manage.openLink')}
                       </button>
                     )}
                     {doc.addedDate && (
                       <div className="text-[10px] uppercase tracking-[0.08em] text-white/30">
-                        Added {new Date(doc.addedDate).toLocaleDateString()}
+                        {t('manage.addedDate', { date: new Date(doc.addedDate).toLocaleDateString() })}
                       </div>
                     )}
                   </div>
@@ -767,14 +769,14 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
                     className="btn btn-outline btn-sm"
                     onClick={() => handleEditDocument(category, doc)}
                   >
-                    Edit
+                    {t('manage.edit')}
                   </button>
                   <button
                     className="bg-transparent border-none cursor-pointer text-[10px] uppercase tracking-[0.1em]
                                font-tech text-white/35 hover:text-role-venue transition-colors"
                     onClick={() => handleDeleteDocument(category, doc.id)}
                   >
-                    Delete
+                    {t('manage.delete')}
                   </button>
                 </div>
               </div>
@@ -787,10 +789,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
 
     return (
       <div className="artist-info-tab">
-        {renderDocCategory('pressKit', <ImageIcon />, 'Press Kit', 'Add press photos, bio, EPK, or music samples')}
-        {renderDocCategory('technicalRider', <SlidersIcon />, 'Technical Rider', 'Add stage plot, sound + lighting requirements, equipment list')}
-        {renderDocCategory('hospitalityRider', <SlidersIcon />, 'Hospitality Rider', 'Add accommodation, meals, transport, dressing room requirements')}
-        {renderDocCategory('contracts', <FileTextIcon />, 'Contracts', 'Add contract templates. These can be customized per booking.')}
+        {renderDocCategory('pressKit', <ImageIcon />, t('manage.pressKit'), t('manage.pressKitNote'))}
+        {renderDocCategory('technicalRider', <SlidersIcon />, t('manage.technicalRider'), t('manage.technicalRiderNote'))}
+        {renderDocCategory('hospitalityRider', <SlidersIcon />, t('manage.hospitalityRider'), t('manage.hospitalityRiderNote'))}
+        {renderDocCategory('contracts', <FileTextIcon />, t('manage.contracts'), t('manage.contractsNote'))}
       </div>
     );
   };
@@ -801,7 +803,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />
         </button>
-        <h1>Manage {user?.name || 'Profile'}</h1>
+        <h1>{t('manage.manageTitle', { name: user?.name || t('manage.profile') })}</h1>
       </div>
 
       {/* Artist Info Bar */}
@@ -825,19 +827,19 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => handleTabChange('dashboard')}
         >
-          Dashboard
+          {t('manage.dashboard')}
         </button>
         <button
           className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
           onClick={() => handleTabChange('calendar')}
         >
-          Calendar
+          {t('manage.calendar')}
         </button>
         <button
           className={`tab-button ${activeTab === 'documents' ? 'active' : ''}`}
           onClick={() => handleTabChange('documents')}
         >
-          Documents
+          {t('manage.documents')}
         </button>
       </div>
 
@@ -863,8 +865,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
         initialUrl={editingDoc?.url || ''}
         initialType={editingDoc?.type || 'link'}
         existingFileName={editingDoc?.file?.name || editingDoc?.title || ''}
-        submitLabel={editingDoc ? 'Save' : 'Add'}
-        submittingLabel="Saving…"
+        submitLabel={editingDoc ? t('manage.save') : t('manage.add')}
+        submittingLabel={t('manage.saving')}
         onClose={() => {
           setShowAddDocModal(false);
           setNewDoc({ title: '', url: '' });
@@ -926,10 +928,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
             await apiService.updateProfile(user.id, { documents: documentsToSave });
             setDocuments(updatedDocuments);
             await reloadProfileData();
-            alert('Document added successfully!');
+            alert(t('manage.documentAddedSuccess'));
           } catch (error) {
             console.error('[ManageProfileScreen] Failed to save document:', error);
-            alert('Failed to save document. Please try again.');
+            alert(t('manage.saveDocumentFailed'));
           }
 
           setShowAddDocModal(false);

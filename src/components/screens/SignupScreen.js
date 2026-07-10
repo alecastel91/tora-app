@@ -316,7 +316,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 className="btn-link"
                 onClick={onSwitchToLogin}
               >
-                Log In
+                {t('auth.logIn')}
               </button>
             </div>
           </form>

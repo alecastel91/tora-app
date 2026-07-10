@@ -6,6 +6,7 @@ import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { roleLabel } from '../../utils/roles';
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { t } = useLanguage();
@@ -97,7 +98,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           : (artistContext.representedBy ? [artistContext.representedBy] : []);
         targetName = repArray[0]?.name || repArray[0]?.agentName || 'Agent';
       }
-      alert(`Connection request sent to ${targetName}!`);
+      alert(t('search.connectionRequestSent', { name: targetName }));
     } catch (error) {
       console.error('Error sending connection request:', error);
       console.error('Error details:', {
@@ -280,7 +281,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           <p className="profile-location"><LocationIcon />{profile.location}</p>
           <div className="profile-role-centered">
             <div className={getRoleBadgeClass(profile.role)}>
-              {profile.role}
+              {roleLabel(profile.role, t)}
             </div>
           </div>
           {profile.role === 'AGENT' && profile.agencyName && (
@@ -346,7 +347,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                 })()}
                 frameBorder="0"
                 className="embed-iframe soundcloud-embed"
-                title="SoundCloud Mix"
+                title={t('manageArtist.soundcloudMix')}
                 allow="autoplay"
               />
             </div>
@@ -370,7 +371,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                 allowTransparency="true"
                 allow="encrypted-media"
                 className="embed-iframe spotify-embed"
-                title="Spotify Artist Profile"
+                title={t('manageArtist.spotifyArtistProfile')}
               />
             </div>
           )}

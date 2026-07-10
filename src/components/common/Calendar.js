@@ -42,8 +42,10 @@ const Calendar = ({ onClose }) => {
   const firstDayOfMonth = getFirstDayOfMonth(currentMonth, currentYear);
   
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    t('dateFormat.january'), t('dateFormat.february'), t('dateFormat.march'),
+    t('dateFormat.april'), t('dateFormat.may'), t('dateFormat.june'),
+    t('dateFormat.july'), t('dateFormat.august'), t('dateFormat.september'),
+    t('dateFormat.october'), t('dateFormat.november'), t('dateFormat.december')
   ];
 
   const goToPreviousMonth = () => {
@@ -304,7 +306,7 @@ const Calendar = ({ onClose }) => {
 
   const renderCalendarDays = () => {
     const days = [];
-    const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const weekDays = t('dateFormat.weekLetters').split(',');
     
     // Render weekday headers
     weekDays.forEach(day => {
@@ -488,7 +490,7 @@ const Calendar = ({ onClose }) => {
                       <span className="filter-dates">
                         {filter.startDate === filter.endDate 
                           ? filter.startDate 
-                          : `${filter.startDate} to ${filter.endDate}`}
+                          : `${filter.startDate} – ${filter.endDate}`}
                       </span>
                     </div>
                     <button 

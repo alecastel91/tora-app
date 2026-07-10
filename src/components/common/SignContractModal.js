@@ -193,7 +193,7 @@ const SignContractModal = ({
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full legal name"
+                placeholder={t('contract.enterLegalName')}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
@@ -233,7 +233,7 @@ const SignContractModal = ({
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
                   <span style={{ fontSize: '11px', color: '#888' }}>
-                    Use your finger or mouse to sign
+                    {t('contract.signHint')}
                   </span>
                   <button
                     type="button"
@@ -272,10 +272,7 @@ const SignContractModal = ({
                   required
                 />
                 <span>
-                  I have read and reviewed the contract in its entirety, and I agree to be legally bound by its terms.
-                  I consent to use electronic signatures and electronic records for this transaction, and I confirm
-                  that my electronic signature has the same legal effect as a handwritten signature under
-                  the EU eIDAS Regulation and the US ESIGN Act / UETA.
+                  {t('contract.consentText')}
                 </span>
               </label>
             </div>
@@ -303,13 +300,7 @@ const SignContractModal = ({
               color: '#666',
               lineHeight: '1.4'
             }}>
-              <strong>How TORA secures this signature:</strong> Your full legal name, drawn signature image,
-              consent, timestamp, IP address, and a unique signature ID are recorded as your signature record.
-              The contract document is hashed (SHA-256) so any later modification to the file is detectable.
-              When all parties have signed, TORA generates a Certificate of Completion containing the full
-              audit trail and emails the signed contract together with the certificate to every party for
-              their records. You can request a paper copy or withdraw consent at any time by writing to
-              support@torahub.io.
+              <strong>{t('contract.securityNoteTitle')}</strong> {t('contract.securityNote')}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>

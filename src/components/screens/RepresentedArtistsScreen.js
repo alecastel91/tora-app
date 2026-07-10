@@ -242,7 +242,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                     {t('roster.manage')}
                     {artistActionsMap[artist.profileId || artist.id] && (
                       <span
-                        aria-label="Actions required"
+                        aria-label={t('manage.actionsRequired')}
                         style={{
                           position: 'absolute',
                           top: '4px',

@@ -3,8 +3,10 @@ import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import ViewProfileScreen from '../screens/ViewProfileScreen';
 import LoadingGlobe from './LoadingGlobe';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -244,7 +246,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
     } catch (error) {
       console.error('Error sending connection request:', error);
-      alert('Failed to send connection request');
+      alert(t('findArtist.failedToSendConnection'));
     } finally {
       setSending(false);
     }
@@ -328,7 +330,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
     } catch (error) {
       console.error('Error accepting request:', error);
-      alert('Failed to accept request');
+      alert(t('findArtist.failedToAccept'));
     } finally {
       setSending(false);
     }
@@ -368,7 +370,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
     } catch (error) {
       console.error('Error declining representation request:', error);
-      alert('Failed to decline representation request');
+      alert(t('findArtist.failedToDecline'));
     } finally {
       setSending(false);
     }
@@ -384,7 +386,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
               <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
           </button>
-          <h1>FIND ARTIST</h1>
+          <h1>{t('findArtist.title')}</h1>
           <div style={{ width: '24px' }}></div>
         </div>
 
@@ -393,25 +395,25 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
           <form onSubmit={handleSearch} className="search-form">
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder={t('findArtist.searchPlaceholder')}
               value={searchQuery}
               onChange={handleSearchInputChange}
               className="search-input"
             />
             <button type="submit" className="btn btn-primary">
-              Search
+              {t('findArtist.search')}
             </button>
           </form>
 
           {/* Loading State */}
           {loading && (
-            <LoadingGlobe label="Searching artists..." />
+            <LoadingGlobe label={t('findArtist.searchingArtists')} />
           )}
 
           {/* Prompt to search */}
           {!loading && !hasSearched && (
             <div className="empty-state">
-              <p>Search for an artist by name</p>
+              <p>{t('findArtist.prompt')}</p>
             </div>
           )}
 
@@ -420,9 +422,9 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
             <div className="artists-list">
               {artists.length === 0 ? (
                 <div className="empty-state">
-                  <p>No artists found</p>
+                  <p>{t('findArtist.noArtistsFound')}</p>
                   {searchQuery && (
-                    <p className="empty-state-hint">Try a different search term</p>
+                    <p className="empty-state-hint">{t('findArtist.tryDifferentSearch')}</p>
                   )}
                 </div>
               ) : (
@@ -437,11 +439,11 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                     fontSize: '14px',
                     color: '#ccc'
                   }}>
-                    To send a representation request, you must be connected with the artist first.
+                    {t('findArtist.connectionRequirement')}
                   </div>
 
                   <div className="results-header">
-                    <p>{artists.length} artist{artists.length !== 1 ? 's' : ''} found</p>
+                    <p>{artists.length === 1 ? t('findArtist.artistFound', { count: artists.length }) : t('findArtist.artistsFound', { count: artists.length })}</p>
                   </div>
                   {artists.map((artist) => {
                     const artistId = String(artist.id);
@@ -453,30 +455,30 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                     console.log('[SearchArtistsModal] Checking artist:', artist.name, artistId, 'hasAccepted:', hasAccepted, 'acceptedRequestIds:', [...acceptedRequestIds]);
 
                     // Simplified button logic: always show Send Request (greyed out if not connected)
-                    let buttonText = 'Send Request';
+                    let buttonText = t('findArtist.sendRequest');
                     let buttonClass = 'btn-primary';
                     let buttonDisabled = false;
                     let buttonAction = () => handleRequestClick(artist);
 
                     if (hasAccepted) {
-                      buttonText = 'Represented';
+                      buttonText = t('findArtist.represented');
                       buttonClass = 'btn-success';
                       buttonDisabled = true;
                       buttonAction = null;
                     } else if (wasDeclined) {
-                      buttonText = 'Declined';
+                      buttonText = t('findArtist.declined');
                       buttonClass = 'btn-secondary';
                       buttonDisabled = true;
                       buttonAction = null;
                     } else if (hasRequested) {
                       // Already sent representation request
-                      buttonText = 'Pending';
+                      buttonText = t('findArtist.pending');
                       buttonClass = 'btn-secondary';
                       buttonDisabled = true;
                       buttonAction = null;
                     } else if (!isConnected) {
                       // Not connected - grey out the button
-                      buttonText = 'Send Request';
+                      buttonText = t('findArtist.sendRequest');
                       buttonClass = 'btn-disabled';
                       buttonDisabled = true;
                       buttonAction = null;
@@ -537,7 +539,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
         <div className="modal-overlay" onClick={handleCancelConnection}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Connect with {selectedArtist.name}</h2>
+              <h2>{t('findArtist.connectWith', { name: selectedArtist.name })}</h2>
               <button className="close-btn" onClick={handleCancelConnection}>
                 <CloseIcon />
               </button>
@@ -545,15 +547,15 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
             <div className="modal-body">
               <p className="modal-description">
-                Send a connection request to <strong>{selectedArtist.name}</strong>
+                {t('findArtist.sendConnectionRequestTo')} <strong>{selectedArtist.name}</strong>
               </p>
 
               <div className="form-group">
-                <label>Message (optional)</label>
+                <label>{t('findArtist.messageOptional')}</label>
                 <textarea
                   value={connectionMessage}
                   onChange={(e) => setConnectionMessage(e.target.value)}
-                  placeholder="Say hi and introduce yourself... (optional)"
+                  placeholder={t('findArtist.connectionPlaceholder')}
                   rows={5}
                   className="form-control"
                   maxLength={500}
@@ -568,14 +570,14 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                 onClick={handleCancelConnection}
                 disabled={sending}
               >
-                Cancel
+                {t('findArtist.cancel')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleSendConnection}
                 disabled={sending}
               >
-                {sending ? 'Sending...' : 'Connect'}
+                {sending ? t('findArtist.sending') : t('findArtist.connect')}
               </button>
             </div>
           </div>
@@ -587,7 +589,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
         <div className="modal-overlay" onClick={handleCancelMessage}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Send Representation Request</h2>
+              <h2>{t('findArtist.sendRepresentationRequest')}</h2>
               <button className="close-btn" onClick={handleCancelMessage}>
                 <CloseIcon />
               </button>
@@ -595,15 +597,15 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
             <div className="modal-body">
               <p className="modal-description">
-                Sending representation request to:<br /><strong>{selectedArtist.name}</strong>
+                {t('findArtist.sendingRepRequestTo')}<br /><strong>{selectedArtist.name}</strong>
               </p>
 
               <div className="form-group">
-                <label>Message (optional)</label>
+                <label>{t('findArtist.messageOptional')}</label>
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Add a personal message to introduce yourself... (optional)"
+                  placeholder={t('findArtist.messagePlaceholder')}
                   rows={5}
                   className="form-control"
                   maxLength={500}
@@ -618,14 +620,14 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                 onClick={handleCancelMessage}
                 disabled={sending}
               >
-                Cancel
+                {t('findArtist.cancel')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleSendRequest}
                 disabled={sending}
               >
-                {sending ? 'Sending...' : 'Send Request'}
+                {sending ? t('findArtist.sending') : t('findArtist.sendRequest')}
               </button>
             </div>
           </div>
@@ -642,7 +644,9 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                {reviewingRequest.type === 'CONNECTION_REQUEST' ? 'Connection Request' : 'Representation Request'} from {selectedArtist.name}
+                {reviewingRequest.type === 'CONNECTION_REQUEST'
+                  ? t('findArtist.connectionRequestFrom', { name: selectedArtist.name })
+                  : t('findArtist.representationRequestFrom', { name: selectedArtist.name })}
               </h2>
               <button className="close-btn" onClick={() => {
                 setShowReviewModal(false);
@@ -673,15 +677,15 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
               {reviewingRequest.message && reviewingRequest.message.trim() ? (
                 <div className="review-modal-message">
-                  <label>Message:</label>
+                  <label>{t('findArtist.messageLabel')}</label>
                   <div className="message-content">{reviewingRequest.message}</div>
                 </div>
               ) : (
                 <div className="review-modal-message">
                   <p className="system-message-text">
                     {reviewingRequest.type === 'CONNECTION_REQUEST'
-                      ? `${selectedArtist.name} wants to connect`
-                      : `${selectedArtist.name} wants you to represent them`}
+                      ? t('findArtist.wantsToConnect', { name: selectedArtist.name })
+                      : t('findArtist.wantsYouToRepresentThem', { name: selectedArtist.name })}
                   </p>
                 </div>
               )}
@@ -693,14 +697,14 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                 onClick={handleDeclineRepresentation}
                 disabled={sending}
               >
-                {sending ? 'Processing...' : 'Decline'}
+                {sending ? t('findArtist.processing') : t('findArtist.decline')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleAcceptRepresentation}
                 disabled={sending}
               >
-                {sending ? 'Processing...' : 'Accept'}
+                {sending ? t('findArtist.processing') : t('findArtist.accept')}
               </button>
             </div>
           </div>

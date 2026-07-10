@@ -50,7 +50,7 @@ const ContractViewer = ({ isOpen, onClose, contractUrl, dealId, onTrackView }) =
         {/* Header */}
         <div className="modal-header" style={{ flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-            Contract Preview
+            {t('contract.preview')}
           </h2>
           <button className="modal-close" onClick={onClose}>
             ×
@@ -91,7 +91,7 @@ const ContractViewer = ({ isOpen, onClose, contractUrl, dealId, onTrackView }) =
           {/* PDF Iframe */}
           <iframe
             src={contractUrl}
-            title="Contract Document"
+            title={t('contract.documentTitle')}
             onLoad={handleIframeLoad}
             style={{
               width: '100%',
@@ -130,7 +130,7 @@ const ContractViewer = ({ isOpen, onClose, contractUrl, dealId, onTrackView }) =
                   <polyline points="15 3 21 3 21 9"></polyline>
                   <line x1="10" y1="14" x2="21" y2="3"></line>
                 </svg>
-                Open in New Tab
+                {t('docs.openInNewTab')}
               </a>
             </div>
           )}

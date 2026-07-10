@@ -127,7 +127,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
         <div className="connection-choice-modal">
           <h2>{t('connect.selectAgent')}</h2>
           <p className="modal-description">
-            This artist has multiple agents. Who would you like to connect with?
+            {t('connect.multipleAgents')}
           </p>
 
           {representedByArray.map((agent, index) => (
@@ -172,7 +172,7 @@ const ConnectionChoiceModal = ({ artist, onClose, onConnect }) => {
         </div>
 
         <p className="modal-description">
-          Who would you like to connect with?
+          {t('connect.whoToConnect')}
         </p>
 
         {/* Option 1: Connect with Agent */}

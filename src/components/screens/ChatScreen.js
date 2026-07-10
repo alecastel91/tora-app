@@ -13,7 +13,7 @@ import PdfViewerModal from '../common/PdfViewerModal';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
 import { getAuthedBackendUrl } from '../../utils/urls';
-import { getAvatarClass } from '../../utils/roles';
+import { roleLabel, getAvatarClass } from '../../utils/roles';
 
 const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const { user: currentUser, sendMessage, connectedUsers, reloadProfileData } = useAppContext();
@@ -696,7 +696,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
 
 
   const formatMessageTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', { 
+    return new Date(timestamp).toLocaleTimeString(t('dateFormat.locale'), { 
       hour: 'numeric', 
       minute: '2-digit' 
     });
@@ -888,7 +888,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
           </div>
           <div className="chat-user-details">
             <h3 style={{ color: user.isDeleted || user.deleted ? '#888' : 'inherit' }}>{user.name}</h3>
-            <span className="chat-role" style={{ color: user.isDeleted || user.deleted ? '#888' : 'inherit' }}>{user.role}</span>
+            <span className="chat-role" style={{ color: user.isDeleted || user.deleted ? '#888' : 'inherit' }}>{roleLabel(user.role, t)}</span>
             <span className="chat-location">{user.location}</span>
           </div>
         </div>

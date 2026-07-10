@@ -23,7 +23,7 @@ const AgentTierLadder = ({ currentTier, scrollable = false }) => {
         <div>
           <h3 style={{ margin: 0 }}>{t('agentPlans.title')}</h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
-            Pricing scales with roster size. Pick the plan that fits how many artists you represent.
+            {t('agentPlans.intro')}
           </p>
         </div>
         <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.05)', borderRadius: '999px', padding: '3px' }}>

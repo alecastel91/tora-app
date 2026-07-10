@@ -266,7 +266,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(t('dateFormat.locale'), {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
@@ -304,7 +304,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
 
     filteredDeals.forEach(deal => {
       const date = new Date(deal.date);
-      const monthYear = `${date.toLocaleString('en-US', { month: 'long' })} ${date.getFullYear()}`;
+      const monthYear = `${date.toLocaleString(t('dateFormat.locale'), { month: 'long' })} ${date.getFullYear()}`;
 
       if (!clusters[monthYear]) {
         clusters[monthYear] = {
@@ -387,6 +387,36 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
     return 'ACCEPTED';
   };
 
+  // Localized display helpers (status enums / roles / doc categories / extras keys)
+  const statusLabel = (s) => ({
+    'PENDING': t('bookings.statusPending'),
+    'NEGOTIATING': t('bookings.statusNegotiating'),
+    'DECLINED': t('bookings.statusDeclined'),
+    'COMPLETED': t('bookings.statusCompleted'),
+    'DOCS SHARED': t('bookings.statusDocsShared'),
+    'CONTRACT SIGNED': t('bookings.statusContractSigned'),
+    'ACCEPTED': t('bookings.statusAccepted'),
+  }[s] || s);
+  const roleLabel = (r) => ({
+    ARTIST: t('search.roleArtist'),
+    VENUE: t('search.roleVenue'),
+    PROMOTER: t('search.rolePromoter'),
+    AGENT: t('search.roleAgent'),
+  }[r] || r);
+  const docCatLabel = (cat) => ({
+    pressKit: t('chat.pressKit'),
+    technicalRider: t('chat.technicalRider'),
+    hospitalityRider: t('chat.hospitalityRider'),
+    invoice: t('chat.invoice'),
+  }[cat.key] || cat.label);
+  const extraLabel = (key) => ({
+    travelIn: t('chat.travelIn'),
+    travelOut: t('chat.travelOut'),
+    transportation: t('chat.transportation'),
+    accommodation: t('chat.accommodation'),
+    meals: t('chat.meals'),
+  }[key] || key.replace(/([A-Z])/g, ' $1').trim());
+
   const renderDealCard = (deal) => {
     const isOutgoing = deal.initiator.id === currentUser.id;
     const otherParty = isOutgoing
@@ -454,7 +484,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
       <div key={deal.id} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
         <div className="booking-date-badge">
           <span className="booking-date-month">
-            {dealDate.toLocaleDateString('en-US', { month: 'short' })}
+            {dealDate.toLocaleDateString(t('dateFormat.locale'), { month: 'short' })}
           </span>
           <span className="booking-date-day">{dayNumber}</span>
         </div>
@@ -479,7 +509,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
             <div className="party-name-role">
               <h3>{otherParty.name}</h3>
               <span className={`role-badge ${otherParty.role.toLowerCase()}`}>
-                {otherParty.role}
+                {roleLabel(otherParty.role)}
               </span>
             </div>
             {/* Artist label — shown whenever the deal is for a represented
@@ -513,7 +543,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 const displayStatus = getDealDisplayStatus(deal);
                 return (
                   <span className={getStatusBadgeClass(displayStatus)}>
-                    {displayStatus}
+                    {statusLabel(displayStatus)}
                   </span>
                 );
               })()}
@@ -577,7 +607,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   <span className="detail-value">
                     <div>{deal.setStartTime} - {deal.setEndTime}</div>
                     {deal.setDuration && (
-                      <div className="detail-subtext">({deal.setDuration} minutes)</div>
+                      <div className="detail-subtext">{t('chat.durationMinutes', { n: deal.setDuration })}</div>
                     )}
                   </span>
                 </div>
@@ -619,7 +649,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                           {Object.entries(latestExtras).filter(([, v]) => v).map(([key, value]) => (
                             <div key={key} className="extra-item">
                               <div className="extra-content">
-                                <strong style={{ textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}</strong>
+                                <strong style={{ textTransform: 'capitalize' }}>{extraLabel(key)}</strong>
                                 {value !== 'Included' && value !== true && <span className="extra-note">: {value}</span>}
                               </div>
                             </div>
@@ -651,7 +681,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
             </div>
             {deal.notes && (
               <div className="mb-4 -mt-1">
-                <p className="m-0 mb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30 font-tech">Notes</p>
+                <p className="m-0 mb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30 font-tech">{t('bookings.notes')}</p>
                 <p className="m-0 text-[12px] leading-relaxed text-white/45">{deal.notes}</p>
               </div>
             )}
@@ -670,7 +700,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                     it the same as NOT_SENT. */}
                 {(!deal.contract || !deal.contract.status || deal.contract.status === 'NOT_SENT') && !isArtistSideForDeal(deal, currentUser) && (
                   <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#888' }}>
-                    Waiting for the contract from the artist side
+                    {t('chat.waitingForContractArtistSide')}
                   </p>
                 )}
                 {(!deal.contract || !deal.contract.status || deal.contract.status === 'NOT_SENT') && isArtistSideForDeal(deal, currentUser) && (
@@ -712,7 +742,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         <line x1="16" y1="17" x2="8" y2="17"></line>
                         <polyline points="10 9 9 9 8 9"></polyline>
                       </svg>
-                      Send Contract
+                      {t('chat.sendContract')}
                     </button>
                     <button
                       className="btn btn-skip"
@@ -732,7 +762,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         }
                       }}
                     >
-                      Skip Contract
+                      {t('chat.skipContract')}
                     </button>
                   </>
                 )}
@@ -746,8 +776,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   const onArtistSide = isArtistSideForDeal(deal, currentUser);
                   const isFullySigned = deal.contract.status === 'FULLY_SIGNED';
                   const otherPartyName = onArtistSide
-                    ? (deal.venue?.name || 'the venue')
-                    : (deal.artist?.name || 'the artist');
+                    ? (deal.venue?.name || t('bookings.theVenue'))
+                    : (deal.artist?.name || t('bookings.theArtist'));
 
                   if (onArtistSide) {
                     return (
@@ -768,7 +798,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                           </svg>
-                          View Contract
+                          {t('chat.viewContract')}
                         </button>
                         <button
                           className="btn btn-secondary"
@@ -788,7 +818,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                           </svg>
-                          Withdraw Contract
+                          {t('bookings.withdrawContract')}
                         </button>
                         </div>
                       </div>
@@ -810,7 +840,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                           </svg>
-                          View Contract
+                          {t('chat.viewContract')}
                         </button>
                         <button
                           className="btn btn-primary"
@@ -839,7 +869,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M3 17l6 6 13-13"></path>
                           </svg>
-                          Sign Contract
+                          {t('contract.signContract')}
                         </button>
                       </div>
                     );
@@ -860,7 +890,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                       <polyline points="14 2 14 8 20 8"></polyline>
                     </svg>
-                    View Contract
+                    {t('chat.viewContract')}
                   </button>
                 )}
 
@@ -898,8 +928,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       const pillContent = (
                         <>
                           <span aria-hidden="true">{palette.symbol}</span>
-                          {cat.label}
-                          {status === 'shared' ? ' shared' : status === 'skipped' ? ' skipped' : ' pending'}
+                          {docCatLabel(cat)}
+                          {' ' + (status === 'shared' ? t('bookings.suffixShared') : status === 'skipped' ? t('bookings.suffixSkipped') : t('bookings.suffixPending'))}
                         </>
                       );
                       const sharedStyle = {
@@ -919,7 +949,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                             type="button"
                             onClick={() => setPdfViewerUrl(getFullUrl(entry.documentUrl))}
                             style={{ ...sharedStyle, border: 'none', cursor: 'pointer', fontSize: '11px' }}
-                            title={`Open ${entry.documentTitle || cat.label}`}
+                            title={t('chat.openDocument')}
                           >
                             {pillContent}
                           </button>
@@ -942,8 +972,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                     disabled={actionBusy}
                     onClick={async () => {
                       if (actionBusy) return;
-                      const labels = pendingDocCategories.map(c => c.label).join(', ');
-                      if (!window.confirm(`Skip the remaining document stages (${labels}) for this booking?`)) return;
+                      const labels = pendingDocCategories.map(c => docCatLabel(c)).join(', ');
+                      if (!window.confirm(t('bookings.skipDocsStagesConfirm', { list: labels }))) return;
                       setActionBusy(true);
                       try {
                         for (const cat of pendingDocCategories) {
@@ -958,7 +988,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       }
                     }}
                   >
-                    Skip Documents
+                    {t('bookings.skipDocuments')}
                   </button>
                 )}
 
@@ -980,7 +1010,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       disabled={actionBusy}
                       onClick={() => setDepositHistoryDeal(deal)}
                     >
-                      Confirm receipt
+                      {t('bookings.confirmReceipt')}
                     </button>
                   );
                 })()}
@@ -1008,7 +1038,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                         <line x1="12" y1="1" x2="12" y2="23"></line>
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                       </svg>
-                      Update Payment
+                      {t('bookings.updatePayment')}
                     </button>
                   );
                 })()}
@@ -1025,7 +1055,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    Message
+                    {t('search.message')}
                   </button>
                 )}
               </div>
@@ -1047,7 +1077,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   className="btn btn-outline btn-decline"
                   onClick={() => setDealToDecline(deal.id)}
                 >
-                  Decline
+                  {t('search.decline')}
                 </button>
                 <button
                   className="btn btn-outline"
@@ -1059,7 +1089,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                     }
                   }}
                 >
-                  Review
+                  {t('chat.review')}
                 </button>
                 <button
                   className="btn btn-primary btn-accept"
@@ -1094,7 +1124,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
-                Message
+                {t('search.message')}
               </button>
             )}
 
@@ -1107,7 +1137,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   setDealToDelete(deal.id);
                 }}
               >
-                Delete Offer
+                {t('bookings.deleteOffer')}
               </button>
             )}
           </>
@@ -1185,7 +1215,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
           <div className="bookings-error">
             <p>{error}</p>
             <button className="btn btn-outline" onClick={fetchDeals}>
-              Try Again
+              {t('common.retry')}
             </button>
           </div>
         ) : filteredDeals.length === 0 ? (
@@ -1250,7 +1280,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 className="btn btn-outline"
                 onClick={() => setDealToDelete(null)}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="btn btn-danger"
@@ -1279,7 +1309,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
               <textarea
                 value={declineReason}
                 onChange={(e) => setDeclineReason(e.target.value)}
-                placeholder="e.g., Date conflict, budget doesn't work, etc."
+                placeholder={t('bookings.declineExamplePlaceholder')}
                 className="decline-reason-textarea"
                 rows="4"
                 autoFocus
@@ -1293,7 +1323,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   setDeclineReason('');
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="btn btn-danger"
@@ -1380,7 +1410,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   setSelectedDealForWorkflow(null);
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -1447,12 +1477,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       onClick={() => setPaymentProofFile(null)}
                       style={{ padding: '4px 10px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', color: '#fff', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}
                     >
-                      Remove
+                      {t('viewProfile.remove')}
                     </button>
                   </div>
                 ) : (
                   <label style={{ display: 'inline-block', padding: '7px 14px', backgroundColor: '#FF3366', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
-                    Choose file
+                    {t('bookings.chooseFile')}
                     <input
                       type="file"
                       accept="application/pdf,image/*"
@@ -1512,7 +1542,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       }
                       const totalFee = Number(selectedDealForWorkflow.currentFee) || 0;
                       if (totalFee && amount > totalFee) {
-                        alert(`Deposit cannot exceed the total fee (${totalFee})`);
+                        alert(t('bookings.depositExceedsFee', { fee: totalFee }));
                         return;
                       }
                       const proofErr = validatePaymentProof(paymentProofFile);
@@ -1544,7 +1574,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                       <line x1="12" y1="1" x2="12" y2="23"></line>
                       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                     </svg>
-                    Mark Deposit Paid
+                    {t('bookings.markDepositPaid')}
                   </button>
                 </div>
                 <button
@@ -1580,7 +1610,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 17l6 6 13-13"></path>
                   </svg>
-                  Mark Full Payment Complete
+                  {t('bookings.markFullPaymentComplete')}
                 </button>
               </div>
             </div>
@@ -1592,7 +1622,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   setSelectedDealForWorkflow(null);
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -1742,7 +1772,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, alignItems: 'stretch' }}>
               {proof?.storagePath && (
                 <button type="button" onClick={onViewProof} className="btn btn-outline btn-card-action" style={{ whiteSpace: 'nowrap' }}>
-                  View proof
+                  {t('bookings.viewProof')}
                 </button>
               )}
               {canConfirm && (
@@ -1753,7 +1783,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   onClick={onConfirm}
                   style={{ whiteSpace: 'nowrap' }}
                 >
-                  Confirm receipt
+                  {t('bookings.confirmReceipt')}
                 </button>
               )}
             </div>
@@ -1822,7 +1852,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 </div>
               </div>
               <div className="delete-modal-actions">
-                <button className="btn btn-outline" onClick={() => setDepositHistoryDeal(null)}>Close</button>
+                <button className="btn btn-outline" onClick={() => setDepositHistoryDeal(null)}>{t('common.close')}</button>
               </div>
             </div>
           </div>
@@ -1906,7 +1936,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 Are you sure you want to withdraw the contract for <strong>{dealToWithdraw.eventName || 'this event'}</strong>?
               </p>
               <p style={{ fontSize: '13px', color: '#999', marginBottom: 0 }}>
-                After withdrawal, you can send a corrected contract. The deal status will revert to ACCEPTED.
+                {t('bookings.withdrawNotice')}
               </p>
             </div>
             <div className="delete-modal-actions">
@@ -1917,7 +1947,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   setDealToWithdraw(null);
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="btn btn-primary"
@@ -1928,7 +1958,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   borderColor: 'rgba(255, 165, 0, 1)'
                 }}
               >
-                Withdraw Contract
+                {t('bookings.withdrawContract')}
               </button>
             </div>
           </div>

@@ -24,10 +24,17 @@ const AddContractModal = ({
   categoryLabel = 'Contract',
   initialTitle = '',
   existingContracts = [],
-  submitLabel = 'Continue to sign', // override to "Add" when used from manage-library screens
-  submittingLabel = 'Preparing…',
+  submitLabel = null, // override to "Add" when used from manage-library screens
+  submittingLabel = null,
 }) => {
   const { t } = useLanguage();
+  const displayLabel = {
+    'Contract': t('chat.contract'),
+    'Press Kit': t('chat.pressKit'),
+    'Technical Rider': t('chat.technicalRider'),
+    'Hospitality Rider': t('chat.hospitalityRider'),
+    'Invoice': t('chat.invoice'),
+  }[categoryLabel] || categoryLabel;
   const { user } = useAppContext();
   const [title, setTitle] = useState(initialTitle);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -72,7 +79,7 @@ const AddContractModal = ({
       return;
     }
     if (selectedFile && !title.trim()) {
-      setError(`Please enter a ${categoryLabel.toLowerCase()} title`);
+      setError(t('docs.enterTitleError', { label: displayLabel.toLowerCase() }));
       return;
     }
 
@@ -103,7 +110,7 @@ const AddContractModal = ({
       setSelectedExistingContract(null);
       onClose();
     } catch (err) {
-      setError(err.message || `Failed to add ${categoryLabel.toLowerCase()}`);
+      setError(err.message || t('docs.addFailed', { label: displayLabel.toLowerCase() }));
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +122,7 @@ const AddContractModal = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>Add {categoryLabel}</h2>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>{t('docs.addCategory', { label: displayLabel })}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -124,7 +131,7 @@ const AddContractModal = ({
             {existingContracts.length > 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '10px', fontSize: '13px', fontWeight: '600', color: '#bbb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  From your library
+                  {t('docs.fromYourLibrary')}
                 </label>
                 <div style={{
                   maxHeight: '220px', overflowY: 'auto',
@@ -179,14 +186,14 @@ const AddContractModal = ({
               {selectedFile && (
                 <div style={{ marginBottom: '12px' }}>
                   <label htmlFor="title" style={{ display: 'block', marginBottom: '6px', fontSize: '13px' }}>
-                    {categoryLabel} title *
+                    {t('docs.categoryTitleRequired', { label: displayLabel })}
                   </label>
                   <input
                     id="title"
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g., Booking Agreement 2026"
+                    placeholder={t('docs.titlePlaceholder')}
                     style={{ width: '100%', padding: '9px 12px', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', color: '#fff', fontSize: '14px' }}
                     disabled={isSubmitting}
                     required
@@ -218,7 +225,7 @@ const AddContractModal = ({
                       onClick={() => { setSelectedFile(null); setTitle(''); }}
                       style={{ marginTop: '10px', padding: '5px 12px', backgroundColor: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '4px', color: '#fff', fontSize: '12px', cursor: 'pointer' }}
                     >
-                      Remove
+                      {t('viewProfile.remove')}
                     </button>
                   </div>
                 ) : (
@@ -230,7 +237,7 @@ const AddContractModal = ({
                     </svg>
                     <p style={{ fontSize: '13px', marginBottom: '8px' }}>{t('docs.dragDrop')}</p>
                     <label style={{ display: 'inline-block', padding: '7px 14px', backgroundColor: '#FF3366', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
-                      Browse Files
+                      {t('docs.browseFiles')}
                       <input type="file" accept="application/pdf" onChange={(e) => e.target.files[0] && handleFileSelect(e.target.files[0])} style={{ display: 'none' }} disabled={isSubmitting} />
                     </label>
                     <p style={{ fontSize: '11px', color: '#666', marginTop: '10px' }}>{t('docs.pdfOnlyMax')}</p>
@@ -240,7 +247,7 @@ const AddContractModal = ({
             </div>
 
             <div style={{ padding: '10px 12px', backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: '6px', fontSize: '11px', color: '#888', lineHeight: '1.5' }}>
-              Uploaded PDFs are stored privately and added to your library for reuse on future bookings.
+              {t('docs.uploadPrivacyNote')}
             </div>
 
             {error && (
@@ -251,10 +258,10 @@ const AddContractModal = ({
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '18px' }}>
               <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }} disabled={isSubmitting}>
-                Cancel
+                {t('common.cancel')}
               </button>
               <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={isSubmitting}>
-                {isSubmitting ? submittingLabel : submitLabel}
+                {isSubmitting ? (submittingLabel || t('docs.preparing')) : (submitLabel || t('docs.continueToSign'))}
               </button>
             </div>
           </form>

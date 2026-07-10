@@ -87,7 +87,7 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
             className="max-w-[190px] md:max-w-[210px] h-auto mb-3 mx-auto block mix-blend-screen"
           />
           <p className="text-white/70 text-[10px] md:text-[11px] tracking-[0.25em] font-normal mt-2 whitespace-nowrap uppercase font-tech">
-            Where Music Meets
+            {t('auth.tagline')}
           </p>
         </motion.div>
 

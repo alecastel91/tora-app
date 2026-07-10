@@ -323,7 +323,7 @@ const EditProfileScreen = ({ onClose }) => {
             </div>
             <p className="mt-2 mb-0 text-[10px] text-white/30">
               {selectedGenres.size > 0
-                ? `${selectedGenres.size} selected`
+                ? t('search.nSelected', { n: selectedGenres.size })
                 : t('editProfile.tapGenres')}
             </p>
           </div>
@@ -347,7 +347,7 @@ const EditProfileScreen = ({ onClose }) => {
               marginTop: '4px',
               lineHeight: '1.4'
             }}>
-              If using a share link, open it in your browser and copy the full URL
+              {t('editProfile.shareLinkHint')}
             </p>
           </div>
 
@@ -366,7 +366,7 @@ const EditProfileScreen = ({ onClose }) => {
                 marginTop: '4px',
                 lineHeight: '1.4'
               }}>
-                If using a share link, open it in your browser and copy the full URL
+                {t('editProfile.shareLinkHint')}
               </p>
             </div>
           )}

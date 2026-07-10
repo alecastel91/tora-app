@@ -15,7 +15,7 @@ import SearchAgentsModal from '../common/SearchAgentsModal';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { downscaleImageToDataUrl } from '../../utils/image';
-import { getAvatarClass } from '../../utils/roles';
+import { getAvatarClass, roleLabel } from '../../utils/roles';
 import VerifiedBadge from '../common/VerifiedBadge';
 import VerificationModal from '../common/VerificationModal';
 
@@ -40,7 +40,9 @@ const InstagramGlyph = () => (
 );
 
 // Glassmorphic action tile (Edit Profile / Manage / Find Agent / Add Profile).
-const ActionCard = ({ icon, label, onClick, dot }) => (
+const ActionCard = ({ icon, label, onClick, dot }) => {
+  const { t } = useLanguage();
+  return (
   <button
     type="button"
     onClick={onClick}
@@ -51,12 +53,13 @@ const ActionCard = ({ icon, label, onClick, dot }) => (
     <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white font-tech leading-tight">{label}</span>
     {dot && (
       <span
-        aria-label="Actions required"
+        aria-label={t('manage.actionsRequired')}
         className="absolute top-3 right-3 w-2 h-2 rounded-full bg-infrared shadow-[0_0_6px_rgba(255,51,102,0.7)]"
       />
     )}
   </button>
-);
+  );
+};
 
 // 1234 -> "1.2K" for the stats row.
 const fmtStat = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K` : `${n ?? 0}`);
@@ -443,7 +446,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         </p>
         <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-[10px] font-semibold uppercase
                          tracking-[0.2em] font-tech ${roleBadgeClasses[user?.role] || 'text-white/70 border-white/20'}`}>
-          {user?.role || 'ARTIST'}
+          {roleLabel(user?.role || 'ARTIST', t)}
         </div>
 
         {user?.genres && user.genres.length > 0 && (
@@ -525,7 +528,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               onClick={() => onOpenPremium && onOpenPremium()}
               className="shrink-0 px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider whitespace-nowrap hover:border-infrared/50 hover:text-infrared transition-colors"
             >
-              Upgrade
+              {t('search.upgrade')}
             </button>
           </div>
         );
@@ -624,7 +627,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 >
                   Manage
                   {artistActionsMap[artist.profileId || artist.id] && (
-                    <span aria-label="Actions required" className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+                    <span aria-label={t('manage.actionsRequired')} className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
                   )}
                 </button>
               </div>
@@ -648,7 +651,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(resolvedSoundCloudUrl)}&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`}
                 frameBorder="0"
                 className="w-full h-[320px] rounded-lg"
-                title="SoundCloud Mix"
+                title={t('manageArtist.soundcloudMix')}
               />
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
@@ -670,7 +673,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 allowTransparency="true"
                 allow="encrypted-media"
                 className="w-full h-[380px] rounded-lg"
-                title="Spotify Artist Profile"
+                title={t('manageArtist.spotifyArtistProfile')}
               />
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.02] p-5 text-center">
@@ -689,7 +692,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               onClick={() => setShowRAEvents(true)}
               className="w-full px-4 py-3 rounded-lg bg-infrared/10 border border-infrared/30 text-infrared text-sm font-semibold uppercase tracking-wider hover:bg-infrared/15 transition-colors mb-3"
             >
-              View Upcoming Events
+              {t('profile.viewUpcomingEvents')}
             </button>
             <a
               href={user.residentAdvisor.startsWith('http')
@@ -793,7 +796,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 )}
                 <div className="profile-info">
                   <h4>{profile.name}</h4>
-                  <span className="profile-role">{profile.role}</span>
+                  <span className="profile-role">{roleLabel(profile.role, t)}</span>
                   <span className="profile-location">{profile.location}</span>
                 </div>
               </div>
@@ -821,7 +824,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 )}
                 <div className="profile-info">
                   <h4>{profile.name}</h4>
-                  <span className="profile-role">{profile.role}</span>
+                  <span className="profile-role">{roleLabel(profile.role, t)}</span>
                   <span className="profile-location">{profile.location}</span>
                 </div>
               </div>
@@ -849,7 +852,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                 )}
                 <div className="profile-info">
                   <h4>{profile.name}</h4>
-                  <span className="profile-role">{profile.role}</span>
+                  <span className="profile-role">{roleLabel(profile.role, t)}</span>
                   <span className="profile-location">{profile.location}</span>
                 </div>
               </div>
@@ -900,7 +903,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                   <div className="flex-1 min-w-0 flex flex-col items-start gap-1.5">
                     <h4 className="text-[15px] font-medium text-white truncate leading-none m-0">{profile.name}</h4>
                     <span className={`role-badge ${profile.role.toLowerCase()}`}>
-                      {profile.role}
+                      {roleLabel(profile.role, t)}
                     </span>
                     <p className="text-xs text-white/50 truncate leading-none m-0">{profile.location}</p>
                   </div>

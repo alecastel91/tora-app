@@ -25,7 +25,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
     const summary = summarizeDealPayment(deal);
 
     const steps = [
-      { key: 'offerAccepted', label: 'Offer Accepted', completed: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED', timestamp: deal.updatedAt },
+      { key: 'offerAccepted', label: t('bookings.stepOfferAccepted'), completed: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED', timestamp: deal.updatedAt },
       { key: 'contractSigned', label: t('bookings.stepContractSigned'), completed: deal.contract?.status === 'FULLY_SIGNED', timestamp: deal.contract?.fullySignedAt },
       { key: 'documentsShared', label: t('bookings.stepDocumentsShared'), completed: allDocsResolved, timestamp: allDocsResolved ? latestDocTs : null },
       { key: 'paymentReceived', label: t('bookings.stepPaymentReceived'), completed: summary.isFullyConfirmed, timestamp: deal.payment?.fullPaymentProof?.confirmedAt || (summary.isFullyConfirmed ? deal.payment?.fullPaymentDate : null) },
@@ -130,7 +130,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
               <span><strong style={{ color: 'rgba(80,200,120,0.85)' }}>{pendingConfirmation} {currency}</strong> awaiting confirmation</span>
             )}
             {remaining > 0 && (
-              <span>· Remaining: <strong style={{ color: '#fff' }}>{remaining} {currency}</strong></span>
+              <span>· {t('bookings.remainingLabel')} <strong style={{ color: '#fff' }}>{remaining} {currency}</strong></span>
             )}
             {onViewPaymentDetails && (
               <button
@@ -149,7 +149,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
                   textUnderlineOffset: '2px',
                 }}
               >
-                view details
+                {t('bookings.viewDetailsLink')}
               </button>
             )}
           </div>
@@ -160,11 +160,11 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
       <div className="text-center mt-3.5">
         {completedSteps === steps.length ? (
           <span className="text-[9px] font-semibold uppercase tracking-[0.2em] font-tech text-role-agent">
-            All steps completed
+            {t('bookings.allStepsCompleted')}
           </span>
         ) : (
           <span className="text-[9px] font-medium uppercase tracking-[0.2em] font-tech text-white/25">
-            {completedSteps} of {steps.length} completed
+            {t('bookings.stepsCompleted', { n: completedSteps, m: steps.length })}
           </span>
         )}
       </div>

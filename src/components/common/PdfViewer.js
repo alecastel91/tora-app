@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -9,6 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 const PdfViewer = ({ url, onLoaded }) => {
+  const { t } = useLanguage();
   const [numPages, setNumPages] = useState(null);
   const [scale, setScale] = useState(1);
   const [error, setError] = useState(null);
@@ -59,7 +61,7 @@ const PdfViewer = ({ url, onLoaded }) => {
           type="button"
           onClick={() => setScale(s => Math.max(0.5, s - 0.25))}
           style={{ background: 'transparent', color: 'white', border: '1px solid #444', borderRadius: '14px', width: '32px', height: '28px', cursor: 'pointer' }}
-          aria-label="Zoom out"
+          aria-label={t('common.zoomOut')}
         >
           −
         </button>
@@ -70,7 +72,7 @@ const PdfViewer = ({ url, onLoaded }) => {
           type="button"
           onClick={() => setScale(s => Math.min(3, s + 0.25))}
           style={{ background: 'transparent', color: 'white', border: '1px solid #444', borderRadius: '14px', width: '32px', height: '28px', cursor: 'pointer' }}
-          aria-label="Zoom in"
+          aria-label={t('common.zoomIn')}
         >
           +
         </button>
@@ -78,7 +80,7 @@ const PdfViewer = ({ url, onLoaded }) => {
 
       {error ? (
         <div style={{ color: '#ff6b6b', padding: '24px', textAlign: 'center' }}>
-          Failed to load PDF.
+          {t('docs.pdfLoadFailed')}
         </div>
       ) : (
         <Document

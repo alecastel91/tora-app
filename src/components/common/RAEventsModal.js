@@ -71,7 +71,7 @@ const RAEventsModal = ({ isOpen, onClose, artistName }) => {
             color: '#fff',
             marginBottom: '12px'
           }}>
-            Coming Soon
+            {t('ra.comingSoon')}
           </h3>
           <p style={{
             fontSize: '14px',
@@ -79,7 +79,7 @@ const RAEventsModal = ({ isOpen, onClose, artistName }) => {
             maxWidth: '400px',
             margin: '0 auto'
           }}>
-            This feature is currently in development.
+            {t('ra.featureInDevelopment')}
           </p>
         </div>
 

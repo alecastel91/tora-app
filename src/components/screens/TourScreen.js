@@ -12,6 +12,7 @@ import { citiesByCountry, countriesByZone, genresList } from '../../data/profile
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
   const { t } = useLanguage();
+  const tourStatusLabel = (st) => ({ ACTIVE: t('tour.statusActive'), COMPLETED: t('tour.statusCompleted'), CANCELLED: t('tour.statusCancelled') }[st] || st);
 
   // Helper function to check if user has premium access (per-profile subscription)
   const isPremiumUser = () => {
@@ -1291,7 +1292,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       </div>
                       <span className={`shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full border text-[9px]
                                         font-semibold uppercase tracking-[0.15em] font-tech ${statusPill}`}>
-                        {tour.status}
+                        {tourStatusLabel(tour.status)}
                       </span>
                     </div>
 
@@ -1571,7 +1572,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         </div>
                       </div>
                       <span className={`tour-status-badge status-${tour.status.toLowerCase()}`}>
-                        {tour.status}
+                        {tourStatusLabel(tour.status)}
                       </span>
                     </div>
                     <div className="tour-dates-section">

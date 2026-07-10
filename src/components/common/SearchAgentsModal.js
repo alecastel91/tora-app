@@ -3,8 +3,10 @@ import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import ViewProfileScreen from '../screens/ViewProfileScreen';
 import LoadingGlobe from './LoadingGlobe';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat }) => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -275,7 +277,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     } catch (error) {
       console.error('Error sending connection request:', error);
-      alert('Failed to send connection request');
+      alert(t('findAgent.failedToSendConnection'));
     } finally {
       setSending(false);
     }
@@ -298,7 +300,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     // Show confirmation dialog
     const confirmed = window.confirm(
-      `Are you sure you want to cancel the representation with ${agent.name}?\n\nThis will:\n• Remove you from their represented artists\n• Remove their agent badge from your profile\n• Keep your connection intact`
+      t('findAgent.cancelRepresentationConfirm', { name: agent.name })
     );
 
     if (!confirmed) return;
@@ -329,11 +331,11 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       await fetchSentRequests();
       await fetchAgents(searchQuery);
 
-      alert('Representation cancelled successfully');
+      alert(t('findAgent.representationCancelled'));
 
     } catch (error) {
       console.error('Error cancelling representation:', error);
-      alert('Failed to cancel representation. Please try again.');
+      alert(t('findAgent.failedToCancelRepresentation'));
     } finally {
       setSending(false);
     }
@@ -405,7 +407,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     } catch (error) {
       console.error('Error accepting request:', error);
-      alert('Failed to accept request');
+      alert(t('findAgent.failedToAccept'));
     } finally {
       setSending(false);
     }
@@ -445,7 +447,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
     } catch (error) {
       console.error('Error declining representation request:', error);
-      alert('Failed to decline representation request');
+      alert(t('findAgent.failedToDecline'));
     } finally {
       setSending(false);
     }
@@ -459,7 +461,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
           <button className="back-btn" onClick={onClose}>
             <CloseIcon />
           </button>
-          <h1>Find Agent</h1>
+          <h1>{t('findAgent.title')}</h1>
         </div>
 
         <div className="search-agents-content">
@@ -480,7 +482,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
-                {representingAgents.length === 1 ? 'Current Agent' : 'Current Agents'}
+                {representingAgents.length === 1 ? t('findAgent.currentAgent') : t('findAgent.currentAgents')}
               </div>
               {representingAgents.map((agent, index) => (
                 <div key={agent.agentId?.id || agent.agentId || agent.profileId || index} className="artist-item" style={{ marginBottom: index < representingAgents.length - 1 ? '8px' : '0', gap: '10px' }}>
@@ -515,7 +517,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                       }
                     }}
                   >
-                    Remove
+                    {t('findAgent.remove')}
                   </button>
                 </div>
               ))}
@@ -526,19 +528,19 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
           <form onSubmit={handleSearch} className="search-form">
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder={t('findAgent.searchPlaceholder')}
               value={searchQuery}
               onChange={handleSearchInputChange}
               className="search-input"
             />
             <button type="submit" className="btn btn-primary">
-              Search
+              {t('findAgent.search')}
             </button>
           </form>
 
           {/* Loading State */}
           {loading && (
-            <LoadingGlobe label="Searching agents..." />
+            <LoadingGlobe label={t('findAgent.searchingAgents')} />
           )}
 
           {/* Prompt to search */}
@@ -549,8 +551,8 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                   <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
               </span>
-              <p className="text-sm text-white/50 m-0">Search for an agent by name</p>
-              <p className="text-xs text-white/30 mt-1.5 m-0">Agents can manage your bookings and represent you</p>
+              <p className="text-sm text-white/50 m-0">{t('findAgent.promptTitle')}</p>
+              <p className="text-xs text-white/30 mt-1.5 m-0">{t('findAgent.promptSubtitle')}</p>
             </div>
           )}
 
@@ -559,20 +561,20 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
             <div className="artists-list">
               {agents.length === 0 ? (
                 <div className="empty-state">
-                  <p>No agents found</p>
+                  <p>{t('findAgent.noAgentsFound')}</p>
                   {searchQuery && (
-                    <p className="empty-state-hint">Try a different search term</p>
+                    <p className="empty-state-hint">{t('findAgent.tryDifferentSearch')}</p>
                   )}
                 </div>
               ) : (
                 <>
                   {/* Info banner about connection requirement */}
                   <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 mb-4 text-[11px] leading-relaxed text-white/45">
-                    To send a representation request, you must be connected with the agent first.
+                    {t('findAgent.connectionRequirement')}
                   </div>
 
                   <div className="results-header">
-                    <p>{agents.length} agent{agents.length !== 1 ? 's' : ''} found</p>
+                    <p>{agents.length === 1 ? t('findAgent.agentFound', { count: agents.length }) : t('findAgent.agentsFound', { count: agents.length })}</p>
                   </div>
                   {/* Filter out representing agents from search results (shown at top) */}
                   {(() => {
@@ -593,30 +595,30 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                     const hasReceivedRequest = receivedRequestIds.has(agentId);
 
                     // Simplified button logic: always show Send Request (greyed out if not connected)
-                    let buttonText = 'Send Request';
+                    let buttonText = t('findAgent.sendRequest');
                     let buttonClass = 'btn-primary';
                     let buttonDisabled = false;
                     let buttonAction = () => handleRequestClick(agent);
 
                     if (hasAccepted) {
-                      buttonText = 'Representing';
+                      buttonText = t('findAgent.representing');
                       buttonClass = 'btn-success';
                       buttonDisabled = true;
                       buttonAction = null;
                     } else if (wasDeclined) {
-                      buttonText = 'Declined';
+                      buttonText = t('findAgent.declined');
                       buttonClass = 'btn-secondary';
                       buttonDisabled = true;
                       buttonAction = null;
                     } else if (hasRequested) {
                       // Already sent representation request
-                      buttonText = 'Pending';
+                      buttonText = t('findAgent.pending');
                       buttonClass = 'btn-secondary';
                       buttonDisabled = true;
                       buttonAction = null;
                     } else if (!isConnected) {
                       // Not connected - grey out the button
-                      buttonText = 'Send Request';
+                      buttonText = t('findAgent.sendRequest');
                       buttonClass = 'btn-disabled';
                       buttonDisabled = true;
                       buttonAction = null;
@@ -652,7 +654,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                                 onOpenChat(agent);
                               }}
                             >
-                              Message
+                              {t('findAgent.message')}
                             </button>
                           )}
                           <button
@@ -691,7 +693,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
         <div className="modal-overlay" onClick={handleCancelConnection}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Connect with {selectedAgent.name}</h2>
+              <h2>{t('findAgent.connectWith', { name: selectedAgent.name })}</h2>
               <button className="close-btn" onClick={handleCancelConnection}>
                 <CloseIcon />
               </button>
@@ -699,15 +701,15 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
             <div className="modal-body">
               <p className="modal-description">
-                Send a connection request to <strong>{selectedAgent.name}</strong>
+                {t('findAgent.sendConnectionRequestTo')} <strong>{selectedAgent.name}</strong>
               </p>
 
               <div className="form-group">
-                <label>Message (optional)</label>
+                <label>{t('findAgent.messageOptional')}</label>
                 <textarea
                   value={connectionMessage}
                   onChange={(e) => setConnectionMessage(e.target.value)}
-                  placeholder="Say hi and introduce yourself... (optional)"
+                  placeholder={t('findAgent.connectionPlaceholder')}
                   rows={5}
                   className="form-control"
                   maxLength={500}
@@ -722,14 +724,14 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                 onClick={handleCancelConnection}
                 disabled={sending}
               >
-                Cancel
+                {t('findAgent.cancel')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleSendConnection}
                 disabled={sending}
               >
-                {sending ? 'Sending...' : 'Connect'}
+                {sending ? t('findAgent.sending') : t('findAgent.connect')}
               </button>
             </div>
           </div>
@@ -741,7 +743,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
         <div className="modal-overlay" onClick={handleCancelMessage}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Send Representation Request</h2>
+              <h2>{t('findAgent.sendRepresentationRequest')}</h2>
               <button className="close-btn" onClick={handleCancelMessage}>
                 <CloseIcon />
               </button>
@@ -749,15 +751,15 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
             <div className="modal-body">
               <p className="modal-description">
-                Sending representation request to <strong>{selectedAgent.name}</strong>
+                {t('findAgent.sendingRepRequestTo')} <strong>{selectedAgent.name}</strong>
               </p>
 
               <div className="form-group">
-                <label>Message (optional)</label>
+                <label>{t('findAgent.messageOptional')}</label>
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Add a personal message to introduce yourself... (optional)"
+                  placeholder={t('findAgent.messagePlaceholder')}
                   rows={5}
                   className="form-control"
                   maxLength={500}
@@ -772,14 +774,14 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                 onClick={handleCancelMessage}
                 disabled={sending}
               >
-                Cancel
+                {t('findAgent.cancel')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleSendRequest}
                 disabled={sending}
               >
-                {sending ? 'Sending...' : 'Send Request'}
+                {sending ? t('findAgent.sending') : t('findAgent.sendRequest')}
               </button>
             </div>
           </div>
@@ -796,7 +798,9 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                {reviewingRequest.type === 'CONNECTION_REQUEST' ? 'Connection Request' : 'Representation Request'} from {selectedAgent.name}
+                {reviewingRequest.type === 'CONNECTION_REQUEST'
+                  ? t('findAgent.connectionRequestFrom', { name: selectedAgent.name })
+                  : t('findAgent.representationRequestFrom', { name: selectedAgent.name })}
               </h2>
               <button className="close-btn" onClick={() => {
                 setShowReviewModal(false);
@@ -827,15 +831,15 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
               {reviewingRequest.message && reviewingRequest.message.trim() ? (
                 <div className="review-modal-message">
-                  <label>Message:</label>
+                  <label>{t('findAgent.messageLabel')}</label>
                   <div className="message-content">{reviewingRequest.message}</div>
                 </div>
               ) : (
                 <div className="review-modal-message">
                   <p className="system-message-text">
                     {reviewingRequest.type === 'CONNECTION_REQUEST'
-                      ? `${selectedAgent.name} wants to connect`
-                      : `${selectedAgent.name} wants to represent you`}
+                      ? t('findAgent.wantsToConnect', { name: selectedAgent.name })
+                      : t('findAgent.wantsToRepresentYou', { name: selectedAgent.name })}
                   </p>
                 </div>
               )}
@@ -847,14 +851,14 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                 onClick={handleDeclineRepresentation}
                 disabled={sending}
               >
-                {sending ? 'Processing...' : 'Decline'}
+                {sending ? t('findAgent.processing') : t('findAgent.decline')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleAcceptRepresentation}
                 disabled={sending}
               >
-                {sending ? 'Processing...' : 'Accept'}
+                {sending ? t('findAgent.processing') : t('findAgent.accept')}
               </button>
             </div>
           </div>
