@@ -68,7 +68,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Generate month/year options starting from current month for next 12 months
   const generateMonthOptions = () => {
-    const options = [{ value: 'all', label: 'All Months' }];
+    const options = [{ value: 'all', label: t('tour.allMonths') }];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
@@ -384,26 +384,26 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             <div className="coming-soon-icon">
               <StarIcon />
             </div>
-            <h2>Unlock Calendar Matching</h2>
-            <p>Connect with professionals based on matching travel schedules</p>
+            <h2>{t('tour.unlockCalendarMatching')}</h2>
+            <p>{t('tour.unlockCalendarMatchingDesc')}</p>
             <div className="feature-preview">
-              <h4>Premium features:</h4>
+              <h4>{t('tour.premiumFeatures')}</h4>
               <ul className="feature-list">
                 <li>
                   <span className="feature-icon"><CalendarIcon /></span>
-                  <span>Find profiles with matching availability</span>
+                  <span>{t('tour.featureMatchingAvailability')}</span>
                 </li>
                 <li>
                   <span className="feature-icon"><LocationIcon /></span>
-                  <span>Search globally, not just locally</span>
+                  <span>{t('tour.featureSearchGlobally')}</span>
                 </li>
                 <li>
                   <span className="feature-icon"><TargetIcon /></span>
-                  <span>See when artists are touring your city</span>
+                  <span>{t('tour.featureArtistsTouring')}</span>
                 </li>
                 <li>
                   <span className="feature-icon"><EyeIcon /></span>
-                  <span>Control your calendar visibility</span>
+                  <span>{t('tour.featureCalendarVisibility')}</span>
                 </li>
               </ul>
             </div>
@@ -418,7 +418,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               }}
               onClick={() => onOpenPremium && onOpenPremium()}
             >
-              Upgrade to Premium
+              {t('tour.upgradeToPremium')}
             </button>
           </div>
         </div>
@@ -429,29 +429,29 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       <div className="tour-kickstart-content">
         <div className="coming-soon-placeholder">
           <p className="text-xs text-white/45 leading-relaxed max-w-[300px] mx-auto mt-0 mb-6">
-            Find professionals with matching travel schedules, availability, and music genres
+            {t('tour.matchesIntro')}
           </p>
 
           <div className="feature-preview">
             {/* Filters Section */}
             <div className="matches-filters">
               <div className="filter-group">
-                <label className="filter-label">Role</label>
+                <label className="filter-label">{t('editProfile.role')}</label>
                 <select
                   className="filter-select"
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
                 >
-                  <option value="all">All Roles</option>
-                  <option value="VENUE">Venues</option>
-                  <option value="PROMOTER">Promoters</option>
-                  <option value="AGENT">Agents</option>
-                  <option value="ARTIST">Artists</option>
+                  <option value="all">{t('tour.allRoles')}</option>
+                  <option value="VENUE">{t('tour.venues')}</option>
+                  <option value="PROMOTER">{t('tour.promoters')}</option>
+                  <option value="AGENT">{t('tour.agents')}</option>
+                  <option value="ARTIST">{t('tour.artists')}</option>
                 </select>
               </div>
 
               <div className="filter-group">
-                <label className="filter-label">Period</label>
+                <label className="filter-label">{t('tour.period')}</label>
                 <select
                   className="filter-select"
                   value={monthFilter}
@@ -473,7 +473,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     setMonthFilter('all');
                   }}
                 >
-                  Clear Filters
+                  {t('search.clearFilters')}
                 </button>
               )}
             </div>
@@ -481,7 +481,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             {matches.length > 0 ? (
               <div className="matches-results">
                 <p className="matches-count">
-                  {matches.length} {matches.length === 1 ? 'match' : 'matches'} found
+                  {matches.length === 1 ? t('tour.matchFound', { n: matches.length }) : t('tour.matchesFound', { n: matches.length })}
                 </p>
 
                 {matches.map((match, index) => {
@@ -539,7 +539,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           className="btn btn-message btn-match-full"
                           onClick={() => handleMessage(match.profile)}
                         >
-                          Message
+                          {t('search.message')}
                         </button>
                       ) : (
                         <button
@@ -547,7 +547,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           onClick={() => handleConnect(match.profile)}
                           disabled={isRequested}
                         >
-                          {isRequested ? 'Requested' : 'Connect'}
+                          {isRequested ? t('search.requested') : t('search.connect')}
                         </button>
                       )}
                     </div>
@@ -556,25 +556,25 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               </div>
             ) : (
               <div className="no-matches-simple">
-                <p>No profiles match your travel schedule or events.</p>
+                <p>{t('tour.noMatchesMessage')}</p>
                 <div className="no-matches-tips">
-                  <h4>Tips to get more matches</h4>
+                  <h4>{t('tour.tipsTitle')}</h4>
                   <ul className="feature-list">
                     <li>
                       <span className="feature-icon"><CalendarIcon /></span>
-                      <span>Add travel dates to your calendar</span>
+                      <span>{t('tour.tipAddTravelDates')}</span>
                     </li>
                     <li>
                       <span className="feature-icon"><SlidersIcon /></span>
-                      <span>Add all relevant music genres to your profile</span>
+                      <span>{t('tour.tipAddGenres')}</span>
                     </li>
                     <li>
                       <span className="feature-icon"><EyeIcon /></span>
-                      <span>Make sure your calendar is visible</span>
+                      <span>{t('tour.tipCalendarVisible')}</span>
                     </li>
                     <li>
                       <span className="feature-icon"><LocationIcon /></span>
-                      <span>Check if there are profiles in your destinations</span>
+                      <span>{t('tour.tipCheckDestinations')}</span>
                     </li>
                   </ul>
                 </div>
@@ -593,7 +593,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (tourBusy) return;
     // Validation
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
-      alert('Please fill in all required fields');
+      alert(t('tour.fillRequiredFields'));
       return;
     }
 
@@ -601,7 +601,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const startDate = new Date(tourForm.startDate);
     const endDate = new Date(tourForm.endDate);
     if (endDate <= startDate) {
-      alert('End date must be after start date');
+      alert(t('tour.endDateAfterStart'));
       return;
     }
 
@@ -646,11 +646,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         });
         setShowCreateTourModal(false);
 
-        alert('Tour created successfully!');
+        alert(t('tour.tourCreated'));
       }
     } catch (error) {
       console.error('Error creating tour:', error);
-      alert(error.message || 'Failed to create tour. Please try again.');
+      alert(error.message || t('tour.createTourFailed'));
     } finally {
       setTourBusy(false);
     }
@@ -686,7 +686,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (tourBusy) return;
     // Validation
     if (!tourForm.zone || !tourForm.startDate || !tourForm.endDate || !tourForm.minRevenue) {
-      alert('Please fill in all required fields');
+      alert(t('tour.fillRequiredFields'));
       return;
     }
 
@@ -694,7 +694,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const startDate = new Date(tourForm.startDate);
     const endDate = new Date(tourForm.endDate);
     if (endDate <= startDate) {
-      alert('End date must be after start date');
+      alert(t('tour.endDateAfterStart'));
       return;
     }
 
@@ -740,10 +740,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       });
       setSelectedTour(null);
 
-      alert('Tour updated successfully!');
+      alert(t('tour.tourUpdated'));
     } catch (error) {
       console.error('Error updating tour:', error);
-      alert('Failed to update tour. Please try again.');
+      alert(t('tour.updateTourFailed'));
     } finally {
       setTourBusy(false);
     }
@@ -752,7 +752,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // Handle Delete Tour
   const handleDeleteTour = async (tour) => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete this ${tour.country || tour.zone} tour?\n\nThis action cannot be undone.`
+      t('tour.deleteTourConfirm', { location: tour.country || tour.zone })
     );
 
     if (!confirmed) return;
@@ -773,10 +773,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       // Remove tour from myTours state
       setMyTours(prevTours => prevTours.filter(t => t.id !== tour.id));
 
-      alert('Tour deleted successfully!');
+      alert(t('tour.tourDeleted'));
     } catch (error) {
       console.error('Error deleting tour:', error);
-      alert('Failed to delete tour. Please try again.');
+      alert(t('tour.deleteTourFailed'));
     }
   };
 
@@ -792,7 +792,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       setTourGigs(response.deals || []);
     } catch (error) {
       console.error('Error fetching tour gigs:', error);
-      alert('Failed to load tour gigs. Please try again.');
+      alert(t('tour.loadGigsFailed'));
     } finally {
       setLoadingTourGigs(false);
     }
@@ -809,7 +809,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       const myProposal = response.proposals?.find(p => p.id === tour.myProposal.id);
 
       if (!myProposal) {
-        alert('Proposal not found');
+        alert(t('tour.proposalNotFound'));
         return;
       }
 
@@ -818,7 +818,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       setShowMyProposalModal(true);
     } catch (error) {
       console.error('Error fetching proposal:', error);
-      alert('Failed to load proposal details');
+      alert(t('tour.loadProposalFailed'));
     }
   };
 
@@ -830,36 +830,36 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       <div className="create-tour-modal-overlay" onClick={() => setShowCreateTourModal(false)}>
         <div className="modal-content create-tour-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
-            <h2>Create Tour</h2>
+            <h2>{t('tour.createTour')}</h2>
             <button className="modal-close" onClick={() => setShowCreateTourModal(false)}>×</button>
           </div>
           <div className="modal-body">
             <div className="form-group">
-              <label>Zone *</label>
+              <label>{t('calendar.zone')} *</label>
               <select
                 value={tourForm.zone}
                 onChange={(e) => setTourForm({ ...tourForm, zone: e.target.value, country: '' })}
                 className="form-input"
               >
-                <option value="">Select Zone</option>
+                <option value="">{t('tour.selectZone')}</option>
                 <option value="Europe">Europe</option>
                 <option value="Asia">Asia</option>
                 <option value="Americas">Americas</option>
                 <option value="Africa">Africa</option>
                 <option value="Oceania">Oceania</option>
               </select>
-              <small className="form-hint">Tour area - leave country empty for zone-wide tour</small>
+              <small className="form-hint">{t('tour.zoneHint')}</small>
             </div>
 
             {tourForm.zone && (
               <div className="form-group">
-                <label>Country (Optional)</label>
+                <label>{t('tour.countryOptional')}</label>
                 <select
                   value={tourForm.country}
                   onChange={(e) => setTourForm({ ...tourForm, country: e.target.value })}
                   className="form-input"
                 >
-                  <option value="">Zone-wide tour</option>
+                  <option value="">{t('tour.zoneWideTour')}</option>
                   {(() => {
                     // For Americas, combine North America and Latin America
                     if (tourForm.zone === 'Americas') {
@@ -875,12 +875,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     ));
                   })()}
                 </select>
-                <small className="form-hint">Select a country to make this a country-specific tour</small>
+                <small className="form-hint">{t('tour.countryHint')}</small>
               </div>
             )}
 
             <div className="form-group">
-              <label>Start Date *</label>
+              <label>{t('calendar.startDate')} *</label>
               <input
                 type="date"
                 value={tourForm.startDate}
@@ -889,7 +889,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               />
             </div>
             <div className="form-group">
-              <label>End Date *</label>
+              <label>{t('calendar.endDate')} *</label>
               <input
                 type="date"
                 value={tourForm.endDate}
@@ -899,7 +899,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
 
             <div className="form-group">
-              <label>Minimum Revenue Target *</label>
+              <label>{t('tour.minRevenueTarget')} *</label>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <select
                   value={tourForm.revenueCurrency}
@@ -923,12 +923,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   style={{ flex: 1 }}
                 />
               </div>
-              <small className="form-hint">Minimum total revenue needed to make this tour viable</small>
+              <small className="form-hint">{t('tour.minRevenueHint')}</small>
             </div>
 
 
             <div className="form-group">
-              <label>Fee Expectation Per Show (Optional)</label>
+              <label>{t('tour.feeExpectationPerShow')}</label>
               <div className="fee-input-container">
                 <div className="fee-currency-selector">
                   <select
@@ -953,7 +953,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       type="number"
                       value={tourForm.feeMin}
                       onChange={(e) => setTourForm({ ...tourForm, feeMin: e.target.value })}
-                      placeholder="Min"
+                      placeholder={t('tour.min')}
                       min="0"
                       step={tourForm.feeCurrency === 'JPY' ? '1000' : '50'}
                       className="form-input fee-number-input"
@@ -970,7 +970,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       type="number"
                       value={tourForm.feeMax}
                       onChange={(e) => setTourForm({ ...tourForm, feeMax: e.target.value })}
-                      placeholder="Max"
+                      placeholder={t('tour.max')}
                       min="0"
                       step={tourForm.feeCurrency === 'JPY' ? '1000' : '50'}
                       className="form-input fee-number-input"
@@ -978,15 +978,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   </div>
                 </div>
               </div>
-              <small className="form-hint">Expected fee range per show</small>
+              <small className="form-hint">{t('tour.feeRangeHint')}</small>
             </div>
 
             <div className="form-group">
-              <label>Additional Notes (Optional)</label>
+              <label>{t('tour.additionalNotesOptional')}</label>
               <textarea
                 value={tourForm.additionalNotes}
                 onChange={(e) => setTourForm({ ...tourForm, additionalNotes: e.target.value })}
-                placeholder="Any additional details promoters should know..."
+                placeholder={t('tour.additionalNotesPlaceholder')}
                 className="form-input"
                 rows="3"
               />
@@ -994,10 +994,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowCreateTourModal(false)}>
-                Cancel
+                {t('common.cancel')}
               </button>
               <button className="btn btn-primary" onClick={handleCreateTour} disabled={tourBusy}>
-                {tourBusy ? 'Creating...' : 'Create Tour'}
+                {tourBusy ? t('tour.creating') : t('tour.createTour')}
               </button>
             </div>
           </div>
@@ -1017,36 +1017,36 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       <div className="create-tour-modal-overlay" onClick={() => setShowEditTourModal(false)}>
         <div className="modal-content create-tour-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
-            <h2>Edit Tour</h2>
+            <h2>{t('tour.editTour')}</h2>
             <button className="modal-close" onClick={() => setShowEditTourModal(false)}>×</button>
           </div>
           <div className="modal-body">
             <div className="form-group">
-              <label>Zone *</label>
+              <label>{t('calendar.zone')} *</label>
               <select
                 value={tourForm.zone}
                 onChange={(e) => setTourForm({ ...tourForm, zone: e.target.value })}
                 className="form-input"
               >
-                <option value="">Select Zone</option>
+                <option value="">{t('tour.selectZone')}</option>
                 <option value="Europe">Europe</option>
                 <option value="Asia">Asia</option>
                 <option value="Americas">Americas</option>
                 <option value="Africa">Africa</option>
                 <option value="Oceania">Oceania</option>
               </select>
-              <small className="form-hint">Tour area - leave country empty for zone-wide tour</small>
+              <small className="form-hint">{t('tour.zoneHint')}</small>
             </div>
 
             {tourForm.zone && (
               <div className="form-group">
-                <label>Country (Optional)</label>
+                <label>{t('tour.countryOptional')}</label>
                 <select
                   value={tourForm.country}
                   onChange={(e) => setTourForm({ ...tourForm, country: e.target.value })}
                   className="form-input"
                 >
-                  <option value="">Zone-wide tour</option>
+                  <option value="">{t('tour.zoneWideTour')}</option>
                   {(() => {
                     // For Americas, combine North America and Latin America
                     if (tourForm.zone === 'Americas') {
@@ -1062,12 +1062,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     ));
                   })()}
                 </select>
-                <small className="form-hint">Select a country to make this a country-specific tour</small>
+                <small className="form-hint">{t('tour.countryHint')}</small>
               </div>
             )}
 
             <div className="form-group">
-              <label>Start Date *</label>
+              <label>{t('calendar.startDate')} *</label>
               <input
                 type="date"
                 value={tourForm.startDate}
@@ -1076,7 +1076,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               />
             </div>
             <div className="form-group">
-              <label>End Date *</label>
+              <label>{t('calendar.endDate')} *</label>
               <input
                 type="date"
                 value={tourForm.endDate}
@@ -1086,7 +1086,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
 
             <div className="form-group">
-              <label>Minimum Revenue Target *</label>
+              <label>{t('tour.minRevenueTarget')} *</label>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <select
                   value={tourForm.revenueCurrency}
@@ -1110,12 +1110,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   style={{ flex: 1 }}
                 />
               </div>
-              <small className="form-hint">Minimum total revenue to make tour viable</small>
+              <small className="form-hint">{t('tour.minRevenueHintShort')}</small>
             </div>
 
 
             <div className="form-group">
-              <label>Fee Expectation Range (Optional)</label>
+              <label>{t('tour.feeExpectationRange')}</label>
               <div className="form-row" style={{ gap: '8px', marginBottom: '8px' }}>
                 <div className="form-group" style={{ flex: '0 0 120px', margin: 0 }}>
                   <select
@@ -1135,19 +1135,19 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       type="number"
                       value={tourForm.feeMin}
                       onChange={(e) => setTourForm({ ...tourForm, feeMin: e.target.value })}
-                      placeholder="Min"
+                      placeholder={t('tour.min')}
                       min="0"
                       step={tourForm.feeCurrency === 'JPY' ? '1000' : '50'}
                       className="form-input fee-number-input"
                     />
                   </div>
-                  <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>to</span>
+                  <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>{t('tour.to')}</span>
                   <div style={{ flex: 1 }}>
                     <input
                       type="number"
                       value={tourForm.feeMax}
                       onChange={(e) => setTourForm({ ...tourForm, feeMax: e.target.value })}
-                      placeholder="Max"
+                      placeholder={t('tour.max')}
                       min="0"
                       step={tourForm.feeCurrency === 'JPY' ? '1000' : '50'}
                       className="form-input fee-number-input"
@@ -1155,15 +1155,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   </div>
                 </div>
               </div>
-              <small className="form-hint">Expected fee range per show</small>
+              <small className="form-hint">{t('tour.feeRangeHint')}</small>
             </div>
 
             <div className="form-group">
-              <label>Additional Notes (Optional)</label>
+              <label>{t('tour.additionalNotesOptional')}</label>
               <textarea
                 value={tourForm.additionalNotes}
                 onChange={(e) => setTourForm({ ...tourForm, additionalNotes: e.target.value })}
-                placeholder="Any additional details promoters should know..."
+                placeholder={t('tour.additionalNotesPlaceholder')}
                 className="form-input"
                 rows="3"
               />
@@ -1171,10 +1171,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowEditTourModal(false)}>
-                Cancel
+                {t('common.cancel')}
               </button>
               <button className="btn btn-primary" onClick={handleUpdateTour} disabled={tourBusy}>
-                {tourBusy ? 'Updating...' : 'Update Tour'}
+                {tourBusy ? t('tour.updating') : t('tour.updateTour')}
               </button>
             </div>
           </div>
@@ -1196,26 +1196,26 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             <div className="coming-soon-icon">
               <StarIcon />
             </div>
-            <h2>Unlock Tour Kickstart</h2>
-            <p>Build multi-city tours by connecting with promoters across a region</p>
+            <h2>{t('tour.unlockTourKickstart')}</h2>
+            <p>{t('tour.unlockTourKickstartDesc')}</p>
             <div className="feature-preview">
-              <h4>Premium features:</h4>
+              <h4>{t('tour.premiumFeatures')}</h4>
               <ul className="feature-list">
                 <li>
                   <span className="feature-icon"><LocationIcon /></span>
-                  <span>Set tour goals (zone, dates, minimum gigs)</span>
+                  <span>{t('tour.featureSetTourGoals')}</span>
                 </li>
                 <li>
                   <span className="feature-icon"><HandshakeIcon /></span>
-                  <span>Collaborate with promoters to build viable tours</span>
+                  <span>{t('tour.featureCollaborate')}</span>
                 </li>
                 <li>
                   <span className="feature-icon"><DollarIcon /></span>
-                  <span>Share costs and maximize touring opportunities</span>
+                  <span>{t('tour.featureShareCosts')}</span>
                 </li>
                 <li>
                   <span className="feature-icon"><TargetIcon /></span>
-                  <span>Make regional tours viable for emerging artists</span>
+                  <span>{t('tour.featureRegionalTours')}</span>
                 </li>
               </ul>
             </div>
@@ -1230,7 +1230,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               }}
               onClick={() => onOpenPremium && onOpenPremium()}
             >
-              Upgrade to Premium
+              {t('tour.upgradeToPremium')}
             </button>
           </div>
         </div>
@@ -1247,20 +1247,20 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         <div className="tour-kickstart-content">
           <div className="tour-kickstart-section">
             <div className="section-header">
-              <h3>My Tours</h3>
+              <h3>{t('tour.myTours')}</h3>
               <button className="btn btn-primary btn-small" onClick={() => setShowCreateTourModal(true)}>
-                <span>+ Create Tour</span>
+                <span>+ {t('tour.createTour')}</span>
               </button>
             </div>
 
             {/* Tour cards or empty state */}
             {toursLoading ? (
-              <LoadingGlobe label="Loading tours..." />
+              <LoadingGlobe label={t('tour.loadingTours')} />
             ) : myTours.length === 0 ? (
               <div className="tour-empty-state">
                 <PlaneIcon />
-                <p>You haven't created any tours yet</p>
-                <p className="tour-empty-hint">Create a tour to connect with promoters across a region</p>
+                <p>{t('tour.noToursYet')}</p>
+                <p className="tour-empty-hint">{t('tour.noToursHint')}</p>
               </div>
             ) : (
               <div className="tour-cards-list">
@@ -1280,7 +1280,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     <div className="flex items-start justify-between gap-3 mb-4">
                       <div className="min-w-0">
                         <h4 className="text-[17px] font-semibold text-white font-space-grotesk tracking-[-0.01em] m-0 truncate">
-                          {tour.country || tour.zone} Tour
+                          {t('tour.tourTitle', { location: tour.country || tour.zone })}
                         </h4>
                         <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
                           {new Date(tour.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -1302,7 +1302,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           {tour.confirmedGigs || 0}
                         </p>
                         <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          Gigs confirmed
+                          {t('tour.gigsConfirmed')}
                         </p>
                       </div>
                       <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
@@ -1311,7 +1311,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           <span className="text-xs font-medium text-white/35"> / {Math.round(tour.minRevenue || 0).toLocaleString()} {tour.revenueCurrency || 'EUR'}</span>
                         </p>
                         <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          Revenue target
+                          {t('tour.revenueTarget')}
                         </p>
                       </div>
                     </div>
@@ -1327,17 +1327,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     {/* Actions: primary → neutral → quiet danger */}
                     <div className="flex items-center gap-2 pt-3 border-t border-white/[0.07]">
                       <button className="btn btn-primary btn-small" onClick={() => handleViewTourGigs(tour)}>
-                        View Gigs
+                        {t('tour.viewGigs')}
                       </button>
                       <button className="btn btn-outline btn-small" onClick={() => handleEditTour(tour)}>
-                        Edit
+                        {t('common.edit')}
                       </button>
                       <button
                         className="ml-auto bg-transparent border-none cursor-pointer text-[10px] uppercase tracking-[0.1em]
                                    font-tech text-white/35 hover:text-role-venue transition-colors"
                         onClick={() => handleDeleteTour(tour)}
                       >
-                        Cancel Tour
+                        {t('tour.cancelTour')}
                       </button>
                     </div>
                   </div>
@@ -1364,9 +1364,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         <div className="tour-kickstart-content">
           <div className="tour-kickstart-section">
             <div className="section-header">
-              <h3>Tour Opportunities</h3>
+              <h3>{t('tour.tourOpportunities')}</h3>
             </div>
-            <p className="section-description">Browse tours looking for venues in your region</p>
+            <p className="section-description">{t('tour.tourOpportunitiesDesc')}</p>
 
             {/* Filters */}
             <div className="tour-filters">
@@ -1376,7 +1376,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   onClick={() => setShowZoneDropdown(!showZoneDropdown)}
                   style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
-                  <span>{tourZoneFilter === 'all' ? 'All Zones' : tourZoneFilter}</span>
+                  <span>{tourZoneFilter === 'all' ? t('calendar.allZones') : tourZoneFilter}</span>
                   <span style={{ marginLeft: '8px' }}>▼</span>
                 </button>
                 {showZoneDropdown && (
@@ -1425,7 +1425,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           }
                         }}
                       >
-                        {zone === 'all' ? 'All Zones' : zone}
+                        {zone === 'all' ? t('calendar.allZones') : zone}
                       </div>
                     ))}
                   </div>
@@ -1439,8 +1439,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 >
                   <span>
                     {tourGenreFilter.length === 0
-                      ? 'All Genres'
-                      : `${tourGenreFilter.length} genre${tourGenreFilter.length > 1 ? 's' : ''} selected`
+                      ? t('tour.allGenres')
+                      : tourGenreFilter.length > 1
+                        ? t('tour.genresSelectedCount', { n: tourGenreFilter.length })
+                        : t('tour.genreSelectedCount', { n: tourGenreFilter.length })
                     }
                   </span>
                   <span style={{ marginLeft: '8px' }}>▼</span>
@@ -1481,7 +1483,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           fontSize: '14px'
                         }}
                       >
-                        Clear All
+                        {t('tour.clearAll')}
                       </button>
                       <button
                         onClick={() => setShowGenreDropdown(false)}
@@ -1493,7 +1495,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           fontSize: '14px'
                         }}
                       >
-                        Done
+                        {t('common.done')}
                       </button>
                     </div>
                     {genresList.map(genre => (
@@ -1542,8 +1544,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             {filteredTours.length === 0 ? (
               <div className="tour-empty-state">
                 <PlaneIcon />
-                <p>No active tours found</p>
-                <p className="tour-empty-hint">Try adjusting your filters or check back later</p>
+                <p>{t('tour.noActiveTours')}</p>
+                <p className="tour-empty-hint">{t('tour.noActiveToursHint')}</p>
               </div>
             ) : (
               <div className="tour-cards-list">
@@ -1561,10 +1563,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           )}
                         </div>
                         <div className="tour-artist-details">
-                          <h4 className="tour-artist-name">{tour.artist?.name || 'Unknown Artist'}</h4>
-                          <p className="tour-artist-role">{tour.artist?.role || 'Artist'}</p>
+                          <h4 className="tour-artist-name">{tour.artist?.name || t('tour.unknownArtist')}</h4>
+                          <p className="tour-artist-role">{tour.artist?.role || t('tour.artistRoleFallback')}</p>
                           <p className="tour-location-info">
-                            <LocationIcon /> {tour.country || tour.zone} Tour
+                            <LocationIcon /> {t('tour.tourTitle', { location: tour.country || tour.zone })}
                           </p>
                         </div>
                       </div>
@@ -1583,7 +1585,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       <div className="tour-progress">
                         <div className="tour-progress-header">
                           <span className="tour-progress-label">
-                            {tour.confirmedGigs || 0} gigs confirmed
+                            {t('tour.gigsConfirmedCount', { n: tour.confirmedGigs || 0 })}
                           </span>
                         </div>
                         <div className="tour-progress-bar">
@@ -1600,14 +1602,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       <div className="tour-stats-row">
                         {tour.feeExpectation && (
                           <div className="tour-stat">
-                            <span className="tour-stat-label">Fee Range:</span>
+                            <span className="tour-stat-label">{t('tour.feeRangeLabel')}</span>
                             <span className="tour-stat-value">{tour.feeExpectation}</span>
                           </div>
                         )}
                       </div>
                       {tour.artist?.genres && tour.artist.genres.length > 0 && (
                         <div className="tour-genres">
-                          <span className="genres-label">Genres:</span>
+                          <span className="genres-label">{t('tour.genresLabel')}</span>
                           <span>{tour.artist.genres.slice(0, 3).join(', ')}</span>
                         </div>
                       )}
@@ -1624,9 +1626,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           onClick={() => handleViewMyProposal(tour)}
                           style={{ flex: 1 }}
                         >
-                          {tour.myProposal.status === 'ACCEPTED' ? '✓ Proposal Accepted' :
-                           tour.myProposal.status === 'DECLINED' ? 'Proposal Declined' :
-                           'View Sent Proposal'}
+                          {tour.myProposal.status === 'ACCEPTED' ? `✓ ${t('tour.proposalAccepted')}` :
+                           tour.myProposal.status === 'DECLINED' ? t('tour.proposalDeclined') :
+                           t('tour.viewSentProposal')}
                         </button>
                       ) : (
                         // No proposal sent yet
@@ -1634,7 +1636,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           className="btn btn-primary btn-small"
                           onClick={() => handleMakeOffer(tour)}
                         >
-                          Make an Offer
+                          {t('tour.makeAnOffer')}
                         </button>
                       )}
                       <button
@@ -1646,11 +1648,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                             setViewingProfile(fullProfile);
                           } catch (error) {
                             console.error('Error fetching artist profile:', error);
-                            alert('Failed to load artist profile');
+                            alert(t('tour.loadArtistProfileFailed'));
                           }
                         }}
                       >
-                        View Artist
+                        {t('tour.viewArtist')}
                       </button>
                     </div>
                   </div>
@@ -1669,8 +1671,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           <div className="coming-soon-icon">
             <PlaneIcon />
           </div>
-          <h2>Tour Kickstart</h2>
-          <p>This feature is available for Artists, Promoters, and Venues</p>
+          <h2>{t('tour.tourKickstart')}</h2>
+          <p>{t('tour.agentsNotAvailable')}</p>
         </div>
       </div>
     );
@@ -1694,14 +1696,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           onClick={() => setActiveTab('calendar')}
         >
           <CalendarIcon />
-          <span>Calendar Matches</span>
+          <span>{t('tour.calendarMatches')}</span>
         </button>
         <button
           className={`tour-tab ${activeTab === 'kickstart' ? 'active' : ''}`}
           onClick={() => setActiveTab('kickstart')}
         >
           <PlaneIcon />
-          <span>Tour Kickstart</span>
+          <span>{t('tour.tourKickstart')}</span>
         </button>
       </div>
 
@@ -1719,9 +1721,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           setMessage('');
         }}>
           <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
-            <h2 className="message-modal-title">Connect with {selectedProfile.name}</h2>
+            <h2 className="message-modal-title">{t('tour.connectWith', { name: selectedProfile.name })}</h2>
             <textarea
-              placeholder="Introduce yourself and mention the calendar match..."
+              placeholder={t('tour.connectPlaceholder')}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows="4"
@@ -1736,13 +1738,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   setMessage('');
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="btn btn-primary btn-modal-send"
                 onClick={handleSendMessage}
               >
-                Send Request
+                {t('tour.sendRequest')}
               </button>
             </div>
           </div>
@@ -1776,14 +1778,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         <div className="create-tour-modal-overlay" onClick={() => setShowMyProposalModal(false)}>
           <div className="modal-content create-tour-modal view-proposals-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Your Proposal</h2>
+              <h2>{t('tour.yourProposal')}</h2>
               <button className="modal-close" onClick={() => setShowMyProposalModal(false)}>×</button>
             </div>
             <div className="modal-body">
               {/* Tour Info */}
               <div className="proposal-tour-info" style={{ marginBottom: '24px', padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
                 <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px', color: '#fff' }}>
-                  {myProposalData.tour?.zone} Tour
+                  {t('tour.tourTitle', { location: myProposalData.tour?.zone })}
                 </h3>
                 <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
                   {new Date(myProposalData.tour?.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(myProposalData.tour?.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -1807,7 +1809,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       {myProposalData.tour?.artist?.name}
                     </h4>
                     <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', margin: 0 }}>
-                      ARTIST
+                      {t('editProfile.artist')}
                     </p>
                   </div>
                   <span style={{
@@ -1839,12 +1841,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     <div>
                       {myProposalData.proposedDates && (
                         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', margin: '0 0 6px 0' }}>
-                          <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Proposed Dates:</strong> {myProposalData.proposedDates}
+                          <strong style={{ color: 'rgba(255,255,255,0.8)' }}>{t('tour.proposedDates')}</strong> {myProposalData.proposedDates}
                         </p>
                       )}
                       {myProposalData.proposedFee && (
                         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
-                          <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Proposed Fee:</strong> {myProposalData.proposedFee.currency} {myProposalData.proposedFee.amount.toLocaleString()}
+                          <strong style={{ color: 'rgba(255,255,255,0.8)' }}>{t('tour.proposedFee')}</strong> {myProposalData.proposedFee.currency} {myProposalData.proposedFee.amount.toLocaleString()}
                         </p>
                       )}
                     </div>
@@ -1855,7 +1857,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 {myProposalData.artistResponse && (
                   <div style={{ marginTop: '12px', padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
                     <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', margin: '0 0 4px 0' }}>
-                      Artist Response:
+                      {t('tour.artistResponse')}
                     </p>
                     <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: '1.5' }}>
                       {myProposalData.artistResponse}
@@ -1866,7 +1868,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowMyProposalModal(false)}>
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
@@ -1879,18 +1881,18 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         <div className="modal-overlay" onClick={() => setShowTourGigsModal(false)}>
           <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{selectedTour.country || selectedTour.zone} Tour - Confirmed Gigs</h3>
+              <h3>{t('tour.tourGigsTitle', { location: selectedTour.country || selectedTour.zone })}</h3>
               <button className="modal-close" onClick={() => setShowTourGigsModal(false)}>×</button>
             </div>
             <div className="modal-body" style={{ maxHeight: '500px', overflowY: 'auto' }}>
               {loadingTourGigs ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.5)' }}>
-                  Loading tour gigs...
+                  {t('tour.loadingGigs')}
                 </div>
               ) : tourGigs.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.5)' }}>
-                  <p>No confirmed gigs yet for this tour.</p>
-                  <p style={{ fontSize: '14px', marginTop: '8px' }}>Promoters and venues can make offers from the Browse Tours section.</p>
+                  <p>{t('tour.noGigsYet')}</p>
+                  <p style={{ fontSize: '14px', marginTop: '8px' }}>{t('tour.noGigsHint')}</p>
                 </div>
               ) : (
                 <div className="tour-gigs-list">
@@ -1925,25 +1927,25 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
                         <div>
-                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>Date</p>
+                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>{t('tour.date')}</p>
                           <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)' }}>
                             {new Date(deal.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
                         <div>
-                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>Fee</p>
+                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>{t('tour.fee')}</p>
                           <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>
                             {deal.currency} {(deal.currentFee || 0).toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>City</p>
+                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>{t('editProfile.city')}</p>
                           <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)' }}>
                             {deal.city}
                           </p>
                         </div>
                         <div>
-                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>Country</p>
+                          <p style={{ margin: '0 0 4px 0', color: 'rgba(255,255,255,0.5)' }}>{t('editProfile.country')}</p>
                           <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)' }}>
                             {deal.country}
                           </p>
@@ -1956,7 +1958,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowTourGigsModal(false)}>
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
