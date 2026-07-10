@@ -5,8 +5,10 @@ import RAEventsModal from '../common/RAEventsModal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
+  const { t } = useLanguage();
   const { likedProfiles, toggleLike, sentRequests, receivedRequests, sendConnectionRequest, connectedUsers, removeConnection } = useAppContext();
   // Callers pass whatever row object they have (search result, conversation
   // partner, roster entry) — those are list projections and may lack detail
@@ -118,7 +120,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
       // Only show alert for non-limit errors
       console.error('Connection request failed:', error);
-      alert('Failed to send connection request. Please try again.');
+      alert(t('search.failedToSendRequest'));
     } finally {
       setActionBusy(false);
     }
@@ -148,7 +150,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         setLikeLimitData({ limit, tier });
         setShowLikeLimitModal(true);
       } else {
-        alert('Failed to like profile. Please try again.');
+        alert(t('search.failedToLike'));
       }
     }
   };
@@ -156,7 +158,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   const handleSendMessage = async () => {
     if (actionBusy) return;
     if (!message.trim()) {
-      alert('Please write a message to introduce yourself');
+      alert(t('search.pleaseWriteMessage'));
       return;
     }
     setActionBusy(true);
@@ -189,7 +191,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       }
 
       // Only show alert for non-limit errors
-      alert('Failed to send connection request. Please try again.');
+      alert(t('search.failedToSendRequest'));
     } finally {
       setActionBusy(false);
     }
@@ -208,7 +210,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       }
     } catch (error) {
       console.error('Error removing connection:', error);
-      alert('Failed to remove connection');
+      alert(t('viewProfile.failedToRemove'));
     } finally {
       setActionBusy(false);
     }
@@ -332,7 +334,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         <div className="profile-embeds">
           {profile.mixtape && (
             <div className="embed-card">
-              <h4>Latest Mix</h4>
+              <h4>{t('viewProfile.latestMix')}</h4>
               <iframe
                 src={(() => {
                   // Convert mobile SoundCloud URL to regular URL for embed
@@ -352,7 +354,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           
           {profile.spotify && (
             <div className="embed-card">
-              <h4>Spotify Artist</h4>
+              <h4>{t('viewProfile.spotifyArtist')}</h4>
               <iframe
                 src={(() => {
                   // Extract artist ID from URL and convert to embed URL
@@ -375,13 +377,13 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           
           {profile.residentAdvisor && (
             <div className="embed-card ra-card">
-              <h4>Events</h4>
+              <h4>{t('viewProfile.events')}</h4>
               <button 
                 className="ra-events-button"
                 onClick={() => setShowRAEvents(true)}
               >
                 <span className="ra-icon">📅</span>
-                <span>View Upcoming Events</span>
+                <span>{t('profile.viewUpcomingEvents')}</span>
               </button>
               <a
                 href={profile.residentAdvisor.startsWith('http')
@@ -435,8 +437,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {/* Sender-side alert: counterparty hasn't verified yet */}
         {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
           <p className="mx-4 mb-3 px-4 py-3 rounded-2xl border border-white/10 bg-white/[0.03] text-xs leading-relaxed text-white/50 text-center">
-            This profile hasn't verified their identity yet. They must verify
-            before they can accept offers or requests.
+            {t('viewProfile.unverifiedNotice')}
           </p>
         )}
 
@@ -446,14 +447,14 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             className={`btn ${isLiked ? 'btn-primary' : 'btn-outline'} btn-full-width`}
             onClick={handleLike}
           >
-            <HeartIcon filled={isLiked} /> {isLiked ? 'Liked' : 'Like'}
+            <HeartIcon filled={isLiked} /> {isLiked ? t('search.liked') : t('search.like')}
           </button>
           {isConnected ? (
             <button
               className="btn btn-message btn-full-width"
               onClick={handleMessage}
             >
-              Message
+              {t('search.message')}
             </button>
           ) : (
             <button
@@ -461,7 +462,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               onClick={handleConnect}
               disabled={hasPendingRequest || actionBusy}
             >
-              {hasPendingRequest ? 'Pending' : (actionBusy ? '...' : 'Connect')}
+              {hasPendingRequest ? t('search.pending') : (actionBusy ? '...' : t('search.connect'))}
             </button>
           )}
         </div>
@@ -492,7 +493,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               className="btn btn-outline btn-remove-connection"
               onClick={() => setShowRemoveModal(true)}
             >
-              Remove Connection
+              {t('viewProfile.removeConnection')}
             </button>
           </div>
         )}
@@ -502,9 +503,9 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {showMessageModal && (
           <div className="message-modal-overlay" onClick={() => setShowMessageModal(false)}>
             <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
-              <h2 className="message-modal-title">Send Message to {profile.name}</h2>
+              <h2 className="message-modal-title">{t('search.sendMessageTo')} {profile.name}</h2>
               <textarea
-                placeholder="Write your message..."
+                placeholder={t('messages.writeMessage')}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows="5"
@@ -515,14 +516,14 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                   className="btn btn-outline btn-modal-cancel"
                   onClick={() => setShowMessageModal(false)}
                 >
-                  Cancel
+                  {t('editProfile.cancel')}
                 </button>
                 <button
                   className="btn btn-primary btn-modal-send"
                   onClick={handleSendMessage}
                   disabled={actionBusy}
                 >
-                  {actionBusy ? '...' : 'Send'}
+                  {actionBusy ? '...' : t('messages.send')}
                 </button>
               </div>
             </div>
@@ -542,23 +543,23 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       {showRemoveModal && (
         <div className="message-modal-overlay" onClick={() => setShowRemoveModal(false)}>
           <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
-            <h2 className="message-modal-title">Remove Connection?</h2>
+            <h2 className="message-modal-title">{t('viewProfile.removeConnectionTitle')}</h2>
             <p style={{ color: 'rgba(255, 255, 255, 0.7)', marginBottom: '20px' }}>
-              Are you sure you want to remove your connection with {profile.name}? You can always reconnect later.
+              {t('viewProfile.removeConnectionBody', { name: profile.name })}
             </p>
             <div className="message-modal-actions">
               <button
                 className="btn btn-outline btn-modal-cancel"
                 onClick={() => setShowRemoveModal(false)}
               >
-                Cancel
+                {t('editProfile.cancel')}
               </button>
               <button
                 className="btn btn-outline btn-remove-confirm"
                 onClick={handleRemoveConnection}
                 disabled={actionBusy}
               >
-                {actionBusy ? '...' : 'Remove'}
+                {actionBusy ? '...' : t('viewProfile.remove')}
               </button>
             </div>
           </div>
@@ -579,7 +580,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         <div className="modal-overlay" onClick={() => setShowLikeLimitModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Daily Like Limit Reached</h3>
+              <h3>{t('search.dailyLikeLimitReached')}</h3>
               <button className="modal-close" onClick={() => setShowLikeLimitModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -587,11 +588,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                 <div className="limit-icon">
                   <SlashCircleIcon />
                 </div>
-                <p className="limit-main-text">You've reached your daily limit. Upgrade to Premium for unlimited likes!</p>
+                <p className="limit-main-text">{t('search.dailyLikeLimitMessage')}</p>
               </div>
 
               <div className="tier-info-box">
-                <p className="tier-details">Current plan: <strong>{likeLimitData.tier}</strong> • {likeLimitData.limit} likes per day</p>
+                <p className="tier-details">{t('search.currentPlan')} <strong>{likeLimitData.tier}</strong> • {t('search.likesPerDay', { n: likeLimitData.limit })}</p>
               </div>
             </div>
             <div className="modal-footer">
@@ -599,7 +600,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                 className="btn btn-outline"
                 onClick={() => setShowLikeLimitModal(false)}
               >
-                Close
+                {t('common.close')}
               </button>
               <button
                 className="btn btn-upgrade"
@@ -610,7 +611,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                   }
                 }}
               >
-                Upgrade
+                {t('search.upgrade')}
               </button>
             </div>
           </div>
@@ -622,7 +623,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         <div className="modal-overlay" onClick={() => setShowConnectionLimitModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Monthly Connection Limit Reached</h3>
+              <h3>{t('search.monthlyConnectionLimitReached')}</h3>
               <button className="modal-close" onClick={() => setShowConnectionLimitModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -630,11 +631,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                 <div className="limit-icon">
                   <SlashCircleIcon />
                 </div>
-                <p className="limit-main-text">You've reached your monthly limit. Upgrade to Premium for unlimited connections!</p>
+                <p className="limit-main-text">{t('search.monthlyConnectionLimitMessage')}</p>
               </div>
 
               <div className="tier-info-box">
-                <p className="tier-details">Current plan: <strong>{connectionLimitData.tier}</strong> • {connectionLimitData.limit} connections per month</p>
+                <p className="tier-details">{t('search.currentPlan')} <strong>{connectionLimitData.tier}</strong> • {t('search.connectionsPerMonth', { n: connectionLimitData.limit })}</p>
               </div>
             </div>
             <div className="modal-footer">
@@ -642,7 +643,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                 className="btn btn-outline"
                 onClick={() => setShowConnectionLimitModal(false)}
               >
-                Close
+                {t('common.close')}
               </button>
               <button
                 className="btn btn-upgrade"
@@ -653,7 +654,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                   }
                 }}
               >
-                Upgrade
+                {t('search.upgrade')}
               </button>
             </div>
           </div>

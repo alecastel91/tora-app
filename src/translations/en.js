@@ -1,4 +1,16 @@
 const en = {
+  viewProfile: {
+    failedToRemove: 'Failed to remove connection',
+    latestMix: 'Latest Mix',
+    spotifyArtist: 'Spotify Artist',
+    events: 'Events',
+    unverifiedNotice: 'This profile hasn\'t verified their identity yet. They must verify before they can accept offers or requests.',
+    removeConnection: 'Remove Connection',
+    removeConnectionTitle: 'Remove Connection?',
+    removeConnectionBody: 'Are you sure you want to remove your connection with {{name}}? You can always reconnect later.',
+    remove: 'Remove',
+  },
+
   addProfile: {
     title: 'ADD PROFILE',
     submitFailed: 'Failed to submit application',
