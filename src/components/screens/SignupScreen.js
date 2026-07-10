@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import apiService from '../../services/api';
 import { genresList, zones, countriesByZone, citiesByCountry } from '../../data/profiles';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
+  const { t } = useLanguage();
   const [step, setStep] = useState(1); // 1: Basic info, 2: Profile details
   const [formData, setFormData] = useState({
     // Step 1 - Account
@@ -47,10 +49,10 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
         }));
       } else {
         setInvitationData(null);
-        setCodeError(data.error || 'Invalid code');
+        setCodeError(data.error || t('signup.invalidCode'));
       }
     } catch (err) {
-      setCodeError('Could not validate code');
+      setCodeError(t('signup.couldNotValidate'));
     } finally {
       setValidatingCode(false);
     }
@@ -122,12 +124,12 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
 
     // Validate passwords
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDontMatch'));
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordMinLength'));
       return;
     }
 
@@ -195,7 +197,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
         {step === 1 ? (
           // Step 1: Account Info
           <form className="auth-form" onSubmit={handleNextStep}>
-            <h2>Activate Your Account</h2>
+            <h2>{t('signup.activateTitle')}</h2>
             {!invitationData && <div className="step-indicator">Step 1 of 2</div>}
 
             {error && (
@@ -205,12 +207,12 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
             )}
 
             <div className="form-group">
-              <label>Invitation Code</label>
+              <label>{t('signup.invitationCode')}</label>
               <div className="invitation-code-row">
                 <input
                   type="text"
-                  placeholder="Enter your invitation code"
-                  aria-label="Invitation code"
+                  placeholder={t('signup.enterInvitationCode')}
+                  aria-label={t('signup.invitationCode')}
                   value={invitationCode}
                   onChange={(e) => setInvitationCode(e.target.value)}
                   onBlur={() => validateCode(invitationCode)}
@@ -222,7 +224,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                   onClick={() => validateCode(invitationCode)}
                   disabled={validatingCode || !invitationCode}
                 >
-                  {validatingCode ? '...' : 'Validate'}
+                  {validatingCode ? '...' : t('signup.validate')}
                 </button>
               </div>
               {codeError && (
@@ -239,8 +241,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
               <input
                 type="email"
                 name="email"
-                placeholder="Email"
-                aria-label="Email"
+                placeholder={t('auth.email')}
+                aria-label={t('auth.email')}
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -254,8 +256,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
               <input
                 type="password"
                 name="password"
-                placeholder="Password (min 6 characters)"
-                aria-label="Password"
+                placeholder={t('signup.passwordPlaceholder')}
+                aria-label={t('auth.password')}
                 autoComplete="new-password"
                 value={formData.password}
                 onChange={handleChange}
@@ -268,8 +270,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
               <input
                 type="password"
                 name="confirmPassword"
-                placeholder="Confirm Password"
-                aria-label="Confirm password"
+                placeholder={t('auth.confirmPassword')}
+                aria-label={t('auth.confirmPassword')}
                 autoComplete="new-password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -279,11 +281,11 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
             </div>
 
             <p className="signup-terms-notice">
-              By creating your account, you agree to our{' '}
-              <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-              {' '}and{' '}
-              <a href="https://torahub.io/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
-              You agreed to a previous version when you applied — this confirms acceptance of any changes since then.
+              {t('signup.termsBefore')}{' '}
+              <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">{t('signup.termsOfService')}</a>
+              {' '}{t('signup.and')}{' '}
+              <a href="https://torahub.io/privacy" target="_blank" rel="noopener noreferrer">{t('signup.privacyPolicy')}</a>.
+              {t('signup.termsReaffirm')}
             </p>
 
             <label className="signup-marketing-consent">
@@ -294,8 +296,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 onChange={(e) => setFormData({ ...formData, marketingConsent: e.target.checked })}
               />
               <span>
-                Send me product updates and tips for getting the most out of TORA
-                <small> (recommended — you can unsubscribe anytime)</small>
+                {t('signup.marketingConsent')}
+                <small> {t('signup.marketingConsentSmall')}</small>
               </span>
             </label>
 
@@ -304,11 +306,11 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
               className="btn btn-primary btn-full"
               disabled={loading}
             >
-              {loading ? 'Creating Account...' : invitationData ? 'Create Account' : 'Next'}
+              {loading ? t('signup.creatingAccount') : invitationData ? t('signup.createAccount') : t('signup.next')}
             </button>
 
             <div className="auth-footer">
-              <p>Already a member?</p>
+              <p>{t('signup.alreadyMember')}</p>
               <button
                 type="button"
                 className="btn-link"
@@ -321,7 +323,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
         ) : (
           // Step 2: Profile Info
           <form className="auth-form" onSubmit={handleSubmit}>
-            <h2>Complete Your Profile</h2>
+            <h2>{t('signup.completeProfile')}</h2>
             <div className="step-indicator">Step 2 of 2</div>
 
             {error && (
@@ -334,8 +336,8 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
               <input
                 type="text"
                 name="name"
-                placeholder="Your Name / Artist Name"
-                aria-label="Name or artist name"
+                placeholder={t('signup.namePlaceholder')}
+                aria-label={t('signup.namePlaceholder')}
                 autoComplete="name"
                 value={formData.name}
                 onChange={handleChange}
@@ -345,7 +347,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
             </div>
 
             <div className="form-group">
-              <label>I am a...</label>
+              <label>{t('signup.iAmA')}</label>
               <div className="role-selector">
                 {['ARTIST', 'VENUE', 'PROMOTER', 'AGENT'].map(role => (
                   <button
@@ -362,14 +364,14 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
 
             {/* Cascading Location Dropdowns */}
             <div className="form-group">
-              <label>Zone</label>
+              <label>{t('editProfile.zone')}</label>
               <select
                 value={formData.zone || ''}
                 onChange={(e) => handleZoneChange(e.target.value)}
                 required
                 className="form-input"
               >
-                <option value="">Select Zone</option>
+                <option value="">{t('editProfile.selectZone')}</option>
                 {zones.map(zone => (
                   <option key={zone} value={zone}>{zone}</option>
                 ))}
@@ -378,14 +380,14 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
 
             {formData.zone && (
               <div className="form-group">
-                <label>Country</label>
+                <label>{t('editProfile.country')}</label>
                 <select
                   value={formData.country || ''}
                   onChange={(e) => handleCountryChange(e.target.value)}
                   required
                   className="form-input"
                 >
-                  <option value="">Select Country</option>
+                  <option value="">{t('editProfile.selectCountry')}</option>
                   {availableCountries.map(country => (
                     <option key={country} value={country}>{country}</option>
                   ))}
@@ -395,14 +397,14 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
 
             {formData.country && (
               <div className="form-group">
-                <label>City</label>
+                <label>{t('editProfile.city')}</label>
                 <select
                   value={formData.city || ''}
                   onChange={(e) => handleCityChange(e.target.value)}
                   required
                   className="form-input"
                 >
-                  <option value="">Select City</option>
+                  <option value="">{t('editProfile.selectCity')}</option>
                   {availableCities.map(city => (
                     <option key={city} value={city}>{city}</option>
                   ))}
@@ -412,13 +414,13 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
 
             {showCustomCityInput && (
               <div className="form-group">
-                <label>Enter City Name</label>
+                <label>{t('editProfile.enterCityName')}</label>
                 <input
                   type="text"
                   value={customCity}
                   onChange={(e) => handleCustomCityChange(e.target.value)}
-                  placeholder="Enter city name"
-                  aria-label="City name"
+                  placeholder={t('editProfile.enterCityPlaceholder')}
+                  aria-label={t('editProfile.enterCityName')}
                   autoComplete="address-level2"
                   required
                   className="form-input"
@@ -427,7 +429,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
             )}
 
             <div className="form-group">
-              <label>Select Your Genres (optional)</label>
+              <label>{t('signup.selectGenresOptional')}</label>
               <div className="genre-selector">
                 {genresList.map(genre => (
                   <button
@@ -455,7 +457,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin }) => {
                 className="btn btn-primary"
                 disabled={loading}
               >
-                {loading ? 'Creating Account...' : 'Sign Up'}
+                {loading ? t('signup.creatingAccount') : t('signup.signUp')}
               </button>
             </div>
           </form>

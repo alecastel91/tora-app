@@ -1,4 +1,30 @@
 const en = {
+  signup: {
+    invalidCode: 'Invalid code',
+    couldNotValidate: 'Could not validate code',
+    activateTitle: 'Activate Your Account',
+    invitationCode: 'Invitation Code',
+    enterInvitationCode: 'Enter your invitation code',
+    validate: 'Validate',
+    passwordPlaceholder: 'Password (min 6 characters)',
+    creatingAccount: 'Creating Account...',
+    createAccount: 'Create Account',
+    next: 'Next',
+    alreadyMember: 'Already a member?',
+    completeProfile: 'Complete Your Profile',
+    namePlaceholder: 'Your Name / Artist Name',
+    iAmA: 'I am a...',
+    selectGenresOptional: 'Select Your Genres (optional)',
+    signUp: 'Sign Up',
+    termsBefore: 'By creating your account, you agree to our',
+    termsOfService: 'Terms of Service',
+    and: 'and',
+    privacyPolicy: 'Privacy Policy',
+    termsReaffirm: 'You agreed to a previous version when you applied — this confirms acceptance of any changes since then.',
+    marketingConsent: 'Send me product updates and tips for getting the most out of TORA',
+    marketingConsentSmall: '(recommended — you can unsubscribe anytime)',
+  },
+
   roster: {
     title: 'Represented Artists',
     failedToRemove: 'Failed to remove artist. Please try again.',
@@ -23,6 +49,7 @@ const en = {
   },
 
   auth: {
+    confirmPassword: 'Confirm Password',
     loginFailed: 'Login failed. Please try again.',
     email: 'Email',
     password: 'Password',
