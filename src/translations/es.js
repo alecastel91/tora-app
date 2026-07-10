@@ -754,6 +754,8 @@ const es = {
     selectCity: 'Seleccionar ciudad',
     enterCityName: 'Introduce el nombre de la ciudad',
     enterCityPlaceholder: 'Nombre de la ciudad',
+    searchCityPlaceholder: 'Empieza a escribir tu ciudad...',
+    cityNotFound: 'Mi ciudad no aparece',
     venueCapacity: 'Aforo del local',
     maxCapacity: 'Aforo máximo',
     agencyName: 'Nombre de la agencia',

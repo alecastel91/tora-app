@@ -754,6 +754,8 @@ const ja = {
     selectCity: '都市を選択',
     enterCityName: '都市名を入力',
     enterCityPlaceholder: '都市名を入力',
+    searchCityPlaceholder: '都市名を入力...',
+    cityNotFound: '都市が見つからない場合',
     venueCapacity: '収容人数',
     maxCapacity: '最大収容人数',
     agencyName: 'エージェンシー名',

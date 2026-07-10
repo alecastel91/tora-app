@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { genresList, zones, countriesByZone, citiesByCountry } from '../../data/profiles';
+import { genresList } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel } from '../../utils/roles';
+import CitySearch from '../common/CitySearch';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -20,8 +21,6 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
   const [zone, setZone] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
-  const [customCity, setCustomCity] = useState('');
-  const [showCustomCityInput, setShowCustomCityInput] = useState(false);
   const [genres, setGenres] = useState([]);
   const [instagram, setInstagram] = useState('');
   const [residentAdvisor, setResidentAdvisor] = useState('');
@@ -31,16 +30,12 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
   const [agencyName, setAgencyName] = useState('');
   const [venueCapacity, setVenueCapacity] = useState('');
 
-  // Derived data
-  const availableCountries = zone ? countriesByZone[zone] || [] : [];
-  const availableCities = country ? citiesByCountry[country] || [] : [];
-
   // --- Validation per step ---
   const canAdvance = () => {
     switch (step) {
       case 1: return !!role;
       case 2: return profileName.trim().length > 0;
-      case 3: return !!zone && !!country && (!!city || (showCustomCityInput && customCity.trim().length > 0));
+      case 3: return !!zone && !!country && !!city;
       case 4: return true; // genres are optional
       case 5: {
         if (role === 'AGENT' && !agencyName.trim()) return false;
@@ -49,38 +44,6 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       }
       default: return false;
     }
-  };
-
-  // --- Location handlers ---
-  const handleZoneChange = (val) => {
-    setZone(val);
-    setCountry('');
-    setCity('');
-    setCustomCity('');
-    setShowCustomCityInput(false);
-  };
-
-  const handleCountryChange = (val) => {
-    setCountry(val);
-    setCity('');
-    setCustomCity('');
-    setShowCustomCityInput(false);
-  };
-
-  const handleCityChange = (val) => {
-    if (val === 'Other') {
-      setShowCustomCityInput(true);
-      setCity(customCity);
-    } else {
-      setShowCustomCityInput(false);
-      setCustomCity('');
-      setCity(val);
-    }
-  };
-
-  const handleCustomCityChange = (val) => {
-    setCustomCity(val);
-    setCity(val);
   };
 
   // --- Genre toggle ---
@@ -262,66 +225,19 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
 
       case 3:
         return (
-          <>
-            <div className="form-group">
-              <label className={labelClass}>{t('editProfile.zone')}</label>
-              <select
-                className="form-input"
-                value={zone}
-                onChange={(e) => handleZoneChange(e.target.value)}
-              >
-                <option value="">{t('editProfile.selectZone')}</option>
-                {zones.map(z => (
-                  <option key={z} value={z}>{z}</option>
-                ))}
-              </select>
-            </div>
-
-            {zone && (
-              <div className="form-group">
-                <label className={labelClass}>{t('editProfile.country')}</label>
-                <select
-                  className="form-input"
-                  value={country}
-                  onChange={(e) => handleCountryChange(e.target.value)}
-                >
-                  <option value="">{t('editProfile.selectCountry')}</option>
-                  {availableCountries.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {country && (
-              <div className="form-group">
-                <label className={labelClass}>{t('editProfile.city')}</label>
-                <select
-                  className="form-input"
-                  value={showCustomCityInput ? 'Other' : city}
-                  onChange={(e) => handleCityChange(e.target.value)}
-                >
-                  <option value="">{t('editProfile.selectCity')}</option>
-                  {availableCities.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {showCustomCityInput && (
-              <div className="form-group">
-                <label className={labelClass}>{t('editProfile.enterCityName')}</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={customCity}
-                  onChange={(e) => handleCustomCityChange(e.target.value)}
-                  placeholder={t('editProfile.enterCityPlaceholder')}
-                />
-              </div>
-            )}
-          </>
+          <div className="form-group">
+            <label className={labelClass}>{t('editProfile.city')}</label>
+            <CitySearch
+              city={city}
+              country={country}
+              zone={zone}
+              onSelect={(nextCity, nextCountry, nextZone) => {
+                setCity(nextCity);
+                setCountry(nextCountry);
+                setZone(nextZone);
+              }}
+            />
+          </div>
         );
 
       case 4:

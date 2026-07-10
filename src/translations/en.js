@@ -757,6 +757,8 @@ const en = {
     selectCity: 'Select City',
     enterCityName: 'Enter City Name',
     enterCityPlaceholder: 'Enter city name',
+    searchCityPlaceholder: 'Start typing your city...',
+    cityNotFound: 'My city isn\'t listed',
     venueCapacity: 'Venue Capacity',
     maxCapacity: 'Maximum capacity',
     agencyName: 'Agency Name',

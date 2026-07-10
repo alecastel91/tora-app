@@ -754,6 +754,8 @@ const ko = {
     selectCity: '도시 선택',
     enterCityName: '도시 이름을 입력하세요',
     enterCityPlaceholder: '도시 이름',
+    searchCityPlaceholder: '도시 이름을 입력하세요...',
+    cityNotFound: '내 도시가 목록에 없어요',
     venueCapacity: '베뉴 수용 인원',
     maxCapacity: '최대 수용 인원',
     agencyName: '에이전시 이름',

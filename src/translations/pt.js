@@ -754,6 +754,8 @@ const pt = {
     selectCity: 'Selecionar cidade',
     enterCityName: 'Introduz o nome da cidade',
     enterCityPlaceholder: 'Nome da cidade',
+    searchCityPlaceholder: 'Começa a escrever a tua cidade...',
+    cityNotFound: 'A minha cidade não está na lista',
     venueCapacity: 'Lotação do espaço',
     maxCapacity: 'Lotação máxima',
     agencyName: 'Nome da agência',

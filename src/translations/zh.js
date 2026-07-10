@@ -754,6 +754,8 @@ const zh = {
     selectCity: '选择城市',
     enterCityName: '请输入城市名称',
     enterCityPlaceholder: '城市名称',
+    searchCityPlaceholder: '输入你的城市...',
+    cityNotFound: '我的城市不在列表中',
     venueCapacity: '场地容量',
     maxCapacity: '最大容量',
     agencyName: '经纪公司名称',
