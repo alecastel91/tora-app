@@ -38,6 +38,9 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
       case 3: return !!zone && !!country && !!city;
       case 4: return true; // genres are optional
       case 5: {
+        // Instagram is the verification channel — mandatory for every role,
+        // matching the torahub.io application form.
+        if (!instagram.trim()) return false;
         if (role === 'AGENT' && !agencyName.trim()) return false;
         if (role === 'VENUE' && !venueCapacity.trim()) return false;
         return true;
@@ -82,7 +85,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         country,
         city,
         genres,
-        instagram: instagram || undefined,
+        instagram: instagram.trim(),
         residentAdvisor: residentAdvisor || undefined,
         soundcloud: soundcloud || undefined,
         website: website || undefined,
@@ -269,7 +272,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
         return (
           <>
             <div className="form-group">
-              <label className={labelClass}>{t('editProfile.instagram')}</label>
+              <label className={labelClass}>{t('editProfile.instagram')} *</label>
               <div style={{ position: 'relative' }}>
                 <span style={{
                   position: 'absolute',
