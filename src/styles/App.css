@@ -488,7 +488,8 @@
   padding: 0;
   background: transparent;
   border: none;
-  color: rgba(255, 215, 0, 0.9);
+  /* One color everywhere: the agent role green (matches the own profile). */
+  color: rgba(0, 200, 117, 0.9);
   font-size: 13px;
   font-weight: 500;
 }
@@ -5991,16 +5992,17 @@
 
 /* View Profile Screen (Full Page) */
 .view-profile-screen {
+  /* Page, not popup: sits between the app header (57px) and the tab bar
+     (53px) so global navigation stays visible and usable. */
   position: fixed;
-  top: 0;
+  top: 57px;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 53px;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background: var(--bg-dark);
-  z-index: 1100;
+  z-index: 90;
   overflow: hidden;
 }
 

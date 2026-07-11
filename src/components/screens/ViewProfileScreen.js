@@ -6,7 +6,7 @@ import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { roleLabel } from '../../utils/roles';
+import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
 import MakeOfferModal from '../common/MakeOfferModal';
 
@@ -32,6 +32,14 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
   const [artistTours, setArtistTours] = useState([]);
   const [showTourOffer, setShowTourOffer] = useState(false);
+  const [showLikersModal, setShowLikersModal] = useState(false);
+  const [likers, setLikers] = useState(null);
+  useEffect(() => {
+    if (!showLikersModal || likers !== null || !passedProfile?.id) return;
+    apiService.getProfileLikers(passedProfile.id)
+      .then((d) => setLikers(d.likers || []))
+      .catch(() => setLikers([]));
+  }, [showLikersModal, likers, passedProfile?.id]);
   useEffect(() => {
     let cancelled = false;
     setArtistTours([]);
@@ -249,9 +257,12 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   return (
     <div className="screen active view-profile-screen">
       <div className="view-profile-header">
-        <button className="back-btn" onClick={onClose}>
-          <CloseIcon />
+        <button className="back-btn" onClick={onClose} aria-label={t('common.back')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
         </button>
+        <h1 className="m-0 text-[13px] font-semibold text-white uppercase tracking-[0.2em] font-tech">{t('nav.profile')}</h1>
         <div style={{ width: '24px' }}></div>
       </div>
       
@@ -316,53 +327,74 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         </div>
         
         {/* Stats */}
-        {(profile.followers || profile.connections || profile.venueCapacity
-          || profile.gigsCompleted > 0 || profile.rosterSize > 0) && (
-          <div className="profile-stats">
-            {profile.followers && (
-              <div className="stat-item">
-                <span className="stat-value">{profile.followers.toLocaleString()}</span>
-                <span className="stat-label">{t('profile.likes')}</span>
+        {/* Represented By Badge */}
+        {(() => {
+          const repArray = Array.isArray(profile.representedBy)
+            ? profile.representedBy
+            : (profile.representedBy ? [profile.representedBy] : []);
+          const agentNames = repArray
+            .map(a => a.name || a.agentName)
+            .filter(Boolean);
+          if (agentNames.length === 0) return null;
+          return (
+            <div className="represented-by-container">
+              <div className="represented-by-badge">
+                <span className="represented-icon"><HandshakeIcon /></span>
+                {t('profile.representedBy')} {agentNames.join(', ')}
               </div>
-            )}
-            {profile.connections && (
-              <div className="stat-item">
-                <span className="stat-value">{profile.connections}</span>
-                <span className="stat-label">{t('profile.connections')}</span>
-              </div>
-            )}
-            {profile.role === 'ARTIST' && profile.gigsCompleted > 0 && (
-              <div className="stat-item">
-                <span className="stat-value">{profile.gigsCompleted}</span>
-                <span className="stat-label">{t('viewProfile.gigs')}</span>
-              </div>
-            )}
-            {profile.role === 'AGENT' && profile.rosterSize > 0 && (
-              <div className="stat-item">
-                <span className="stat-value">{profile.rosterSize}</span>
-                <span className="stat-label">{t('roster.roster')}</span>
-              </div>
-            )}
-            {profile.venueCapacity && (
-              <div className="stat-item">
-                <span className="stat-value">{profile.venueCapacity.toLocaleString()}</span>
-                <span className="stat-label">{t('profile.capacity')}</span>
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          );
+        })()}
 
-        {/* Member-since + mutual connections meta line */}
-        {(profile.memberSince || profile.mutualConnections > 0) && (
-          <p className="m-0 mt-2 mb-1 text-center text-[10px] uppercase tracking-[0.15em] text-white/35 font-tech">
-            {profile.memberSince && t('viewProfile.memberSince', {
-              date: new Date(profile.memberSince).toLocaleDateString(t('dateFormat.locale'), { month: 'short', year: 'numeric' }),
-            })}
-            {profile.memberSince && profile.mutualConnections > 0 && ' · '}
-            {profile.mutualConnections > 0 && t('viewProfile.mutualConnections', { n: profile.mutualConnections })}
+        {/* Action Buttons */}
+        <div className="profile-actions-bottom">
+          <button
+            className={`btn ${isLiked ? 'btn-primary' : 'btn-outline'} btn-full-width`}
+            onClick={handleLike}
+          >
+            <HeartIcon filled={isLiked} /> {isLiked ? t('search.liked') : t('search.like')}
+          </button>
+          {isConnected ? (
+            <button
+              className="btn btn-message btn-full-width"
+              onClick={handleMessage}
+            >
+              {t('search.message')}
+            </button>
+          ) : (
+            <button
+              className={`btn ${hasPendingRequest ? 'btn-disabled' : 'btn-primary'} btn-full-width`}
+              onClick={handleConnect}
+              disabled={hasPendingRequest || actionBusy}
+            >
+              {hasPendingRequest ? t('search.pending') : (actionBusy ? '...' : t('search.connect'))}
+            </button>
+          )}
+        </div>
+
+        {/* Sender-side alert: counterparty hasn't verified yet */}
+        {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
+          <p className="mx-4 mb-3 px-4 py-3 rounded-2xl border border-white/10 bg-white/[0.03] text-xs leading-relaxed text-white/50 text-center">
+            {t('viewProfile.unverifiedNotice')}
           </p>
         )}
-        
+
+        {/* Stats — same row as the own profile (likes received = credibility) */}
+        <div className="mx-4 mb-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5">
+          <div className="flex flex-col items-center gap-0.5 px-1">
+            <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesGiven ?? 0}</span>
+            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.liked')}</span>
+          </div>
+          <button type="button" onClick={() => setShowLikersModal(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
+            <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesReceived ?? profile.statsLikes ?? 0}</span>
+            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likes')}</span>
+          </button>
+          <div className="flex flex-col items-center gap-0.5 px-1">
+            <span className="text-lg font-bold text-white font-space-grotesk">{profile.connectionsCount ?? 0}</span>
+            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.connections')}</span>
+          </div>
+        </div>
+
         {/* Bio */}
         {profile.bio && (
           <div className="profile-bio">
@@ -470,101 +502,58 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           
         </div>
 
-        {/* Social CTAs */}
-        <div className="profile-social-ctas">
-          {profile.instagram && (
-            <a 
-              href={`https://instagram.com/${profile.instagram.replace('@', '')}`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-social"
-            >
-              <span>Instagram</span>
-            </a>
-          )}
-          {profile.residentAdvisor && (
-            <a
-              href={raProfileUrl(profile.residentAdvisor)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-social"
-            >
-              <span>RA</span>
-            </a>
-          )}
-          {profile.website && (
-            <a
-              href={profile.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-social"
-            >
-              <span>Website</span>
-            </a>
-          )}
-          {profile.linkedin && (
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-social"
-            >
-              <span>LinkedIn</span>
-            </a>
-          )}
-        </div>
-        
-        {/* Sender-side alert: counterparty hasn't verified yet */}
-        {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
-          <p className="mx-4 mb-3 px-4 py-3 rounded-2xl border border-white/10 bg-white/[0.03] text-xs leading-relaxed text-white/50 text-center">
-            {t('viewProfile.unverifiedNotice')}
-          </p>
+        {/* ===== Links (same rows as the own profile) ===== */}
+        {(profile.website || profile.instagram || profile.residentAdvisor || profile.linkedin) && (
+          <div className="px-5 mb-5 text-left">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{t('profile.links')}</p>
+            <div className="flex flex-col gap-3">
+              {profile.website && (
+                <a href={profile.website} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
+                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">🌐</span>
+                  <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
+                  <span className="text-white/30 text-xs">↗</span>
+                </a>
+              )}
+              {profile.instagram && (
+                <a href={`https://instagram.com/${profile.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
+                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">IG</span>
+                  <span className="flex-1 text-sm font-medium text-white">Instagram</span>
+                  <span className="text-white/30 text-xs">↗</span>
+                </a>
+              )}
+              {profile.residentAdvisor && (
+                <a href={raProfileUrl(profile.residentAdvisor)} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
+                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[10px] font-bold font-tech">RA</span>
+                  <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
+                  <span className="text-white/30 text-xs">↗</span>
+                </a>
+              )}
+              {profile.linkedin && (
+                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
+                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">in</span>
+                  <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>
+                  <span className="text-white/30 text-xs">↗</span>
+                </a>
+              )}
+            </div>
+          </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="profile-actions-bottom">
-          <button
-            className={`btn ${isLiked ? 'btn-primary' : 'btn-outline'} btn-full-width`}
-            onClick={handleLike}
-          >
-            <HeartIcon filled={isLiked} /> {isLiked ? t('search.liked') : t('search.like')}
-          </button>
-          {isConnected ? (
-            <button
-              className="btn btn-message btn-full-width"
-              onClick={handleMessage}
-            >
-              {t('search.message')}
-            </button>
-          ) : (
-            <button
-              className={`btn ${hasPendingRequest ? 'btn-disabled' : 'btn-primary'} btn-full-width`}
-              onClick={handleConnect}
-              disabled={hasPendingRequest || actionBusy}
-            >
-              {hasPendingRequest ? t('search.pending') : (actionBusy ? '...' : t('search.connect'))}
-            </button>
-          )}
-        </div>
-
-        {/* Represented By Badge */}
-        {(() => {
-          const repArray = Array.isArray(profile.representedBy)
-            ? profile.representedBy
-            : (profile.representedBy ? [profile.representedBy] : []);
-          const agentNames = repArray
-            .map(a => a.name || a.agentName)
-            .filter(Boolean);
-          if (agentNames.length === 0) return null;
-          return (
-            <div className="represented-by-container">
-              <div className="represented-by-badge">
-                <span className="represented-icon"><HandshakeIcon /></span>
-                Represented by {agentNames.join(', ')}
-              </div>
-            </div>
-          );
-        })()}
+        {/* Quiet footer meta: member-since, mutuals, capacity, TORA gig count */}
+        <p className="m-0 mb-4 px-5 text-center text-[10px] uppercase tracking-[0.15em] text-white/35 font-tech leading-relaxed">
+          {[
+            profile.memberSince && t('viewProfile.memberSince', {
+              date: new Date(profile.memberSince).toLocaleDateString(t('dateFormat.locale'), { month: 'short', year: 'numeric' }),
+            }),
+            profile.mutualConnections > 0 && t('viewProfile.mutualConnections', { n: profile.mutualConnections }),
+            profile.role === 'VENUE' && profile.venueCapacity && `${t('profile.capacity')} ${profile.venueCapacity.toLocaleString()}`,
+            profile.role === 'ARTIST' && profile.gigsCompleted > 0 && t('viewProfile.gigsViaTora', { n: profile.gigsCompleted }),
+          ].filter(Boolean).join(' · ')}
+        </p>
 
         {/* Remove Connection Button (only shown if connected) */}
         {isConnected && (
@@ -579,6 +568,36 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         )}
       </div>
         
+
+      {showLikersModal && (
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 p-5" onClick={() => setShowLikersModal(false)}>
+          <div className="max-w-md w-full max-h-[70vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#131315]/95 backdrop-blur-xl p-5" onClick={(e) => e.stopPropagation()}>
+            <h3 className="m-0 mb-4 text-[13px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em] text-center">
+              {t('profile.profilesThatLikedYou')}
+            </h3>
+            {likers === null ? (
+              <p className="text-sm text-white/40 text-center m-0">…</p>
+            ) : likers.length === 0 ? (
+              <p className="text-sm text-white/40 text-center m-0">{t('profile.noLikersYet')}</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {likers.map((l) => (
+                  <div key={l.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                    <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-semibold ${getAvatarClass ? getAvatarClass(l.role) : ''}`}>
+                      {l.avatar ? <img src={l.avatar} alt={l.name} className="w-full h-full object-cover" /> : (l.name || '?').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="m-0 text-sm text-white truncate">{l.name}</p>
+                      <p className="m-0 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{roleLabel(l.role, t)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Message Modal */}
         <MakeOfferModal
         isOpen={showTourOffer}

@@ -760,7 +760,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
           <div className="flex justify-center mb-4">
             <div className="inline-flex items-center gap-2 text-xs text-role-agent/90 font-tech">
               <span className="inline-flex [&>svg]:w-4 [&>svg]:h-4"><HandshakeIcon /></span>
-              Represented by {agentNames.join(', ')}
+              {t('profile.representedBy')} {agentNames.join(', ')}
             </div>
           </div>
         );

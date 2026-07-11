@@ -450,6 +450,7 @@ const zh = {
     mutualConnections: '{{n}}个共同联系人',
     pastHighlights: '过往亮点',
     activeTours: '进行中的巡演',
+    gigsViaTora: '通过TORA预订的演出{{n}}场',
   },
 
   addProfile: {

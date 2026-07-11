@@ -450,6 +450,7 @@ const fr = {
     mutualConnections: '{{n}} connexions en commun',
     pastHighlights: 'Dates marquantes',
     activeTours: 'Tournées en cours',
+    gigsViaTora: '{{n}} dates réservées via TORA',
   },
 
   addProfile: {

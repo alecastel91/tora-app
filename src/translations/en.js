@@ -450,6 +450,7 @@ const en = {
     mutualConnections: '{{n}} mutual connections',
     pastHighlights: 'Past Highlights',
     activeTours: 'Active Tours',
+    gigsViaTora: '{{n}} gigs booked via TORA',
   },
 
   addProfile: {

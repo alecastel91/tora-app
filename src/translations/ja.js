@@ -450,6 +450,7 @@ const ja = {
     mutualConnections: '共通のコネクション{{n}}件',
     pastHighlights: '過去のハイライト',
     activeTours: '進行中のツアー',
+    gigsViaTora: 'TORA経由の出演 {{n}}件',
   },
 
   addProfile: {
