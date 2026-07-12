@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
-import { LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
+import { GlobeIcon, LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
@@ -9,6 +9,18 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
 import MakeOfferModal from '../common/MakeOfferModal';
+
+// Real platform glyphs for the links rows.
+const InstagramGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+const RAGlyph = () => (
+  <span className="text-white text-[11px] font-black tracking-tight leading-none" style={{ fontFamily: 'Arial Black, Inter, sans-serif' }}>RA</span>
+);
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { t } = useLanguage();
@@ -32,14 +44,44 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
   const [artistTours, setArtistTours] = useState([]);
   const [showTourOffer, setShowTourOffer] = useState(false);
-  const [showLikersModal, setShowLikersModal] = useState(false);
-  const [likers, setLikers] = useState(null);
+  const [listModal, setListModal] = useState(null); // 'liked' | 'likes' | 'connections'
+  const [listData, setListData] = useState({});
+  const [likers, setLikers] = useState(null); // eager — powers the liked-by line
+  const [showAllGenres, setShowAllGenres] = useState(false);
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const [showGigsModal, setShowGigsModal] = useState(false);
+  const [gigs, setGigs] = useState(null);
+
   useEffect(() => {
-    if (!showLikersModal || likers !== null || !passedProfile?.id) return;
+    let cancelled = false;
+    setLikers(null);
+    setListData({});
+    setGigs(null);
+    if (!passedProfile?.id) return undefined;
     apiService.getProfileLikers(passedProfile.id)
-      .then((d) => setLikers(d.likers || []))
-      .catch(() => setLikers([]));
-  }, [showLikersModal, likers, passedProfile?.id]);
+      .then((d) => { if (!cancelled) setLikers(d.likers || []); })
+      .catch(() => { if (!cancelled) setLikers([]); });
+    return () => { cancelled = true; };
+  }, [passedProfile?.id]);
+
+  useEffect(() => {
+    if (!listModal || listData[listModal] || !passedProfile?.id) return;
+    const fetchers = {
+      liked: () => apiService.getProfileLiked(passedProfile.id).then((d) => d.profiles || []),
+      likes: () => Promise.resolve(likers || []),
+      connections: () => apiService.getProfileConnections(passedProfile.id).then((d) => d.profiles || []),
+    };
+    fetchers[listModal]()
+      .then((rows) => setListData((prev) => ({ ...prev, [listModal]: rows })))
+      .catch(() => setListData((prev) => ({ ...prev, [listModal]: [] })));
+  }, [listModal, listData, passedProfile?.id, likers]);
+
+  useEffect(() => {
+    if (!showGigsModal || gigs !== null || !passedProfile?.id) return;
+    apiService.getProfileGigs(passedProfile.id)
+      .then((d) => setGigs(d.gigs || []))
+      .catch(() => setGigs([]));
+  }, [showGigsModal, gigs, passedProfile?.id]);
   useEffect(() => {
     let cancelled = false;
     setArtistTours([]);
@@ -255,16 +297,19 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   };
   
   return (
-    <div className="screen active view-profile-screen">
-      <div className="view-profile-header">
-        <button className="back-btn" onClick={onClose} aria-label={t('common.back')}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h1 className="m-0 text-[13px] font-semibold text-white uppercase tracking-[0.2em] font-tech">{t('nav.profile')}</h1>
-        <div style={{ width: '24px' }}></div>
-      </div>
+    <div className="screen active view-profile-screen relative">
+      {/* Floating back arrow — no header bar, the page starts at the avatar */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={t('common.back')}
+        className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
+                   flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
       
       <div className="view-profile-content relative isolate">
         {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
@@ -317,11 +362,20 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           )}
           {profile.genres && profile.genres.length > 0 && (
             <div className="profile-genres-container">
-              <div className="profile-genres">
+              <div className={`profile-genres overflow-hidden transition-[max-height] duration-300 ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[60px]'}`}>
                 {profile.genres.map(genre => (
                   <span key={genre} className="genre-tag">{genre}</span>
                 ))}
               </div>
+              {profile.genres.length > 6 && (
+                <button
+                  type="button"
+                  className="mt-1.5 bg-transparent border-none p-0 text-infrared text-xs cursor-pointer hover:underline"
+                  onClick={() => setShowAllGenres(!showAllGenres)}
+                >
+                  {showAllGenres ? t('profile.seeLess') : t('profile.seeMore')}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -347,7 +401,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         })()}
 
         {/* Action Buttons */}
-        <div className="profile-actions-bottom">
+        <div className="profile-actions-bottom" style={{ marginBottom: '18px' }}>
           <button
             className={`btn ${isLiked ? 'btn-primary' : 'btn-outline'} btn-full-width`}
             onClick={handleLike}
@@ -379,26 +433,50 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </p>
         )}
 
-        {/* Stats — same row as the own profile (likes received = credibility) */}
-        <div className="mx-4 mb-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5">
-          <div className="flex flex-col items-center gap-0.5 px-1">
+        {/* Stats — same row as the own profile; every column opens the real list */}
+        <div className="mx-4 mb-2 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5">
+          <button type="button" onClick={() => setListModal('liked')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesGiven ?? 0}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.liked')}</span>
-          </div>
-          <button type="button" onClick={() => setShowLikersModal(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
+          </button>
+          <button type="button" onClick={() => setListModal('likes')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesReceived ?? profile.statsLikes ?? 0}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likes')}</span>
           </button>
-          <div className="flex flex-col items-center gap-0.5 px-1">
+          <button type="button" onClick={() => setListModal('connections')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{profile.connectionsCount ?? 0}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.connections')}</span>
-          </div>
+          </button>
         </div>
 
-        {/* Bio */}
+        {/* Instagram-style social proof: first likers by name */}
+        {likers && likers.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setListModal('likes')}
+            className="block w-full bg-transparent border-none px-8 mb-4 text-center text-xs text-white/50 cursor-pointer"
+          >
+            {t('viewProfile.likedBy')}{' '}
+            <span className="text-white/80 font-medium">
+              {likers.slice(0, 2).map((l) => l.name).join(', ')}
+            </span>
+            {likers.length > 2 && <> {t('viewProfile.andOthers', { n: (profile.likesReceived ?? likers.length) - 2 })}</>}
+          </button>
+        )}
+
+        {/* Bio — clamped with see-more; authored line breaks preserved */}
         {profile.bio && (
           <div className="profile-bio">
-            <p>{profile.bio}</p>
+            <p className={`whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
+            {profile.bio.length > 180 && (
+              <button
+                type="button"
+                className="mt-1 bg-transparent border-none p-0 text-infrared text-xs cursor-pointer hover:underline"
+                onClick={() => setBioExpanded(!bioExpanded)}
+              >
+                {bioExpanded ? t('profile.seeLess') : t('profile.seeMore')}
+              </button>
+            )}
           </div>
         )}
 
@@ -510,7 +588,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {profile.website && (
                 <a href={profile.website} target="_blank" rel="noopener noreferrer"
                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">🌐</span>
+                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4"><GlobeIcon /></span>
                   <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
@@ -518,7 +596,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {profile.instagram && (
                 <a href={`https://instagram.com/${profile.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">IG</span>
+                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4"><InstagramGlyph /></span>
                   <span className="flex-1 text-sm font-medium text-white">Instagram</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
@@ -526,7 +604,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {profile.residentAdvisor && (
                 <a href={raProfileUrl(profile.residentAdvisor)} target="_blank" rel="noopener noreferrer"
                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[10px] font-bold font-tech">RA</span>
+                  <span className="w-9 h-9 rounded-full bg-black border border-white/20 flex items-center justify-center shrink-0"><RAGlyph /></span>
                   <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
@@ -543,15 +621,31 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </div>
         )}
 
-        {/* Quiet footer meta: member-since, mutuals, capacity, TORA gig count */}
+        {/* TORA gig history — tappable, opens the detailed list */}
+        {profile.role === 'ARTIST' && profile.gigsCompleted > 0 && (
+          <div className="px-5 mb-3">
+            <button
+              type="button"
+              onClick={() => setShowGigsModal(true)}
+              className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3
+                         text-left cursor-pointer hover:border-infrared/40 transition-colors"
+            >
+              <span className="w-9 h-9 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center shrink-0 text-infrared text-sm font-bold font-space-grotesk">
+                {profile.gigsCompleted}
+              </span>
+              <span className="flex-1 text-sm font-medium text-white">{t('viewProfile.gigsViaTora', { n: profile.gigsCompleted })}</span>
+              <span className="text-white/30 text-xs">›</span>
+            </button>
+          </div>
+        )}
+
+        {/* Quiet footer meta */}
         <p className="m-0 mb-4 px-5 text-center text-[10px] uppercase tracking-[0.15em] text-white/35 font-tech leading-relaxed">
           {[
             profile.memberSince && t('viewProfile.memberSince', {
               date: new Date(profile.memberSince).toLocaleDateString(t('dateFormat.locale'), { month: 'short', year: 'numeric' }),
             }),
-            profile.mutualConnections > 0 && t('viewProfile.mutualConnections', { n: profile.mutualConnections }),
             profile.role === 'VENUE' && profile.venueCapacity && `${t('profile.capacity')} ${profile.venueCapacity.toLocaleString()}`,
-            profile.role === 'ARTIST' && profile.gigsCompleted > 0 && t('viewProfile.gigsViaTora', { n: profile.gigsCompleted }),
           ].filter(Boolean).join(' · ')}
         </p>
 
@@ -569,27 +663,55 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       </div>
         
 
-      {showLikersModal && (
-        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 p-5" onClick={() => setShowLikersModal(false)}>
+      {listModal && (
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 p-5" onClick={() => setListModal(null)}>
           <div className="max-w-md w-full max-h-[70vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#131315]/95 backdrop-blur-xl p-5" onClick={(e) => e.stopPropagation()}>
             <h3 className="m-0 mb-4 text-[13px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em] text-center">
-              {t('profile.profilesThatLikedYou')}
+              {listModal === 'liked' ? t('profile.liked') : listModal === 'likes' ? t('profile.likes') : t('profile.connections')}
             </h3>
-            {likers === null ? (
+            {!listData[listModal] ? (
               <p className="text-sm text-white/40 text-center m-0">…</p>
-            ) : likers.length === 0 ? (
-              <p className="text-sm text-white/40 text-center m-0">{t('profile.noLikersYet')}</p>
+            ) : listData[listModal].length === 0 ? (
+              <p className="text-sm text-white/40 text-center m-0">—</p>
             ) : (
               <div className="flex flex-col gap-2">
-                {likers.map((l) => (
+                {listData[listModal].map((l) => (
                   <div key={l.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
-                    <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-semibold ${getAvatarClass ? getAvatarClass(l.role) : ''}`}>
+                    <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-semibold ${getAvatarClass(l.role)}`}>
                       {l.avatar ? <img src={l.avatar} alt={l.name} className="w-full h-full object-cover" /> : (l.name || '?').charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="m-0 text-sm text-white truncate">{l.name}</p>
                       <p className="m-0 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{roleLabel(l.role, t)}</p>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showGigsModal && (
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 p-5" onClick={() => setShowGigsModal(false)}>
+          <div className="max-w-md w-full max-h-[70vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#131315]/95 backdrop-blur-xl p-5" onClick={(e) => e.stopPropagation()}>
+            <h3 className="m-0 mb-4 text-[13px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em] text-center">
+              {t('viewProfile.gigsTitle')}
+            </h3>
+            {gigs === null ? (
+              <p className="text-sm text-white/40 text-center m-0">…</p>
+            ) : gigs.length === 0 ? (
+              <p className="text-sm text-white/40 text-center m-0">—</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {gigs.map((g) => (
+                  <div key={g.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                    <p className="m-0 text-sm font-medium text-white truncate">{g.eventName || g.venueName}</p>
+                    <p className="m-0 mt-1 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">
+                      {[g.venueName && g.eventName ? g.venueName : '', [g.city, g.country].filter(Boolean).join(', '),
+                        g.date && new Date(g.date).toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric' })]
+                        .filter(Boolean).join(' · ')}
+                    </p>
                   </div>
                 ))}
               </div>

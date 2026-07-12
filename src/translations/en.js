@@ -451,6 +451,9 @@ const en = {
     pastHighlights: 'Past Highlights',
     activeTours: 'Active Tours',
     gigsViaTora: '{{n}} gigs booked via TORA',
+    likedBy: 'Liked by',
+    andOthers: 'and {{n}} others',
+    gigsTitle: 'Gigs booked via TORA',
   },
 
   addProfile: {

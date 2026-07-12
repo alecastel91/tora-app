@@ -451,6 +451,9 @@ const it = {
     pastHighlights: 'Highlight passati',
     activeTours: 'Tour attivi',
     gigsViaTora: '{{n}} serate prenotate via TORA',
+    likedBy: 'Piace a',
+    andOthers: 'e altri {{n}}',
+    gigsTitle: 'Serate prenotate via TORA',
   },
 
   addProfile: {

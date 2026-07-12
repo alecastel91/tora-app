@@ -451,6 +451,9 @@ const ja = {
     pastHighlights: '過去のハイライト',
     activeTours: '進行中のツアー',
     gigsViaTora: 'TORA経由の出演 {{n}}件',
+    likedBy: 'いいね：',
+    andOthers: '他{{n}}人',
+    gigsTitle: 'TORA経由の出演',
   },
 
   addProfile: {

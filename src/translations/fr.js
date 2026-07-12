@@ -451,6 +451,9 @@ const fr = {
     pastHighlights: 'Dates marquantes',
     activeTours: 'Tournées en cours',
     gigsViaTora: '{{n}} dates réservées via TORA',
+    likedBy: 'Aimé par',
+    andOthers: 'et {{n}} autres',
+    gigsTitle: 'Dates réservées via TORA',
   },
 
   addProfile: {

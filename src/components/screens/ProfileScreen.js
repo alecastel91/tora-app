@@ -588,7 +588,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       {/* Bio Section */}
       {user?.bio && (
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 mb-5 text-left">
-          <p className="text-sm leading-relaxed text-white/70">{user.bio}</p>
+          <p className="text-sm leading-relaxed text-white/70 whitespace-pre-line">{user.bio}</p>
         </div>
       )}
 

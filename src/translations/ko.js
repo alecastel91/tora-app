@@ -451,6 +451,9 @@ const ko = {
     pastHighlights: '지난 하이라이트',
     activeTours: '진행 중인 투어',
     gigsViaTora: 'TORA로 성사된 공연 {{n}}건',
+    likedBy: '좋아요:',
+    andOthers: '외 {{n}}명',
+    gigsTitle: 'TORA로 성사된 공연',
   },
 
   addProfile: {

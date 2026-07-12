@@ -215,6 +215,21 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async getProfileLiked(profileId) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/liked`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
+  async getProfileConnections(profileId) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/connections`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
+  async getProfileGigs(profileId) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/gigs`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
   async getProfileLikers(profileId) {
     const response = await fetch(`${API_URL}/profiles/${profileId}/likers`, {
       method: 'GET',

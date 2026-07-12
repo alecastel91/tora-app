@@ -451,6 +451,9 @@ const zh = {
     pastHighlights: '过往亮点',
     activeTours: '进行中的巡演',
     gigsViaTora: '通过TORA预订的演出{{n}}场',
+    likedBy: '赞过：',
+    andOthers: '和其他{{n}}人',
+    gigsTitle: '通过TORA预订的演出',
   },
 
   addProfile: {

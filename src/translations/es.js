@@ -451,6 +451,9 @@ const es = {
     pastHighlights: 'Momentos destacados',
     activeTours: 'Giras activas',
     gigsViaTora: '{{n}} bolos reservados vía TORA',
+    likedBy: 'Le gusta a',
+    andOthers: 'y {{n}} más',
+    gigsTitle: 'Bolos reservados vía TORA',
   },
 
   addProfile: {
