@@ -750,6 +750,8 @@ const ja = {
     events: 'イベント',
     viewUpcomingEvents: '今後のイベントを見る',
     representedBy: '所属',
+    likesGiven: 'いいね済み',
+    likedByLabel: 'いいねされた',
     searchingWorldwidePremium: 'プレミアムで世界中を検索中',
     searchingWorldwideTrial: '48時間トライアルで世界中を検索中',
     searchLimitedTo: '検索範囲',

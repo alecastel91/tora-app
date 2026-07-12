@@ -448,11 +448,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         <div className="mx-4 mb-2 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5">
           <button type="button" onClick={() => setListModal('liked')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesGiven ?? 0}</span>
-            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.liked')}</span>
+            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
           </button>
           <button type="button" onClick={() => setListModal('likes')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-            <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesReceived ?? profile.statsLikes ?? 0}</span>
-            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likes')}</span>
+            <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesReceived ?? 0}</span>
+            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likedByLabel')}</span>
           </button>
           <button type="button" onClick={() => setListModal('connections')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{profile.connectionsCount ?? 0}</span>
@@ -692,7 +692,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 p-5" onClick={() => setListModal(null)}>
           <div className="max-w-md w-full max-h-[70vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#131315]/95 backdrop-blur-xl p-5" onClick={(e) => e.stopPropagation()}>
             <h3 className="m-0 mb-4 text-[13px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em] text-center">
-              {listModal === 'liked' ? t('profile.liked') : listModal === 'likes' ? t('profile.likes') : t('profile.connections')}
+              {listModal === 'liked' ? t('profile.likesGiven') : listModal === 'likes' ? t('profile.likedByLabel') : t('profile.connections')}
             </h3>
             {!listData[listModal] ? (
               <p className="text-sm text-white/40 text-center m-0">…</p>

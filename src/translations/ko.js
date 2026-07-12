@@ -750,6 +750,8 @@ const ko = {
     events: '이벤트',
     viewUpcomingEvents: '다가오는 이벤트 보기',
     representedBy: '소속 에이전트',
+    likesGiven: '보낸 좋아요',
+    likedByLabel: '받은 좋아요',
     searchingWorldwidePremium: '프리미엄으로 전 세계 검색 중',
     searchingWorldwideTrial: '48시간 체험으로 전 세계 검색 중',
     searchLimitedTo: '검색 범위 제한:',

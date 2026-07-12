@@ -750,6 +750,8 @@ const pt = {
     events: 'EVENTOS',
     viewUpcomingEvents: 'Ver próximos eventos',
     representedBy: 'Representado por',
+    likesGiven: 'Likes dados',
+    likedByLabel: 'Gostam',
     searchingWorldwidePremium: 'Pesquisa mundial com Premium',
     searchingWorldwideTrial: 'Pesquisa mundial com teste de 48h',
     searchLimitedTo: 'Pesquisa limitada a',

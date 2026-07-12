@@ -752,6 +752,8 @@ const en = {
     events: 'EVENTS',
     viewUpcomingEvents: 'View Upcoming Events',
     representedBy: 'Represented by',
+    likesGiven: 'Likes',
+    likedByLabel: 'Liked by',
     searchingWorldwidePremium: 'Searching worldwide with Premium',
     searchingWorldwideTrial: 'Searching worldwide with 48h trial',
     searchLimitedTo: 'Search limited to'

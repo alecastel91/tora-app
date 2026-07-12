@@ -532,11 +532,11 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       <div className="grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5 mb-5">
         <button type="button" onClick={() => setShowLikesList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
           <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(likedProfiles.size)}</span>
-          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.liked')}</span>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
         </button>
         <button type="button" onClick={() => setShowLikersList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
           <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(likerProfilesList.length)}</span>
-          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likes')}</span>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likedByLabel')}</span>
         </button>
         <button type="button" onClick={() => setShowConnectionsList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
           <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(connectedUsers.size)}</span>

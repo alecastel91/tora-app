@@ -750,6 +750,8 @@ const zh = {
     events: '活动',
     viewUpcomingEvents: '查看即将举行的活动',
     representedBy: '经纪方',
+    likesGiven: '已赞',
+    likedByLabel: '获赞',
     searchingWorldwidePremium: '高级版全球搜索中',
     searchingWorldwideTrial: '48小时试用全球搜索中',
     searchLimitedTo: '搜索范围限于',
