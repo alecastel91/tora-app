@@ -37,6 +37,13 @@ function App() {
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : 'login');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
+  // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
+  useEffect(() => {
+    const onNav = (e) => e.detail?.tab && setActiveTab(e.detail.tab);
+    window.addEventListener('tora:navigate-tab', onNav);
+    return () => window.removeEventListener('tora:navigate-tab', onNav);
+  }, []);
+
   // Keep-mounted tabs: once visited, a tab's screen stays mounted and is
   // hidden with display:none, so switching back is instant — no refetch,
   // no rebuild. Realtime subscriptions (deals, inbox) and the context poll

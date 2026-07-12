@@ -25,6 +25,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Tab state
   const [activeTab, setActiveTab] = useState('calendar');  // 'calendar' or 'kickstart'
+  // Deep-link: ViewProfile's tour block routes here and asks for Kickstart.
+  useEffect(() => {
+    const openKickstart = () => setActiveTab('kickstart');
+    window.addEventListener('tora:tour-kickstart', openKickstart);
+    return () => window.removeEventListener('tora:tour-kickstart', openKickstart);
+  }, []);
 
   // Calendar Matches state
   const [viewingProfile, setViewingProfile] = useState(null);

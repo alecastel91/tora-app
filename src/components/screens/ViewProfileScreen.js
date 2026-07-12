@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
-import { GlobeIcon, LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
+import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
@@ -9,6 +9,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
 import MakeOfferModal from '../common/MakeOfferModal';
+import { isPremiumViewer } from '../../utils/subscription';
+import { RA_LOGO_WHITE } from '../../utils/brandAssets';
 
 // Real platform glyphs for the links rows.
 const InstagramGlyph = () => (
@@ -19,7 +21,7 @@ const InstagramGlyph = () => (
   </svg>
 );
 const RAGlyph = () => (
-  <span className="text-white text-[11px] font-black tracking-tight leading-none" style={{ fontFamily: 'Arial Black, Inter, sans-serif' }}>RA</span>
+  <img src={RA_LOGO_WHITE} alt="RA" className="w-[22px] h-auto" />
 );
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
@@ -51,6 +53,9 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   const [bioExpanded, setBioExpanded] = useState(false);
   const [showGigsModal, setShowGigsModal] = useState(false);
   const [gigs, setGigs] = useState(null);
+  // Opening a person from this page (list rows, represented-by) stacks
+  // another ViewProfileScreen on top.
+  const [nestedProfile, setNestedProfile] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -390,12 +395,18 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             .map(a => a.name || a.agentName)
             .filter(Boolean);
           if (agentNames.length === 0) return null;
+          const firstAgent = repArray.find(a => (a.name || a.agentName) && (a.agentId || a.profileId || a.id));
+          const agentId = firstAgent && (firstAgent.agentId || firstAgent.profileId || firstAgent.id);
           return (
             <div className="represented-by-container">
-              <div className="represented-by-badge">
+              <button
+                type="button"
+                className="represented-by-badge bg-transparent border-none p-0 cursor-pointer hover:underline"
+                onClick={() => agentId && setNestedProfile({ id: agentId, name: firstAgent.name || firstAgent.agentName, role: 'AGENT' })}
+              >
                 <span className="represented-icon"><HandshakeIcon /></span>
                 {t('profile.representedBy')} {agentNames.join(', ')}
-              </div>
+              </button>
             </div>
           );
         })()}
@@ -449,20 +460,24 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </button>
         </div>
 
-        {/* Instagram-style social proof: first likers by name */}
-        {likers && likers.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setListModal('likes')}
-            className="block w-full bg-transparent border-none px-8 mb-4 text-center text-xs text-white/50 cursor-pointer"
-          >
-            {t('viewProfile.likedBy')}{' '}
-            <span className="text-white/80 font-medium">
-              {likers.slice(0, 2).map((l) => l.name).join(', ')}
-            </span>
-            {likers.length > 2 && <> {t('viewProfile.andOthers', { n: (profile.likesReceived ?? likers.length) - 2 })}</>}
-          </button>
-        )}
+        {/* Instagram-style social proof: only likers the VIEWER also likes */}
+        {(() => {
+          if (!likers || likers.length === 0) return null;
+          const familiar = likers.filter((l) => likedProfiles.has(l.id)).slice(0, 2);
+          if (familiar.length === 0) return null;
+          const others = (profile.likesReceived ?? likers.length) - familiar.length;
+          return (
+            <button
+              type="button"
+              onClick={() => setListModal('likes')}
+              className="block w-full bg-transparent border-none px-8 mb-4 text-center text-xs text-white/50 cursor-pointer"
+            >
+              {t('viewProfile.likedBy')}{' '}
+              <span className="text-white/80 font-medium">{familiar.map((l) => l.name).join(', ')}</span>
+              {others > 0 && <> {t('viewProfile.andOthers', { n: others })}</>}
+            </button>
+          );
+        })()}
 
         {/* Bio — clamped with see-more; authored line breaks preserved */}
         {profile.bio && (
@@ -496,13 +511,23 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </div>
         )}
 
-        {/* Active tours — promoters/venues can respond with an offer */}
-        {profile.role === 'ARTIST' && artistTours.length > 0 && (
+        {/* Active tours — Tour Kickstart is premium, so only premium viewers see it */}
+        {profile.role === 'ARTIST' && artistTours.length > 0 && isPremiumViewer(currentUser) && (
           <div className="px-5 mb-5 text-left">
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.activeTours')}</p>
             <div className="flex flex-col gap-2">
               {artistTours.map((tour) => (
-                <div key={tour.id} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                <div
+                  key={tour.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('tora:navigate-tab', { detail: { tab: 'tour' } }));
+                    window.dispatchEvent(new CustomEvent('tora:tour-kickstart'));
+                    onClose && onClose();
+                  }}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 cursor-pointer hover:border-infrared/40 transition-colors"
+                >
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="m-0 text-sm font-medium text-white truncate">
@@ -521,7 +546,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                       <button
                         type="button"
                         className="btn btn-primary btn-small shrink-0"
-                        onClick={() => setShowTourOffer(true)}
+                        onClick={(e) => { e.stopPropagation(); setShowTourOffer(true); }}
                       >
                         {t('tour.makeAnOffer')}
                       </button>
@@ -630,8 +655,8 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3
                          text-left cursor-pointer hover:border-infrared/40 transition-colors"
             >
-              <span className="w-9 h-9 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center shrink-0 text-infrared text-sm font-bold font-space-grotesk">
-                {profile.gigsCompleted}
+              <span className="w-9 h-9 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center shrink-0 text-infrared [&>svg]:w-4 [&>svg]:h-4">
+                <BookingsIcon />
               </span>
               <span className="flex-1 text-sm font-medium text-white">{t('viewProfile.gigsViaTora', { n: profile.gigsCompleted })}</span>
               <span className="text-white/30 text-xs">›</span>
@@ -676,7 +701,12 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             ) : (
               <div className="flex flex-col gap-2">
                 {listData[listModal].map((l) => (
-                  <div key={l.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => { setListModal(null); setNestedProfile(l); }}
+                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 w-full text-left cursor-pointer hover:border-infrared/40 transition-colors"
+                  >
                     <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-semibold ${getAvatarClass(l.role)}`}>
                       {l.avatar ? <img src={l.avatar} alt={l.name} className="w-full h-full object-cover" /> : (l.name || '?').charAt(0).toUpperCase()}
                     </div>
@@ -684,7 +714,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                       <p className="m-0 text-sm text-white truncate">{l.name}</p>
                       <p className="m-0 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{roleLabel(l.role, t)}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -718,6 +748,16 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             )}
           </div>
         </div>
+      )}
+
+      {nestedProfile && (
+        <ViewProfileScreen
+          profile={nestedProfile}
+          onClose={() => setNestedProfile(null)}
+          onOpenChat={onOpenChat}
+          onNavigateToMessages={onNavigateToMessages}
+          onOpenPremium={onOpenPremium}
+        />
       )}
 
       {/* Message Modal */}
