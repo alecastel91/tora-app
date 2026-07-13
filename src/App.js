@@ -25,6 +25,7 @@ import './styles/responsive.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
+import { appConfirm } from './utils/dialogs';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,6 +38,22 @@ function App() {
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : 'login');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
+  // Free-tier offer limit tripped anywhere: styled upgrade prompt.
+  useEffect(() => {
+    const onLimit = async (e) => {
+      const limit = e.detail?.limit ?? 3;
+      const nextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+      const when = nextMonth.toLocaleDateString(t('dateFormat.locale'), { month: 'long', day: 'numeric' });
+      const upgrade = await appConfirm(
+        t('offer.limitMessage', { n: limit, date: when }),
+        { title: t('offer.limitTitle'), confirmLabel: t('search.upgradeNow') }
+      );
+      if (upgrade) setShowPremium(true);
+    };
+    window.addEventListener('tora:offer-limit', onLimit);
+    return () => window.removeEventListener('tora:offer-limit', onLimit);
+  });
+
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
   // Goes through switchTab so the target joins mountedTabs (keep-mounted
   // invariant) and scroll bookkeeping runs.
@@ -978,6 +995,12 @@ function App() {
                   <div className="tier-value">2 x day</div>
                   <div className="tier-value">5 x day</div>
                   <div className="tier-value tier-value-highlight">Unlimited</div>
+                </div>
+                <div className="features-table-row">
+                  <div className="feature-name">{t('premium.sendOffers')}</div>
+                  <div className="tier-value">{t('premium.perMonth', { n: 3 })}</div>
+                  <div className="tier-value tier-value-highlight">{t('premium.unlimited')}</div>
+                  <div className="tier-value tier-value-highlight">{t('premium.unlimited')}</div>
                 </div>
               </div>
 

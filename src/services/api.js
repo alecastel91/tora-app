@@ -55,6 +55,12 @@ class ApiService {
         window.dispatchEvent(new CustomEvent('tora:verification-required', { detail: errorData }));
       }
 
+      // Free-tier offer allowance exhausted: one global signal, App.js shows
+      // the upgrade dialog (same pattern as the verification gate).
+      if (errorData.code === 'OFFER_LIMIT' && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('tora:offer-limit', { detail: errorData }));
+      }
+
       // Create an error object that mimics axios structure
       const error = new Error(errorData.message || errorData.error || 'Request failed');
       error.response = {

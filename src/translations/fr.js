@@ -61,6 +61,8 @@ const fr = {
     accommodationPlaceholder: 'ex. : hôtel pour 2 nuits',
     mealsPlaceholder: 'ex. : dîner avant le show',
     durationMinutes: '{{n}} minutes',
+    limitTitle: 'Limite mensuelle d\'offres atteinte',
+    limitMessage: 'Vous avez utilisé vos {{n}} offres gratuites ce mois-ci. Passez à Premium pour des offres illimitées, ou votre quota se réinitialise le {{date}}.',
   },
 
   bookings: {
@@ -380,6 +382,9 @@ const fr = {
     cancelAnytime: 'Annulez à tout moment. Tous les prix sont en EUR.',
     subscribeNow: 'S\'abonner maintenant',
     startExploring: 'Commencer à explorer',
+    sendOffers: 'Envoi d\'offres',
+    perMonth: '{{n}} par mois',
+    unlimited: 'Illimitées',
   },
 
   settingsExtra: {

@@ -61,6 +61,8 @@ const ko = {
     accommodationPlaceholder: '예: 호텔 2박',
     mealsPlaceholder: '예: 공연 전 저녁 식사',
     durationMinutes: '{{n}}분',
+    limitTitle: '월간 오퍼 한도 도달',
+    limitMessage: '이번 달 무료 오퍼 {{n}}건을 모두 사용했습니다. 프리미엄으로 무제한 오퍼를 이용하거나, {{date}}에 한도가 초기화됩니다.',
   },
 
   bookings: {
@@ -380,6 +382,9 @@ const ko = {
     cancelAnytime: '언제든지 해지할 수 있습니다. 모든 가격은 EUR 기준입니다.',
     subscribeNow: '지금 구독하기',
     startExploring: '시작하기',
+    sendOffers: '오퍼 보내기',
+    perMonth: '월 {{n}}회',
+    unlimited: '무제한',
   },
 
   settingsExtra: {

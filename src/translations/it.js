@@ -61,6 +61,8 @@ const it = {
     accommodationPlaceholder: 'es. hotel per 2 notti',
     mealsPlaceholder: 'es. cena prima dello show',
     durationMinutes: '{{n}} minuti',
+    limitTitle: 'Limite mensile di offerte raggiunto',
+    limitMessage: 'Hai usato le tue {{n}} offerte gratuite di questo mese. Passa a Premium per offerte illimitate, oppure il tuo limite si azzera il {{date}}.',
   },
 
   bookings: {
@@ -380,6 +382,9 @@ const it = {
     cancelAnytime: 'Disdici quando vuoi. Tutti i prezzi sono in EUR.',
     subscribeNow: 'Abbonati ora',
     startExploring: 'Inizia a esplorare',
+    sendOffers: 'Invio offerte',
+    perMonth: '{{n}} al mese',
+    unlimited: 'Illimitate',
   },
 
   settingsExtra: {

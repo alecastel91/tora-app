@@ -280,7 +280,12 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
         mealsNote: ''
       });
     } catch (err) {
-      setError(err.message || t('offer.createFailed'));
+      const code = err.response?.data?.code;
+      // OFFER_LIMIT / VERIFICATION_REQUIRED are handled by the global
+      // dialogs (api.js events) — no second error inside the modal.
+      if (code !== 'OFFER_LIMIT' && code !== 'VERIFICATION_REQUIRED') {
+        setError(err.message || t('offer.createFailed'));
+      }
       setLoading(false);
     }
   };

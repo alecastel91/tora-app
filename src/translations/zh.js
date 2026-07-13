@@ -61,6 +61,8 @@ const zh = {
     accommodationPlaceholder: '例如：酒店2晚',
     mealsPlaceholder: '例如：演出前晚餐',
     durationMinutes: '{{n}}分钟',
+    limitTitle: '已达本月报价上限',
+    limitMessage: '本月{{n}}次免费报价已用完。升级高级版享受无限报价，或等待{{date}}重置。',
   },
 
   bookings: {
@@ -380,6 +382,9 @@ const zh = {
     cancelAnytime: '随时可取消。所有价格均以欧元计。',
     subscribeNow: '立即订阅',
     startExploring: '开始探索',
+    sendOffers: '发送报价',
+    perMonth: '每月{{n}}次',
+    unlimited: '不限',
   },
 
   settingsExtra: {

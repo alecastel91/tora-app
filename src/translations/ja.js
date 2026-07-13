@@ -61,6 +61,8 @@ const ja = {
     accommodationPlaceholder: '例：ホテル2泊',
     mealsPlaceholder: '例：ショー前のディナー',
     durationMinutes: '{{n}}分',
+    limitTitle: '今月のオファー上限に達しました',
+    limitMessage: '今月の無料オファー{{n}}件を使い切りました。プレミアムで無制限にするか、{{date}}のリセットをお待ちください。',
   },
 
   bookings: {
@@ -380,6 +382,9 @@ const ja = {
     cancelAnytime: 'いつでもキャンセル可能。価格はすべてユーロ表示です。',
     subscribeNow: '今すぐ登録',
     startExploring: 'さっそく始める',
+    sendOffers: 'オファー送信',
+    perMonth: '月{{n}}回',
+    unlimited: '無制限',
   },
 
   settingsExtra: {
