@@ -52,9 +52,12 @@ const CitySearch = ({ city, country, zone, onSelect }) => {
     }
     setLoading(true);
     setOpen(true);
+    // Create the replacement controller NOW: the aborted request's finally
+    // block checks abortRef.current, and during the debounce window it would
+    // otherwise still see itself and clear the loading state early.
+    const controller = new AbortController();
+    abortRef.current = controller;
     debounceRef.current = setTimeout(async () => {
-      const controller = new AbortController();
-      abortRef.current = controller;
       try {
         const res = await fetch(`${API_URL}/cities?q=${encodeURIComponent(term)}`, { signal: controller.signal });
         const data = await res.json();

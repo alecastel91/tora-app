@@ -488,8 +488,8 @@
   padding: 0;
   background: transparent;
   border: none;
-  /* One color everywhere: the agent role green (matches the own profile). */
-  color: rgba(0, 200, 117, 0.9);
+  /* One color everywhere: the canonical agent role token. */
+  color: var(--color-role-agent);
   font-size: 13px;
   font-weight: 500;
 }
@@ -3182,34 +3182,6 @@
   height: 166px;
 }
 
-/* Profile Social CTAs */
-.profile-social-ctas {
-  display: flex;
-  gap: 10px;
-  padding: 0 20px;
-  margin: 20px 0;
-}
-
-.btn-social {
-  flex: 1;
-  padding: 12px;
-  font-size: 11px;
-  text-decoration: none;
-  text-align: center;
-}
-
-.btn-social.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  border-color: var(--border-dark);
-  color: var(--text-gray);
-}
-
-.btn-social:not(.disabled):hover {
-  background: var(--primary-pink);
-  color: white;
-}
-
 /* Instagram Input with @ Prefix */
 .input-with-prefix {
   display: flex;
@@ -4925,13 +4897,6 @@
   font-size: 16px;
 }
 
-/* RA Events Modal Styles */
-.ra-events-modal .modal-content {
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
 .ra-events-container {
   padding: 10px;
 }
@@ -4961,27 +4926,6 @@
 
 .ra-view-all-link:hover {
   opacity: 0.8;
-}
-
-.ra-events-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.ra-event-card {
-  display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: var(--bg-secondary);
-  border-radius: 10px;
-  border: 1px solid var(--border-dark);
-  transition: all 0.2s;
-}
-
-.ra-event-card:hover {
-  background: rgba(255, 51, 102, 0.05);
-  border-color: rgba(255, 51, 102, 0.3);
 }
 
 .event-date-block {
@@ -5037,15 +4981,6 @@
   font-weight: 600;
   color: var(--text-white);
   margin: 0;
-}
-
-.ticket-status {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .status-on-sale {
@@ -5112,28 +5047,12 @@
   color: var(--text-secondary);
 }
 
-.ra-events-footer {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid var(--border-dark);
-}
-
 .ra-disclaimer {
   font-size: 11px;
   color: var(--text-secondary);
   text-align: center;
   margin: 0;
   opacity: 0.7;
-}
-
-/* RA Events Tabs */
-.ra-events-tabs {
-  display: flex;
-  gap: 0;
-  background: var(--bg-tertiary);
-  border-radius: 8px;
-  padding: 4px;
-  margin-bottom: 20px;
 }
 
 .ra-tab {
@@ -5163,20 +5082,6 @@
 
 .ra-tab.active:hover {
   background: var(--primary-pink);
-}
-
-/* Past Events Styling */
-.ra-event-card.past-event {
-  opacity: 0.85;
-}
-
-.ra-event-card.past-event .event-date-block {
-  background: rgba(128, 128, 128, 0.1);
-  border-color: rgba(128, 128, 128, 0.2);
-}
-
-.ra-event-card.past-event .event-month {
-  color: var(--text-secondary);
 }
 
 .event-media-info {
@@ -5211,39 +5116,6 @@
   color: var(--text-white);
   border-color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.05);
-}
-
-/* RA Embed Card Updates */
-.embed-card.ra-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px;
-  background: var(--bg-secondary);
-  border-radius: 10px;
-  border: 1px solid var(--border-dark);
-}
-
-.ra-events-button {
-  width: 100%;
-  padding: 12px;
-  background: rgba(255, 51, 102, 0.08);
-  border: 1px solid rgba(255, 51, 102, 0.45);
-  border-radius: 12px;
-  color: var(--primary-pink);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.ra-events-button:hover {
-  background: rgba(255, 51, 102, 0.15);
-  box-shadow: 0 0 16px rgba(255, 51, 102, 0.2);
 }
 
 .ra-icon {
@@ -6004,25 +5876,6 @@
   background: var(--bg-dark);
   z-index: 90;
   overflow: hidden;
-}
-
-.view-profile-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(10, 10, 12, 0.97);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.view-profile-header h1 {
-  color: var(--text-white);
-  font-size: 18px;
-  margin: 0;
-  font-weight: 600;
 }
 
 .view-profile-content {

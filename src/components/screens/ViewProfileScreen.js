@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
-import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, CloseIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
+import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
@@ -11,6 +11,12 @@ import { raProfileUrl } from '../../utils/urls';
 import MakeOfferModal from '../common/MakeOfferModal';
 import { isPremiumViewer } from '../../utils/subscription';
 import { RA_LOGO_WHITE } from '../../utils/brandAssets';
+
+// 1234 -> '1.2K', matching the own-profile stats row.
+const fmtStat = (n) => {
+  const v = Number(n) || 0;
+  return v >= 1000 ? `${(v / 1000).toFixed(1).replace(/\.0$/, '')}K` : String(v);
+};
 
 // Real platform glyphs for the links rows.
 const InstagramGlyph = () => (
@@ -70,16 +76,17 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   }, [passedProfile?.id]);
 
   useEffect(() => {
-    if (!listModal || listData[listModal] || !passedProfile?.id) return;
+    // 'likes' renders straight from the eager likers state (caching a copy
+    // here could freeze an empty snapshot taken before the fetch resolved).
+    if (!listModal || listModal === 'likes' || listData[listModal] || !passedProfile?.id) return;
     const fetchers = {
       liked: () => apiService.getProfileLiked(passedProfile.id).then((d) => d.profiles || []),
-      likes: () => Promise.resolve(likers || []),
       connections: () => apiService.getProfileConnections(passedProfile.id).then((d) => d.profiles || []),
     };
     fetchers[listModal]()
       .then((rows) => setListData((prev) => ({ ...prev, [listModal]: rows })))
       .catch(() => setListData((prev) => ({ ...prev, [listModal]: [] })));
-  }, [listModal, listData, passedProfile?.id, likers]);
+  }, [listModal, listData, passedProfile?.id]);
 
   useEffect(() => {
     if (!showGigsModal || gigs !== null || !passedProfile?.id) return;
@@ -447,15 +454,15 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {/* Stats — same row as the own profile; every column opens the real list */}
         <div className="mx-4 mb-2 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2.5">
           <button type="button" onClick={() => setListModal('liked')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-            <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesGiven ?? 0}</span>
+            <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesGiven)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
           </button>
           <button type="button" onClick={() => setListModal('likes')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-            <span className="text-lg font-bold text-white font-space-grotesk">{profile.likesReceived ?? 0}</span>
+            <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesReceived)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likedByLabel')}</span>
           </button>
           <button type="button" onClick={() => setListModal('connections')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-            <span className="text-lg font-bold text-white font-space-grotesk">{profile.connectionsCount ?? 0}</span>
+            <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.connectionsCount)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.connections')}</span>
           </button>
         </div>
@@ -522,6 +529,9 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                   role="button"
                   tabIndex={0}
                   onClick={() => {
+                    // Flag first: if TourScreen isn't mounted yet, it reads
+                    // this on mount; if it is, the event switches it live.
+                    sessionStorage.setItem('tora:tour-kickstart-intent', '1');
                     window.dispatchEvent(new CustomEvent('tora:navigate-tab', { detail: { tab: 'tour' } }));
                     window.dispatchEvent(new CustomEvent('tora:tour-kickstart'));
                     onClose && onClose();
@@ -694,13 +704,15 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <h3 className="m-0 mb-4 text-[13px] font-semibold text-white font-space-grotesk uppercase tracking-[0.08em] text-center">
               {listModal === 'liked' ? t('profile.likesGiven') : listModal === 'likes' ? t('profile.likedByLabel') : t('profile.connections')}
             </h3>
-            {!listData[listModal] ? (
+            {(() => {
+              const rows = listModal === 'likes' ? likers : listData[listModal];
+              return !rows ? (
               <p className="text-sm text-white/40 text-center m-0">…</p>
-            ) : listData[listModal].length === 0 ? (
+            ) : rows.length === 0 ? (
               <p className="text-sm text-white/40 text-center m-0">—</p>
             ) : (
               <div className="flex flex-col gap-2">
-                {listData[listModal].map((l) => (
+                {rows.map((l) => (
                   <button
                     key={l.id}
                     type="button"
@@ -717,7 +729,8 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                   </button>
                 ))}
               </div>
-            )}
+            );
+            })()}
           </div>
         </div>
       )}

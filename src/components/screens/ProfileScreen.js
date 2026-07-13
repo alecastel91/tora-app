@@ -263,7 +263,10 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       // Downscale on-device before upload (backend re-normalizes to 512px
       // webp and stores it in object storage — the profile keeps a URL).
       const avatarBlob = await downscaleImageToBlob(file);
-      const updatedProfile = await apiService.uploadAvatar(user.id, avatarBlob);
+      const response = await apiService.uploadAvatar(user.id, avatarBlob);
+      // The multipart endpoint wraps the row: { profile } — updateUser needs
+      // the bare profile object (it keys on userData.id).
+      const updatedProfile = response.profile || response;
       updateUser(updatedProfile);
     } catch (error) {
       console.error('Failed to upload avatar:', error);

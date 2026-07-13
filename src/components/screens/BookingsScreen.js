@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef , useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
@@ -16,6 +16,7 @@ import { subscribeToDeals } from '../../services/realtime';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
+import { roleLabel } from '../../utils/roles';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -388,35 +389,36 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
     return 'ACCEPTED';
   };
 
-  // Localized display helpers (status enums / roles / doc categories / extras keys)
-  const statusLabel = (s) => ({
-    'PENDING': t('bookings.statusPending'),
-    'NEGOTIATING': t('bookings.statusNegotiating'),
-    'DECLINED': t('bookings.statusDeclined'),
-    'COMPLETED': t('bookings.statusCompleted'),
-    'DOCS SHARED': t('bookings.statusDocsShared'),
-    'CONTRACT SIGNED': t('bookings.statusContractSigned'),
-    'ACCEPTED': t('bookings.statusAccepted'),
-  }[s] || s);
-  const roleLabel = (r) => ({
-    ARTIST: t('search.roleArtist'),
-    VENUE: t('search.roleVenue'),
-    PROMOTER: t('search.rolePromoter'),
-    AGENT: t('search.roleAgent'),
-  }[r] || r);
-  const docCatLabel = (cat) => ({
-    pressKit: t('chat.pressKit'),
-    technicalRider: t('chat.technicalRider'),
-    hospitalityRider: t('chat.hospitalityRider'),
-    invoice: t('chat.invoice'),
-  }[cat.key] || cat.label);
-  const extraLabel = (key) => ({
-    travelIn: t('chat.travelIn'),
-    travelOut: t('chat.travelOut'),
-    transportation: t('chat.transportation'),
-    accommodation: t('chat.accommodation'),
-    meals: t('chat.meals'),
-  }[key] || key.replace(/([A-Z])/g, ' $1').trim());
+  // Localized display helpers. Maps are memoized on the language (t identity)
+  // — the render loop calls these hundreds of times per bookings page, so
+  // rebuilding the maps per call was thousands of t() lookups per render.
+  const labelMaps = useMemo(() => ({
+    status: {
+      'PENDING': t('bookings.statusPending'),
+      'NEGOTIATING': t('bookings.statusNegotiating'),
+      'DECLINED': t('bookings.statusDeclined'),
+      'COMPLETED': t('bookings.statusCompleted'),
+      'DOCS SHARED': t('bookings.statusDocsShared'),
+      'CONTRACT SIGNED': t('bookings.statusContractSigned'),
+      'ACCEPTED': t('bookings.statusAccepted'),
+    },
+    docCat: {
+      pressKit: t('chat.pressKit'),
+      technicalRider: t('chat.technicalRider'),
+      hospitalityRider: t('chat.hospitalityRider'),
+      invoice: t('chat.invoice'),
+    },
+    extra: {
+      travelIn: t('chat.travelIn'),
+      travelOut: t('chat.travelOut'),
+      transportation: t('chat.transportation'),
+      accommodation: t('chat.accommodation'),
+      meals: t('chat.meals'),
+    },
+  }), [t]);
+  const statusLabel = (s) => labelMaps.status[s] || s;
+  const docCatLabel = (cat) => labelMaps.docCat[cat.key] || cat.label;
+  const extraLabel = (key) => labelMaps.extra[key] || key.replace(/([A-Z])/g, ' $1').trim();
 
   const renderDealCard = (deal) => {
     const isOutgoing = deal.initiator.id === currentUser.id;
@@ -510,7 +512,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
             <div className="party-name-role">
               <h3>{otherParty.name}</h3>
               <span className={`role-badge ${otherParty.role.toLowerCase()}`}>
-                {roleLabel(otherParty.role)}
+                {roleLabel(otherParty.role, t)}
               </span>
             </div>
             {/* Artist label — shown whenever the deal is for a represented

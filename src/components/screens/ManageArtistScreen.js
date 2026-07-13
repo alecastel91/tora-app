@@ -973,11 +973,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 <div key={item.id} className="action-item">
                   <div className="action-icon"><Icon /></div>
                   <div className="action-content">
-                    <div className="action-title">{localizeActionItem(item, t).title}</div>
+                    <div className="action-title">{localized.title}</div>
                     {item.subtitle && <div className="action-description">{item.subtitle}</div>}
                   </div>
                   <button className="btn btn-outline btn-sm" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
-                    {localizeActionItem(item, t).actionLabel}
+                    {localized.actionLabel}
                   </button>
                 </div>
               );

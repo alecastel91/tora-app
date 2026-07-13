@@ -57,7 +57,15 @@ const EditProfileScreen = ({ onClose }) => {
       };
 
       // city/country/zone are real profile columns (search filters read
-      // them) — keep them in the payload alongside the display location.
+      // them). Only send them when the picker state is COMPLETE — CitySearch
+      // clears all three while typing, and legacy locations may not parse, so
+      // a partial state must never wipe the stored columns (bio-only saves
+      // included).
+      if (!(editedUser.city && editedUser.country && editedUser.zone)) {
+        delete updatedProfile.city;
+        delete updatedProfile.country;
+        delete updatedProfile.zone;
+      }
       // This screen never edits the avatar — don't echo it back. Avatar
       // uploads go through ProfileScreen, which sends only { avatar }.
       delete updatedProfile.avatar;

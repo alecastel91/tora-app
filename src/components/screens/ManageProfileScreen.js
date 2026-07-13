@@ -525,16 +525,17 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
             <div className="action-empty">{t('manage.nothingNeedsAttention')}</div>
           ) : (
             actionItems.map((item) => {
+              const localized = localizeActionItem(item, t);
               const Icon = getActionIcon(item.type);
               return (
                 <div key={item.id} className="action-item">
                   <div className="action-icon"><Icon /></div>
                   <div className="action-content">
-                    <div className="action-title">{localizeActionItem(item, t).title}</div>
+                    <div className="action-title">{localized.title}</div>
                     {item.subtitle && <div className="action-subtitle">{item.subtitle}</div>}
                   </div>
                   <button className="btn btn-sm btn-primary" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
-                    {localizeActionItem(item, t).actionLabel}
+                    {localized.actionLabel}
                   </button>
                 </div>
               );

@@ -38,11 +38,13 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
+  // Goes through switchTab so the target joins mountedTabs (keep-mounted
+  // invariant) and scroll bookkeeping runs.
   useEffect(() => {
-    const onNav = (e) => e.detail?.tab && setActiveTab(e.detail.tab);
+    const onNav = (e) => e.detail?.tab && switchTab(e.detail.tab);
     window.addEventListener('tora:navigate-tab', onNav);
     return () => window.removeEventListener('tora:navigate-tab', onNav);
-  }, []);
+  });
 
   // Keep-mounted tabs: once visited, a tab's screen stays mounted and is
   // hidden with display:none, so switching back is instant — no refetch,

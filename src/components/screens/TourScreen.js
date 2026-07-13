@@ -9,6 +9,7 @@ import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { citiesByCountry, countriesByZone, genresList } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
+import { isPremiumViewer } from '../../utils/subscription';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -16,18 +17,23 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const tourStatusLabel = (st) => ({ ACTIVE: t('tour.statusActive'), COMPLETED: t('tour.statusCompleted'), CANCELLED: t('tour.statusCancelled') }[st] || st);
 
   // Helper function to check if user has premium access (per-profile subscription)
-  const isPremiumUser = () => {
-    // Agents unlock via their agent plan (roster-based), not subscriptionTier.
-    if (user?.role === 'AGENT') return !!user?.agentTier;
-    const tier = user?.subscriptionTier || 'FREE';
-    return ['TRIAL', 'MONTHLY', 'YEARLY'].includes(tier);
-  };
+  // Single premium gate shared with every other surface (utils/subscription).
+  const isPremiumUser = () => isPremiumViewer(user);
 
   // Tab state
   const [activeTab, setActiveTab] = useState('calendar');  // 'calendar' or 'kickstart'
   // Deep-link: ViewProfile's tour block routes here and asks for Kickstart.
+  // The sessionStorage flag covers the case where TourScreen wasn't mounted
+  // yet when the event fired (event listeners only exist after mount).
   useEffect(() => {
-    const openKickstart = () => setActiveTab('kickstart');
+    if (sessionStorage.getItem('tora:tour-kickstart-intent')) {
+      sessionStorage.removeItem('tora:tour-kickstart-intent');
+      setActiveTab('kickstart');
+    }
+    const openKickstart = () => {
+      sessionStorage.removeItem('tora:tour-kickstart-intent');
+      setActiveTab('kickstart');
+    };
     window.addEventListener('tora:tour-kickstart', openKickstart);
     return () => window.removeEventListener('tora:tour-kickstart', openKickstart);
   }, []);
@@ -186,7 +192,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
         if (isArtist) {
           // Fetch artist's own tours
-          const response = await apiService.getMyTours();
+          const response = await apiService.getMyTours(user.id);
           console.log('[TourScreen] Artist tours received:', response.tours?.length);
           console.log('[TourScreen] My tours count:', response.tours?.length);
           setMyTours(response.tours || []);

@@ -849,8 +849,9 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async getMyTours() {
-    const response = await fetch(`${API_URL}/tours/my-tours`, {
+  async getMyTours(profileId) {
+    const qs = profileId ? `?profileId=${profileId}` : '';
+    const response = await fetch(`${API_URL}/tours/my-tours${qs}`, {
       method: 'GET',
       headers: this.getHeaders()
     });
