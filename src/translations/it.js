@@ -450,6 +450,7 @@ const it = {
     mutualConnections: '{{n}} collegamenti in comune',
     pastHighlights: 'Highlight passati',
     activeTours: 'Tour attivi',
+    toursLockedMsg: 'Scopri dove è in tour questo artista — sblocca con Premium',
     gigsViaTora: '{{n}} serate prenotate via TORA',
     likedBy: 'Piace a',
     andOthers: 'e altri {{n}}',

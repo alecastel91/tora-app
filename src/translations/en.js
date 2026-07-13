@@ -450,6 +450,7 @@ const en = {
     mutualConnections: '{{n}} mutual connections',
     pastHighlights: 'Past Highlights',
     activeTours: 'Active Tours',
+    toursLockedMsg: 'See where this artist is touring — unlock with Premium',
     gigsViaTora: '{{n}} gigs booked via TORA',
     likedBy: 'Liked by',
     andOthers: 'and {{n}} others',

@@ -450,6 +450,7 @@ const ko = {
     mutualConnections: '함께 아는 연결 {{n}}명',
     pastHighlights: '지난 하이라이트',
     activeTours: '진행 중인 투어',
+    toursLockedMsg: '이 아티스트의 투어 일정 — 프리미엄으로 확인하세요',
     gigsViaTora: 'TORA로 성사된 공연 {{n}}건',
     likedBy: '좋아요:',
     andOthers: '외 {{n}}명',

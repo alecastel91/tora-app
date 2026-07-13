@@ -450,6 +450,7 @@ const fr = {
     mutualConnections: '{{n}} connexions en commun',
     pastHighlights: 'Dates marquantes',
     activeTours: 'Tournées en cours',
+    toursLockedMsg: 'Découvrez où cet artiste est en tournée — débloquez avec Premium',
     gigsViaTora: '{{n}} dates réservées via TORA',
     likedBy: 'Aimé par',
     andOthers: 'et {{n}} autres',

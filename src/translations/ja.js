@@ -450,6 +450,7 @@ const ja = {
     mutualConnections: '共通のコネクション{{n}}件',
     pastHighlights: '過去のハイライト',
     activeTours: '進行中のツアー',
+    toursLockedMsg: 'このアーティストのツアー情報 — プレミアムで解放',
     gigsViaTora: 'TORA経由の出演 {{n}}件',
     likedBy: 'いいね：',
     andOthers: '他{{n}}人',
