@@ -21,6 +21,23 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const isPremiumUser = () => isPremiumViewer(user);
   // Fee privacy is Yearly-exclusive (backend re-enforces on save).
   const canHideFee = isYearlyViewer(user);
+  // Same fee-privacy control in both the create and edit forms.
+  const renderHideFeeField = () => (
+    <div className="form-group">
+      <label className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}>
+        <input
+          type="checkbox"
+          checked={canHideFee && !!tourForm.hideFee}
+          disabled={!canHideFee}
+          onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
+        />
+        <span>{t('tour.hideFeeLabel')}</span>
+      </label>
+      {!canHideFee && (
+        <small className="form-hint text-infrared/80">{t('tour.hideFeeYearlyNote')}</small>
+      )}
+    </div>
+  );
 
   // Tab state
   const [activeTab, setActiveTab] = useState('calendar');  // 'calendar' or 'kickstart'
@@ -1033,20 +1050,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <small className="form-hint">{t('tour.feeRangeHint')}</small>
             </div>
 
-            <div className="form-group">
-              <label className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}>
-                <input
-                  type="checkbox"
-                  checked={canHideFee && !!tourForm.hideFee}
-                  disabled={!canHideFee}
-                  onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
-                />
-                <span>{t('tour.hideFeeLabel')}</span>
-              </label>
-              {!canHideFee && (
-                <small className="form-hint text-infrared/80">{t('tour.hideFeeYearlyNote')}</small>
-              )}
-            </div>
+            {renderHideFeeField()}
 
             <div className="form-group">
               <label>{t('tour.additionalNotesOptional')}</label>
@@ -1225,20 +1229,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <small className="form-hint">{t('tour.feeRangeHint')}</small>
             </div>
 
-            <div className="form-group">
-              <label className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}>
-                <input
-                  type="checkbox"
-                  checked={canHideFee && !!tourForm.hideFee}
-                  disabled={!canHideFee}
-                  onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
-                />
-                <span>{t('tour.hideFeeLabel')}</span>
-              </label>
-              {!canHideFee && (
-                <small className="form-hint text-infrared/80">{t('tour.hideFeeYearlyNote')}</small>
-              )}
-            </div>
+            {renderHideFeeField()}
 
             <div className="form-group">
               <label>{t('tour.additionalNotesOptional')}</label>

@@ -52,7 +52,7 @@ function App() {
     };
     window.addEventListener('tora:offer-limit', onLimit);
     return () => window.removeEventListener('tora:offer-limit', onLimit);
-  });
+  }, [t]);
 
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
   // Goes through switchTab so the target joins mountedTabs (keep-mounted

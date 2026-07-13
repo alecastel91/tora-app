@@ -9,6 +9,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
 import MakeOfferModal from '../common/MakeOfferModal';
+import LockOverlay from '../common/LockOverlay';
 import { isPremiumViewer } from '../../utils/subscription';
 import { RA_LOGO_WHITE } from '../../utils/brandAssets';
 
@@ -539,13 +540,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                   <div className="h-7 w-24 rounded-full bg-infrared/50 shrink-0" />
                 </div>
               </div>
-              <div className="absolute inset-0 flex items-center justify-center gap-2.5 bg-black/35 px-4">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-infrared">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span className="text-xs text-white/85 leading-snug">{t('viewProfile.toursLockedMsg')}</span>
-              </div>
+              <LockOverlay message={t('viewProfile.toursLockedMsg')} />
             </button>
           </div>
         )}

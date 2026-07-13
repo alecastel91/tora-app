@@ -11,11 +11,14 @@ import { isYearlyViewer } from '../../utils/subscription';
 const CalendarScreen = ({ onClose, embedded = false }) => {
   const { t } = useLanguage();
   const { user, updateUser } = useAppContext();
-  // Calendar privacy (Yearly-exclusive): everyone vs connected-only.
+  // Calendar privacy: tightening to CONNECTED_ONLY is the Yearly perk;
+  // relaxing back to EVERYONE stays available at any tier so a lapsed
+  // subscriber is never trapped with a hidden calendar (backend agrees).
   const canEditVisibility = isYearlyViewer(user);
+  const canSelectVisibility = (value) => value === 'EVERYONE' || canEditVisibility;
   const [visibilitySaving, setVisibilitySaving] = useState(false);
   const handleVisibilityChange = async (value) => {
-    if (!canEditVisibility || visibilitySaving) return;
+    if (!canSelectVisibility(value) || visibilitySaving) return;
     if ((user?.calendarVisibility || 'EVERYONE') === value) return;
     setVisibilitySaving(true);
     try {
@@ -799,26 +802,27 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       )}
 
       <div className="calendar-content" style={embedded ? { padding: '0' } : {}}>
-        {/* Calendar privacy (Yearly-exclusive) — who sees availability +
-            travel schedule. Non-yearly tiers see the control disabled with
-            an upgrade note. Backend ignores writes from other tiers. */}
+        {/* Calendar privacy — who sees availability + travel schedule.
+            Restricting to connections-only is the Yearly perk; reopening to
+            everyone stays available at any tier (no lapsed-user trap). */}
         {user?.role === 'ARTIST' && (
           <div className="dashboard-section">
             <h3>{t('calendar.visibilityTitle')}</h3>
-            <div className={`flex gap-2 ${canEditVisibility ? '' : 'opacity-50'}`}>
+            <div className="flex gap-2">
               {['EVERYONE', 'CONNECTED_ONLY'].map((value) => {
                 const active = (user?.calendarVisibility || 'EVERYONE') === value;
+                const selectable = canSelectVisibility(value);
                 return (
                   <button
                     key={value}
                     type="button"
-                    disabled={!canEditVisibility || visibilitySaving}
+                    disabled={!selectable || visibilitySaving}
                     onClick={() => handleVisibilityChange(value)}
                     className={`flex-1 px-3 py-2.5 rounded-xl border text-xs font-tech uppercase tracking-[0.08em] transition-colors ${
                       active
                         ? 'border-infrared/60 text-infrared bg-infrared/10'
                         : 'border-white/10 text-white/50 bg-transparent hover:bg-white/5'
-                    } ${canEditVisibility ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                    } ${selectable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
                   >
                     {value === 'EVERYONE' ? t('calendar.visibilityEveryone') : t('calendar.visibilityConnected')}
                   </button>
