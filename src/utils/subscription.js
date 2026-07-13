@@ -14,3 +14,15 @@ export function isPremiumViewer(user) {
   }
   return tier === 'MONTHLY' || tier === 'YEARLY';
 }
+
+/**
+ * Yearly-exclusive features (tour fee privacy, calendar privacy, travel
+ * alerts, priority placement). Agents qualify via any active agent plan —
+ * their pricing axis is the roster ladder. Mirrors backend
+ * utils/subscription.js#isYearlyTier.
+ */
+export function isYearlyViewer(user) {
+  if (!user) return false;
+  if (user.agentTier) return true;
+  return user.subscriptionTier === 'YEARLY';
+}

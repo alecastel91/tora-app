@@ -6,10 +6,28 @@ import { CloseIcon, CalendarIcon, ListIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
 import apiService from '../../services/api';
 import { appAlert } from '../../utils/dialogs';
+import { isYearlyViewer } from '../../utils/subscription';
 
 const CalendarScreen = ({ onClose, embedded = false }) => {
   const { t } = useLanguage();
   const { user, updateUser } = useAppContext();
+  // Calendar privacy (Yearly-exclusive): everyone vs connected-only.
+  const canEditVisibility = isYearlyViewer(user);
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
+  const handleVisibilityChange = async (value) => {
+    if (!canEditVisibility || visibilitySaving) return;
+    if ((user?.calendarVisibility || 'EVERYONE') === value) return;
+    setVisibilitySaving(true);
+    try {
+      const updatedProfile = await apiService.updateProfile(user.id, { calendarVisibility: value });
+      updateUser(updatedProfile);
+    } catch (error) {
+      console.error('Failed to update calendar visibility:', error);
+      appAlert(t('calendar.visibilitySaveFailed'));
+    } finally {
+      setVisibilitySaving(false);
+    }
+  };
   const [selectedDates, setSelectedDates] = useState(new Set(user?.availableDates || []));
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [schedules, setSchedules] = useState(user?.travelSchedule || []);
@@ -781,6 +799,38 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
       )}
 
       <div className="calendar-content" style={embedded ? { padding: '0' } : {}}>
+        {/* Calendar privacy (Yearly-exclusive) — who sees availability +
+            travel schedule. Non-yearly tiers see the control disabled with
+            an upgrade note. Backend ignores writes from other tiers. */}
+        {user?.role === 'ARTIST' && (
+          <div className="dashboard-section">
+            <h3>{t('calendar.visibilityTitle')}</h3>
+            <div className={`flex gap-2 ${canEditVisibility ? '' : 'opacity-50'}`}>
+              {['EVERYONE', 'CONNECTED_ONLY'].map((value) => {
+                const active = (user?.calendarVisibility || 'EVERYONE') === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    disabled={!canEditVisibility || visibilitySaving}
+                    onClick={() => handleVisibilityChange(value)}
+                    className={`flex-1 px-3 py-2.5 rounded-xl border text-xs font-tech uppercase tracking-[0.08em] transition-colors ${
+                      active
+                        ? 'border-infrared/60 text-infrared bg-infrared/10'
+                        : 'border-white/10 text-white/50 bg-transparent hover:bg-white/5'
+                    } ${canEditVisibility ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                  >
+                    {value === 'EVERYONE' ? t('calendar.visibilityEveryone') : t('calendar.visibilityConnected')}
+                  </button>
+                );
+              })}
+            </div>
+            <small className="block mt-2 text-[11px] text-white/40">
+              {canEditVisibility ? t('calendar.visibilityHint') : t('calendar.visibilityYearlyNote')}
+            </small>
+          </div>
+        )}
+
         {/* Schedules Display - Conditional based on role */}
         {isPromoterOrVenue ? (
           /* Promoter/Venue Layout - matches agent's dashboard */

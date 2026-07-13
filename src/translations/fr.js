@@ -341,6 +341,8 @@ const fr = {
   },
 
   premium: {
+    preview: 'Aperçu',
+    feePrivacy: 'Confidentialité du cachet de tournée',
     title: 'TORA Premium',
     comparePlans: 'Comparer les offres',
     feature: 'Fonctionnalité',
@@ -498,6 +500,7 @@ const fr = {
   },
 
   tour: {
+    hideFeeYearlyNote: 'Masquer le cachet est une fonction Yearly — passez au plan annuel pour le garder privé.',
     allMonths: 'Tous les mois',
     unlockCalendarMatching: 'Débloquez le Calendar Matching',
     unlockCalendarMatchingDesc: 'Connectez-vous avec des professionnels selon des calendriers de voyage compatibles',
@@ -915,6 +918,12 @@ const fr = {
   },
 
   calendar: {
+    visibilityTitle: 'Visibilité du calendrier',
+    visibilityEveryone: 'Tout le monde',
+    visibilityConnected: 'Connexions uniquement',
+    visibilityHint: 'Choisissez qui peut voir vos disponibilités et vos déplacements.',
+    visibilityYearlyNote: 'La confidentialité du calendrier est une fonction Yearly — passez au plan annuel pour limiter qui voit votre agenda.',
+    visibilitySaveFailed: 'Impossible de mettre à jour la visibilité du calendrier. Veuillez réessayer.',
     endBeforeStart: 'La date de fin ne peut pas précéder la date de début. Corrigez les dates.',
     scheduleOverlap: 'Ce voyage chevauche un voyage existant. Choisissez d\'autres dates.',
     saveScheduleFailed: "Échec de l'enregistrement. Réessayez.",
@@ -1037,6 +1046,8 @@ const fr = {
   },
 
   manage: {
+    dashboardLockedMsg: 'Passez à Premium pour débloquer votre tableau de bord professionnel',
+    calendarLockedMsg: 'Passez à Premium pour gérer votre calendrier et vos déplacements',
     provideTitleAndUrl: 'Renseignez le titre et l\'URL',
     saveDocumentFailed: 'Impossible d\'enregistrer le document. Réessayez.',
     deleteDocumentConfirm: 'Voulez-vous vraiment supprimer ce lien de document ?',

@@ -21,6 +21,8 @@ const TYPE_TO_TAB = {
   REPRESENTATION_REQUEST: 'messages',
   REPRESENTATION_ACCEPTED: 'messages',
   NEW_MESSAGE: 'messages',
+  // Yearly travel alerts: a liked artist scheduled travel to your city.
+  TRAVEL_ALERT: 'search',
 };
 
 const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) => {

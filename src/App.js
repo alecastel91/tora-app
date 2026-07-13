@@ -932,7 +932,7 @@ function App() {
 
                 <div className="features-table-row">
                   <div className="feature-name">{t('premium.professionalDashboard')}</div>
-                  <div className="tier-value">—</div>
+                  <div className="tier-value">{t('premium.preview')}</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
@@ -976,6 +976,15 @@ function App() {
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
+                {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
+                  <div className="features-table-row">
+                    <div className="feature-name">{t('premium.feePrivacy')}</div>
+                    <div className="tier-value">—</div>
+                    <div className="tier-value">—</div>
+                    <div className="tier-value tier-value-highlight">✓</div>
+                  </div>
+                )}
+
                 <div className="features-table-row">
                   <div className="feature-name">{t('premium.messaging')}</div>
                   <div className="tier-value">✓</div>
@@ -1005,7 +1014,7 @@ function App() {
               </div>
 
               <div className="premium-extras-note">
-                <div className="extras-text">(10 EXTRA LIKES €2, 7-DAYS UNLIMITED LIKES €5)</div>
+                <div className="extras-text">(5 EXTRA LIKES €2, 7-DAYS UNLIMITED LIKES €5)</div>
               </div>
 
               <div className="features-table" style={{ marginTop: '0' }}>
@@ -1018,7 +1027,7 @@ function App() {
               </div>
 
               <div className="premium-extras-note">
-                <div className="extras-text">(1 EXTRA REQUEST €5, 5 EXTRA REQUESTS €15, 10 EXTRA CONTACTS €25)</div>
+                <div className="extras-text">(1 EXTRA REQUEST €5, 3 EXTRA REQUESTS €12)</div>
               </div>
             </div>
             

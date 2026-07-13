@@ -9,7 +9,7 @@ import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { citiesByCountry, countriesByZone, genresList } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import { isPremiumViewer } from '../../utils/subscription';
+import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -19,6 +19,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // Helper function to check if user has premium access (per-profile subscription)
   // Single premium gate shared with every other surface (utils/subscription).
   const isPremiumUser = () => isPremiumViewer(user);
+  // Fee privacy is Yearly-exclusive (backend re-enforces on save).
+  const canHideFee = isYearlyViewer(user);
 
   // Tab state
   const [activeTab, setActiveTab] = useState('calendar');  // 'calendar' or 'kickstart'
@@ -1032,14 +1034,18 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
 
             <div className="form-group">
-              <label className="checkbox-label">
+              <label className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}>
                 <input
                   type="checkbox"
-                  checked={!!tourForm.hideFee}
+                  checked={canHideFee && !!tourForm.hideFee}
+                  disabled={!canHideFee}
                   onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
                 />
                 <span>{t('tour.hideFeeLabel')}</span>
               </label>
+              {!canHideFee && (
+                <small className="form-hint text-infrared/80">{t('tour.hideFeeYearlyNote')}</small>
+              )}
             </div>
 
             <div className="form-group">
@@ -1220,14 +1226,18 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
 
             <div className="form-group">
-              <label className="checkbox-label">
+              <label className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}>
                 <input
                   type="checkbox"
-                  checked={!!tourForm.hideFee}
+                  checked={canHideFee && !!tourForm.hideFee}
+                  disabled={!canHideFee}
                   onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
                 />
                 <span>{t('tour.hideFeeLabel')}</span>
               </label>
+              {!canHideFee && (
+                <small className="form-hint text-infrared/80">{t('tour.hideFeeYearlyNote')}</small>
+              )}
             </div>
 
             <div className="form-group">

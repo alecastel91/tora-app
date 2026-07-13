@@ -341,6 +341,8 @@ const en = {
   },
 
   premium: {
+    preview: 'Preview',
+    feePrivacy: 'Tour Fee Privacy',
     title: 'TORA Premium',
     comparePlans: 'Compare Plans',
     feature: 'Feature',
@@ -498,6 +500,7 @@ const en = {
   },
 
   tour: {
+    hideFeeYearlyNote: 'Hide fee is a Yearly feature — upgrade to keep your fee private.',
     allMonths: 'All Months',
     unlockCalendarMatching: 'Unlock Calendar Matching',
     unlockCalendarMatchingDesc: 'Connect with professionals based on matching travel schedules',
@@ -922,6 +925,12 @@ const en = {
   
   // Calendar
   calendar: {
+    visibilityTitle: 'Calendar Visibility',
+    visibilityEveryone: 'Everyone',
+    visibilityConnected: 'Connections only',
+    visibilityHint: 'Choose who can see your availability and travel schedule.',
+    visibilityYearlyNote: 'Calendar privacy is a Yearly feature — upgrade to restrict who sees your schedule.',
+    visibilitySaveFailed: 'Could not update calendar visibility. Please try again.',
     endBeforeStart: 'End date cannot be before start date. Please adjust your dates.',
     scheduleOverlap: 'This travel schedule overlaps with an existing schedule. Please choose different dates.',
     saveScheduleFailed: 'Failed to save schedule. Please try again.',
@@ -1049,6 +1058,8 @@ const en = {
   
   // Common
   manage: {
+    dashboardLockedMsg: 'Upgrade to Premium to unlock your professional dashboard',
+    calendarLockedMsg: 'Upgrade to Premium to manage your calendar and travel schedule',
     provideTitleAndUrl: 'Please provide both title and URL',
     saveDocumentFailed: 'Failed to save document. Please try again.',
     deleteDocumentConfirm: 'Are you sure you want to delete this document link?',

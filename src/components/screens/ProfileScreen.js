@@ -344,7 +344,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
   // Show full-screen manage profile if requested
   if (showManageProfile) {
-    return <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} />;
+    return <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} />;
   }
 
   // Show full-screen represented artists if requested

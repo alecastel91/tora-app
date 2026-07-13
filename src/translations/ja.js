@@ -341,6 +341,8 @@ const ja = {
   },
 
   premium: {
+    preview: 'プレビュー',
+    feePrivacy: 'ツアー料金の非公開',
     title: 'TORAプレミアム',
     comparePlans: 'プラン比較',
     feature: '機能',
@@ -498,6 +500,7 @@ const ja = {
   },
 
   tour: {
+    hideFeeYearlyNote: '料金の非表示はYearly限定機能です。アップグレードすると料金を非公開にできます。',
     allMonths: 'すべての月',
     unlockCalendarMatching: 'カレンダーマッチングを解除',
     unlockCalendarMatchingDesc: '旅行スケジュールが一致するプロフェッショナルとつながりましょう',
@@ -915,6 +918,12 @@ const ja = {
   },
 
   calendar: {
+    visibilityTitle: 'カレンダーの公開範囲',
+    visibilityEveryone: '全員',
+    visibilityConnected: 'コネクションのみ',
+    visibilityHint: '空き状況と移動スケジュールを誰が見られるかを選択します。',
+    visibilityYearlyNote: 'カレンダーのプライバシー設定はYearly限定機能です。アップグレードすると公開範囲を制限できます。',
+    visibilitySaveFailed: '公開範囲を更新できませんでした。もう一度お試しください。',
     endBeforeStart: '終了日は開始日より前にできません。日付を調整してください。',
     scheduleOverlap: 'この旅行スケジュールは既存のスケジュールと重なっています。別の日付を選択してください。',
     saveScheduleFailed: 'スケジュールの保存に失敗しました。もう一度お試しください。',
@@ -1037,6 +1046,8 @@ const ja = {
   },
 
   manage: {
+    dashboardLockedMsg: 'プレミアムにアップグレードしてプロフェッショナルダッシュボードを解放',
+    calendarLockedMsg: 'プレミアムにアップグレードしてカレンダーと移動スケジュールを管理',
     provideTitleAndUrl: 'タイトルとURLの両方を入力してください',
     saveDocumentFailed: 'ドキュメントを保存できませんでした。もう一度お試しください。',
     deleteDocumentConfirm: 'このドキュメントリンクを削除しますか？',

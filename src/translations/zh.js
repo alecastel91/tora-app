@@ -341,6 +341,8 @@ const zh = {
   },
 
   premium: {
+    preview: '预览',
+    feePrivacy: '巡演费用保密',
     title: 'TORA 高级版',
     comparePlans: '套餐对比',
     feature: '功能',
@@ -498,6 +500,7 @@ const zh = {
   },
 
   tour: {
+    hideFeeYearlyNote: '隐藏费用是年费专属功能——升级后可将费用保密。',
     allMonths: '全部月份',
     unlockCalendarMatching: '解锁日历匹配',
     unlockCalendarMatchingDesc: '根据契合的行程安排与专业人士建立联系',
@@ -915,6 +918,12 @@ const zh = {
   },
 
   calendar: {
+    visibilityTitle: '日历可见范围',
+    visibilityEveryone: '所有人',
+    visibilityConnected: '仅限联系人',
+    visibilityHint: '选择谁可以查看你的档期和行程安排。',
+    visibilityYearlyNote: '日历隐私是年费专属功能——升级后可限制谁能查看你的日程。',
+    visibilitySaveFailed: '无法更新日历可见范围,请重试。',
     endBeforeStart: '结束日期不能早于开始日期。请修正日期。',
     scheduleOverlap: '此行程与现有行程重叠。请选择其他日期。',
     saveScheduleFailed: '保存失败。请重试。',
@@ -1037,6 +1046,8 @@ const zh = {
   },
 
   manage: {
+    dashboardLockedMsg: '升级至高级版以解锁专业仪表盘',
+    calendarLockedMsg: '升级至高级版以管理日历和行程安排',
     provideTitleAndUrl: '请同时填写标题和URL',
     saveDocumentFailed: '无法保存文件。请重试。',
     deleteDocumentConfirm: '确定要删除这个文件链接吗？',

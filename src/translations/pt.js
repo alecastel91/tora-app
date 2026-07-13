@@ -341,6 +341,8 @@ const pt = {
   },
 
   premium: {
+    preview: 'Pré-visualização',
+    feePrivacy: 'Privacidade do cachê da tour',
     title: 'TORA Premium',
     comparePlans: 'Comparar planos',
     feature: 'Funcionalidade',
@@ -498,6 +500,7 @@ const pt = {
   },
 
   tour: {
+    hideFeeYearlyNote: 'Ocultar o cachê é uma função Yearly — faça upgrade para mantê-lo privado.',
     allMonths: 'Todos os meses',
     unlockCalendarMatching: 'Desbloqueia o Calendar Matching',
     unlockCalendarMatchingDesc: 'Liga-te a profissionais com calendários de viagem compatíveis',
@@ -915,6 +918,12 @@ const pt = {
   },
 
   calendar: {
+    visibilityTitle: 'Visibilidade do calendário',
+    visibilityEveryone: 'Todos',
+    visibilityConnected: 'Apenas conexões',
+    visibilityHint: 'Escolha quem pode ver a sua disponibilidade e agenda de viagens.',
+    visibilityYearlyNote: 'A privacidade do calendário é uma função Yearly — faça upgrade para restringir quem vê a sua agenda.',
+    visibilitySaveFailed: 'Não foi possível atualizar a visibilidade do calendário. Tente novamente.',
     endBeforeStart: 'A data de fim não pode ser anterior à de início. Corrige as datas.',
     scheduleOverlap: 'Esta viagem sobrepõe-se a uma existente. Escolhe outras datas.',
     saveScheduleFailed: 'Não foi possível guardar. Tenta novamente.',
@@ -1037,6 +1046,8 @@ const pt = {
   },
 
   manage: {
+    dashboardLockedMsg: 'Faça upgrade para Premium para desbloquear o seu painel profissional',
+    calendarLockedMsg: 'Faça upgrade para Premium para gerir o calendário e a agenda de viagens',
     provideTitleAndUrl: 'Indica o título e o URL',
     saveDocumentFailed: 'Não foi possível guardar o documento. Tenta novamente.',
     deleteDocumentConfirm: 'Queres mesmo eliminar este link de documento?',

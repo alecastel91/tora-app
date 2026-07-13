@@ -10,10 +10,37 @@ import { uploadDocument } from '../../services/contractService';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 import { appAlert, appConfirm } from '../../utils/dialogs';
+import { isPremiumViewer } from '../../utils/subscription';
 
-const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
+const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const { t } = useLanguage();
+  // Free tier sees Dashboard + Calendar as blurred teasers that open
+  // Premium. Documents stays open — riders/press kits feed accepted deals
+  // and gating them would break bookings already in motion.
+  const manageLocked = !isPremiumViewer(user);
+
+  // Same teaser language as ViewProfile's locked tour block: real content
+  // under a heavy blur, one overlay CTA that opens the Premium screen.
+  const renderLockedPane = (content, message) => (
+    <div className="relative overflow-hidden rounded-xl">
+      <div className="blur-[7px] select-none pointer-events-none" aria-hidden>
+        {content}
+      </div>
+      <button
+        type="button"
+        onClick={() => onOpenPremium()}
+        className="absolute inset-0 z-10 flex items-center justify-center gap-2.5 bg-black/35 px-6
+                   border-none cursor-pointer text-center"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-infrared">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        <span className="text-xs text-white/85 leading-snug">{message}</span>
+      </button>
+    </div>
+  );
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, calendar, documents
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
@@ -853,8 +880,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {} }) => {
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
-        {activeTab === 'dashboard' && renderDashboardTab()}
-        {activeTab === 'calendar' && <CalendarScreen embedded={true} />}
+        {activeTab === 'dashboard' && (manageLocked
+          ? renderLockedPane(renderDashboardTab(), t('manage.dashboardLockedMsg'))
+          : renderDashboardTab())}
+        {activeTab === 'calendar' && (manageLocked
+          ? renderLockedPane(<CalendarScreen embedded={true} />, t('manage.calendarLockedMsg'))
+          : <CalendarScreen embedded={true} />)}
         {activeTab === 'documents' && renderDocumentsTab()}
       </div>
 
