@@ -500,6 +500,8 @@ const it = {
   },
 
   tour: {
+    artist: 'Artista',
+    allArtists: 'Tutti gli artisti',
     hideFeeYearlyNote: 'Nascondere il cachet è una funzione Yearly: passa al piano annuale per mantenerlo privato.',
     allMonths: 'Tutti i mesi',
     unlockCalendarMatching: 'Sblocca il Calendar Matching',

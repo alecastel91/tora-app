@@ -500,6 +500,8 @@ const es = {
   },
 
   tour: {
+    artist: 'Artista',
+    allArtists: 'Todos los artistas',
     hideFeeYearlyNote: 'Ocultar el caché es una función Yearly: mejora tu plan para mantenerlo privado.',
     allMonths: 'Todos los meses',
     unlockCalendarMatching: 'Desbloquea el Calendar Matching',

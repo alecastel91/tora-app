@@ -500,6 +500,8 @@ const ja = {
   },
 
   tour: {
+    artist: 'アーティスト',
+    allArtists: 'すべてのアーティスト',
     hideFeeYearlyNote: '料金の非表示はYearly限定機能です。アップグレードすると料金を非公開にできます。',
     allMonths: 'すべての月',
     unlockCalendarMatching: 'カレンダーマッチングを解除',

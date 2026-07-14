@@ -500,6 +500,8 @@ const zh = {
   },
 
   tour: {
+    artist: '艺人',
+    allArtists: '所有艺人',
     hideFeeYearlyNote: '隐藏费用是年费专属功能——升级后可将费用保密。',
     allMonths: '全部月份',
     unlockCalendarMatching: '解锁日历匹配',

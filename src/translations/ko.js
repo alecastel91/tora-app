@@ -500,6 +500,8 @@ const ko = {
   },
 
   tour: {
+    artist: '아티스트',
+    allArtists: '모든 아티스트',
     hideFeeYearlyNote: '요금 숨기기는 Yearly 전용 기능입니다. 업그레이드하면 요금을 비공개로 유지할 수 있습니다.',
     allMonths: '전체 월',
     unlockCalendarMatching: '캘린더 매칭 잠금 해제',

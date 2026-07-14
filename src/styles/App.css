@@ -9065,6 +9065,11 @@ input[type="date"].form-input,
 input[type="time"].form-input {
   color-scheme: dark;
   cursor: pointer;
+  /* Contain the full-size ::-webkit-calendar-picker-indicator below. Without
+     a positioning context the absolutely-positioned indicator escapes the
+     input on desktop Chrome and overlays neighbouring fields, so clicking
+     them re-opens this input's picker. */
+  position: relative;
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 14px;

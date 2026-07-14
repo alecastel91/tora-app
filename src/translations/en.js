@@ -500,6 +500,8 @@ const en = {
   },
 
   tour: {
+    artist: 'Artist',
+    allArtists: 'All Artists',
     hideFeeYearlyNote: 'Hide fee is a Yearly feature — upgrade to keep your fee private.',
     allMonths: 'All Months',
     unlockCalendarMatching: 'Unlock Calendar Matching',

@@ -21,6 +21,21 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const isPremiumUser = () => isPremiumViewer(user);
   // Fee privacy is Yearly-exclusive (backend re-enforces on save).
   const canHideFee = isYearlyViewer(user);
+
+  // Date fields: after a selection, desktop Chrome leaves the picker primed to
+  // re-open on the next click anywhere, so we blur to dismiss it. On touch that
+  // same blur fights the native wheel picker (onChange fires on every scroll),
+  // so blur only for fine (mouse) pointers.
+  const handleDateChange = (field) => (e) => {
+    const el = e.target;
+    const value = el.value;
+    setTourForm((prev) => ({ ...prev, [field]: value }));
+    if (typeof window !== 'undefined'
+        && window.matchMedia
+        && window.matchMedia('(pointer: fine)').matches) {
+      el.blur();
+    }
+  };
   // Same fee-privacy control in both the create and edit forms.
   const renderHideFeeField = () => (
     <div className="form-group">
@@ -69,6 +84,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [message, setMessage] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [monthFilter, setMonthFilter] = useState('all');
+  // Agents: filter matches down to a single represented artist.
+  const [artistFilter, setArtistFilter] = useState('all');
   const [calendarMatches, setCalendarMatches] = useState([]);
   const [loadingMatches, setLoadingMatches] = useState(false);
 
@@ -321,6 +338,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // filters here — re-checking genre against user.genres would wrongly drop
   // every agent match (an agent has no genres of their own).
   const filteredMatches = allMatches.filter(match => {
+    // Represented-artist filter (agents only)
+    if (artistFilter !== 'all' && match.forArtist?.id !== artistFilter) {
+      return false;
+    }
+
     // Role filter
     if (roleFilter !== 'all' && match.profile.role !== roleFilter) {
       return false;
@@ -471,6 +493,23 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           <div className="feature-preview">
             {/* Filters Section */}
             <div className="matches-filters">
+              {user?.role === 'AGENT' && (user.representingArtists || []).length > 0 && (
+                <div className="filter-group">
+                  <label className="filter-label">{t('tour.artist')}</label>
+                  <select
+                    className="filter-select"
+                    value={artistFilter}
+                    onChange={(e) => setArtistFilter(e.target.value)}
+                  >
+                    <option value="all">{t('tour.allArtists')}</option>
+                    {(user.representingArtists || []).map((a) => {
+                      const id = a.profileId || a.id;
+                      return <option key={id} value={id}>{a.name}</option>;
+                    })}
+                  </select>
+                </div>
+              )}
+
               <div className="filter-group">
                 <label className="filter-label">{t('editProfile.role')}</label>
                 <select
@@ -501,12 +540,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 </select>
               </div>
 
-              {(roleFilter !== 'all' || monthFilter !== 'all') && (
+              {(roleFilter !== 'all' || monthFilter !== 'all' || artistFilter !== 'all') && (
                 <button
                   className="filter-clear-btn"
                   onClick={() => {
                     setRoleFilter('all');
                     setMonthFilter('all');
+                    setArtistFilter('all');
                   }}
                 >
                   {t('search.clearFilters')}
@@ -957,7 +997,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.startDate}
-                onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })}
+                onChange={handleDateChange('startDate')}
                 className="form-input"
               />
             </div>
@@ -966,7 +1006,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.endDate}
-                onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })}
+                onChange={handleDateChange('endDate')}
                 className="form-input"
               />
             </div>
@@ -1146,7 +1186,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.startDate}
-                onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })}
+                onChange={handleDateChange('startDate')}
                 className="form-input"
               />
             </div>
@@ -1155,7 +1195,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.endDate}
-                onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })}
+                onChange={handleDateChange('endDate')}
                 className="form-input"
               />
             </div>
