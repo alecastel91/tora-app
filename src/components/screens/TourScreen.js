@@ -131,65 +131,69 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   const monthOptions = generateMonthOptions();
 
-  // Fetch calendar matches when user is premium and has available dates
+  // Fetch calendar matches when premium. Artists/venues/promoters match on
+  // their OWN availability; an agent has no calendar of their own, so they
+  // match on behalf of each represented artist (each match is tagged with the
+  // artist it belongs to).
   useEffect(() => {
     const fetchCalendarMatches = async () => {
-      if (!user || !isPremiumUser() || !user.availableDates || user.availableDates.length === 0) {
+      if (!user || !isPremiumUser()) {
         setCalendarMatches([]);
         return;
       }
 
+      const isAgent = user.role === 'AGENT';
+
+      // Resolve the "source" profiles whose availability drives the matching.
+      let sources = [];
+      if (isAgent) {
+        const ids = (user.representingArtists || [])
+          .map((a) => a.profileId || a.id)
+          .filter(Boolean);
+        if (ids.length === 0) { setCalendarMatches([]); return; }
+        const artistProfiles = await Promise.all(
+          ids.map((id) => apiService.getProfile(id).catch(() => null))
+        );
+        sources = artistProfiles.filter((p) => p && (p.availableDates || []).length > 0);
+      } else if ((user.availableDates || []).length > 0) {
+        sources = [user];
+      }
+
+      if (sources.length === 0) { setCalendarMatches([]); return; }
+
       setLoadingMatches(true);
       try {
-        // Fetch all profiles from backend (no filters = get all)
         const response = await apiService.searchProfiles({});
         const allProfiles = response.profiles || [];
 
-        // Find matches
-        const userAvailableDates = new Set(user.availableDates);
         const matches = [];
+        for (const source of sources) {
+          const sourceDates = new Set(source.availableDates || []);
+          const sourceGenres = source.genres || [];
 
-        for (const profile of allProfiles) {
-          // Skip self
-          if (profile.id === user.id) continue;
+          for (const profile of allProfiles) {
+            if (profile.id === source.id || profile.id === user.id) continue;
+            if (!isValidRoleMatch(source.role, profile.role)) continue;
 
-          // Check role compatibility
-          if (!isValidRoleMatch(user.role, profile.role)) continue;
+            const profileGenres = profile.genres || [];
+            if (sourceGenres.length === 0 || profileGenres.length === 0) continue;
+            if (!sourceGenres.some((genre) => profileGenres.includes(genre))) continue;
 
-          // Check genre matching - must have at least one genre in common
-          const userGenres = user.genres || [];
-          const profileGenres = profile.genres || [];
-
-          // Skip if either has no genres, or if they have no common genres
-          if (userGenres.length === 0 || profileGenres.length === 0) {
-            continue;
-          }
-
-          const hasCommonGenre = userGenres.some(genre => profileGenres.includes(genre));
-          if (!hasCommonGenre) {
-            continue;
-          }
-
-          // Check for overlapping available dates
-          const profileAvailableDates = profile.availableDates || [];
-          const overlappingDates = profileAvailableDates.filter(date => userAvailableDates.has(date));
-
-          if (overlappingDates.length > 0) {
-            // Format dates for display
-            const datesFormatted = formatMatchDates(overlappingDates);
-
-            matches.push({
-              profile,
-              dates: datesFormatted,
-              matchCount: overlappingDates.length,
-              rawDates: overlappingDates
-            });
+            const overlappingDates = (profile.availableDates || []).filter((date) => sourceDates.has(date));
+            if (overlappingDates.length > 0) {
+              matches.push({
+                profile,
+                dates: formatMatchDates(overlappingDates),
+                matchCount: overlappingDates.length,
+                rawDates: overlappingDates,
+                // Agent view: which represented artist this match is for.
+                forArtist: isAgent ? { id: source.id, name: source.name } : null,
+              });
+            }
           }
         }
 
-        // Sort by number of matching dates (most matches first)
         matches.sort((a, b) => b.matchCount - a.matchCount);
-
         setCalendarMatches(matches);
       } catch (error) {
         console.error('Error fetching calendar matches:', error);
@@ -200,7 +204,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     };
 
     fetchCalendarMatches();
-  }, [user?.id, user?.subscriptionTier, user?.availableDates?.length, activeTab]);
+  }, [user?.id, user?.role, user?.subscriptionTier, user?.availableDates?.length, user?.representingArtists?.length, activeTab]);
 
   // Fetch tours when Kickstart tab is active
   useEffect(() => {
@@ -311,22 +315,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   const allMatches = calendarMatches;
 
-  // Filter matches based on selected filters
+  // Filter matches based on selected UI filters. Genre + availability
+  // matching already happened at fetch time against the correct source
+  // profile (the artist, for agents), so we only apply the role/period
+  // filters here — re-checking genre against user.genres would wrongly drop
+  // every agent match (an agent has no genres of their own).
   const filteredMatches = allMatches.filter(match => {
-    // Genre matching - must have at least one genre in common
-    const userGenres = user?.genres || [];
-    const matchGenres = match.profile.genres || [];
-
-    // Skip if either has no genres, or if they have no common genres
-    if (userGenres.length === 0 || matchGenres.length === 0) {
-      return false;
-    }
-
-    const hasCommonGenre = userGenres.some(genre => matchGenres.includes(genre));
-    if (!hasCommonGenre) {
-      return false;
-    }
-
     // Role filter
     if (roleFilter !== 'all' && match.profile.role !== roleFilter) {
       return false;
@@ -533,6 +527,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
                   return (
                     <div key={`${profileId}-${index}`} className="match-card-simple">
+                      {match.forArtist && (
+                        <div className="text-[10px] uppercase tracking-[0.15em] text-infrared/80 font-tech mb-1.5">
+                          {t('bookings.forArtist', { name: match.forArtist.name })}
+                        </div>
+                      )}
                       <div className="match-date-location">
                         <span><CalendarIcon /> {match.dates}</span>
                         <span><LocationIcon /> {match.profile.location}</span>
@@ -958,7 +957,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.startDate}
-                onChange={(e) => { setTourForm({ ...tourForm, startDate: e.target.value }); e.target.blur(); }}
+                onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })}
                 className="form-input"
               />
             </div>
@@ -967,7 +966,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.endDate}
-                onChange={(e) => { setTourForm({ ...tourForm, endDate: e.target.value }); e.target.blur(); }}
+                onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })}
                 className="form-input"
               />
             </div>
@@ -1147,7 +1146,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.startDate}
-                onChange={(e) => { setTourForm({ ...tourForm, startDate: e.target.value }); e.target.blur(); }}
+                onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })}
                 className="form-input"
               />
             </div>
@@ -1156,7 +1155,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <input
                 type="date"
                 value={tourForm.endDate}
-                onChange={(e) => { setTourForm({ ...tourForm, endDate: e.target.value }); e.target.blur(); }}
+                onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })}
                 className="form-input"
               />
             </div>
