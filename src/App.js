@@ -38,21 +38,6 @@ function App() {
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : 'login');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
-  // Free-tier offer limit tripped anywhere: styled upgrade prompt.
-  useEffect(() => {
-    const onLimit = async (e) => {
-      const limit = e.detail?.limit ?? 3;
-      const nextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
-      const when = nextMonth.toLocaleDateString(t('dateFormat.locale'), { month: 'long', day: 'numeric' });
-      const upgrade = await appConfirm(
-        t('offer.limitMessage', { n: limit, date: when }),
-        { title: t('offer.limitTitle'), confirmLabel: t('search.upgradeNow') }
-      );
-      if (upgrade) setShowPremium(true);
-    };
-    window.addEventListener('tora:offer-limit', onLimit);
-    return () => window.removeEventListener('tora:offer-limit', onLimit);
-  }, [t]);
 
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
   // Goes through switchTab so the target joins mountedTabs (keep-mounted
@@ -129,6 +114,23 @@ function App() {
   const [accountUser, setAccountUser] = useState(null); // Account-level user data (email, currency, etc)
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
   const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback } = useAppContext();
+
+  // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
+  // after t/setShowPremium so the [t] dependency isn't read before init.
+  useEffect(() => {
+    const onLimit = async (e) => {
+      const limit = e.detail?.limit ?? 3;
+      const nextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+      const when = nextMonth.toLocaleDateString(t('dateFormat.locale'), { month: 'long', day: 'numeric' });
+      const upgrade = await appConfirm(
+        t('offer.limitMessage', { n: limit, date: when }),
+        { title: t('offer.limitTitle'), confirmLabel: t('search.upgradeNow') }
+      );
+      if (upgrade) setShowPremium(true);
+    };
+    window.addEventListener('tora:offer-limit', onLimit);
+    return () => window.removeEventListener('tora:offer-limit', onLimit);
+  }, [t]);
 
   // Available currencies
   const availableCurrencies = [
