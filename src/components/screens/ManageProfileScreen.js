@@ -22,19 +22,23 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const manageLocked = !isPremiumViewer(user);
 
   // Same teaser language as ViewProfile's locked tour block: real content
-  // under a heavy blur with a shared lock overlay; the whole pane opens
-  // Premium.
+  // under a heavy blur, with a clickable lock overlay that opens Premium.
+  // The overlay is an absolute sibling (not a wrapper) so the blurred
+  // content's own buttons aren't nested inside a <button>.
   const renderLockedPane = (content, message) => (
-    <button
-      type="button"
-      onClick={() => onOpenPremium()}
-      className="relative block w-full overflow-hidden rounded-xl border-none bg-transparent p-0 cursor-pointer text-left"
-    >
+    <div className="relative overflow-hidden rounded-xl">
       <div className="blur-[7px] select-none pointer-events-none" aria-hidden>
         {content}
       </div>
-      <LockOverlay message={message} />
-    </button>
+      <button
+        type="button"
+        onClick={() => onOpenPremium()}
+        aria-label={message}
+        className="absolute inset-0 z-10 w-full border-none bg-transparent p-0 cursor-pointer"
+      >
+        <LockOverlay message={message} />
+      </button>
+    </div>
   );
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, calendar, documents
   const [upcomingGigs, setUpcomingGigs] = useState(null);
