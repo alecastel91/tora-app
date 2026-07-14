@@ -24,14 +24,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // Same fee-privacy control in both the create and edit forms.
   const renderHideFeeField = () => (
     <div className="form-group">
-      <label className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}>
+      <label
+        className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}
+        style={{ gap: '18px', paddingBlock: '6px' }}
+      >
         <input
           type="checkbox"
           checked={canHideFee && !!tourForm.hideFee}
           disabled={!canHideFee}
           onChange={(e) => setTourForm({ ...tourForm, hideFee: e.target.checked })}
         />
-        <span>{t('tour.hideFeeLabel')}</span>
+        <span style={{ lineHeight: 1.4 }}>{t('tour.hideFeeLabel')}</span>
       </label>
       {!canHideFee && (
         <small className="form-hint text-infrared/80">{t('tour.hideFeeYearlyNote')}</small>
