@@ -26,7 +26,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     <div className="form-group">
       <label
         className={`checkbox-label ${canHideFee ? '' : 'opacity-50 cursor-not-allowed'}`}
-        style={{ gap: '18px', paddingBlock: '6px' }}
+        /* `.form-group label { display: block }` (canonical rule) otherwise
+           beats `.checkbox-label`'s flex, collapsing the gap — force flex here. */
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBlock: '2px' }}
       >
         <input
           type="checkbox"
