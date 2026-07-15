@@ -10,7 +10,13 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  background: #000000;
+  /* Same ambient depth as the app frame, so the login feels cohesive. */
+  background-color: #060609;
+  background-image:
+    radial-gradient(90% 50% at 50% 0%, rgba(255, 51, 102, 0.14), transparent 60%),
+    radial-gradient(130% 80% at 50% 12%, rgba(42, 38, 62, 0.55), transparent 72%),
+    radial-gradient(70% 45% at 108% 4%, rgba(128, 92, 236, 0.09), transparent 55%),
+    radial-gradient(150% 120% at 50% 30%, transparent 55%, rgba(0, 0, 0, 0.6) 100%);
   padding: 20px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -302,9 +308,50 @@
   position: relative;
   max-width: 428px;
   margin: 0 auto;
-  background: var(--bg-black);
+  /* Ambient depth: a near-black base lit by soft, off-screen colour blooms
+     (brand crimson + a cool counter-tone) with a gentle vignette pulling the
+     eye to centre. Fixed to the frame so it stays put while content scrolls —
+     the screens above are transparent, so this reads through the gaps between
+     cards and gives every page dimension instead of flat black. */
+  background-color: #060609;
+  background-image:
+    /* brand crimson light source, top */
+    radial-gradient(92% 55% at 50% -6%, rgba(255, 51, 102, 0.13), transparent 60%),
+    /* broad cool atmosphere lifting the whole upper canvas off pure black */
+    radial-gradient(130% 90% at 50% 16%, rgba(42, 38, 62, 0.6), transparent 72%),
+    /* violet + teal accents in opposite corners for colour depth */
+    radial-gradient(68% 48% at 114% 4%, rgba(128, 92, 236, 0.09), transparent 55%),
+    radial-gradient(80% 55% at -14% 106%, rgba(0, 135, 170, 0.08), transparent 55%),
+    /* gentle vignette to focus the centre */
+    radial-gradient(140% 125% at 50% 30%, transparent 52%, rgba(0, 0, 0, 0.55) 100%);
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+/* Faint engineering grid, masked to fade toward the edges. */
+.app-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-size: 46px 46px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  -webkit-mask-image: radial-gradient(118% 92% at 50% 0%, #000 0%, transparent 74%);
+  mask-image: radial-gradient(118% 92% at 50% 0%, #000 0%, transparent 74%);
+}
+
+/* Subtle film grain for a tactile, non-flat surface. */
+.app-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .app-content {
@@ -313,11 +360,12 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding-bottom: 70px;
-  background: var(--bg-black);
+  background: transparent; /* let the app-container ambient show through */
   overscroll-behavior: none;
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
   position: relative;
+  z-index: 1; /* above the ambient ::before / ::after */
 }
 
 /* Header */
@@ -329,7 +377,7 @@
 .screen {
   display: none;
   animation: fadeIn 0.3s ease;
-  background: var(--bg-black);
+  background: transparent; /* ambient depth comes from .app-container */
   min-height: calc(100vh - 120px);
 }
 
