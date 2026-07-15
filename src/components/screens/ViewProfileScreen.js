@@ -363,7 +363,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </h2>
           </div>
           {profile.role === 'AGENT' && profile.agencyName && (
-            <p className="text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p>
+            <p className="text-center text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p>
           )}
           <p className="profile-location"><LocationIcon />{profile.location}</p>
           <div className="profile-role-centered">
@@ -445,13 +445,13 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Sender-side alert: counterparty hasn't verified yet */}
         {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
-          <p className="mx-4 mb-3 px-4 py-3 rounded-2xl border border-white/10 bg-[#101015] text-xs leading-relaxed text-white/50 text-center">
+          <p className="mb-5 px-4 py-3 rounded-2xl border border-white/10 bg-[#101015] text-xs leading-relaxed text-white/50 text-center">
             {t('viewProfile.unverifiedNotice')}
           </p>
         )}
 
         {/* Stats — same row as the own profile; every column opens the real list */}
-        <div className="mx-4 mb-2 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-2.5">
+        <div className="mb-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-2.5">
           <button type="button" onClick={() => setListModal('liked')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesGiven)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
@@ -487,8 +487,8 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Bio — clamped with see-more; authored line breaks preserved */}
         {profile.bio && (
-          <div className="profile-bio">
-            <p className={`whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
+          <div className="rounded-2xl border border-white/10 bg-[#101015] p-4 mb-5 text-left">
+            <p className={`text-sm leading-relaxed text-white/70 whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
             {profile.bio.length > 180 && (
               <button
                 type="button"
@@ -503,7 +503,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Venue capacity + rooms — showcased in a box for relevance */}
         {profile.role === 'VENUE' && (profile.venueCapacity || profile.venueRooms) && (
-          <div className="mx-4 mb-4 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-4">
+          <div className="mb-5 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-2.5">
             {profile.venueCapacity && (
               <div className="flex-1 px-2 text-center">
                 <div className="text-lg font-semibold text-white">{Number(profile.venueCapacity).toLocaleString()}</div>
@@ -521,7 +521,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Past highlights — artist-curated gigs (roadmap item 10) */}
         {profile.role === 'ARTIST' && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0 && (
-          <div className="px-5 mb-5 text-left">
+          <div className="mb-5 text-left">
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.pastHighlights')}</p>
             <div className="flex flex-col gap-2">
               {profile.pastHighlights.map((h, i) => (
@@ -538,7 +538,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {/* Active tours — Tour Kickstart is premium. Free viewers always see
             the section as a blurred teaser (tours or not) that opens Premium. */}
         {profile.role === 'ARTIST' && !isPremiumViewer(currentUser) && (
-          <div className="px-5 mb-5 text-left">
+          <div className="mb-5 text-left">
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.activeTours')}</p>
             <button
               type="button"
@@ -562,7 +562,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         )}
 
         {profile.role === 'ARTIST' && artistTours.length > 0 && isPremiumViewer(currentUser) && (
-          <div className="px-5 mb-5 text-left">
+          <div className="mb-5 text-left">
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.activeTours')}</p>
             <div className="flex flex-col gap-2">
               {artistTours.map((tour) => (
@@ -659,7 +659,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* ===== Links (same rows as the own profile) ===== */}
         {(profile.website || profile.instagram || profile.residentAdvisor || profile.linkedin) && (
-          <div className="px-5 mb-5 text-left">
+          <div className="mb-5 text-left">
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{t('profile.links')}</p>
             <div className="flex flex-col gap-3">
               {profile.website && (
@@ -700,7 +700,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* TORA gig history — tappable, opens the detailed list */}
         {profile.role === 'ARTIST' && profile.gigsCompleted > 0 && (
-          <div className="px-5 mb-3">
+          <div className="mb-3">
             <button
               type="button"
               onClick={() => setShowGigsModal(true)}
