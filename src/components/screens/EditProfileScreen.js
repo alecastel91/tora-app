@@ -182,6 +182,20 @@ const EditProfileScreen = ({ onClose }) => {
             </div>
           )}
 
+          {editedUser.role === 'VENUE' && (
+            <div className="form-group">
+              <label>{t('editProfile.venueRooms')}</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={editedUser.venueRooms || ''}
+                onChange={(e) => setEditedUser({ ...editedUser, venueRooms: e.target.value.replace(/[^0-9]/g, '') })}
+                placeholder={t('editProfile.venueRoomsPlaceholder')}
+              />
+            </div>
+          )}
+
           {editedUser.role === 'AGENT' && (
             <div className="form-group">
               <label>{t('editProfile.agencyName')}</label>

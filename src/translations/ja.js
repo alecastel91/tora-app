@@ -710,6 +710,7 @@ const ja = {
   },
 
   profile: {
+    rooms: 'フロア',
     uploadFailed: '画像のアップロードに失敗しました。もう一度お試しください。',
     deleteFailed: 'プロフィールの削除に失敗しました。もう一度お試しください。',
     manageLabel: '管理',
@@ -769,6 +770,8 @@ const ja = {
   },
 
   editProfile: {
+    venueRooms: 'フロア / ステージ数',
+    venueRoomsPlaceholder: '例: 2',
     profileIdMissing: 'プロフィールIDが見つかりません。ログアウトして再度ログインしてください。',
     saveFailed: 'プロフィールの保存に失敗しました。もう一度お試しください。',
     basicInformation: '基本情報',

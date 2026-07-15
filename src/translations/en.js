@@ -712,6 +712,7 @@ const en = {
   
   // Profile Screen
   profile: {
+    rooms: 'Rooms',
     uploadFailed: 'Failed to upload image. Please try again.',
     deleteFailed: 'Failed to delete profile. Please try again.',
     manageLabel: 'Manage',
@@ -772,6 +773,8 @@ const en = {
   
   // Edit Profile
   editProfile: {
+    venueRooms: 'Rooms / Stages',
+    venueRoomsPlaceholder: 'e.g. 2',
     profileIdMissing: 'Profile ID is missing. Please log out and log back in.',
     saveFailed: 'Failed to save profile. Please try again.',
     basicInformation: 'Basic Information',

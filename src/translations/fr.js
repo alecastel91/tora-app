@@ -710,6 +710,7 @@ const fr = {
   },
 
   profile: {
+    rooms: 'Salles',
     uploadFailed: "Échec du téléversement de l'image. Réessayez.",
     deleteFailed: 'Échec de la suppression du profil. Réessayez.',
     manageLabel: 'Gérer',
@@ -769,6 +770,8 @@ const fr = {
   },
 
   editProfile: {
+    venueRooms: 'Salles / Scènes',
+    venueRoomsPlaceholder: 'ex. 2',
     profileIdMissing: 'ID de profil manquant. Déconnectez-vous puis reconnectez-vous.',
     saveFailed: "Échec de l'enregistrement du profil. Réessayez.",
     basicInformation: 'Informations de base',

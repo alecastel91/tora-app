@@ -362,22 +362,15 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {profile.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" />}
             </h2>
           </div>
+          {profile.role === 'AGENT' && profile.agencyName && (
+            <p className="text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p>
+          )}
           <p className="profile-location"><LocationIcon />{profile.location}</p>
           <div className="profile-role-centered">
             <div className={getRoleBadgeClass(profile.role)}>
               {roleLabel(profile.role, t)}
             </div>
           </div>
-          {profile.role === 'AGENT' && profile.agencyName && (
-            <p className="profile-agency-name" style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', marginTop: '4px' }}>
-              {profile.agencyName}
-            </p>
-          )}
-          {profile.role === 'VENUE' && profile.venueCapacity && (
-            <p className="profile-agency-name" style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', marginTop: '4px' }}>
-              {t('profile.capacity')} · {Number(profile.venueCapacity).toLocaleString()}
-            </p>
-          )}
           {profile.genres && profile.genres.length > 0 && (
             <div className="profile-genres-container">
               <div className={`profile-genres overflow-hidden transition-[max-height] duration-300 ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[60px]'}`}>
@@ -504,6 +497,24 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               >
                 {bioExpanded ? t('profile.seeLess') : t('profile.seeMore')}
               </button>
+            )}
+          </div>
+        )}
+
+        {/* Venue capacity + rooms — showcased in a box for relevance */}
+        {profile.role === 'VENUE' && (profile.venueCapacity || profile.venueRooms) && (
+          <div className="mx-4 mb-4 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-4">
+            {profile.venueCapacity && (
+              <div className="flex-1 px-2 text-center">
+                <div className="text-lg font-semibold text-white">{Number(profile.venueCapacity).toLocaleString()}</div>
+                <div className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.capacity')}</div>
+              </div>
+            )}
+            {profile.venueRooms && (
+              <div className="flex-1 px-2 text-center">
+                <div className="text-lg font-semibold text-white">{profile.venueRooms}</div>
+                <div className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.rooms')}</div>
+              </div>
             )}
           </div>
         )}

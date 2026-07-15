@@ -710,6 +710,7 @@ const ko = {
   },
 
   profile: {
+    rooms: '룸',
     uploadFailed: '이미지를 업로드하지 못했습니다. 다시 시도해 주세요.',
     deleteFailed: '프로필을 삭제하지 못했습니다. 다시 시도해 주세요.',
     manageLabel: '관리',
@@ -769,6 +770,8 @@ const ko = {
   },
 
   editProfile: {
+    venueRooms: '룸 / 스테이지',
+    venueRoomsPlaceholder: '예: 2',
     profileIdMissing: '프로필 ID가 없습니다. 로그아웃 후 다시 로그인해 주세요.',
     saveFailed: '프로필을 저장하지 못했습니다. 다시 시도해 주세요.',
     basicInformation: '기본 정보',

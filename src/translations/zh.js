@@ -710,6 +710,7 @@ const zh = {
   },
 
   profile: {
+    rooms: '厅数',
     uploadFailed: '图片上传失败。请重试。',
     deleteFailed: '档案删除失败。请重试。',
     manageLabel: '管理',
@@ -769,6 +770,8 @@ const zh = {
   },
 
   editProfile: {
+    venueRooms: '厅数 / 舞台数',
+    venueRoomsPlaceholder: '例如 2',
     profileIdMissing: '缺少档案ID。请退出后重新登录。',
     saveFailed: '档案保存失败。请重试。',
     basicInformation: '基本信息',

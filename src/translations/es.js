@@ -710,6 +710,7 @@ const es = {
   },
 
   profile: {
+    rooms: 'Salas',
     uploadFailed: 'No se pudo subir la imagen. Inténtalo de nuevo.',
     deleteFailed: 'No se pudo eliminar el perfil. Inténtalo de nuevo.',
     manageLabel: 'Gestionar',
@@ -769,6 +770,8 @@ const es = {
   },
 
   editProfile: {
+    venueRooms: 'Salas / Escenarios',
+    venueRoomsPlaceholder: 'p. ej. 2',
     profileIdMissing: 'Falta el ID del perfil. Cierra sesión y vuelve a entrar.',
     saveFailed: 'No se pudo guardar el perfil. Inténtalo de nuevo.',
     basicInformation: 'Información básica',

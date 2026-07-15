@@ -710,6 +710,7 @@ const it = {
   },
 
   profile: {
+    rooms: 'Sale',
     uploadFailed: "Caricamento dell'immagine non riuscito. Riprova.",
     deleteFailed: 'Eliminazione del profilo non riuscita. Riprova.',
     manageLabel: 'Gestisci',
@@ -769,6 +770,8 @@ const it = {
   },
 
   editProfile: {
+    venueRooms: 'Sale / Palchi',
+    venueRoomsPlaceholder: 'es. 2',
     profileIdMissing: 'ID profilo mancante. Esci e accedi di nuovo.',
     saveFailed: 'Salvataggio del profilo non riuscito. Riprova.',
     basicInformation: 'Informazioni di base',
