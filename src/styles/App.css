@@ -10,11 +10,10 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  /* Black with the same whisper of colour depth as the app frame. */
+  /* Same defined pink top-wash as the app frame. */
   background-color: #000000;
   background-image:
-    radial-gradient(100% 55% at 50% -6%, rgba(255, 51, 102, 0.08), transparent 55%),
-    radial-gradient(90% 50% at 50% 108%, rgba(96, 76, 168, 0.045), transparent 55%);
+    radial-gradient(120% 42% at 50% -10%, rgba(255, 51, 102, 0.18), transparent 60%);
   padding: 20px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -306,17 +305,31 @@
   position: relative;
   max-width: 428px;
   margin: 0 auto;
-  /* Stays black, but not dead-flat: pure black with a whisper of colour
-     bled into it — a faint crimson depth up top and barely-there cool tones
-     in the lower corners. No grid, no vignette; it just gives the black some
-     life. Fixed to the frame; the transparent screens let it read through. */
+  /* Black with a defined pink wash across the top of the page (a "web"
+     header glow) over a super-light-pink grid that fades down — pink only,
+     no other tints. Fixed to the frame; transparent screens read it through.
+     The Profile screen paints its own black base so only its role colour
+     shows there. */
   background-color: #000000;
   background-image:
-    radial-gradient(115% 72% at 50% -8%, rgba(255, 51, 102, 0.22), transparent 62%),
-    radial-gradient(95% 60% at 108% 106%, rgba(120, 92, 210, 0.13), transparent 58%),
-    radial-gradient(95% 60% at -8% 100%, rgba(0, 120, 155, 0.10), transparent 58%);
+    radial-gradient(120% 46% at 50% -14%, rgba(255, 51, 102, 0.20), transparent 60%);
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+/* Super-light-pink "web" grid, strongest at the top and fading out down-page. */
+.app-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-size: 44px 44px;
+  background-image:
+    linear-gradient(to right, rgba(255, 51, 102, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 51, 102, 0.045) 1px, transparent 1px);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 52%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, transparent 52%);
 }
 
 .app-content {

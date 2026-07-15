@@ -377,14 +377,16 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
   // Bloom behind the avatar takes the profile's canonical role color.
   const roleBloomColor = {
-    ARTIST: 'rgba(107, 95, 255, 0.18)',   // #6B5FFF
-    VENUE: 'rgba(255, 87, 87, 0.16)',     // #FF5757
-    PROMOTER: 'rgba(255, 184, 0, 0.13)',  // #FFB800
-    AGENT: 'rgba(0, 200, 117, 0.13)',     // #00C875
-  }[user?.role] || 'rgba(255, 255, 255, 0.08)';
+    ARTIST: 'rgba(107, 95, 255, 0.26)',   // #6B5FFF
+    VENUE: 'rgba(255, 87, 87, 0.24)',     // #FF5757
+    PROMOTER: 'rgba(255, 184, 0, 0.22)',  // #FFB800
+    AGENT: 'rgba(0, 200, 117, 0.22)',     // #00C875
+  }[user?.role] || 'rgba(255, 255, 255, 0.10)';
 
   return (
-    <div className="screen active px-5 pt-6 pb-5">
+    // Own black base so the global pink ambient doesn't bleed in — the Profile
+    // shows only its single role colour.
+    <div className="screen active px-5 pt-6 pb-5" style={{ backgroundColor: '#000' }}>
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           modals live OUTSIDE it so they aren't trapped under the app header. */}
       <div className="relative isolate">
