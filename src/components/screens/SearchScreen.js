@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon } from '../../utils/icons';
@@ -9,11 +9,15 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
+// The globe pulls in d3-geo + a world topojson (~150KB) — only load it when the
+// user actually switches to the globe view (matches the PdfViewer lazy pattern).
+const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 
 const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, accountUser }) => {
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptConnectionRequest, declineConnectionRequest } = useAppContext();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'globe'
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     roles: [],
@@ -480,6 +484,24 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           </button>
         </div>
 
+        {/* List / Globe view toggle */}
+        <div className="mt-3 flex rounded-full border border-white/10 bg-[#0c0c10] p-0.5 text-xs font-tech uppercase tracking-[0.12em]">
+          {[
+            { key: 'list', label: t('search.viewList') },
+            { key: 'globe', label: t('search.viewGlobe') },
+          ].map((v) => (
+            <button
+              key={v.key}
+              onClick={() => setViewMode(v.key)}
+              className={`flex-1 rounded-full px-3 py-1.5 transition ${
+                viewMode === v.key ? 'bg-[#FF3366] text-white' : 'text-white/45'
+              }`}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+
         {/* Tier-based notification banner */}
         {user && hasGlobalSearch() && (
           <div className="search-premium-notice">
@@ -519,7 +541,17 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       </div>
 
+      {/* Globe view */}
+      {viewMode === 'globe' && (
+        <div className="mt-3">
+          <Suspense fallback={<LoadingGlobe label={t('search.loadingProfiles')} />}>
+            <SearchGlobe profiles={searchResults} onSelectProfile={handleProfileClick} />
+          </Suspense>
+        </div>
+      )}
+
       {/* Search Results */}
+      {viewMode === 'list' && (
       <div className="search-results">
         {loading ? (
           <LoadingGlobe label={t('search.loadingProfiles')} />
@@ -601,6 +633,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           </div>
         )}
       </div>
+      )}
       </div>
 
       {/* Filter Full-Page Screen */}
