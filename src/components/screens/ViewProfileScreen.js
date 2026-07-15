@@ -373,6 +373,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {profile.agencyName}
             </p>
           )}
+          {profile.role === 'VENUE' && profile.venueCapacity && (
+            <p className="profile-agency-name" style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', marginTop: '4px' }}>
+              {t('profile.capacity')} · {Number(profile.venueCapacity).toLocaleString()}
+            </p>
+          )}
           {profile.genres && profile.genres.length > 0 && (
             <div className="profile-genres-container">
               <div className={`profile-genres overflow-hidden transition-[max-height] duration-300 ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[60px]'}`}>
