@@ -491,13 +491,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           </p>
 
           <div className="feature-preview">
-            {/* Filters Section */}
-            <div className="matches-filters">
-              {user?.role === 'AGENT' && (user.representingArtists || []).length > 0 && (
-                <div className="filter-group">
+            {/* Agent-only: filter matches to one represented artist (own row). */}
+            {user?.role === 'AGENT' && (user.representingArtists || []).length > 0 && (
+              <div className="matches-filters">
+                <div className="filter-group" style={{ flex: 1 }}>
                   <label className="filter-label">{t('tour.artist')}</label>
                   <select
                     className="filter-select"
+                    style={{ width: '100%' }}
                     value={artistFilter}
                     onChange={(e) => setArtistFilter(e.target.value)}
                   >
@@ -508,8 +509,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     })}
                   </select>
                 </div>
-              )}
+              </div>
+            )}
 
+            {/* Filters Section */}
+            <div className="matches-filters">
               <div className="filter-group">
                 <label className="filter-label">{t('editProfile.role')}</label>
                 <select
