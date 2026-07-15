@@ -55,7 +55,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
             ? 'bg-infrared text-white'
             : isCurrent
               ? 'border border-infrared/70 text-infrared bg-[#131315] shadow-[0_0_10px_rgba(255,51,102,0.35)]'
-              : 'border border-white/15 text-white/30 bg-white/[0.02]';
+              : 'border border-white/15 text-white/30 bg-[#0c0c10]';
           return (
             <div key={step.key} className="relative flex flex-col items-center min-w-0">
               {/* track segment from the previous node's center to this node's edge */}

@@ -187,7 +187,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
 
       {usage.cap !== Infinity && (
         <div className={`flex items-center justify-between gap-3 mx-4 mt-4 mb-3 px-4 py-3 rounded-2xl border
-                        ${usage.atLimit ? 'border-infrared/30 bg-infrared/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
+                        ${usage.atLimit ? 'border-infrared/30 bg-infrared/[0.06]' : 'border-white/10 bg-[#101015]'}`}>
           <div className="min-w-0 flex items-baseline gap-2">
             <span className={`text-[9px] font-semibold uppercase tracking-[0.2em] font-tech
                              ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>{t('roster.roster')}</span>
@@ -258,7 +258,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                     )}
                   </button>
                   <button
-                    className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-white/[0.06] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
+                    className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#1a1a20] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
                     aria-label={`Remove ${artist.name}`}
                     onClick={() => handleRemoveArtist(artist)}
                     disabled={removingArtistId === (artist.profileId || artist.id)}

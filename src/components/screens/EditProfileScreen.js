@@ -222,7 +222,7 @@ const EditProfileScreen = ({ onClose }) => {
                                 font-tech cursor-pointer transition-colors ${
                       on
                         ? 'bg-infrared/[0.12] border-infrared/60 text-infrared'
-                        : 'bg-white/[0.03] border-white/10 text-white/50 hover:border-white/25 hover:text-white/75'
+                        : 'bg-[#101015] border-white/10 text-white/50 hover:border-white/25 hover:text-white/75'
                     }`}
                   >
                     {genre}

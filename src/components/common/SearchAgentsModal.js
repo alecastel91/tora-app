@@ -571,7 +571,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
               ) : (
                 <>
                   {/* Info banner about connection requirement */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 mb-4 text-[11px] leading-relaxed text-white/45">
+                  <div className="rounded-xl border border-white/10 bg-[#101015] px-4 py-3 mb-4 text-[11px] leading-relaxed text-white/45">
                     {t('findAgent.connectionRequirement')}
                   </div>
 
