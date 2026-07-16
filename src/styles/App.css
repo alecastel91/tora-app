@@ -1215,7 +1215,9 @@
 
 /* Search Screen */
 .search-screen {
-  padding: 24px 16px;
+  /* top matches the globe overlay's 12px inset so the search bar / filter /
+     view switch sit in the exact same spot in both views */
+  padding: 12px 16px 24px;
 }
 
 .search-header {

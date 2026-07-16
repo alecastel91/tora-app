@@ -563,7 +563,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         className="pointer-events-none absolute -inset-x-4 -top-6 h-48 -z-10 bg-grid
                    [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
-      <div className="search-header">
+      <div className="search-header mb-4">
         {/* Search bar + icon-only filter button — identical to the globe view */}
         <div className="flex items-center gap-2">
           <input
