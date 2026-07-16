@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
+import { geoOrthographic, geoPath, geoGraticule10, geoContains, geoCentroid } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
 import { coordsForCity, normalizeCity, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
@@ -56,6 +56,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
   const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState(null); // { name, feature, cities, profiles }
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
   const [dims, setDims] = useState({ w: 0, h: 0 });
 
@@ -73,15 +74,21 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const pinchDist = useRef(0);
   const hoveredKey = useRef(null);
   const selectedKey = useRef(null);
+  const selectedCountryRef = useRef(null);
   const roleOnRef = useRef(roleOn);
   const citiesRef = useRef(cities);
   const lockedHubsRef = useRef(lockedHubs);
   const dimsRef = useRef({ w: 0, h: 0, dpr: 1 });
+  const viewRef = useRef({ cx: 0, cy: 0, r: 1 }); // current sphere placement (for hit-tests)
+  const starsRef = useRef([]);
 
   useEffect(() => { roleOnRef.current = roleOn; }, [roleOn]);
   useEffect(() => { citiesRef.current = cities; }, [cities]);
   useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
-  useEffect(() => { selectedKey.current = selectedCity?.key || null; }, [selectedCity]);
+  useEffect(() => {
+    selectedKey.current = selectedCity?.key || selectedCountry?.name || null;
+    selectedCountryRef.current = selectedCountry;
+  }, [selectedCity, selectedCountry]);
 
   const projection = useRef(geoOrthographic().clipAngle(90).precision(0.5)).current;
 
@@ -127,6 +134,18 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     dimsRef.current = { w: dims.w, h: dims.h, dpr };
 
+    // Starfield: regenerated per canvas size, drifts gently via per-star twinkle.
+    const starCount = Math.round((dims.w * dims.h) / 8500);
+    starsRef.current = Array.from({ length: starCount }, () => ({
+      x: Math.random() * dims.w,
+      y: Math.random() * dims.h,
+      r: 0.4 + Math.random() * 0.8,
+      a: 0.10 + Math.random() * 0.35,
+      tw: 0.0008 + Math.random() * 0.0022,
+      ph: Math.random() * Math.PI * 2,
+      crimson: Math.random() < 0.12,
+    }));
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const path = geoPath(projection, ctx);
     let raf = 0;
@@ -138,6 +157,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     function frame() {
       const W = dims.w, H = dims.h;
       const r = baseR * zoomRef.current;
+      viewRef.current = { cx, cy, r };
 
       if (focusing.current && targetRot.current) {
         for (let i = 0; i < 2; i++) {
@@ -157,40 +177,74 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       projection.rotate(rot.current).scale(r).translate([cx, cy]);
       ctx.clearRect(0, 0, W, H);
 
-      // atmosphere halo (infrared)
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.97, cx, cy, r * 1.16);
-      halo.addColorStop(0, 'rgba(255,51,102,0.20)');
-      halo.addColorStop(1, 'rgba(255,51,102,0)');
-      ctx.fillStyle = halo;
-      ctx.beginPath(); ctx.arc(cx, cy, r * 1.16, 0, 7); ctx.fill();
+      const now = performance.now();
 
-      // ocean sphere
+      // starfield behind the sphere
+      for (const s of starsRef.current) {
+        const a = s.a * (0.7 + 0.3 * Math.sin(now * s.tw + s.ph));
+        ctx.fillStyle = s.crimson ? `rgba(255,80,120,${a})` : `rgba(255,255,255,${a})`;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
+      }
+
+      // atmosphere: one wide soft crimson wash + one tight rim bloom
+      const haloWide = ctx.createRadialGradient(cx, cy, r * 0.92, cx, cy, r * 1.24);
+      haloWide.addColorStop(0, 'rgba(255,51,102,0.13)');
+      haloWide.addColorStop(1, 'rgba(255,51,102,0)');
+      ctx.fillStyle = haloWide;
+      ctx.beginPath(); ctx.arc(cx, cy, r * 1.24, 0, 7); ctx.fill();
+      const haloRim = ctx.createRadialGradient(cx, cy, r * 0.985, cx, cy, r * 1.06);
+      haloRim.addColorStop(0, 'rgba(255,51,102,0.28)');
+      haloRim.addColorStop(1, 'rgba(255,51,102,0)');
+      ctx.fillStyle = haloRim;
+      ctx.beginPath(); ctx.arc(cx, cy, r * 1.06, 0, 7); ctx.fill();
+
+      // ocean sphere — deep, lit from the upper left
       ctx.beginPath(); path(SPHERE);
-      const oc = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r * 1.05);
-      oc.addColorStop(0, '#12121c'); oc.addColorStop(1, '#050507');
+      const oc = ctx.createRadialGradient(cx - r * 0.38, cy - r * 0.42, r * 0.08, cx, cy, r * 1.05);
+      oc.addColorStop(0, '#151523');
+      oc.addColorStop(0.55, '#0b0b14');
+      oc.addColorStop(1, '#040409');
       ctx.fillStyle = oc; ctx.fill();
 
-      // graticule
+      // graticule — barely-there technical texture
       ctx.beginPath(); path(GRATICULE);
-      ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 0.6; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.6; ctx.stroke();
 
-      // land + borders
-      ctx.beginPath(); path(LAND); ctx.fillStyle = '#1d1d27'; ctx.fill();
-      ctx.beginPath(); path(BORDERS); ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 0.5; ctx.stroke();
+      // land — soft top-left light, luminous coastlines
+      ctx.beginPath(); path(LAND);
+      const lg = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+      lg.addColorStop(0, '#262633');
+      lg.addColorStop(0.5, '#1d1d29');
+      lg.addColorStop(1, '#15151f');
+      ctx.fillStyle = lg; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+      // country borders
+      ctx.beginPath(); path(BORDERS);
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+      // selected country — crimson tint + glowing outline
+      if (selectedCountryRef.current) {
+        ctx.beginPath(); path(selectedCountryRef.current.feature);
+        ctx.fillStyle = 'rgba(255,51,102,0.16)'; ctx.fill();
+        ctx.save();
+        ctx.shadowColor = 'rgba(255,51,102,0.8)'; ctx.shadowBlur = 8;
+        ctx.strokeStyle = 'rgba(255,51,102,0.75)'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.restore();
+      }
 
       // spherical shading
       ctx.save(); ctx.beginPath(); path(SPHERE); ctx.clip();
       const sh = ctx.createRadialGradient(cx - r * 0.42, cy - r * 0.46, r * 0.1, cx, cy, r * 1.18);
-      sh.addColorStop(0, 'rgba(255,255,255,0.06)');
+      sh.addColorStop(0, 'rgba(255,255,255,0.07)');
       sh.addColorStop(0.45, 'rgba(0,0,0,0)');
-      sh.addColorStop(1, 'rgba(0,0,0,0.55)');
+      sh.addColorStop(1, 'rgba(0,0,0,0.6)');
       ctx.fillStyle = sh; ctx.fillRect(0, 0, W, H); ctx.restore();
 
       // rim
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7);
-      ctx.strokeStyle = 'rgba(255,51,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,51,102,0.4)'; ctx.lineWidth = 1; ctx.stroke();
 
-      const now = performance.now();
       const showLabels = zoomRef.current > 1.5;
       const font = getComputedStyle(document.body).fontFamily;
 
@@ -210,21 +264,23 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         }
       }
 
-      // member pins
+      // member pins — glowing crimson with a hot white core
       for (const c of citiesRef.current) {
         const count = c.profiles.reduce((n, p) => n + (roleOnRef.current[p.role] ? 1 : 0), 0);
         const xy = count > 0 ? projection(c.coord) : null;
         c._xy = xy; c._count = count;
         if (!xy) continue;
-        const isSel = selectedKey.current === c.key;
+        const isSel = selectedCity && selectedKey.current === c.key;
         const isHov = hoveredKey.current === c.key;
         const rad = 3 + Math.min(count, 8) * 0.7;
         ctx.save();
-        ctx.shadowColor = 'rgba(255,51,102,0.9)';
-        ctx.shadowBlur = isSel ? 18 : (isHov ? 14 : 8);
-        ctx.fillStyle = isSel ? '#fff' : '#ff3366';
+        ctx.shadowColor = 'rgba(255,51,102,0.95)';
+        ctx.shadowBlur = isSel ? 20 : (isHov ? 16 : 10);
+        ctx.fillStyle = '#ff3366';
         ctx.beginPath(); ctx.arc(xy[0], xy[1], rad, 0, 7); ctx.fill();
         ctx.restore();
+        ctx.fillStyle = isSel ? '#fff' : 'rgba(255,255,255,0.85)';
+        ctx.beginPath(); ctx.arc(xy[0], xy[1], Math.max(1, rad * 0.36), 0, 7); ctx.fill();
         if (isSel) {
           const pr = rad + 6 + Math.sin(now * 0.005) * 3;
           ctx.strokeStyle = 'rgba(255,51,102,0.85)'; ctx.lineWidth = 1.5;
@@ -241,7 +297,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     }
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [dims, projection]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dims, projection, selectedCity]);
 
   // hit-test: member pins first, then locked hubs (uses _xy from the last frame)
   const hit = (mx, my) => {
@@ -261,6 +318,15 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     return best;
   };
 
+  // country under a canvas point (null when the tap is off the sphere)
+  const countryAt = (mx, my) => {
+    const { cx, cy, r } = viewRef.current;
+    if (Math.hypot(mx - cx, my - cy) > r) return null;
+    const geo = projection.invert([mx, my]);
+    if (!geo || !isFinite(geo[0]) || !isFinite(geo[1])) return null;
+    return LAND.features.find((f) => geoContains(f, geo)) || null;
+  };
+
   // ---- city sheet state ----
   const [sheetPx, setSheetPx] = useState(0);
   const sheetPxRef = useRef(0);
@@ -271,20 +337,55 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const snapSheet = (px) => {
     sheetAnimating.current = true;
     const H = dimsRef.current.h;
-    if (px < H * 0.25) { setSelectedCity(null); setSheetPx(0); }
+    if (px < H * 0.25) { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); }
     else if (px < H * 0.8) setSheetPx(Math.round(H * 0.62));
     else setSheetPx(H);
   };
 
+  // Rotate a place to the front, offset north so it sits centered in the
+  // strip of map that stays visible above the 62% sheet.
+  const focusOn = (lon, lat) => {
+    const r = Math.max(viewRef.current.r, 1);
+    const offsetPx = dimsRef.current.h * 0.27; // canvas center → visible-strip center
+    const delta = Math.min(35, (Math.asin(Math.min(0.95, offsetPx / r)) * 180) / Math.PI);
+    focusing.current = true;
+    targetRot.current = [-lon, Math.max(-90, Math.min(90, -lat + delta))];
+  };
+
   const openCity = (c) => {
     setSelectedCity(c);
-    focusing.current = true;
-    targetRot.current = [-c.coord[0], -c.coord[1]];
+    setSelectedCountry(null);
+    focusOn(c.coord[0], c.coord[1]);
     setTip(null);
     sheetAnimating.current = true;
     setSheetPx(Math.round(dimsRef.current.h * 0.62));
   };
-  const closeCity = () => { setSelectedCity(null); setSheetPx(0); focusing.current = false; };
+  const openCountry = (f) => {
+    const name = f.properties?.name || '';
+    if (locked) {
+      const own = coordsForCity(userCity);
+      if (!own || !geoContains(f, own)) { onLockedCity?.(name); return; }
+    }
+    // geoContains + name fallback: small islands (e.g. Ibiza) are missing from
+    // the 110m geometry, but those profiles still carry country = "Spain".
+    const fname = name.toLowerCase();
+    const inCountry = citiesRef.current.filter(
+      (c) => geoContains(f, c.coord) || (c.country && c.country.toLowerCase() === fname)
+    );
+    setSelectedCountry({
+      name,
+      feature: f,
+      cities: inCountry,
+      profiles: inCountry.flatMap((c) => c.profiles),
+    });
+    setSelectedCity(null);
+    const center = geoCentroid(f);
+    focusOn(center[0], center[1]);
+    setTip(null);
+    sheetAnimating.current = true;
+    setSheetPx(Math.round(dimsRef.current.h * 0.62));
+  };
+  const closeCity = () => { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); focusing.current = false; };
 
   // ---- pointer interaction on the canvas ----
   const onPointerDown = (e) => {
@@ -335,10 +436,13 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   };
   const endTap = (e) => {
     if (movedRef.current >= 6) { pausedRef.current = true; return; }
-    const h = hit(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    if (h?.kind === 'city') openCity(h.ref);
-    else if (h?.kind === 'locked') onLockedCity?.(h.ref.name);
-    else if (selectedKey.current) closeCity();
+    const mx = e.nativeEvent.offsetX, my = e.nativeEvent.offsetY;
+    const h = hit(mx, my);
+    if (h?.kind === 'city') { openCity(h.ref); return; }
+    if (h?.kind === 'locked') { onLockedCity?.(h.ref.name); return; }
+    const country = countryAt(mx, my);
+    if (country) { openCountry(country); return; }
+    if (selectedKey.current) closeCity();
     else pausedRef.current = !pausedRef.current;
   };
   const onPointerUp = (e) => {
@@ -379,9 +483,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   // ---- coordinated list scroll (touch): swipe up → expand to full page;
   //      pull down at the top → collapse toward the globe / close.
   //      Native listeners because React touch events are passive at the root.
+  const sheetOpen = !!(selectedCity || selectedCountry);
   useEffect(() => {
     const el = listRef.current;
-    if (!el || !selectedCity) return undefined;
+    if (!el || !sheetOpen) return undefined;
     let ls = null;
     const onStart = (e) => { ls = { y: e.touches[0].clientY, h: sheetPxRef.current }; };
     const onMove = (e) => {
@@ -415,14 +520,13 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       el.removeEventListener('touchcancel', onEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCity]);
+  }, [sheetOpen]);
 
-  const panelProfiles = selectedCity
-    ? selectedCity.profiles.filter((p) => roleOn[p.role])
-    : [];
+  const place = selectedCountry || selectedCity;
+  const panelProfiles = place ? place.profiles.filter((p) => roleOn[p.role]) : [];
 
   return (
-    <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-[#050507]">
+    <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-[#040407]">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full touch-none"
@@ -457,7 +561,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       </div>
 
       {/* Hover tooltip */}
-      {tip && !selectedCity && (
+      {tip && !sheetOpen && (
         <div
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[140%] whitespace-nowrap rounded-lg border border-white/10 bg-black/80 px-2 py-1 text-[11px] text-white/90 backdrop-blur-sm"
           style={{ left: tip.x, top: tip.y }}
@@ -470,7 +574,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       {/* Role legend — bottom chrome, above the parent's view toggle */}
       <div className="pointer-events-none absolute inset-x-0 z-20 flex flex-col items-center gap-2"
            style={{ bottom: bottomInset + 8 }}>
-        {!selectedCity && cities.length > 0 && (
+        {!sheetOpen && cities.length > 0 && (
           <div className="text-center text-[10px] font-tech uppercase tracking-[0.15em] text-white/25">
             {t('search.globeHint')}
           </div>
@@ -497,8 +601,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         </div>
       )}
 
-      {/* City bottom sheet — expands to cover the whole page */}
-      {selectedCity && (
+      {/* City / country bottom sheet — expands to cover the whole page */}
+      {sheetOpen && (
         <>
           <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />
           <aside
@@ -517,10 +621,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             <div className="flex shrink-0 items-start justify-between px-5 pb-3">
               <div>
                 <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-[#FF3366]">{t('search.globeOnNetwork')}</div>
-                <h2 className="mt-0.5 text-xl font-semibold text-white">{selectedCity.name}</h2>
+                <h2 className="mt-0.5 text-xl font-semibold text-white">{place.name}</h2>
                 <div className="mt-0.5 text-xs text-white/45">
                   {t(panelProfiles.length === 1 ? 'search.globeMember' : 'search.globeMembers', { count: panelProfiles.length })}
-                  {selectedCity.country ? ` · ${selectedCity.country}` : ''}
+                  {selectedCountry
+                    ? ` · ${t(selectedCountry.cities.length === 1 ? 'search.globeCity' : 'search.globeCities', { count: selectedCountry.cities.length })}`
+                    : (selectedCity?.country ? ` · ${selectedCity.country}` : '')}
                 </div>
               </div>
               <button onClick={closeCity} aria-label="Close" className="text-2xl leading-none text-white/40 hover:text-white/70">×</button>
@@ -539,14 +645,20 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
                     <span className="block truncate text-sm font-medium text-white">{p.name}</span>
                     <span className="mt-0.5 block text-xs" style={{ color: ROLE_COLOR[p.role] || 'rgba(255,255,255,0.5)' }}>
                       {t(`editProfile.${(p.role || '').toLowerCase()}`)}
-                      {p.genres?.length ? <span className="text-white/35"> · {p.genres.slice(0, 2).join(', ')}</span> : null}
+                      {selectedCountry
+                        ? (cityNameOf(p) ? <span className="text-white/35"> · {cityNameOf(p)}</span> : null)
+                        : (p.genres?.length ? <span className="text-white/35"> · {p.genres.slice(0, 2).join(', ')}</span> : null)}
                     </span>
                   </span>
                   <span className="shrink-0 text-white/25">›</span>
                 </button>
               ))}
               {panelProfiles.length === 0 && (
-                <p className="py-8 text-center text-sm text-white/40">{t('search.globeNoMatchingRoles')}</p>
+                <p className="py-8 text-center text-sm text-white/40">
+                  {selectedCountry && selectedCountry.profiles.length === 0
+                    ? t('search.globeCountryEmpty', { country: selectedCountry.name })
+                    : t('search.globeNoMatchingRoles')}
+                </p>
               )}
             </div>
           </aside>

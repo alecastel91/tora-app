@@ -1833,8 +1833,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         </button>
       </div>
 
-      {/* Tab Content */}
-      <div className="tour-tab-content">
+      {/* Tab Content — the FREE gate is a single fixed page, so don't let it
+          scroll under the tab header */}
+      <div className={`tour-tab-content ${!isPremiumUser() ? 'overflow-y-hidden' : ''}`}>
         {activeTab === 'calendar' ? renderCalendarMatches() : renderTourKickstart()}
       </div>
       </div>

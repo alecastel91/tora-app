@@ -558,50 +558,35 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                    [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
       <div className="search-header">
-        {/* Search Bar */}
-        <div className="search-bar">
+        {/* Search bar + icon-only filter button — identical to the globe view */}
+        <div className="flex items-center gap-2">
           <input
             type="text"
             placeholder={t('search.searchByName')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            className="search-input"
+            className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-black/35 px-4 text-sm text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
           />
           <button
-            className="filter-toggle-btn"
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => setShowFilters(true)}
+            aria-label={t('search.filters')}
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white/80 backdrop-blur-md"
           >
-            <span className="filter-icon"><FilterIcon /></span> {t('search.filters')}
+            <span className="[&>svg]:h-4 [&>svg]:w-4"><FilterIcon /></span>
             {activeFilterCount > 0 && (
-              <span className="filter-count">{activeFilterCount}</span>
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3366] px-1 text-[9px] font-semibold text-white">
+                {activeFilterCount}
+              </span>
             )}
           </button>
         </div>
 
-        {/* Globe / List view toggle */}
-        <div className="mt-3 flex rounded-full border border-white/10 bg-[#0c0c10] p-0.5 text-xs font-tech uppercase tracking-[0.12em]">
-          {[
-            { key: 'globe', label: t('search.viewGlobe') },
-            { key: 'list', label: t('search.viewList') },
-          ].map((v) => (
-            <button
-              key={v.key}
-              onClick={() => setViewMode(v.key)}
-              className={`flex-1 rounded-full px-3 py-1.5 transition ${
-                viewMode === v.key ? 'bg-[#FF3366] text-white' : 'text-white/45'
-              }`}
-            >
-              {v.label}
-            </button>
-          ))}
-        </div>
-
-        {/* FREE tier only: compact upgrade pill (premium members see no banner) */}
+        {/* FREE tier only: compact upgrade pill right under (premium sees no banner) */}
         {user && !hasGlobalSearch() && (
           <button
             onClick={onOpenPremium}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-[#FF3366]/35 bg-[#FF3366]/10 px-4 py-2 text-xs text-white/85"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-[#FF3366]/35 bg-[#FF3366]/10 px-4 py-2 text-xs text-white/85"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-[#FF3366]">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -611,6 +596,24 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             <span className="shrink-0 font-semibold text-[#FF3366]">{t('search.upgradeNow')}</span>
           </button>
         )}
+
+        {/* Globe / List switch below */}
+        <div className="mt-2 flex rounded-full border border-white/10 bg-black/20 p-0.5 text-xs font-tech uppercase tracking-[0.12em]">
+          {[
+            { key: 'globe', label: t('search.viewGlobe') },
+            { key: 'list', label: t('search.viewList') },
+          ].map((v) => (
+            <button
+              key={v.key}
+              onClick={() => setViewMode(v.key)}
+              className={`flex-1 rounded-full px-3 py-1.5 transition ${
+                viewMode === v.key ? 'bg-[#FF3366]/70 text-white' : 'text-white/45'
+              }`}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
 
       </div>
 

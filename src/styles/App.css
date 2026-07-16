@@ -12333,6 +12333,11 @@ textarea.form-textarea:focus {
   padding-bottom: 40px;
 }
 
+/* FREE-tier gate is a single fixed page — nothing to scroll */
+.tour-tab-content.overflow-y-hidden {
+  overflow-y: hidden;
+}
+
 /* Tour Kickstart Content */
 .tour-kickstart-content {
   padding: 20px 16px;
