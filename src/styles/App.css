@@ -3392,89 +3392,15 @@
   color: var(--text-gray);
 }
 
-.search-bar {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
-  width: 100%;
-}
 
 /* Obsidian Neon: glass input, focus animates border to crimson. */
-.search-bar .search-input {
-  flex: 1;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  color: var(--text-white);
-  font-size: 12px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  transition: border-color 0.3s;
-}
 
-.search-bar .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.1em;
-}
 
-.search-bar .search-input:focus {
-  outline: none;
-  border-color: rgba(255, 51, 102, 0.5);
-  background: rgba(255, 255, 255, 0.06);
-}
 
-.filter-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  color: var(--text-white);
-  font-size: 10px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
-}
 
-.filter-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 51, 102, 0.4);
-}
 
-.filter-icon {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 2px;
-}
 
-.filter-icon svg {
-  width: 16px;
-  height: 16px;
-}
 
-.filter-count {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: var(--primary-pink);
-  color: white;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-xs);
-  font-weight: bold;
-}
 
 .filters-section {
   background: #000000;
@@ -3593,7 +3519,7 @@
 }
 
 .search-result-card:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #16161c; /* opaque brighten — rgba hover let the pink grid bleed through */
   border-color: rgba(255, 51, 102, 0.4);
 }
 
@@ -5585,10 +5511,6 @@
   max-width: 400px;
 }
 
-.upgrade-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-}
 
 .upgrade-card h2 {
   color: var(--text-white);
@@ -6835,104 +6757,18 @@
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
-.search-premium-notice {
-  background: rgba(255, 51, 102, 0.06);
-  border: 1px solid rgba(255, 51, 102, 0.35);
-  border-radius: 14px;
-  padding: 12px 16px;
-  margin: 16px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
 
 /* Upgrade banner for FREE tier users */
-.search-upgrade-banner {
-  background: rgba(255, 193, 7, 0.05);
-  border: 1px solid rgba(255, 193, 7, 0.35);
-  border-radius: 14px;
-  padding: 16px;
-  margin: 16px 0;
-}
 
-.upgrade-banner-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 
-.upgrade-icon {
-  display: flex;
-  align-items: center;
-  color: #FFC107;
-  flex-shrink: 0;
-}
 
-.upgrade-icon svg {
-  width: 18px;
-  height: 18px;
-}
 
-.upgrade-text {
-  flex: 1;
-}
 
-.upgrade-text strong {
-  display: block;
-  color: var(--text-white);
-  font-size: 13px;
-  margin-bottom: 4px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
 
-.upgrade-text p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-}
 
-.btn-upgrade-banner {
-  background: rgba(255, 193, 7, 0.12);
-  color: #FFC107;
-  border: 1px solid rgba(255, 193, 7, 0.5);
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 11px;
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  cursor: pointer;
-  transition: all 0.3s;
-  flex-shrink: 0;
-}
 
-.btn-upgrade-banner:hover {
-  background: rgba(255, 193, 7, 0.2);
-  box-shadow: 0 0 16px rgba(255, 193, 7, 0.2);
-}
 
-.premium-icon {
-  display: flex;
-  align-items: center;
-  color: var(--primary-pink);
-  flex-shrink: 0;
-}
 
-.premium-icon svg {
-  width: 15px;
-  height: 15px;
-}
 
 /* Represented Artists Screen */
 .represented-artists-screen {
@@ -7217,15 +7053,6 @@
   .upgrade-btn {
     font-size: 11px;
     padding: 3px 6px;
-  }
-
-  .search-premium-notice {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .premium-icon {
-    font-size: 14px;
   }
 
   .artist-card {
@@ -9406,7 +9233,7 @@ textarea.form-textarea:focus {
 }
 
 .booking-card:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: #1a1a20; /* opaque brighten — rgba hover let the pink grid bleed through */
   border-color: rgba(255, 255, 255, 0.3);
   transform: scale(1.01);
 }
@@ -12337,11 +12164,6 @@ textarea.form-textarea:focus {
   -webkit-overflow-scrolling: touch;
   min-height: 0;
   padding-bottom: 40px;
-}
-
-/* FREE-tier gate is a single fixed page — nothing to scroll */
-.tour-tab-content.overflow-y-hidden {
-  overflow-y: hidden;
 }
 
 /* Tour Kickstart Content */

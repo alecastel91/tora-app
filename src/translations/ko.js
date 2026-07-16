@@ -764,8 +764,6 @@ const ko = {
     representedBy: '소속 에이전트',
     likesGiven: '보낸 좋아요',
     likedByLabel: '받은 좋아요',
-    searchingWorldwidePremium: '프리미엄으로 전 세계 검색 중',
-    searchingWorldwideTrial: '48시간 체험으로 전 세계 검색 중',
     searchLimitedTo: '검색 범위 제한:',
   },
 
@@ -851,7 +849,6 @@ const ko = {
     failedToAcceptRequest: '요청을 수락하지 못했습니다',
     failedToDeclineRequest: '요청을 거절하지 못했습니다',
     pleaseWriteMessage: '자기소개 메시지를 작성해 주세요',
-    upgradeWorldwide: '업그레이드하고 전 세계 검색과 프리미엄 기능을 이용하세요',
     upgradeNow: '지금 업그레이드',
     loadingProfiles: '프로필 불러오는 중...',
     message: '메시지',

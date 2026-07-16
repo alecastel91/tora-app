@@ -764,8 +764,6 @@ const pt = {
     representedBy: 'Representado por',
     likesGiven: 'Likes dados',
     likedByLabel: 'Gostam',
-    searchingWorldwidePremium: 'Pesquisa mundial com Premium',
-    searchingWorldwideTrial: 'Pesquisa mundial com teste de 48h',
     searchLimitedTo: 'Pesquisa limitada a',
   },
 
@@ -851,7 +849,6 @@ const pt = {
     failedToAcceptRequest: 'Não foi possível aceitar o pedido',
     failedToDeclineRequest: 'Não foi possível recusar o pedido',
     pleaseWriteMessage: 'Escreve uma mensagem para te apresentares',
-    upgradeWorldwide: 'Faz upgrade para pesquisares no mundo inteiro e desbloqueares as funcionalidades premium',
     upgradeNow: 'Fazer upgrade agora',
     loadingProfiles: 'A carregar perfis...',
     message: 'Mensagem',

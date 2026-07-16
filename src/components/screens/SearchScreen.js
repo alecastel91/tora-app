@@ -9,6 +9,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
+import { isPremiumViewer } from '../../utils/subscription';
 // The globe pulls in d3-geo + a world topojson (~150KB) — only load it when the
 // user actually switches to the globe view (matches the PdfViewer lazy pattern).
 const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
@@ -48,11 +49,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   // Dropdown states
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Helper function to check if user has global search access (per-profile)
-  const hasGlobalSearch = () => {
-    const tier = user?.subscriptionTier || 'FREE';
-    return ['TRIAL', 'MONTHLY', 'YEARLY'].includes(tier);
-  };
+  // Global search access = the shared premium gate (expires TRIAL correctly,
+  // unlike the old local tier-list copy).
+  const hasGlobalSearch = () => isPremiumViewer(user);
 
   // Debug: Log when showConnectionChoice changes
   useEffect(() => {
@@ -120,7 +119,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       const header = document.querySelector('.app-header');
       const tabBar = document.querySelector('.tab-bar');
       const top = header ? header.getBoundingClientRect().bottom : 56;
-      const bottom = tabBar ? tabBar.getBoundingClientRect().top : window.innerHeight - 70;
+      // Desktop (≥1024px) turns .tab-bar into a fixed LEFT SIDEBAR with top 0
+      // — a tab-bar top at/above the header means it isn't below the content,
+      // so the stage extends to the bottom of the window instead.
+      const tabTop = tabBar ? tabBar.getBoundingClientRect().top : -1;
+      const bottom = tabTop > top + 50 ? tabTop : window.innerHeight;
       setStageH(Math.max(420, Math.round(bottom - top)));
     };
     measure();
@@ -457,6 +460,22 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     setViewingProfile(profile);
   };
 
+  // FREE-tier upgrade pill — the single banner (premium members see none),
+  // rendered identically right under the search line in both views.
+  const upgradePill = user && !hasGlobalSearch() && (
+    <button
+      onClick={onOpenPremium}
+      className="pointer-events-auto mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-infrared/35 bg-infrared/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-infrared">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </svg>
+      <span className="truncate">{t('profile.searchLimitedTo')} {user.city}</span>
+      <span className="shrink-0 font-semibold text-infrared">{t('search.upgradeNow')}</span>
+    </button>
+  );
+
   // Icon-only Globe/List switch — lives on the same line as search + filter
   // in BOTH views so the chrome never moves when you flip.
   const viewToggle = (
@@ -470,7 +489,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           onClick={() => setViewMode(key)}
           aria-label={label}
           className={`flex h-10 w-10 items-center justify-center rounded-full transition [&_svg]:h-4 [&_svg]:w-4 ${
-            viewMode === key ? 'bg-[#FF3366]/70 text-white' : 'text-white/45'
+            viewMode === key ? 'bg-infrared/70 text-white' : 'text-white/45'
           }`}
         >
           <Icon />
@@ -527,7 +546,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               >
                 <span className="[&>svg]:h-4 [&>svg]:w-4"><FilterIcon /></span>
                 {activeFilterCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3366] px-1 text-[9px] font-semibold text-white">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-infrared px-1 text-[9px] font-semibold text-white">
                     {activeFilterCount}
                   </span>
                 )}
@@ -536,19 +555,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             </div>
 
             {/* FREE tier only: a compact Premium ad (premium members see no banner) */}
-            {user && !hasGlobalSearch() && (
-              <button
-                onClick={onOpenPremium}
-                className="pointer-events-auto mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-[#FF3366]/35 bg-[#FF3366]/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-[#FF3366]">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span className="truncate">{t('profile.searchLimitedTo')} {user.city}</span>
-                <span className="shrink-0 font-semibold text-[#FF3366]">{t('search.upgradeNow')}</span>
-              </button>
-            )}
+            {upgradePill}
           </div>
 
         </div>
@@ -560,7 +567,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-4 -top-6 h-48 -z-10 bg-grid
+        className="pointer-events-none absolute -inset-x-4 -top-3 h-48 -z-10 bg-grid
                    [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
       />
       <div className="search-header mb-4">
@@ -581,7 +588,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           >
             <span className="[&>svg]:h-4 [&>svg]:w-4"><FilterIcon /></span>
             {activeFilterCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3366] px-1 text-[9px] font-semibold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-infrared px-1 text-[9px] font-semibold text-white">
                 {activeFilterCount}
               </span>
             )}
@@ -590,19 +597,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         </div>
 
         {/* FREE tier only: compact upgrade pill right under (premium sees no banner) */}
-        {user && !hasGlobalSearch() && (
-          <button
-            onClick={onOpenPremium}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-[#FF3366]/35 bg-[#FF3366]/10 px-4 py-2 text-xs text-white/85"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-[#FF3366]">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            <span className="truncate">{t('profile.searchLimitedTo')} {user.city}</span>
-            <span className="shrink-0 font-semibold text-[#FF3366]">{t('search.upgradeNow')}</span>
-          </button>
-        )}
+        {upgradePill}
 
       </div>
 

@@ -764,8 +764,6 @@ const zh = {
     representedBy: '经纪方',
     likesGiven: '已赞',
     likedByLabel: '获赞',
-    searchingWorldwidePremium: '高级版全球搜索中',
-    searchingWorldwideTrial: '48小时试用全球搜索中',
     searchLimitedTo: '搜索范围限于',
   },
 
@@ -851,7 +849,6 @@ const zh = {
     failedToAcceptRequest: '无法接受请求',
     failedToDeclineRequest: '无法拒绝请求',
     pleaseWriteMessage: '请写一条自我介绍消息',
-    upgradeWorldwide: '升级即可全球搜索并解锁高级功能',
     upgradeNow: '立即升级',
     loadingProfiles: '正在加载档案...',
     message: '消息',

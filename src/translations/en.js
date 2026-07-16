@@ -766,8 +766,6 @@ const en = {
     representedBy: 'Represented by',
     likesGiven: 'Likes',
     likedByLabel: 'Liked by',
-    searchingWorldwidePremium: 'Searching worldwide with Premium',
-    searchingWorldwideTrial: 'Searching worldwide with 48h trial',
     searchLimitedTo: 'Search limited to'
   },
   
@@ -856,7 +854,6 @@ const en = {
     failedToAcceptRequest: 'Failed to accept request',
     failedToDeclineRequest: 'Failed to decline request',
     pleaseWriteMessage: 'Please write a message to introduce yourself',
-    upgradeWorldwide: 'Upgrade to search worldwide and unlock premium features',
     upgradeNow: 'Upgrade Now',
     loadingProfiles: 'Loading profiles...',
     message: 'Message',

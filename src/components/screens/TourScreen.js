@@ -91,7 +91,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const measure = () => {
       const scroller = el.closest('.app-content');
       if (!scroller || scroller.clientHeight < 100) return; // hidden keep-mounted panel
-      const padBottom = parseFloat(getComputedStyle(scroller).paddingBottom) || 70;
+      // NaN-only fallback: desktop legitimately has padding-bottom 0 (sidebar
+      // layout), and `|| 70` would treat that real 0 as missing.
+      const pb = parseFloat(getComputedStyle(scroller).paddingBottom);
+      const padBottom = Number.isNaN(pb) ? 70 : pb;
       el.style.setProperty('--tour-screen-h', `${Math.max(320, Math.round(scroller.clientHeight - padBottom))}px`);
     };
     measure();
@@ -1854,9 +1857,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         </button>
       </div>
 
-      {/* Tab Content — the FREE gate is a single fixed page, so don't let it
-          scroll under the tab header */}
-      <div className={`tour-tab-content ${!isPremiumUser() ? 'overflow-y-hidden' : ''}`}>
+      {/* Tab Content — the measured --tour-screen-h height means the FREE gate
+          fits without scrolling on normal phones; scrolling stays enabled so
+          short viewports can still reach the Upgrade CTA */}
+      <div className="tour-tab-content">
         {activeTab === 'calendar' ? renderCalendarMatches() : renderTourKickstart()}
       </div>
       </div>

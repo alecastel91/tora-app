@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { geoOrthographic, geoPath, geoGraticule10, geoContains, geoCentroid } from 'd3-geo';
+import { geoOrthographic, geoPath, geoGraticule10, geoContains, geoCentroid, geoDistance } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
 import { coordsForCity, normalizeCity, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
-import { getAvatarClass } from '../../utils/roles';
+import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 // Country geometry is decoded once at module load (shared across mounts).
@@ -13,7 +13,6 @@ const GRATICULE = geoGraticule10();
 const SPHERE = { type: 'Sphere' };
 
 const ROLES = ['ARTIST', 'AGENT', 'PROMOTER', 'VENUE'];
-const ROLE_COLOR = { ARTIST: '#6B5FFF', AGENT: '#00C875', PROMOTER: '#FFB800', VENUE: '#FF5757' };
 
 const cityNameOf = (p) => p.city || (p.location || '').split(',')[0].trim();
 
@@ -74,19 +73,29 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const pinchDist = useRef(0);
   const hoveredKey = useRef(null);
   const selectedKey = useRef(null);
+  const selectedCityKey = useRef(null); // city selection only (pin highlight)
   const selectedCountryRef = useRef(null);
   const roleOnRef = useRef(roleOn);
   const citiesRef = useRef(cities);
   const lockedHubsRef = useRef(lockedHubs);
   const dimsRef = useRef({ w: 0, h: 0, dpr: 1 });
+  const hiddenRef = useRef(false); // keep-mounted tab panel is display:none
   const viewRef = useRef({ cx: 0, cy: 0, r: 1 }); // current sphere placement (for hit-tests)
   const starsRef = useRef([]);
 
   useEffect(() => { roleOnRef.current = roleOn; }, [roleOn]);
-  useEffect(() => { citiesRef.current = cities; }, [cities]);
   useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
+  // Visible-member counts change only when the data or the role toggles do —
+  // precompute them here instead of reducing per pin per animation frame.
+  useEffect(() => {
+    for (const c of cities) {
+      c._cnt = c.profiles.reduce((n, p) => n + (roleOn[p.role] ? 1 : 0), 0);
+    }
+    citiesRef.current = cities;
+  }, [cities, roleOn]);
   useEffect(() => {
     selectedKey.current = selectedCity?.key || selectedCountry?.name || null;
+    selectedCityKey.current = selectedCity?.key || null;
     selectedCountryRef.current = selectedCountry;
   }, [selectedCity, selectedCountry]);
 
@@ -95,16 +104,19 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   // Start the map zoomed in on the member's own city (map-app feel). Starts
   // paused — auto-rotation at this zoom would sweep the view away instantly;
   // zooming out and tapping empty space resumes the ambient spin.
-  const didInitView = useRef(false);
+  // Keyed on the city value so switching to another own profile (different
+  // city) re-centers instead of staying parked on the previous one.
+  const initCityRef = useRef(null);
   useEffect(() => {
-    if (didInitView.current || !userCity) return;
+    if (!userCity || initCityRef.current === userCity) return;
+    initCityRef.current = userCity;
     const own = coordsForCity(userCity);
     if (own) {
       rot.current = [-own[0], -own[1], 0];
       zoomRef.current = 4.2;
       pausedRef.current = true;
+      focusing.current = false;
     }
-    didInitView.current = true;
   }, [userCity]);
 
   // Track the rendered size for the canvas backing store (also fires when the
@@ -114,7 +126,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     if (!el) return undefined;
     const measure = () => {
       const r = el.getBoundingClientRect();
-      if (r.width < 10 || r.height < 10) return; // hidden tab panel
+      if (r.width < 10 || r.height < 10) { hiddenRef.current = true; return; } // hidden tab panel
+      hiddenRef.current = false;
       setDims({ w: Math.round(r.width), h: Math.round(r.height) });
     };
     const ro = new ResizeObserver(measure);
@@ -148,6 +161,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const path = geoPath(projection, ctx);
+    // JS % is negative for negative operands — double-mod keeps the delta in
+    // [-180, 180) even after the ambient spin has drifted many revolutions.
+    const shortArc = (d) => ((d % 360) + 540) % 360 - 180;
+    const font = getComputedStyle(document.body).fontFamily; // stable — don't re-read per frame
     let raf = 0;
 
     const cx = dims.w / 2;
@@ -155,6 +172,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     const baseR = Math.min(dims.w, dims.h) * 0.44;
 
     function frame() {
+      // Keep-mounted tab hidden (display:none): skip all drawing — rAF is
+      // document-scoped and would otherwise redraw an invisible canvas at
+      // 60fps for the whole session.
+      if (hiddenRef.current) { raf = requestAnimationFrame(frame); return; }
       const W = dims.w, H = dims.h;
       const r = baseR * zoomRef.current;
       viewRef.current = { cx, cy, r };
@@ -162,10 +183,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       if (focusing.current && targetRot.current) {
         for (let i = 0; i < 2; i++) {
           let d = targetRot.current[i] - rot.current[i];
-          if (i === 0) d = ((d + 540) % 360) - 180;
+          if (i === 0) d = shortArc(d);
           rot.current[i] += d * 0.12;
         }
-        if (Math.abs(((targetRot.current[0] - rot.current[0] + 540) % 360) - 180) < 0.2 &&
+        if (Math.abs(shortArc(targetRot.current[0] - rot.current[0])) < 0.2 &&
             Math.abs(targetRot.current[1] - rot.current[1]) < 0.2) {
           rot.current[0] = targetRot.current[0];
           rot.current[1] = targetRot.current[1];
@@ -241,11 +262,15 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       ctx.strokeStyle = 'rgba(255,51,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
 
       const showLabels = zoomRef.current > 1.5;
-      const font = getComputedStyle(document.body).fontFamily;
+      // d3's forward projection never culls the far hemisphere (clipAngle
+      // only clips streams) — without this check, far-side pins render as
+      // tappable ghosts inside the visible disc.
+      const viewCenter = [-rot.current[0], -rot.current[1]];
+      const onFront = (coord) => geoDistance(coord, viewCenter) <= Math.PI / 2;
 
       // locked hub pins (FREE tier) — dim, tappable, upsell on tap
       for (const hub of lockedHubsRef.current) {
-        const xy = projection(hub.coord);
+        const xy = onFront(hub.coord) ? projection(hub.coord) : null;
         hub._xy = xy;
         if (!xy) continue;
         const isHov = hoveredKey.current === hub.key;
@@ -261,11 +286,11 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
       // member pins — glowing crimson with a hot white core
       for (const c of citiesRef.current) {
-        const count = c.profiles.reduce((n, p) => n + (roleOnRef.current[p.role] ? 1 : 0), 0);
-        const xy = count > 0 ? projection(c.coord) : null;
+        const count = c._cnt || 0; // precomputed on data/role-toggle changes
+        const xy = count > 0 && onFront(c.coord) ? projection(c.coord) : null;
         c._xy = xy; c._count = count;
         if (!xy) continue;
-        const isSel = selectedCity && selectedKey.current === c.key;
+        const isSel = selectedCityKey.current === c.key;
         const isHov = hoveredKey.current === c.key;
         const rad = 3 + Math.min(count, 8) * 0.7;
         ctx.save();
@@ -292,8 +317,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     }
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
+    // selection is read via refs — keeping it out of the deps avoids tearing
+    // down the loop (and regenerating the starfield) on every sheet open/close
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dims, projection, selectedCity]);
+  }, [dims, projection]);
 
   // hit-test: member pins first, then locked hubs (uses _xy from the last frame)
   const hit = (mx, my) => {
@@ -357,16 +384,20 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   };
   const openCountry = (f) => {
     const name = f.properties?.name || '';
-    if (locked) {
-      const own = coordsForCity(userCity);
-      if (!own || !geoContains(f, own)) { onLockedCity?.(name); return; }
-    }
     // geoContains + name fallback: small islands (e.g. Ibiza) are missing from
     // the 110m geometry, but those profiles still carry country = "Spain".
     const fname = name.toLowerCase();
     const inCountry = citiesRef.current.filter(
       (c) => geoContains(f, c.coord) || (c.country && c.country.toLowerCase() === fname)
     );
+    if (locked) {
+      // FREE members may open their own country. Their searchResults only
+      // contain their own city, so any data pin inside the country proves
+      // ownership — this also covers home cities missing from CITY_COORDS.
+      const own = coordsForCity(userCity);
+      const allowed = inCountry.length > 0 || (own && geoContains(f, own));
+      if (!allowed) { onLockedCity?.(name); return; }
+    }
     setSelectedCountry({
       name,
       feature: f,
@@ -411,6 +442,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       return;
     }
     if (draggingRef.current) {
+      if (!dimsRef.current.w) return; // before first layout — avoid Infinity/NaN poisoning rot
       const dx = e.clientX - lastRef.current.x, dy = e.clientY - lastRef.current.y;
       lastRef.current = { x: e.clientX, y: e.clientY };
       movedRef.current += Math.abs(dx) + Math.abs(dy);
@@ -419,7 +451,9 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       rot.current[1] = Math.max(-90, Math.min(90, rot.current[1] - dy * k));
     } else {
       const h = hit(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-      hoveredKey.current = h?.ref.key || null;
+      const key = h?.ref.key || null;
+      if (key === hoveredKey.current) return; // same target — skip the re-render
+      hoveredKey.current = key;
       if (h && h.ref._xy) {
         setTip({
           x: h.ref._xy[0], y: h.ref._xy[1], name: h.ref.name,
@@ -451,6 +485,20 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     } else if (ptrs.current.size === 0) {
       draggingRef.current = false;
       if (!wasTwo) endTap(e);
+    }
+  };
+  // A browser-cancelled gesture (palm rejection, notification swipe) is NOT a
+  // tap — clean up the pointer state without running endTap.
+  const onPointerCancelH = (e) => {
+    if (!ptrs.current.has(e.pointerId)) return;
+    ptrs.current.delete(e.pointerId);
+    pinchDist.current = 0;
+    if (ptrs.current.size === 1) {
+      const p = [...ptrs.current.values()][0];
+      lastRef.current = { x: p.cx, y: p.cy }; movedRef.current = 999;
+      draggingRef.current = true;
+    } else if (ptrs.current.size === 0) {
+      draggingRef.current = false;
     }
   };
   const onWheel = (e) => {
@@ -529,7 +577,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancelH}
         onWheel={onWheel}
       />
 
@@ -615,7 +663,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             </div>
             <div className="flex shrink-0 items-start justify-between px-5 pb-3">
               <div>
-                <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-[#FF3366]">{t('search.globeOnNetwork')}</div>
+                <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-infrared">{t('search.globeOnNetwork')}</div>
                 <h2 className="mt-0.5 text-xl font-semibold text-white">{place.name}</h2>
                 <div className="mt-0.5 text-xs text-white/45">
                   {t(panelProfiles.length === 1 ? 'search.globeMember' : 'search.globeMembers', { count: panelProfiles.length })}

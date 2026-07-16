@@ -764,8 +764,6 @@ const ja = {
     representedBy: '所属',
     likesGiven: 'いいね済み',
     likedByLabel: 'いいねされた',
-    searchingWorldwidePremium: 'プレミアムで世界中を検索中',
-    searchingWorldwideTrial: '48時間トライアルで世界中を検索中',
     searchLimitedTo: '検索範囲',
   },
 
@@ -851,7 +849,6 @@ const ja = {
     failedToAcceptRequest: 'リクエストの承認に失敗しました',
     failedToDeclineRequest: 'リクエストの辞退に失敗しました',
     pleaseWriteMessage: '自己紹介のメッセージを書いてください',
-    upgradeWorldwide: 'アップグレードして世界中を検索し、プレミアム機能を解除しましょう',
     upgradeNow: '今すぐアップグレード',
     loadingProfiles: 'プロフィールを読み込み中...',
     message: 'メッセージ',

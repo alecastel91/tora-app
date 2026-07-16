@@ -764,8 +764,6 @@ const it = {
     representedBy: 'Rappresentato da',
     likesGiven: 'Like dati',
     likedByLabel: 'Piace a',
-    searchingWorldwidePremium: 'Ricerca mondiale con Premium',
-    searchingWorldwideTrial: 'Ricerca mondiale con prova 48h',
     searchLimitedTo: 'Ricerca limitata a',
   },
 
@@ -851,7 +849,6 @@ const it = {
     failedToAcceptRequest: 'Impossibile accettare la richiesta',
     failedToDeclineRequest: 'Impossibile rifiutare la richiesta',
     pleaseWriteMessage: 'Scrivi un messaggio per presentarti',
-    upgradeWorldwide: 'Fai upgrade per cercare in tutto il mondo e sbloccare le funzioni premium',
     upgradeNow: 'Fai upgrade ora',
     loadingProfiles: 'Caricamento profili...',
     message: 'Messaggio',
