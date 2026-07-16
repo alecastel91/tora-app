@@ -418,7 +418,7 @@ function App() {
         <div className="auth-container">
           <div className="auth-header">
             <img src="/tora_logo.png" alt="TORA" className="auth-logo" />
-            <LoadingGlobe label="" size={180} className="py-0" />
+            <LoadingGlobe label="" size={150} className="py-0 mt-3" />
           </div>
         </div>
       </div>
