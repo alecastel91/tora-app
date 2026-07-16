@@ -62,188 +62,176 @@
   }
 }
 
-/* Desktop Styles (1024px and up) */
+/* Desktop Styles (1024px and up) — a real web layout: fixed sidebar nav,
+   slim in-flow header, centered content columns. Mobile is untouched. */
 @media (min-width: 1024px) {
   body {
     background: #0a0a0a;
   }
 
   .app-container {
-    display: flex;
-    flex-direction: row;
     max-width: 100%;
   }
 
-  /* Convert tab bar to sidebar for desktop */
+  /* Tab bar becomes a fixed left sidebar */
   .tab-bar {
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
     width: 240px;
+    max-width: none;
     flex-direction: column;
     justify-content: flex-start;
-    padding: 20px;
-    gap: 8px;
+    padding: 24px 16px;
+    gap: 6px;
     transform: none;
-    border-right: 1px solid #222;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     border-top: none;
   }
 
+  .sidebar-brand {
+    display: block;
+    width: 100%;
+    padding: 4px 14px 22px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .sidebar-brand img {
+    height: 24px;
+    width: auto;
+    display: block;
+  }
+
   .tab-item {
+    flex: 0 0 auto; /* the mobile flex-1 must not stretch items down the column */
+    width: 100%;
     flex-direction: row;
     justify-content: flex-start;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    transition: background 0.2s;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
   }
 
   .tab-item:hover {
-    background: rgba(255, 51, 102, 0.1);
+    background: rgba(255, 255, 255, 0.05);
   }
 
   .tab-item.active {
-    background: rgba(255, 51, 102, 0.2);
+    background: rgba(255, 51, 102, 0.12);
   }
 
   .tab-item span {
     display: block;
-    font-size: 14px;
+    font-size: 11px;
   }
 
-  /* Sidebar logo */
-  .sidebar-logo {
-    padding: 20px 16px 30px 16px;
-    border-bottom: 1px solid #222;
-    margin-bottom: 20px;
+  /* Slim header in normal flow (position:fixed buried the screens' top edge) */
+  .app-header {
+    margin-left: 240px;
+    padding: 12px 32px;
   }
 
-  .sidebar-logo .logo {
-    font-size: 28px;
-    font-weight: 800;
-    color: #ff3366;
-    letter-spacing: -1px;
+  /* the brand lives in the sidebar on desktop */
+  .app-header .logo {
+    visibility: hidden;
   }
 
-  /* Adjust main content for sidebar */
   .app-content {
     margin-left: 240px;
-    padding-bottom: 0;
+    padding-bottom: 24px;
     width: calc(100% - 240px);
     overscroll-behavior: contain;
   }
 
-  /* Header spans full width */
-  .app-header {
-    position: fixed;
-    top: 0;
-    left: 240px;
-    right: 0;
+  /* Centered content column — screens keep their mobile composition instead
+     of stretching across the window */
+  .app-content > .screen,
+  .app-content > .tab-panel > .screen,
+  .app-content > .tab-panel > .bookings-screen,
+  .app-content > .bookings-screen {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Search is the exception: the globe is a full-bleed map… */
+  .app-content > .tab-panel > .search-screen,
+  .app-content > .search-screen {
     max-width: none;
-    z-index: 100;
-    padding: 16px 32px;
+    margin: 0;
   }
 
-  /* Add top padding to account for fixed header */
-  .screen {
-    padding-top: 80px;
-  }
-
-  /* Cards in 3-column grid on desktop */
-  .search-results,
-  .explore-feed {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-
-  /* Profile screen centered with max width */
-  .profile-screen {
-    max-width: 800px;
+  /* …while the list view inside it becomes a centered multi-column board */
+  .search-screen > .relative.isolate {
+    max-width: 1040px;
     margin: 0 auto;
   }
 
-  /* Messages with sidebar and chat */
-  .messages-screen {
-    height: calc(100vh - 80px);
+  .search-screen .search-header {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .chat-screen {
-    position: relative;
-    left: auto;
-    transform: none;
-    max-width: none;
-    height: calc(100vh - 80px);
-    margin-left: 240px;
-    width: calc(100% - 240px);
-    top: 80px;
-  }
-
-  /* Form improvements for desktop */
-  .edit-form {
+  .search-results {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 16px;
+    align-items: start;
   }
 
-  .form-group:last-child {
-    grid-column: 1 / -1;
+  /* Bookings breathes a little wider than the default column */
+  .app-content > .tab-panel > .bookings-screen,
+  .app-content > .bookings-screen {
+    max-width: 760px;
   }
 
-  .form-actions {
-    grid-column: 1 / -1;
+  /* Full-screen overlays offset by the sidebar */
+  .chat-screen,
+  .filter-screen {
+    left: 240px;
+    max-width: none;
+  }
+
+  /* Overlay screens (view profile, manage, settings…) render as centered
+     columns too — they are .screen elements outside the tab panels */
+  .view-profile-screen .view-profile-content {
+    max-width: 680px;
+    margin: 0 auto;
   }
 }
 
 /* Wide Desktop (1440px and up) */
 @media (min-width: 1440px) {
-  /* Limit content width for readability. Tab screens live inside a
-     .tab-panel wrapper (keep-mounted tabs); overlays stay direct children. */
-  .app-content > .screen,
-  .app-content > .tab-panel > .screen {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  /* Cards in 4-column grid on wide screens */
-  .search-results,
-  .explore-feed {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  /* Larger sidebar */
   .tab-bar {
     width: 280px;
+  }
+
+  .app-header {
+    margin-left: 280px;
   }
 
   .app-content {
     margin-left: 280px;
     width: calc(100% - 280px);
-    overscroll-behavior: contain;
   }
 
-  .app-header {
+  .search-screen > .relative.isolate {
+    max-width: 1240px;
+  }
+
+  .search-results {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .chat-screen,
+  .filter-screen {
     left: 280px;
   }
-
-  .chat-screen {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-  }
-}
-
-/* Responsive Typography */
-@media (min-width: 768px) {
-  h1 { font-size: 2.5rem; }
-  h2 { font-size: 2rem; }
-  h3 { font-size: 1.5rem; }
-  body { font-size: 16px; }
-}
-
-@media (min-width: 1024px) {
-  h1 { font-size: 3rem; }
-  h2 { font-size: 2.25rem; }
-  h3 { font-size: 1.75rem; }
 }
 
 /* Hide mobile-only elements on desktop */

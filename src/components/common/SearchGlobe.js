@@ -81,6 +81,17 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const [selectedCountry, setSelectedCountry] = useState(null); // { name, feature, cities, profiles }
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
   const [dims, setDims] = useState({ w: 0, h: 0 });
+  // Desktop docks the members panel on the right instead of the bottom sheet
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onChange = (e) => setIsDesktop(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  const isDesktopRef = useRef(isDesktop);
+  useEffect(() => { isDesktopRef.current = isDesktop; }, [isDesktop]);
+  const PANEL_W = 400;
 
   // Mutable animation/interaction state kept in refs so the RAF loop never
   // triggers React re-renders.
@@ -427,10 +438,18 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     else setSheetPx(H);
   };
 
-  // Rotate a place to the front, offset north so it sits centered in the
-  // strip of map that stays visible above the 62% sheet.
+  // Rotate a place to the front, offset so it stays visible next to the open
+  // panel: north of the 62% bottom sheet on mobile, west of the right-docked
+  // panel on desktop.
   const focusOn = (lon, lat) => {
     const r = Math.max(viewRef.current.r, 1);
+    if (isDesktopRef.current) {
+      const offsetPx = PANEL_W / 2; // canvas center → center of the un-covered area
+      const delta = Math.min(35, (Math.asin(Math.min(0.95, offsetPx / r)) * 180) / Math.PI);
+      focusing.current = true;
+      targetRot.current = [-(lon + delta), -lat];
+      return;
+    }
     const offsetPx = dimsRef.current.h * 0.27; // canvas center → visible-strip center
     const delta = Math.min(35, (Math.asin(Math.min(0.95, offsetPx / r)) * 180) / Math.PI);
     focusing.current = true;
@@ -594,7 +613,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const sheetOpen = !!(selectedCity || selectedCountry);
   useEffect(() => {
     const el = listRef.current;
-    if (!el || !sheetOpen) return undefined;
+    if (!el || !sheetOpen || isDesktop) return undefined; // desktop panel is fixed, no sheet gestures
     let ls = null;
     const onStart = (e) => { ls = { y: e.touches[0].clientY, h: sheetPxRef.current }; };
     const onMove = (e) => {
@@ -628,7 +647,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       el.removeEventListener('touchcancel', onEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sheetOpen]);
+  }, [sheetOpen, isDesktop]);
 
   const place = selectedCountry || selectedCity;
   const panelProfiles = place ? place.profiles.filter((p) => roleOn[p.role]) : [];
@@ -654,8 +673,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         </div>
       )}
 
-      {/* Zoom controls — right edge, above the bottom chrome */}
-      <div className="absolute right-3 flex flex-col gap-1.5" style={{ bottom: bottomInset + 64 }}>
+      {/* Zoom controls — right edge, above the bottom chrome (shift left of the desktop panel) */}
+      <div className="absolute flex flex-col gap-1.5" style={{ bottom: bottomInset + 64, right: 12 + (isDesktop && sheetOpen ? PANEL_W : 0) }}>
         {['+', '−'].map((sym, i) => (
           <button
             key={sym}
@@ -680,8 +699,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       )}
 
       {/* Role legend — bottom chrome, above the parent's view toggle */}
-      <div className="pointer-events-none absolute inset-x-0 z-20 flex flex-col items-center gap-2"
-           style={{ bottom: bottomInset + 8 }}>
+      <div className="pointer-events-none absolute left-0 z-20 flex flex-col items-center gap-2"
+           style={{ bottom: bottomInset + 8, right: isDesktop && sheetOpen ? PANEL_W : 0 }}>
         {!sheetOpen && cities.length > 0 && (
           <div className="text-center text-[10px] font-tech uppercase tracking-[0.15em] text-white/25">
             {t('search.globeHint')}
@@ -709,14 +728,18 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         </div>
       )}
 
-      {/* City / country bottom sheet — expands to cover the whole page */}
+      {/* Members panel — bottom sheet on mobile (expands to cover the page),
+          right-docked side panel on desktop */}
       {sheetOpen && (
         <>
-          <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />
+          {!isDesktop && <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />}
           <aside
-            className="absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#0c0c10]"
-            style={{ height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
+            className={isDesktop
+              ? 'absolute right-0 top-0 bottom-0 z-40 flex w-[400px] flex-col border-l border-white/10 bg-[#0c0c10]/95 backdrop-blur-md'
+              : 'absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#0c0c10]'}
+            style={isDesktop ? undefined : { height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
           >
+            {!isDesktop && (
             <div
               className="flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1"
               onPointerDown={onGrabDown}
@@ -726,6 +749,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             >
               <span className="h-1 w-10 rounded-full bg-white/20" />
             </div>
+            )}
+            {isDesktop && <div className="pt-4" />}
             <div className="flex shrink-0 items-start justify-between px-5 pb-3">
               <div>
                 <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-infrared">{t('search.globeOnNetwork')}</div>

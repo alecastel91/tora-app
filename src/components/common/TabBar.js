@@ -21,6 +21,10 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
     <nav className="tab-bar fixed bottom-0 left-1/2 max-lg:-translate-x-1/2 w-full max-w-[428px] z-[100]
                     flex justify-around pt-1.5 pb-[env(safe-area-inset-bottom,0.375rem)]
                     bg-black/95 border-t border-white/10">
+      {/* desktop sidebar brand — hidden on mobile via responsive.css */}
+      <div className="sidebar-brand desktop-only">
+        <img src="/tora_logo.png" alt="TORA" />
+      </div>
       {tabs.map(tab => {
         const Icon = tab.icon;
         const showMessagesBadge = tab.id === 'messages' && unreadMessagesCount > 0;

@@ -473,7 +473,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const upgradePill = user && !hasGlobalSearch() && (
     <button
       onClick={onOpenPremium}
-      className="pointer-events-auto mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-infrared/35 bg-infrared/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md"
+      className="pointer-events-auto mx-auto mt-2 flex w-full max-w-[640px] items-center justify-center gap-2 rounded-full border border-infrared/35 bg-infrared/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-infrared">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -539,7 +539,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
           {/* floating translucent search bar + icon-only filter button */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-3">
-            <div className="pointer-events-auto flex items-center gap-2">
+            <div className="pointer-events-auto mx-auto flex max-w-[640px] items-center gap-2">
               <input
                 type="text"
                 placeholder={t('search.searchByName')}
