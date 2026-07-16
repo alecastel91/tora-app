@@ -17,6 +17,7 @@ const ROLES = ['ARTIST', 'AGENT', 'PROMOTER', 'VENUE'];
 // Zoom staging (level-of-detail): far away only the main cities show, easing
 // in the secondary ones as you approach a country — otherwise labels overlap.
 const MAX_ZOOM = 18;
+const PANEL_W = 400; // desktop members panel width — single source for the aside, offsets and focusOn
 const SECONDARY_PINS_ZOOM = 2.6; // below this, only major cities get pins
 const LABEL_MAJOR_ZOOM = 1.5;    // majors get labels from here
 const LABEL_ALL_ZOOM = 4.0;      // country-level: every visible pin is labelled
@@ -82,16 +83,18 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
   const [dims, setDims] = useState({ w: 0, h: 0 });
   // Desktop docks the members panel on the right instead of the bottom sheet
+  // 1024px matches responsive.css's desktop breakpoint / Tailwind lg
   const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
     const onChange = (e) => setIsDesktop(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+    else mq.addListener(onChange); // Safari < 14
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener('change', onChange);
+      else mq.removeListener(onChange);
+    };
   }, []);
-  const isDesktopRef = useRef(isDesktop);
-  useEffect(() => { isDesktopRef.current = isDesktop; }, [isDesktop]);
-  const PANEL_W = 400;
 
   // Mutable animation/interaction state kept in refs so the RAF loop never
   // triggers React re-renders.
@@ -443,7 +446,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   // panel on desktop.
   const focusOn = (lon, lat) => {
     const r = Math.max(viewRef.current.r, 1);
-    if (isDesktopRef.current) {
+    if (isDesktop) {
       const offsetPx = PANEL_W / 2; // canvas center → center of the un-covered area
       const delta = Math.min(35, (Math.asin(Math.min(0.95, offsetPx / r)) * 180) / Math.PI);
       focusing.current = true;
@@ -455,6 +458,16 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     focusing.current = true;
     targetRot.current = [-lon, Math.max(-90, Math.min(90, -lat + delta))];
   };
+
+  // Crossing desktop -> mobile with a place selected: the sheet height was
+  // never meaningful on desktop, so re-snap it for the current stage.
+  useEffect(() => {
+    if (!isDesktop && (selectedCity || selectedCountry)) {
+      sheetAnimating.current = true;
+      setSheetPx(Math.round(dimsRef.current.h * 0.62));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDesktop]);
 
   const openCity = (c) => {
     setSelectedCity(c);
@@ -667,8 +680,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
       {/* Un-mapped count — sits below the parent's search-bar overlay */}
       {unmapped > 0 && (
-        <div className="absolute right-3 rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40 backdrop-blur-sm"
-             style={{ top: topInset + 8 }}>
+        <div className="absolute rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40 backdrop-blur-sm"
+             style={{ top: topInset + 8, right: 12 + (isDesktop && sheetOpen ? PANEL_W : 0) }}>
           {t('search.globeUnmapped', { count: unmapped })}
         </div>
       )}
@@ -735,9 +748,11 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           {!isDesktop && <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />}
           <aside
             className={isDesktop
-              ? 'absolute right-0 top-0 bottom-0 z-40 flex w-[400px] flex-col border-l border-white/10 bg-[#070709]/95 backdrop-blur-md'
+              ? 'absolute right-0 bottom-0 z-40 flex flex-col rounded-tl-2xl border-l border-t border-white/10 bg-[#070709]'
               : 'absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#070709]'}
-            style={isDesktop ? undefined : { height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
+            style={isDesktop
+              ? { width: PANEL_W, top: topInset } /* below the floating search chrome, which stays clickable */
+              : { height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
           >
             {!isDesktop && (
             <div

@@ -33,17 +33,6 @@
   }
 
   /* Cards in grid layout */
-  .search-results,
-  .explore-feed {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .user-card,
-  .feed-card {
-    margin-bottom: 0;
-  }
 
   /* Modal larger on tablet */
   .modal-content {
@@ -132,7 +121,9 @@
   /* Slim header in normal flow (position:fixed buried the screens' top edge) */
   .app-header {
     margin-left: 240px;
-    padding: 12px 32px;
+    /* 10px vertical keeps the header at the mobile 57px height — fixed
+       overlays (.view-profile-screen top:57px) assume it */
+    padding: 10px 32px;
   }
 
   /* the brand lives in the sidebar on desktop */
@@ -148,11 +139,10 @@
   }
 
   /* Centered content column — screens keep their mobile composition instead
-     of stretching across the window */
-  .app-content > .screen,
-  .app-content > .tab-panel > .screen,
-  .app-content > .tab-panel > .bookings-screen,
-  .app-content > .bookings-screen {
+     of stretching across the window. The view-profile overlay is excluded:
+     it's position:fixed, and max-width + auto margins would shrink it into a
+     floating strip. */
+  .app-content > .tab-panel > .screen:not(.view-profile-screen) {
     max-width: 680px;
     margin-left: auto;
     margin-right: auto;
@@ -166,7 +156,7 @@
   }
 
   /* …while the list view inside it becomes a centered multi-column board */
-  .search-screen > .relative.isolate {
+  .search-screen .search-board {
     max-width: 1040px;
     margin: 0 auto;
   }
@@ -188,6 +178,8 @@
   .app-content > .tab-panel > .bookings-screen,
   .app-content > .bookings-screen {
     max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* Full-screen overlays offset by the sidebar */
@@ -195,6 +187,22 @@
   .filter-screen {
     left: 240px;
     max-width: none;
+  }
+
+  /* View profile: cover the content area (not a floating strip), reach the
+     window bottom (no mobile tab bar on desktop) */
+  .view-profile-screen {
+    left: 240px;
+    bottom: 0;
+  }
+
+  /* Settings/Premium cover the viewport at z-1000 — keep the sidebar visible
+     and center their content in a comfortable column */
+  .settings-screen,
+  .premium-screen {
+    left: 240px;
+    padding-left: max(24px, calc((100% - 720px) / 2));
+    padding-right: max(24px, calc((100% - 720px) / 2));
   }
 
   /* Overlay screens (view profile, manage, settings…) render as centered
@@ -220,7 +228,7 @@
     width: calc(100% - 280px);
   }
 
-  .search-screen > .relative.isolate {
+  .search-screen .search-board {
     max-width: 1240px;
   }
 
@@ -229,7 +237,10 @@
   }
 
   .chat-screen,
-  .filter-screen {
+  .filter-screen,
+  .view-profile-screen,
+  .settings-screen,
+  .premium-screen {
     left: 280px;
   }
 }
@@ -248,28 +259,3 @@
   }
 }
 
-/* Responsive utilities */
-.container {
-  width: 100%;
-  padding: 0 16px;
-  margin: 0 auto;
-}
-
-@media (min-width: 768px) {
-  .container {
-    padding: 0 24px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    padding: 0 32px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .container {
-    padding: 0 40px;
-    max-width: 1400px;
-  }
-}

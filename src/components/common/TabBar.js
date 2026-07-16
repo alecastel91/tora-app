@@ -18,9 +18,9 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
     // .tab-bar / .tab-item / .active stay as hooks for responsive.css's desktop sidebar layout.
     // -translate-x-1/2 scoped to <lg: it compiles to the `translate` property, which the
     // desktop sidebar override in responsive.css (transform: none) cannot reset.
-    <nav className="tab-bar fixed bottom-0 left-1/2 max-lg:-translate-x-1/2 w-full max-w-[428px] z-[100]
-                    flex justify-around pt-1.5 pb-[env(safe-area-inset-bottom,0.375rem)]
-                    bg-black/95 border-t border-white/10">
+    <nav className="tab-bar fixed max-lg:bottom-0 max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-full max-lg:max-w-[428px] z-[100]
+                    flex max-lg:justify-around pt-1.5 pb-[env(safe-area-inset-bottom,0.375rem)]
+                    bg-black/95 max-lg:border-t border-white/10">
       {/* desktop sidebar brand — hidden on mobile via responsive.css */}
       <div className="sidebar-brand desktop-only">
         <img src="/tora_logo.png" alt="TORA" />

@@ -572,7 +572,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       {/* ===== LIST view ===== */}
       {viewMode === 'list' && (
-      <div className="relative isolate">
+      <div className="search-board relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
         aria-hidden
