@@ -183,7 +183,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
             </p>
 
             {/* What happens next */}
-            <div className="w-full max-w-[340px] rounded-2xl border border-white/10 bg-[#101015] p-4 text-left mb-8">
+            <div className="w-full max-w-[340px] rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 text-left mb-8">
               <p className="m-0 mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 font-tech">
                 {t('addProfile.whatHappensNext')}
               </p>
@@ -225,7 +225,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                                 text-[11px] font-semibold uppercase tracking-[0.12em] font-tech transition-colors
                                 ${active
                                   ? 'border-infrared/60 bg-infrared/10 text-white shadow-[0_0_14px_rgba(255,51,102,0.15)]'
-                                  : 'border-white/10 bg-[#101015] text-white/60 hover:border-white/25'}`}
+                                  : 'border-white/10 bg-[#0a0a0e] text-white/60 hover:border-white/25'}`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
                     {roleLabel(r, t)}
@@ -294,7 +294,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
                     className={`rounded-full border px-3 py-2.5 text-[12px] font-medium text-center transition-colors
                                 ${isSelected
                                   ? 'border-infrared/60 bg-infrared/10 text-infrared'
-                                  : 'border-white/10 bg-[#101015] text-white/60 hover:border-white/25'}`}
+                                  : 'border-white/10 bg-[#0a0a0e] text-white/60 hover:border-white/25'}`}
                   >
                     {genre}
                   </button>

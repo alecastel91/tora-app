@@ -571,7 +571,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   {deal.eventName || t('bookings.booking')}
                 </h3>
                 {deal.performanceType && (
-                  <span className="shrink-0 px-2 py-0.5 rounded-lg bg-[#131318] border border-white/10 text-white/60
+                  <span className="shrink-0 px-2 py-0.5 rounded-lg bg-[#0e0e13] border border-white/10 text-white/60
                                    text-[8px] font-medium uppercase tracking-[0.15em] font-tech">
                     {deal.performanceType}
                   </span>
@@ -1255,7 +1255,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                 type="button"
                 onClick={loadOlderDeals}
                 disabled={loadingOlderDeals}
-                className="mx-auto my-4 block px-4 py-2 rounded-full border border-white/15 bg-[#131318] text-xs
+                className="mx-auto my-4 block px-4 py-2 rounded-full border border-white/15 bg-[#0e0e13] text-xs
                            uppercase tracking-[0.12em] text-white/60 font-tech cursor-pointer hover:text-white
                            hover:border-white/30 transition-colors disabled:opacity-50"
               >

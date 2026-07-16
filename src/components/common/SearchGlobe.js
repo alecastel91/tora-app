@@ -735,8 +735,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           {!isDesktop && <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />}
           <aside
             className={isDesktop
-              ? 'absolute right-0 top-0 bottom-0 z-40 flex w-[400px] flex-col border-l border-white/10 bg-[#0c0c10]/95 backdrop-blur-md'
-              : 'absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#0c0c10]'}
+              ? 'absolute right-0 top-0 bottom-0 z-40 flex w-[400px] flex-col border-l border-white/10 bg-[#070709]/95 backdrop-blur-md'
+              : 'absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#070709]'}
             style={isDesktop ? undefined : { height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
           >
             {!isDesktop && (
@@ -769,7 +769,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
                 <button
                   key={p.id}
                   onClick={() => onSelectProfile(p)}
-                  className="mb-2 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-[#101015] px-3 py-2.5 text-left active:scale-[0.99]"
+                  className="mb-2 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-[#0a0a0e] px-3 py-2.5 text-left active:scale-[0.99]"
                 >
                   <span className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-semibold text-white ${getAvatarClass(p.role)}`}>
                     {p.avatar ? <img src={p.avatar} alt={p.name} className="h-full w-full object-cover" /> : (p.name || '?').charAt(0).toUpperCase()}

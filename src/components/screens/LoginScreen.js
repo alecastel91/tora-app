@@ -117,8 +117,8 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-[#101015] border border-white/10 rounded-xl text-white text-sm
-                           placeholder:text-white/35 focus:outline-none focus:border-infrared/60 focus:bg-[#131318]
+                className="w-full px-4 py-3 bg-[#0a0a0e] border border-white/10 rounded-xl text-white text-sm
+                           placeholder:text-white/35 focus:outline-none focus:border-infrared/60 focus:bg-[#0e0e13]
                            transition-colors duration-300"
               />
             </div>
@@ -134,8 +134,8 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-[#101015] border border-white/10 rounded-xl text-white text-sm
-                           placeholder:text-white/35 focus:outline-none focus:border-infrared/60 focus:bg-[#131318]
+                className="w-full px-4 py-3 bg-[#0a0a0e] border border-white/10 rounded-xl text-white text-sm
+                           placeholder:text-white/35 focus:outline-none focus:border-infrared/60 focus:bg-[#0e0e13]
                            transition-colors duration-300"
               />
             </div>

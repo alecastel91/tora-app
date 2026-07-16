@@ -1419,7 +1419,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   return (
                   <div
                     key={tour.id}
-                    className="rounded-2xl border border-white/10 bg-[#101015] p-4 transition-colors hover:border-white/20"
+                    className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 transition-colors hover:border-white/20"
                   >
                     {/* Header: destination + window, status pill */}
                     <div className="flex items-start justify-between gap-3 mb-4">
@@ -1447,7 +1447,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
                     {/* Console: gigs + revenue tiles */}
                     <div className="grid grid-cols-2 gap-2.5 mb-3">
-                      <div className="rounded-xl border border-white/10 bg-[#0c0c10] px-3 py-2.5">
+                      <div className="rounded-xl border border-white/10 bg-[#070709] px-3 py-2.5">
                         <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
                           {tour.confirmedGigs || 0}
                         </p>
@@ -1455,7 +1455,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           {t('tour.gigsConfirmed')}
                         </p>
                       </div>
-                      <div className="rounded-xl border border-white/10 bg-[#0c0c10] px-3 py-2.5">
+                      <div className="rounded-xl border border-white/10 bg-[#070709] px-3 py-2.5">
                         <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
                           {Math.round(tour.totalRevenue || 0).toLocaleString()}
                           <span className="text-xs font-medium text-white/35"> / {Math.round(tour.minRevenue || 0).toLocaleString()} {tour.revenueCurrency || 'EUR'}</span>

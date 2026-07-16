@@ -39,7 +39,7 @@ const Header = ({ onOpenSettings, onOpenPremium, accountUser, onSwitchTab }) => 
   };
 
   // Round glass icon button (Obsidian Neon). Base classes shared by all three.
-  const iconBtnClasses = `relative w-9 h-9 rounded-full border border-white/10 bg-[#1a1a20]
+  const iconBtnClasses = `relative w-9 h-9 rounded-full border border-white/10 bg-[#15151b]
                           flex items-center justify-center text-white cursor-pointer
                           transition-colors hover:border-infrared/40 hover:bg-white/[0.1]
                           [&>svg]:w-[18px] [&>svg]:h-[18px]`;

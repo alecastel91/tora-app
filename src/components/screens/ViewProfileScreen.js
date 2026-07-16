@@ -445,13 +445,13 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Sender-side alert: counterparty hasn't verified yet */}
         {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
-          <p className="mb-5 px-4 py-3 rounded-2xl border border-white/10 bg-[#101015] text-xs leading-relaxed text-white/50 text-center">
+          <p className="mb-5 px-4 py-3 rounded-2xl border border-white/10 bg-[#0a0a0e] text-xs leading-relaxed text-white/50 text-center">
             {t('viewProfile.unverifiedNotice')}
           </p>
         )}
 
         {/* Stats — same row as the own profile; every column opens the real list */}
-        <div className="mb-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-2.5">
+        <div className="mb-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0e] px-2 py-2.5">
           <button type="button" onClick={() => setListModal('liked')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
             <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesGiven)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
@@ -487,7 +487,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Bio — clamped with see-more; authored line breaks preserved */}
         {profile.bio && (
-          <div className="rounded-2xl border border-white/10 bg-[#101015] p-4 mb-5 text-left">
+          <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 mb-5 text-left">
             <p className={`text-sm leading-relaxed text-white/70 whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
             {profile.bio.length > 180 && (
               <button
@@ -503,7 +503,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Venue capacity + rooms — showcased in a box for relevance */}
         {profile.role === 'VENUE' && (profile.venueCapacity || profile.venueRooms) && (
-          <div className="mb-5 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#101015] px-2 py-2.5">
+          <div className="mb-5 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0e] px-2 py-2.5">
             {profile.venueCapacity && (
               <div className="flex-1 px-2 text-center">
                 <div className="text-lg font-semibold text-white">{Number(profile.venueCapacity).toLocaleString()}</div>
@@ -525,7 +525,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.pastHighlights')}</p>
             <div className="flex flex-col gap-2">
               {profile.pastHighlights.map((h, i) => (
-                <div key={i} className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-4 py-2.5">
+                <div key={i} className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-2.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-infrared shrink-0" />
                   <span className="flex-1 text-sm text-white truncate">{h.venue}{h.city ? <span className="text-white/40"> · {h.city}</span> : null}</span>
                   {h.year && <span className="text-[11px] text-white/40 font-tech shrink-0">{h.year}</span>}
@@ -543,7 +543,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <button
               type="button"
               onClick={() => onOpenPremium && onOpenPremium()}
-              className="relative block w-full rounded-xl border border-white/10 bg-[#101015] overflow-hidden
+              className="relative block w-full rounded-xl border border-white/10 bg-[#0a0a0e] overflow-hidden
                          text-left cursor-pointer hover:border-infrared/40 transition-colors"
             >
               {/* skeleton tour card under the blur — same silhouette as the real one */}
@@ -578,7 +578,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                     window.dispatchEvent(new CustomEvent('tora:tour-kickstart'));
                     onClose && onClose();
                   }}
-                  className="rounded-xl border border-white/10 bg-[#101015] px-4 py-3 cursor-pointer hover:border-infrared/40 transition-colors"
+                  className="rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 cursor-pointer hover:border-infrared/40 transition-colors"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -664,7 +664,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <div className="flex flex-col gap-3">
               {profile.website && (
                 <a href={profile.website} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-4 py-3 hover:border-infrared/40 transition-colors">
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
                   <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4"><GlobeIcon /></span>
                   <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
                   <span className="text-white/30 text-xs">↗</span>
@@ -672,7 +672,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               )}
               {profile.instagram && (
                 <a href={`https://instagram.com/${profile.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-4 py-3 hover:border-infrared/40 transition-colors">
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
                   <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4"><InstagramGlyph /></span>
                   <span className="flex-1 text-sm font-medium text-white">Instagram</span>
                   <span className="text-white/30 text-xs">↗</span>
@@ -680,7 +680,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               )}
               {profile.residentAdvisor && (
                 <a href={raProfileUrl(profile.residentAdvisor)} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-4 py-3 hover:border-infrared/40 transition-colors">
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
                   <span className="w-9 h-9 rounded-full bg-black border border-white/20 flex items-center justify-center shrink-0"><RAGlyph /></span>
                   <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
                   <span className="text-white/30 text-xs">↗</span>
@@ -688,7 +688,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               )}
               {profile.linkedin && (
                 <a href={profile.linkedin} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-4 py-3 hover:border-infrared/40 transition-colors">
+                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
                   <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">in</span>
                   <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>
                   <span className="text-white/30 text-xs">↗</span>
@@ -704,10 +704,10 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <button
               type="button"
               onClick={() => setShowGigsModal(true)}
-              className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-4 py-3
+              className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3
                          text-left cursor-pointer hover:border-infrared/40 transition-colors"
             >
-              <span className="w-9 h-9 rounded-full bg-[#1a1a20] border border-white/10 flex items-center justify-center shrink-0 text-infrared [&>svg]:w-4 [&>svg]:h-4">
+              <span className="w-9 h-9 rounded-full bg-[#15151b] border border-white/10 flex items-center justify-center shrink-0 text-infrared [&>svg]:w-4 [&>svg]:h-4">
                 <BookingsIcon />
               </span>
               <span className="flex-1 text-sm font-medium text-white">{t('viewProfile.gigsViaTora', { n: profile.gigsCompleted })}</span>
@@ -759,7 +759,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                     key={l.id}
                     type="button"
                     onClick={() => { setListModal(null); setNestedProfile(l); }}
-                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#101015] px-3 py-2.5 w-full text-left cursor-pointer hover:border-infrared/40 transition-colors"
+                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-3 py-2.5 w-full text-left cursor-pointer hover:border-infrared/40 transition-colors"
                   >
                     <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white text-sm font-semibold ${getAvatarClass(l.role)}`}>
                       {l.avatar ? <img src={l.avatar} alt={l.name} className="w-full h-full object-cover" /> : (l.name || '?').charAt(0).toUpperCase()}
@@ -790,7 +790,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             ) : (
               <div className="flex flex-col gap-2">
                 {gigs.map((g) => (
-                  <div key={g.id} className="rounded-xl border border-white/10 bg-[#101015] px-4 py-3">
+                  <div key={g.id} className="rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3">
                     <p className="m-0 text-sm font-medium text-white truncate">{g.eventName || g.venueName}</p>
                     <p className="m-0 mt-1 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">
                       {[g.venueName && g.eventName ? g.venueName : '', [g.city, g.country].filter(Boolean).join(', '),
