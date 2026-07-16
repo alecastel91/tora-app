@@ -897,7 +897,7 @@ const fr = {
     globeNoCities: 'Aucun membre à afficher sur le globe pour l’instant',
     globeNoMatchingRoles: 'Aucun membre ne correspond aux rôles sélectionnés',
     globeLockedTitle: 'Recherchez dans le monde entier',
-    globeLockedBody: '{{city}} est sur TORA — mais explorer au-delà de votre ville nécessite Premium. Passez à Premium pour ouvrir toutes les villes du réseau.',
+    globeLockedBody: '{{city}} est sur TORA — mais explorer au-delà de votre pays nécessite Premium. Passez à Premium pour ouvrir toutes les villes du réseau.',
     globeCity: '{{count}} ville',
     globeCities: '{{count}} villes',
     globeCountryEmpty: 'Pas encore de membres en {{country}}',

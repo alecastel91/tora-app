@@ -897,7 +897,7 @@ const ja = {
     globeNoCities: 'まだ地球儀に表示するメンバーがいません',
     globeNoMatchingRoles: '選択した役割に一致するメンバーがいません',
     globeLockedTitle: '世界中を検索',
-    globeLockedBody: '{{city}}はTORAにあります。ただし、自分の都市以外を探索するにはプレミアムが必要です。アップグレードしてネットワーク上のすべての都市を開きましょう。',
+    globeLockedBody: '{{city}}はTORAにあります。ただし、自分の国以外を探索するにはプレミアムが必要です。アップグレードしてネットワーク上のすべての都市を開きましょう。',
     globeCity: '{{count}} 都市',
     globeCities: '{{count}} 都市',
     globeCountryEmpty: '{{country}}にはまだメンバーがいません',

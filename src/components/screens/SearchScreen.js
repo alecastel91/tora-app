@@ -139,7 +139,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       if (hasLocationFilters) {
         const tierName = user?.subscriptionTier === 'TRIAL' ? t('search.trialTierName') : t('search.freeTierName');
         // Show alert and clear location filters
-        appAlert(t('search.locationFiltersAlert', { tierName, city: user.city }));
+        appAlert(t('search.locationFiltersAlert', { tierName, city: user.country || user.city }));
 
         // Clear location filters but keep other filters
         setFilters({
@@ -460,6 +460,14 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     setViewingProfile(profile);
   };
 
+  // FREE discovery spans the whole country, but the list leads with the
+  // member's own city (stable sort keeps the server order within each group).
+  const listResults = hasGlobalSearch()
+    ? searchResults
+    : [...searchResults].sort(
+        (a, b) => (a.city === user?.city ? 0 : 1) - (b.city === user?.city ? 0 : 1)
+      );
+
   // FREE-tier upgrade pill — the single banner (premium members see none),
   // rendered identically right under the search line in both views.
   const upgradePill = user && !hasGlobalSearch() && (
@@ -471,7 +479,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
-      <span className="truncate">{t('profile.searchLimitedTo')} {user.city}</span>
+      <span className="truncate">{t('profile.searchLimitedTo')} {user.country || user.city}</span>
       <span className="shrink-0 font-semibold text-infrared">{t('search.upgradeNow')}</span>
     </button>
   );
@@ -522,6 +530,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               onSelectProfile={handleProfileClick}
               locked={!hasGlobalSearch()}
               userCity={user?.city}
+              userCountry={user?.country}
               onLockedCity={setGlobeUpsellCity}
               topInset={user && !hasGlobalSearch() ? 118 : 66}
               bottomInset={8}
@@ -605,8 +614,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       <div className="search-results">
         {loading ? (
           <LoadingGlobe label={t('search.loadingProfiles')} />
-        ) : searchResults.length > 0 ? (
-          searchResults.map(profile => {
+        ) : listResults.length > 0 ? (
+          listResults.map(profile => {
             const profileId = profile.id;
             const isLiked = likedProfiles.has(profileId);
             const isRequested = sentRequests.has(profileId);

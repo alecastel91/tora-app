@@ -902,7 +902,7 @@ const en = {
     globeNoCities: 'No members to place on the globe yet',
     globeNoMatchingRoles: 'No members match the selected roles',
     globeLockedTitle: 'Search worldwide',
-    globeLockedBody: '{{city}} is on TORA — but exploring beyond your own city takes Premium. Upgrade to open every city on the network.',
+    globeLockedBody: '{{city}} is on TORA — but exploring beyond your own country takes Premium. Upgrade to open every city on the network.',
     globeCity: '{{count}} city',
     globeCities: '{{count}} cities',
     globeCountryEmpty: 'No members in {{country}} yet',

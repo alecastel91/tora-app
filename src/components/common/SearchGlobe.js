@@ -36,22 +36,37 @@ function groupByCity(profiles) {
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', onLockedCity, topInset = 68, bottomInset = 52 }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, topInset = 68, bottomInset = 52 }) => {
   const { t } = useLanguage();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
 
   const { list: cities, unmapped } = useMemo(() => groupByCity(profiles), [profiles]);
 
+  // The FREE member's own country feature — their whole discovery scope.
+  const ownCountryFeature = useMemo(() => {
+    if (!locked) return null;
+    const own = coordsForCity(userCity);
+    if (own) {
+      const f = LAND.features.find((c) => geoContains(c, own));
+      if (f) return f;
+    }
+    const cn = (userCountry || '').toLowerCase();
+    return cn ? LAND.features.find((c) => (c.properties?.name || '').toLowerCase() === cn) || null : null;
+  }, [locked, userCity, userCountry]);
+
   // For FREE members: dim "Premium" pins on the big hubs they can't open yet.
+  // Hubs inside their own country are excluded — that's their discovery scope,
+  // handled by real data pins and the country sheet.
   const lockedHubs = useMemo(() => {
     if (!locked) return [];
     const ownKey = normalizeCity(userCity);
     const dataKeys = new Set(cities.map((c) => c.key));
     return FEATURED_HUBS
       .map((name) => ({ key: normalizeCity(name), name, coord: CITY_COORDS[normalizeCity(name)] }))
-      .filter((h) => h.coord && h.key !== ownKey && !dataKeys.has(h.key));
-  }, [locked, userCity, cities]);
+      .filter((h) => h.coord && h.key !== ownKey && !dataKeys.has(h.key)
+        && !(ownCountryFeature && geoContains(ownCountryFeature, h.coord)));
+  }, [locked, userCity, cities, ownCountryFeature]);
 
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
   const [selectedCity, setSelectedCity] = useState(null);
@@ -391,11 +406,13 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       (c) => geoContains(f, c.coord) || (c.country && c.country.toLowerCase() === fname)
     );
     if (locked) {
-      // FREE members may open their own country. Their searchResults only
-      // contain their own city, so any data pin inside the country proves
-      // ownership — this also covers home cities missing from CITY_COORDS.
+      // FREE members may open their own country (their whole discovery
+      // scope). Data pins inside prove ownership; own-city coords and the
+      // profile's country name cover empty/unmapped cases.
       const own = coordsForCity(userCity);
-      const allowed = inCountry.length > 0 || (own && geoContains(f, own));
+      const allowed = inCountry.length > 0
+        || (own && geoContains(f, own))
+        || (userCountry && fname === userCountry.toLowerCase());
       if (!allowed) { onLockedCity?.(name); return; }
     }
     setSelectedCountry({
