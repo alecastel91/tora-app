@@ -12464,6 +12464,8 @@ textarea.form-textarea:focus {
 
 .coming-soon-icon {
   margin-bottom: 24px;
+  display: flex;
+  justify-content: center; /* the svg is block-level, so the parent's text-align can't center it */
 }
 
 .coming-soon-icon svg {

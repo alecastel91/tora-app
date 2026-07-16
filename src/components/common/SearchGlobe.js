@@ -85,6 +85,21 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
   const projection = useRef(geoOrthographic().clipAngle(90).precision(0.5)).current;
 
+  // Start the map zoomed in on the member's own city (map-app feel). Starts
+  // paused — auto-rotation at this zoom would sweep the view away instantly;
+  // zooming out and tapping empty space resumes the ambient spin.
+  const didInitView = useRef(false);
+  useEffect(() => {
+    if (didInitView.current || !userCity) return;
+    const own = coordsForCity(userCity);
+    if (own) {
+      rot.current = [-own[0], -own[1], 0];
+      zoomRef.current = 4.2;
+      pausedRef.current = true;
+    }
+    didInitView.current = true;
+  }, [userCity]);
+
   // Track the rendered size for the canvas backing store (also fires when the
   // keep-mounted tab flips from display:none to visible).
   useEffect(() => {

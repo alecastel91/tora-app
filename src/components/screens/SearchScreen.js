@@ -528,9 +528,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             )}
           </div>
 
-          {/* floating view toggle at the bottom of the map */}
+          {/* floating view toggle at the bottom of the map — as translucent as the tier pill up top */}
           <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2">
-            <div className="flex rounded-full border border-white/10 bg-black/45 p-0.5 text-xs font-tech uppercase tracking-[0.12em] backdrop-blur-md">
+            <div className="flex rounded-full border border-white/10 bg-black/20 p-0.5 text-xs font-tech uppercase tracking-[0.12em] backdrop-blur-md">
               {[
                 { key: 'globe', label: t('search.viewGlobe') },
                 { key: 'list', label: t('search.viewList') },
@@ -538,7 +538,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 <button
                   key={v.key}
                   onClick={() => setViewMode(v.key)}
-                  className={`rounded-full px-5 py-1.5 transition ${viewMode === v.key ? 'bg-[#FF3366] text-white' : 'text-white/45'}`}
+                  className={`rounded-full px-5 py-1.5 transition ${viewMode === v.key ? 'bg-[#FF3366]/70 text-white' : 'text-white/45'}`}
                 >
                   {v.label}
                 </button>
@@ -597,25 +597,19 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           ))}
         </div>
 
-        {/* FREE tier only: upgrade ad (premium members see no banner) */}
+        {/* FREE tier only: compact upgrade pill (premium members see no banner) */}
         {user && !hasGlobalSearch() && (
-          <div className="search-upgrade-banner">
-            <div className="upgrade-banner-content">
-              <span className="upgrade-icon" aria-hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-              </span>
-              <div className="upgrade-text">
-                <strong>{t('profile.searchLimitedTo')} {user.city}</strong>
-                <p>{t('search.upgradeWorldwide')}</p>
-              </div>
-              <button className="btn btn-upgrade-banner" onClick={onOpenPremium}>
-                {t('search.upgradeNow')}
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={onOpenPremium}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-[#FF3366]/35 bg-[#FF3366]/10 px-4 py-2 text-xs text-white/85"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-[#FF3366]">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span className="truncate">{t('profile.searchLimitedTo')} {user.city}</span>
+            <span className="shrink-0 font-semibold text-[#FF3366]">{t('search.upgradeNow')}</span>
+          </button>
         )}
 
       </div>
