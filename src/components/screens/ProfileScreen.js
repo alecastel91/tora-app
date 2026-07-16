@@ -47,7 +47,7 @@ const ActionCard = ({ icon, label, onClick, dot }) => {
     type="button"
     onClick={onClick}
     className="group relative flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[#0a0a0e]
-               px-3.5 py-3 min-h-[58px] text-left transition-colors hover:border-infrared/40 hover:bg-[#111117]"
+               px-3.5 py-3 min-h-[58px] text-left transition-colors hover:border-infrared/40 hover:bg-[#0e0e13]"
   >
     <span className="shrink-0 text-infrared [&>svg]:w-5 [&>svg]:h-5">{icon}</span>
     <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white font-tech leading-tight">{label}</span>
@@ -458,7 +458,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               {user.genres.map(genre => (
                 <span
                   key={genre}
-                  className="px-2.5 py-1 rounded-lg bg-[#0e0e13] border border-white/10 text-white/60
+                  className="px-2.5 py-1 rounded-lg bg-[#0c0c11] border border-white/10 text-white/60
                              text-[8px] font-medium uppercase tracking-[0.15em] font-tech"
                 >
                   {genre}
@@ -907,7 +907,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                   )}
                   {!isActive && userProfiles.length > 1 && (
                     <button
-                      className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#15151b] transition-colors cursor-pointer bg-transparent border-none"
+                      className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#111117] transition-colors cursor-pointer bg-transparent border-none"
                       aria-label={`Delete ${profile.name}`}
                       onClick={(e) => {
                         e.stopPropagation();

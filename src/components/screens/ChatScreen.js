@@ -908,7 +908,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             type="button"
             onClick={loadOlderMessages}
             disabled={loadingOlder}
-            className="mx-auto mb-4 block px-4 py-2 rounded-full border border-white/15 bg-[#0e0e13] text-xs
+            className="mx-auto mb-4 block px-4 py-2 rounded-full border border-white/15 bg-[#0c0c11] text-xs
                        uppercase tracking-[0.12em] text-white/60 font-tech cursor-pointer hover:text-white
                        hover:border-white/30 transition-colors disabled:opacity-50"
           >

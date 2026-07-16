@@ -3519,7 +3519,7 @@
 }
 
 .search-result-card:hover {
-  background: #111117; /* opaque brighten — rgba hover let the pink grid bleed through */
+  background: #0e0e13; /* opaque brighten — rgba hover let the pink grid bleed through */
   border-color: rgba(255, 51, 102, 0.4);
 }
 
@@ -9233,7 +9233,7 @@ textarea.form-textarea:focus {
 }
 
 .booking-card:hover {
-  background: #15151b; /* opaque brighten — rgba hover let the pink grid bleed through */
+  background: #111117; /* opaque brighten — rgba hover let the pink grid bleed through */
   border-color: rgba(255, 255, 255, 0.3);
   transform: scale(1.01);
 }

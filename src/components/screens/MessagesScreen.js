@@ -179,8 +179,8 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
                 <div
                   key={conv.profile.id}
                   className={`flex items-center gap-3 rounded-2xl border p-3.5 cursor-pointer transition-colors
-                              ${unread ? 'border-infrared/30 bg-[#111117]' : 'border-white/10 bg-[#0a0a0e]'}
-                              ${isDeleted ? 'opacity-70' : ''} hover:border-infrared/40 hover:bg-[#15151b]`}
+                              ${unread ? 'border-infrared/30 bg-[#0e0e13]' : 'border-white/10 bg-[#0a0a0e]'}
+                              ${isDeleted ? 'opacity-70' : ''} hover:border-infrared/40 hover:bg-[#111117]`}
                   onClick={() => onOpenChat && onOpenChat(conv.profile)}
                 >
                   <div className={`message-avatar shrink-0 ${isDeleted ? 'avatar-deleted' : getAvatarClass(conv.profile.role)}`}>
@@ -235,7 +235,7 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
               <div
                 key={request.requestId}
                 className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-3.5 cursor-pointer
-                           transition-colors hover:border-infrared/40 hover:bg-[#15151b]"
+                           transition-colors hover:border-infrared/40 hover:bg-[#111117]"
                 onClick={() => onOpenChat && onOpenChat(request.profile)}
               >
                 <div className="flex items-center gap-3">

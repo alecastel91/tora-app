@@ -258,7 +258,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                     )}
                   </button>
                   <button
-                    className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#15151b] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
+                    className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#111117] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
                     aria-label={`Remove ${artist.name}`}
                     onClick={() => handleRemoveArtist(artist)}
                     disabled={removingArtistId === (artist.profileId || artist.id)}

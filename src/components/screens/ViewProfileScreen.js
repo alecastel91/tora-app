@@ -707,7 +707,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3
                          text-left cursor-pointer hover:border-infrared/40 transition-colors"
             >
-              <span className="w-9 h-9 rounded-full bg-[#15151b] border border-white/10 flex items-center justify-center shrink-0 text-infrared [&>svg]:w-4 [&>svg]:h-4">
+              <span className="w-9 h-9 rounded-full bg-[#111117] border border-white/10 flex items-center justify-center shrink-0 text-infrared [&>svg]:w-4 [&>svg]:h-4">
                 <BookingsIcon />
               </span>
               <span className="flex-1 text-sm font-medium text-white">{t('viewProfile.gigsViaTora', { n: profile.gigsCompleted })}</span>
