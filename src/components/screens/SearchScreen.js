@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon } from '../../utils/icons';
@@ -17,7 +17,10 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptConnectionRequest, declineConnectionRequest } = useAppContext();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'globe'
+  const [viewMode, setViewMode] = useState('globe'); // 'globe' | 'list' — the globe IS the search landing
+  const [globeUpsellCity, setGlobeUpsellCity] = useState(null); // FREE member tapped a locked city
+  const stageRef = useRef(null);
+  const [stageH, setStageH] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     roles: [],
@@ -107,6 +110,23 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profilesLoaded]);
+
+  // Full-bleed globe stage: fill exactly between the app header and the tab
+  // bar. Measured off the (always-visible) header/tab-bar so it's correct even
+  // while this tab is pre-warmed inside a hidden keep-mounted panel.
+  useEffect(() => {
+    if (viewMode !== 'globe' || viewingProfile) return undefined;
+    const measure = () => {
+      const header = document.querySelector('.app-header');
+      const tabBar = document.querySelector('.tab-bar');
+      const top = header ? header.getBoundingClientRect().bottom : 56;
+      const bottom = tabBar ? tabBar.getBoundingClientRect().top : window.innerHeight - 70;
+      setStageH(Math.max(420, Math.round(bottom - top)));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [viewMode, viewingProfile]);
 
   const handleSearch = async () => {
     // Check if FREE tier user is trying to use location filters
@@ -451,10 +471,85 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   }
 
   return (
-    <div className="screen active search-screen">
-      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
-          full-screen overlays (filter screen, modals) must live OUTSIDE it or
-          they get trapped under the sticky app header's stacking context. */}
+    <div className="screen active search-screen" style={viewMode === 'globe' ? { padding: 0, minHeight: 0 } : undefined}>
+      {/* ===== GLOBE — the search landing: a full-bleed map with floating chrome ===== */}
+      {viewMode === 'globe' && (
+        <div ref={stageRef} className="relative overflow-hidden" style={{ height: stageH || 'calc(100dvh - 130px)' }}>
+          <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingGlobe label={t('search.loadingProfiles')} /></div>}>
+            <SearchGlobe
+              profiles={searchResults}
+              onSelectProfile={handleProfileClick}
+              locked={!hasGlobalSearch()}
+              userCity={user?.city}
+              onLockedCity={setGlobeUpsellCity}
+              topInset={user && !hasGlobalSearch() ? 118 : 66}
+              bottomInset={52}
+            />
+          </Suspense>
+
+          {/* floating translucent search bar + icon-only filter button */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-3">
+            <div className="pointer-events-auto flex items-center gap-2">
+              <input
+                type="text"
+                placeholder={t('search.searchByName')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-black/35 px-4 text-sm text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
+              />
+              <button
+                onClick={() => setShowFilters(true)}
+                aria-label={t('search.filters')}
+                className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white/80 backdrop-blur-md"
+              >
+                <span className="[&>svg]:h-4 [&>svg]:w-4"><FilterIcon /></span>
+                {activeFilterCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3366] px-1 text-[9px] font-semibold text-white">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* FREE tier only: a compact Premium ad (premium members see no banner) */}
+            {user && !hasGlobalSearch() && (
+              <button
+                onClick={onOpenPremium}
+                className="pointer-events-auto mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-[#FF3366]/35 bg-[#FF3366]/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 shrink-0 text-[#FF3366]">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span className="truncate">{t('profile.searchLimitedTo')} {user.city}</span>
+                <span className="shrink-0 font-semibold text-[#FF3366]">{t('search.upgradeNow')}</span>
+              </button>
+            )}
+          </div>
+
+          {/* floating view toggle at the bottom of the map */}
+          <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2">
+            <div className="flex rounded-full border border-white/10 bg-black/45 p-0.5 text-xs font-tech uppercase tracking-[0.12em] backdrop-blur-md">
+              {[
+                { key: 'globe', label: t('search.viewGlobe') },
+                { key: 'list', label: t('search.viewList') },
+              ].map((v) => (
+                <button
+                  key={v.key}
+                  onClick={() => setViewMode(v.key)}
+                  className={`rounded-full px-5 py-1.5 transition ${viewMode === v.key ? 'bg-[#FF3366] text-white' : 'text-white/45'}`}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== LIST view ===== */}
+      {viewMode === 'list' && (
       <div className="relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
@@ -473,7 +568,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             className="search-input"
           />
-          <button 
+          <button
             className="filter-toggle-btn"
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -484,11 +579,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           </button>
         </div>
 
-        {/* List / Globe view toggle */}
+        {/* Globe / List view toggle */}
         <div className="mt-3 flex rounded-full border border-white/10 bg-[#0c0c10] p-0.5 text-xs font-tech uppercase tracking-[0.12em]">
           {[
-            { key: 'list', label: t('search.viewList') },
             { key: 'globe', label: t('search.viewGlobe') },
+            { key: 'list', label: t('search.viewList') },
           ].map((v) => (
             <button
               key={v.key}
@@ -502,23 +597,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           ))}
         </div>
 
-        {/* Tier-based notification banner */}
-        {user && hasGlobalSearch() && (
-          <div className="search-premium-notice">
-            <span className="premium-icon" aria-hidden>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </span>
-            <span>
-              {user?.subscriptionTier === 'TRIAL' ? t('profile.searchingWorldwideTrial') : t('profile.searchingWorldwidePremium')}
-            </span>
-          </div>
-        )}
-
-        {/* Upgrade banner for FREE tier */}
+        {/* FREE tier only: upgrade ad (premium members see no banner) */}
         {user && !hasGlobalSearch() && (
           <div className="search-upgrade-banner">
             <div className="upgrade-banner-content">
@@ -541,17 +620,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       </div>
 
-      {/* Globe view */}
-      {viewMode === 'globe' && (
-        <div className="mt-3">
-          <Suspense fallback={<LoadingGlobe label={t('search.loadingProfiles')} />}>
-            <SearchGlobe profiles={searchResults} onSelectProfile={handleProfileClick} />
-          </Suspense>
-        </div>
-      )}
-
       {/* Search Results */}
-      {viewMode === 'list' && (
       <div className="search-results">
         {loading ? (
           <LoadingGlobe label={t('search.loadingProfiles')} />
@@ -633,8 +702,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           </div>
         )}
       </div>
-      )}
       </div>
+      )}
 
       {/* Filter Full-Page Screen */}
       {showFilters && (
@@ -1003,6 +1072,45 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 className="btn btn-upgrade"
                 onClick={() => {
                   setShowConnectionLimitModal(false);
+                  if (onOpenPremium) {
+                    onOpenPremium();
+                  }
+                }}
+              >
+                {t('search.upgrade')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Globe locked-city upsell (FREE members tapping a Premium pin) */}
+      {globeUpsellCity && (
+        <div className="modal-overlay" onClick={() => setGlobeUpsellCity(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{t('search.globeLockedTitle')}</h3>
+              <button className="modal-close" onClick={() => setGlobeUpsellCity(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="limit-message-centered">
+                <div className="limit-icon">
+                  <SlashCircleIcon />
+                </div>
+                <p className="limit-main-text">{t('search.globeLockedBody', { city: globeUpsellCity })}</p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn btn-outline"
+                onClick={() => setGlobeUpsellCity(null)}
+              >
+                {t('common.close')}
+              </button>
+              <button
+                className="btn btn-upgrade"
+                onClick={() => {
+                  setGlobeUpsellCity(null);
                   if (onOpenPremium) {
                     onOpenPremium();
                   }

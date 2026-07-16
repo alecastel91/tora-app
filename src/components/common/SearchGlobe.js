@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
-import { coordsForCity, normalizeCity } from '../../data/cityCoords';
+import { coordsForCity, normalizeCity, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
 import { getAvatarClass } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -34,18 +34,30 @@ function groupByCity(profiles) {
   return { list: [...map.values()], unmapped };
 }
 
-const SearchGlobe = ({ profiles, onSelectProfile }) => {
+// Fills its positioned parent. The parent (SearchScreen) overlays the search
+// bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
+// tell this component how much of its own chrome those overlays cover.
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', onLockedCity, topInset = 68, bottomInset = 52 }) => {
   const { t } = useLanguage();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
 
   const { list: cities, unmapped } = useMemo(() => groupByCity(profiles), [profiles]);
 
+  // For FREE members: dim "Premium" pins on the big hubs they can't open yet.
+  const lockedHubs = useMemo(() => {
+    if (!locked) return [];
+    const ownKey = normalizeCity(userCity);
+    const dataKeys = new Set(cities.map((c) => c.key));
+    return FEATURED_HUBS
+      .map((name) => ({ key: normalizeCity(name), name, coord: CITY_COORDS[normalizeCity(name)] }))
+      .filter((h) => h.coord && h.key !== ownKey && !dataKeys.has(h.key));
+  }, [locked, userCity, cities]);
+
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
   const [selectedCity, setSelectedCity] = useState(null);
-  const [tip, setTip] = useState(null); // { x, y, name, count }
+  const [tip, setTip] = useState(null); // { x, y, name, count, locked }
   const [dims, setDims] = useState({ w: 0, h: 0 });
-  const [boxH, setBoxH] = useState(0); // fits the globe between the header and the tab bar
 
   // Mutable animation/interaction state kept in refs so the RAF loop never
   // triggers React re-renders.
@@ -63,40 +75,29 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
   const selectedKey = useRef(null);
   const roleOnRef = useRef(roleOn);
   const citiesRef = useRef(cities);
+  const lockedHubsRef = useRef(lockedHubs);
   const dimsRef = useRef({ w: 0, h: 0, dpr: 1 });
 
   useEffect(() => { roleOnRef.current = roleOn; }, [roleOn]);
   useEffect(() => { citiesRef.current = cities; }, [cities]);
+  useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
   useEffect(() => { selectedKey.current = selectedCity?.key || null; }, [selectedCity]);
 
   const projection = useRef(geoOrthographic().clipAngle(90).precision(0.5)).current;
 
-  // Fit the globe box between its top (below the search header) and the tab bar,
-  // so the zoom controls and hint never hide under the bottom nav.
+  // Track the rendered size for the canvas backing store (also fires when the
+  // keep-mounted tab flips from display:none to visible).
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return undefined;
-    const TAB_BAR = 84; // bottom nav + gap
     const measure = () => {
-      const top = el.getBoundingClientRect().top;
-      setBoxH(Math.max(340, Math.round(window.innerHeight - top - TAB_BAR)));
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
-
-  // Track the actual rendered size for the canvas backing store.
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return undefined;
-    const ro = new ResizeObserver(() => {
       const r = el.getBoundingClientRect();
+      if (r.width < 10 || r.height < 10) return; // hidden tab panel
       setDims({ w: Math.round(r.width), h: Math.round(r.height) });
-    });
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    const r = el.getBoundingClientRect();
-    setDims({ w: Math.round(r.width), h: Math.round(r.height) });
+    measure();
     return () => ro.disconnect();
   }, []);
 
@@ -115,14 +116,13 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
     const path = geoPath(projection, ctx);
     let raf = 0;
 
-    const CX = () => dims.w / 2;
-    const CY = () => dims.h / 2 + Math.min(dims.h * 0.03, 20);
-    const baseR = () => Math.min(dims.w, dims.h) * 0.44;
+    const cx = dims.w / 2;
+    const cy = dims.h * 0.46; // slightly above center — bottom chrome overlays the lower band
+    const baseR = Math.min(dims.w, dims.h) * 0.44;
 
     function frame() {
       const W = dims.w, H = dims.h;
-      const cx = CX(), cy = CY();
-      const r = baseR() * zoomRef.current;
+      const r = baseR * zoomRef.current;
 
       if (focusing.current && targetRot.current) {
         for (let i = 0; i < 2; i++) {
@@ -175,10 +175,27 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7);
       ctx.strokeStyle = 'rgba(255,51,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
 
-      // pins
       const now = performance.now();
       const showLabels = zoomRef.current > 1.5;
       const font = getComputedStyle(document.body).fontFamily;
+
+      // locked hub pins (FREE tier) — dim, tappable, upsell on tap
+      for (const hub of lockedHubsRef.current) {
+        const xy = projection(hub.coord);
+        hub._xy = xy;
+        if (!xy) continue;
+        const isHov = hoveredKey.current === hub.key;
+        ctx.fillStyle = isHov ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.26)';
+        ctx.beginPath(); ctx.arc(xy[0], xy[1], 2.8, 0, 7); ctx.fill();
+        if (showLabels || isHov) {
+          ctx.font = `500 11px ${font}`; ctx.textAlign = 'left';
+          ctx.fillStyle = 'rgba(255,255,255,0.38)';
+          ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
+          ctx.fillText(hub.name, xy[0] + 8, xy[1] + 4); ctx.shadowBlur = 0;
+        }
+      }
+
+      // member pins
       for (const c of citiesRef.current) {
         const count = c.profiles.reduce((n, p) => n + (roleOnRef.current[p.role] ? 1 : 0), 0);
         const xy = count > 0 ? projection(c.coord) : null;
@@ -211,15 +228,37 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
     return () => cancelAnimationFrame(raf);
   }, [dims, projection]);
 
-  // hit-test against pins (uses the _xy stamped by the last frame)
+  // hit-test: member pins first, then locked hubs (uses _xy from the last frame)
   const hit = (mx, my) => {
     let best = null, bd = 1e9;
     for (const c of citiesRef.current) {
       if (!c._xy) continue;
       const d = Math.hypot(mx - c._xy[0], my - c._xy[1]);
-      if (d < 16 && d < bd) { bd = d; best = c; }
+      if (d < 16 && d < bd) { bd = d; best = { kind: 'city', ref: c }; }
+    }
+    if (!best) {
+      for (const hub of lockedHubsRef.current) {
+        if (!hub._xy) continue;
+        const d = Math.hypot(mx - hub._xy[0], my - hub._xy[1]);
+        if (d < 14 && d < bd) { bd = d; best = { kind: 'locked', ref: hub }; }
+      }
     }
     return best;
+  };
+
+  // ---- city sheet state ----
+  const [sheetPx, setSheetPx] = useState(0);
+  const sheetPxRef = useRef(0);
+  const sheetAnimating = useRef(false); // false during drags → no height transition
+  const listRef = useRef(null);
+  useEffect(() => { sheetPxRef.current = sheetPx; }, [sheetPx]);
+
+  const snapSheet = (px) => {
+    sheetAnimating.current = true;
+    const H = dimsRef.current.h;
+    if (px < H * 0.25) { setSelectedCity(null); setSheetPx(0); }
+    else if (px < H * 0.8) setSheetPx(Math.round(H * 0.62));
+    else setSheetPx(H);
   };
 
   const openCity = (c) => {
@@ -227,9 +266,10 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
     focusing.current = true;
     targetRot.current = [-c.coord[0], -c.coord[1]];
     setTip(null);
+    sheetAnimating.current = true;
     setSheetPx(Math.round(dimsRef.current.h * 0.62));
   };
-  const closeCity = () => { setSelectedCity(null); focusing.current = false; };
+  const closeCity = () => { setSelectedCity(null); setSheetPx(0); focusing.current = false; };
 
   // ---- pointer interaction on the canvas ----
   const onPointerDown = (e) => {
@@ -268,15 +308,21 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
       rot.current[1] = Math.max(-90, Math.min(90, rot.current[1] - dy * k));
     } else {
       const h = hit(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-      hoveredKey.current = h?.key || null;
-      if (h && h._xy) setTip({ x: h._xy[0], y: h._xy[1], name: h.name, count: h._count });
-      else setTip(null);
+      hoveredKey.current = h?.ref.key || null;
+      if (h && h.ref._xy) {
+        setTip({
+          x: h.ref._xy[0], y: h.ref._xy[1], name: h.ref.name,
+          count: h.kind === 'city' ? h.ref._count : null,
+          locked: h.kind === 'locked',
+        });
+      } else setTip(null);
     }
   };
   const endTap = (e) => {
     if (movedRef.current >= 6) { pausedRef.current = true; return; }
     const h = hit(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    if (h) openCity(h);
+    if (h?.kind === 'city') openCity(h.ref);
+    else if (h?.kind === 'locked') onLockedCity?.(h.ref.name);
     else if (selectedKey.current) closeCity();
     else pausedRef.current = !pausedRef.current;
   };
@@ -297,34 +343,71 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
     zoomRef.current = Math.max(1, Math.min(6, zoomRef.current * (1 - e.deltaY * 0.0012)));
   };
 
-  // ---- bottom-sheet drag ----
-  const [sheetPx, setSheetPx] = useState(0);
-  const sheetDrag = useRef(null);
+  // ---- grabber drag (pointer, works on desktop too) ----
+  const grabDrag = useRef(null);
   const onGrabDown = (e) => {
-    sheetDrag.current = { y: e.clientY, h: sheetPx };
+    grabDrag.current = { y: e.clientY, h: sheetPxRef.current };
+    sheetAnimating.current = false;
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
   const onGrabMove = (e) => {
-    if (!sheetDrag.current) return;
-    const h = sheetDrag.current.h - (e.clientY - sheetDrag.current.y);
+    if (!grabDrag.current) return;
+    const h = grabDrag.current.h - (e.clientY - grabDrag.current.y);
     setSheetPx(Math.max(0, Math.min(dimsRef.current.h, h)));
   };
   const onGrabUp = () => {
-    if (!sheetDrag.current) return;
-    sheetDrag.current = null;
-    const H = dimsRef.current.h;
-    if (sheetPx < H * 0.25) closeCity();
-    else if (sheetPx < H * 0.8) setSheetPx(Math.round(H * 0.62));
-    else setSheetPx(H);
+    if (!grabDrag.current) return;
+    grabDrag.current = null;
+    snapSheet(sheetPxRef.current);
   };
+
+  // ---- coordinated list scroll (touch): swipe up → expand to full page;
+  //      pull down at the top → collapse toward the globe / close.
+  //      Native listeners because React touch events are passive at the root.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || !selectedCity) return undefined;
+    let ls = null;
+    const onStart = (e) => { ls = { y: e.touches[0].clientY, h: sheetPxRef.current }; };
+    const onMove = (e) => {
+      if (!ls) return;
+      const dy = e.touches[0].clientY - ls.y;
+      const H = dimsRef.current.h;
+      const down = dy > 0;
+      if (sheetPxRef.current < H - 2 && !down) {
+        e.preventDefault();
+        sheetAnimating.current = false;
+        setSheetPx(Math.min(H, ls.h - dy));
+      } else if (el.scrollTop <= 0 && down) {
+        e.preventDefault();
+        sheetAnimating.current = false;
+        setSheetPx(Math.max(0, ls.h - dy));
+      }
+    };
+    const onEnd = () => {
+      if (!ls) return;
+      ls = null;
+      if (!sheetAnimating.current) snapSheet(sheetPxRef.current);
+    };
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
+    el.addEventListener('touchend', onEnd);
+    el.addEventListener('touchcancel', onEnd);
+    return () => {
+      el.removeEventListener('touchstart', onStart);
+      el.removeEventListener('touchmove', onMove);
+      el.removeEventListener('touchend', onEnd);
+      el.removeEventListener('touchcancel', onEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCity]);
 
   const panelProfiles = selectedCity
     ? selectedCity.profiles.filter((p) => roleOn[p.role])
     : [];
 
   return (
-    <div ref={wrapRef} className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-[#060608]"
-         style={{ height: boxH || 'calc(100dvh - 260px)', minHeight: 340, touchAction: 'none' }}>
+    <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-[#050507]">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full touch-none"
@@ -336,36 +419,22 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
         onWheel={onWheel}
       />
 
-      {/* Role legend (top-left) */}
-      <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-        {ROLES.map((r) => (
-          <button
-            key={r}
-            onClick={() => setRoleOn((s) => ({ ...s, [r]: !s[r] }))}
-            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] transition
-              ${roleOn[r] ? 'border-white/15 bg-black/50 text-white/80' : 'border-white/5 bg-black/30 text-white/30'}`}
-          >
-            <i className="h-1.5 w-1.5 rounded-full" style={{ background: roleOn[r] ? ROLE_COLOR[r] : 'rgba(255,255,255,0.2)' }} />
-            {t(`editProfile.${r.toLowerCase()}`)}
-          </button>
-        ))}
-      </div>
-
-      {/* Un-mapped count (top-right) */}
+      {/* Un-mapped count — sits below the parent's search-bar overlay */}
       {unmapped > 0 && (
-        <div className="absolute right-3 top-3 rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40">
+        <div className="absolute right-3 rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40 backdrop-blur-sm"
+             style={{ top: topInset + 8 }}>
           {t('search.globeUnmapped', { count: unmapped })}
         </div>
       )}
 
-      {/* Zoom controls (bottom-right) */}
-      <div className="absolute bottom-3 right-3 flex flex-col gap-1.5">
+      {/* Zoom controls — right edge, above the bottom chrome */}
+      <div className="absolute right-3 flex flex-col gap-1.5" style={{ bottom: bottomInset + 64 }}>
         {['+', '−'].map((sym, i) => (
           <button
             key={sym}
             aria-label={i === 0 ? 'Zoom in' : 'Zoom out'}
             onClick={() => { zoomRef.current = i === 0 ? Math.min(6, zoomRef.current * 1.3) : Math.max(1, zoomRef.current / 1.3); }}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/50 text-lg text-white/70 backdrop-blur-sm active:scale-95"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/45 text-lg text-white/70 backdrop-blur-md active:scale-95"
           >
             {sym}
           </button>
@@ -378,34 +447,51 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[140%] whitespace-nowrap rounded-lg border border-white/10 bg-black/80 px-2 py-1 text-[11px] text-white/90 backdrop-blur-sm"
           style={{ left: tip.x, top: tip.y }}
         >
-          <b>{tip.name}</b> <span className="text-white/50">· {tip.count}</span>
+          <b>{tip.name}</b>{' '}
+          <span className="text-white/50">· {tip.locked ? 'Premium' : tip.count}</span>
         </div>
       )}
 
-      {/* Hint */}
-      {!selectedCity && cities.length > 0 && (
-        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-center text-[10px] font-tech uppercase tracking-[0.15em] text-white/25">
-          {t('search.globeHint')}
+      {/* Role legend — bottom chrome, above the parent's view toggle */}
+      <div className="pointer-events-none absolute inset-x-0 z-20 flex flex-col items-center gap-2"
+           style={{ bottom: bottomInset + 8 }}>
+        {!selectedCity && cities.length > 0 && (
+          <div className="text-center text-[10px] font-tech uppercase tracking-[0.15em] text-white/25">
+            {t('search.globeHint')}
+          </div>
+        )}
+        <div className="pointer-events-auto flex flex-wrap justify-center gap-1.5 px-4">
+          {ROLES.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRoleOn((s) => ({ ...s, [r]: !s[r] }))}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] backdrop-blur-md transition
+                ${roleOn[r] ? 'border-white/15 bg-black/45 text-white/80' : 'border-white/5 bg-black/30 text-white/30'}`}
+            >
+              <i className="h-1.5 w-1.5 rounded-full" style={{ background: roleOn[r] ? ROLE_COLOR[r] : 'rgba(255,255,255,0.2)' }} />
+              {t(`editProfile.${r.toLowerCase()}`)}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Empty state */}
-      {cities.length === 0 && (
+      {/* Empty state (premium only — FREE members always see the locked hubs) */}
+      {cities.length === 0 && !locked && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
           <p className="text-sm text-white/50">{t('search.globeNoCities')}</p>
         </div>
       )}
 
-      {/* City bottom sheet */}
+      {/* City bottom sheet — expands to cover the whole page */}
       {selectedCity && (
         <>
-          <div className="absolute inset-0 z-20 bg-black/40" onClick={closeCity} />
+          <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />
           <aside
-            className="absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#0c0c10]"
-            style={{ height: sheetPx || Math.round(dims.h * 0.62), transition: sheetDrag.current ? 'none' : 'height 0.22s ease' }}
+            className="absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#0c0c10]"
+            style={{ height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
           >
             <div
-              className="flex shrink-0 cursor-grab justify-center pt-2.5 pb-1"
+              className="flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1"
               onPointerDown={onGrabDown}
               onPointerMove={onGrabMove}
               onPointerUp={onGrabUp}
@@ -424,7 +510,7 @@ const SearchGlobe = ({ profiles, onSelectProfile }) => {
               </div>
               <button onClick={closeCity} aria-label="Close" className="text-2xl leading-none text-white/40 hover:text-white/70">×</button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
+            <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
               {panelProfiles.map((p) => (
                 <button
                   key={p.id}

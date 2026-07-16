@@ -899,6 +899,8 @@ const ko = {
     globeUnmapped: '지도 외 {{count}}',
     globeNoCities: '아직 지구본에 표시할 멤버가 없습니다',
     globeNoMatchingRoles: '선택한 역할과 일치하는 멤버가 없습니다',
+    globeLockedTitle: '전 세계 검색',
+    globeLockedBody: '{{city}}은(는) TORA에 있습니다. 하지만 내 도시 외의 지역을 탐색하려면 프리미엄이 필요합니다. 업그레이드하여 네트워크의 모든 도시를 열어보세요.',
     like: '좋아요',
     liked: '좋아요함',
     connect: '연결',

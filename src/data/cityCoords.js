@@ -92,6 +92,17 @@ export const CITY_COORDS = {
   'perth': [115.86, -31.95], 'auckland': [174.76, -36.85],
 };
 
+// The marquee club-music hubs shown as locked "Premium" pins to FREE members
+// (they can see the network's reach, but only open their own city).
+export const FEATURED_HUBS = [
+  'Berlin', 'London', 'Paris', 'Amsterdam', 'Barcelona', 'Ibiza', 'Lisbon',
+  'Milan', 'Rome', 'Prague', 'Vienna', 'Copenhagen', 'Stockholm', 'Istanbul',
+  'Zurich', 'New York', 'Los Angeles', 'Miami', 'Chicago',
+  'Detroit', 'Toronto', 'Mexico City', 'Tulum', 'São Paulo', 'Buenos Aires',
+  'Tokyo', 'Seoul', 'Bangkok', 'Bali', 'Dubai', 'Tel Aviv', 'Cape Town',
+  'Sydney', 'Melbourne',
+];
+
 // Normalize a free-text city name to a CITY_COORDS key.
 export const normalizeCity = (city) =>
   (city || '')

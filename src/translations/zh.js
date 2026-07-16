@@ -899,6 +899,8 @@ const zh = {
     globeUnmapped: '{{count}} 个未定位',
     globeNoCities: '暂无可在地球上显示的成员',
     globeNoMatchingRoles: '没有符合所选角色的成员',
+    globeLockedTitle: '搜索全球',
+    globeLockedBody: '{{city}} 已在 TORA 上 — 但探索您所在城市以外的地区需要高级版。升级以打开网络中的每个城市。',
     like: '喜欢',
     liked: '已喜欢',
     connect: '联系',

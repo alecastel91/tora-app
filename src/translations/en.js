@@ -904,6 +904,8 @@ const en = {
     globeUnmapped: '{{count}} off-map',
     globeNoCities: 'No members to place on the globe yet',
     globeNoMatchingRoles: 'No members match the selected roles',
+    globeLockedTitle: 'Search worldwide',
+    globeLockedBody: '{{city}} is on TORA — but exploring beyond your own city takes Premium. Upgrade to open every city on the network.',
     like: 'Like',
     liked: 'Liked',
     connect: 'Connect',

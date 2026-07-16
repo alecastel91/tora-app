@@ -899,6 +899,8 @@ const pt = {
     globeUnmapped: '{{count}} fora do mapa',
     globeNoCities: 'Ainda não há membros para mostrar no globo',
     globeNoMatchingRoles: 'Nenhum membro corresponde aos perfis selecionados',
+    globeLockedTitle: 'Pesquise em todo o mundo',
+    globeLockedBody: '{{city}} está na TORA — mas explorar além da sua cidade requer Premium. Faça upgrade para abrir todas as cidades da rede.',
     like: 'Like',
     liked: 'Like dado',
     connect: 'Ligar',
