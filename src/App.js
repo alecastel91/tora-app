@@ -411,16 +411,12 @@ function App() {
     // Here you would update the user's premium status
   };
 
-  // Show loading screen while checking auth
+  // Show loading screen while checking auth — just the brand globe, centered
   if (loading) {
     return (
-      <div className="auth-screen">
-        <div className="auth-container">
-          <div className="auth-header">
-            <img src="/tora_logo.png" alt="TORA" className="auth-logo" />
-            <LoadingGlobe label="" size={150} className="py-0 mt-3" />
-          </div>
-        </div>
+      // .auth-screen CSS sets align-items:flex-start — !items-center overrides
+      <div className="auth-screen flex min-h-[100dvh] !items-center justify-center">
+        <LoadingGlobe label="" size={75} className="py-0" />
       </div>
     );
   }
