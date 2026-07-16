@@ -14,6 +14,14 @@ const SPHERE = { type: 'Sphere' };
 
 const ROLES = ['ARTIST', 'AGENT', 'PROMOTER', 'VENUE'];
 
+// Zoom staging (level-of-detail): far away only the main cities show, easing
+// in the secondary ones as you approach a country — otherwise labels overlap.
+const MAX_ZOOM = 18;
+const SECONDARY_PINS_ZOOM = 2.6; // below this, only major cities get pins
+const LABEL_MAJOR_ZOOM = 1.5;    // majors get labels from here
+const LABEL_ALL_ZOOM = 4.0;      // country-level: every visible pin is labelled
+const MAJOR_KEYS = new Set(FEATURED_HUBS.map((n) => normalizeCity(n)));
+
 const cityNameOf = (p) => p.city || (p.location || '').split(',')[0].trim();
 
 // Group the (already server-filtered) profiles by mapped city.
@@ -102,11 +110,14 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
   // Visible-member counts change only when the data or the role toggles do —
   // precompute them here instead of reducing per pin per animation frame.
+  // Cities are sorted by count so bigger cities win the label space, and
+  // flagged major (hub or 3+ members) for the zoom staging.
   useEffect(() => {
     for (const c of cities) {
       c._cnt = c.profiles.reduce((n, p) => n + (roleOn[p.role] ? 1 : 0), 0);
+      c._major = c._cnt >= 3 || MAJOR_KEYS.has(c.key);
     }
-    citiesRef.current = cities;
+    citiesRef.current = [...cities].sort((a, b) => (b._cnt || 0) - (a._cnt || 0));
   }, [cities, roleOn]);
   useEffect(() => {
     selectedKey.current = selectedCity?.key || selectedCountry?.name || null;
@@ -276,12 +287,31 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7);
       ctx.strokeStyle = 'rgba(255,51,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
 
-      const showLabels = zoomRef.current > 1.5;
+      const zoom = zoomRef.current;
+      const showSecondary = zoom >= SECONDARY_PINS_ZOOM;
+      const labelMajors = zoom > LABEL_MAJOR_ZOOM;
+      const labelAll = zoom >= LABEL_ALL_ZOOM;
       // d3's forward projection never culls the far hemisphere (clipAngle
       // only clips streams) — without this check, far-side pins render as
       // tappable ghosts inside the visible disc.
       const viewCenter = [-rot.current[0], -rot.current[1]];
       const onFront = (coord) => geoDistance(coord, viewCenter) <= Math.PI / 2;
+
+      // Label decluttering: labels claim rectangles in priority order
+      // (selection > hover > bigger cities > hubs); overlapping ones are
+      // skipped instead of stacking on top of each other.
+      const labelBoxes = [];
+      const claimLabel = (x, y, text, force = false) => {
+        const w = ctx.measureText(text).width;
+        const box = { x: x - 2, y: y - 12, w: w + 6, h: 16 };
+        if (!force) {
+          for (const b of labelBoxes) {
+            if (box.x < b.x + b.w && box.x + box.w > b.x && box.y < b.y + b.h && box.y + box.h > b.y) return false;
+          }
+        }
+        labelBoxes.push(box);
+        return true;
+      };
 
       // locked hub pins (FREE tier) — dim, tappable, upsell on tap
       for (const hub of lockedHubsRef.current) {
@@ -291,21 +321,18 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         const isHov = hoveredKey.current === hub.key;
         ctx.fillStyle = isHov ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.26)';
         ctx.beginPath(); ctx.arc(xy[0], xy[1], 2.8, 0, 7); ctx.fill();
-        if (showLabels || isHov) {
-          ctx.font = `500 11px ${font}`; ctx.textAlign = 'left';
-          ctx.fillStyle = 'rgba(255,255,255,0.38)';
-          ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
-          ctx.fillText(hub.name, xy[0] + 8, xy[1] + 4); ctx.shadowBlur = 0;
-        }
       }
 
-      // member pins — glowing crimson with a hot white core
+      // member pins — glowing crimson with a hot white core. Far away only
+      // the majors (hubs / 3+ members) show; secondary cities ease in as the
+      // view closes on their country.
       for (const c of citiesRef.current) {
         const count = c._cnt || 0; // precomputed on data/role-toggle changes
-        const xy = count > 0 && onFront(c.coord) ? projection(c.coord) : null;
+        const isSel = selectedCityKey.current === c.key;
+        const visible = count > 0 && (c._major || showSecondary || isSel);
+        const xy = visible && onFront(c.coord) ? projection(c.coord) : null;
         c._xy = xy; c._count = count;
         if (!xy) continue;
-        const isSel = selectedCityKey.current === c.key;
         const isHov = hoveredKey.current === c.key;
         const rad = 3 + Math.min(count, 8) * 0.7;
         ctx.save();
@@ -321,12 +348,33 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           ctx.strokeStyle = 'rgba(255,51,102,0.85)'; ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.arc(xy[0], xy[1], pr, 0, 7); ctx.stroke();
         }
-        if (showLabels || isSel || isHov) {
-          ctx.font = `600 12px ${font}`; ctx.textAlign = 'left';
-          ctx.fillStyle = isSel ? '#fff' : 'rgba(255,255,255,0.82)';
-          ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
-          ctx.fillText(c.name, xy[0] + rad + 6, xy[1] + 4); ctx.shadowBlur = 0;
-        }
+      }
+
+      // label pass — member cities first (sorted by count, so the big ones
+      // win the space), hubs last; selection/hover always label.
+      ctx.font = `600 12px ${font}`; ctx.textAlign = 'left';
+      for (const c of citiesRef.current) {
+        if (!c._xy) continue;
+        const isSel = selectedCityKey.current === c.key;
+        const isHov = hoveredKey.current === c.key;
+        const wanted = isSel || isHov || labelAll || (c._major && labelMajors);
+        if (!wanted) continue;
+        const lx = c._xy[0] + (3 + Math.min(c._count, 8) * 0.7) + 6, ly = c._xy[1] + 4;
+        if (!claimLabel(lx, ly, c.name, isSel || isHov)) continue;
+        ctx.fillStyle = isSel ? '#fff' : 'rgba(255,255,255,0.82)';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
+        ctx.fillText(c.name, lx, ly); ctx.shadowBlur = 0;
+      }
+      ctx.font = `500 11px ${font}`;
+      for (const hub of lockedHubsRef.current) {
+        if (!hub._xy) continue;
+        const isHov = hoveredKey.current === hub.key;
+        if (!(labelMajors || isHov)) continue;
+        const lx = hub._xy[0] + 8, ly = hub._xy[1] + 4;
+        if (!claimLabel(lx, ly, hub.name, isHov)) continue;
+        ctx.fillStyle = 'rgba(255,255,255,0.38)';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
+        ctx.fillText(hub.name, lx, ly); ctx.shadowBlur = 0;
       }
       raf = requestAnimationFrame(frame);
     }
@@ -453,7 +501,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       const p = [...ptrs.current.values()];
       const d = Math.hypot(p[0].cx - p[1].cx, p[0].cy - p[1].cy);
       if (pinchDist.current > 0) {
-        zoomRef.current = Math.max(1, Math.min(6, zoomRef.current * (d / pinchDist.current)));
+        zoomRef.current = Math.max(1, Math.min(MAX_ZOOM, zoomRef.current * (d / pinchDist.current)));
       }
       pinchDist.current = d; pausedRef.current = true;
       return;
@@ -519,7 +567,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     }
   };
   const onWheel = (e) => {
-    zoomRef.current = Math.max(1, Math.min(6, zoomRef.current * (1 - e.deltaY * 0.0012)));
+    zoomRef.current = Math.max(1, Math.min(MAX_ZOOM, zoomRef.current * (1 - e.deltaY * 0.0012)));
   };
 
   // ---- grabber drag (pointer, works on desktop too) ----
@@ -612,7 +660,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           <button
             key={sym}
             aria-label={i === 0 ? 'Zoom in' : 'Zoom out'}
-            onClick={() => { zoomRef.current = i === 0 ? Math.min(6, zoomRef.current * 1.3) : Math.max(1, zoomRef.current / 1.3); }}
+            onClick={() => { zoomRef.current = i === 0 ? Math.min(MAX_ZOOM, zoomRef.current * 1.3) : Math.max(1, zoomRef.current / 1.3); }}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/45 text-lg text-white/70 backdrop-blur-md active:scale-95"
           >
             {sym}
