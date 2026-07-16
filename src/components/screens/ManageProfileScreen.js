@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon } from '../../utils/icons';
+import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import RevenueChart from '../common/RevenueChart';
 import AddContractModal from '../common/AddContractModal';
@@ -45,6 +45,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
   const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
+  const [topCities, setTopCities] = useState([]); // [{city, count, revenue}]
+  const [reach, setReach] = useState(null); // { views, likes, connections }
   const [thisYearGigs, setThisYearGigs] = useState(null);
   const [expectedRevenue, setExpectedRevenue] = useState(null);
   const [deals, setDeals] = useState([]);
@@ -102,6 +104,14 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
       .then((res) => { if (!cancelled) setActionItems(res.items || []); })
       .catch((err) => console.error('[ManageProfileScreen] action summary failed', err));
     return () => { cancelled = true; };
+  }, [user?.id]);
+
+  // Profile reach (views/likes/connections, 30d vs previous 30d)
+  useEffect(() => {
+    if (!user?.id) return;
+    apiService.getProfileReach(user.id)
+      .then(setReach)
+      .catch((err) => console.error('[ManageProfileScreen] reach fetch failed:', err));
   }, [user?.id]);
 
   const getCurrencySymbol = (currency) => {
@@ -263,6 +273,17 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
             return { date: deal.date, amount };
           });
           setRevenueEvents(events);
+
+          // Top cities played (played gigs only)
+          const cityAgg = {};
+          historicalDeals.forEach((deal, i) => {
+            const city = deal.city || (deal.location || '').split(',')[0].trim();
+            if (!city) return;
+            if (!cityAgg[city]) cityAgg[city] = { city, count: 0, revenue: 0 };
+            cityAgg[city].count += 1;
+            cityAgg[city].revenue += events[i]?.amount || 0;
+          });
+          setTopCities(Object.values(cityAgg).sort((a, b) => b.count - a.count).slice(0, 5));
 
           console.log('[ManageProfileScreen] Dashboard metrics set:', {
             upcomingGigs: upcoming.length,
@@ -525,10 +546,13 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
               const localized = localizeActionItem(item, t);
               const Icon = getActionIcon(item.type);
               return (
-                <div key={item.id} className="action-item">
+                <div key={item.id} className={`action-item${item.urgent ? ' urgent' : ''}`}>
                   <div className="action-icon"><Icon /></div>
                   <div className="action-content">
-                    <div className="action-title">{localized.title}</div>
+                    <div className="action-title">
+                      {localized.title}
+                      {item.urgent && <span className="action-urgent-chip">{t('manage.overdue')}</span>}
+                    </div>
                     {item.subtitle && <div className="action-subtitle">{item.subtitle}</div>}
                   </div>
                   <button className="btn btn-sm btn-primary" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
@@ -546,6 +570,66 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         <h3><TrendingUpIcon /> {t('manage.overviewTitle', { label: revenueLabel })}</h3>
         <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />
       </div>
+
+      {/* Profile reach — internal view/like/connection tracking */}
+      {reach && (
+        <div className="dashboard-section">
+          <h3><TrendingUpIcon /> {t('manage.profileReach')} <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/35">· {t('manage.last30')}</span></h3>
+          <div className="grid grid-cols-3 gap-2.5 mt-3">
+            {[
+              { key: 'reachViews', data: reach.views },
+              { key: 'reachLikes', data: reach.likes },
+              { key: 'reachConnections', data: reach.connections },
+            ].map(({ key, data }) => {
+              const delta = data.prev30 > 0 ? ((data.last30 - data.prev30) / data.prev30) * 100 : null;
+              return (
+                <div key={key} className="rounded-2xl border border-white/10 bg-[#0a0a0e] px-3 py-3 text-center">
+                  <div className="text-xl font-semibold text-white">{data.last30}</div>
+                  <div className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-white/40 font-tech">{t(`manage.${key}`)}</div>
+                  {delta !== null && (
+                    <div className={`mt-1 text-[10px] ${delta >= 0 ? 'text-[#34e3a0]' : 'text-infrared'}`}>
+                      {delta >= 0 ? '▲' : '▼'} {Math.abs(delta).toFixed(0)}%
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {reach.views.daily?.some((d) => d.count > 0) && (
+            <div className="mt-3 flex h-10 items-end gap-[2px]">
+              {reach.views.daily.map((d) => {
+                const max = Math.max(...reach.views.daily.map((x) => x.count), 1);
+                return (
+                  <div key={d.date} className="flex-1 rounded-t-[2px]"
+                       style={{ height: `${Math.max((d.count / max) * 100, d.count > 0 ? 8 : 2)}%`,
+                                background: d.count > 0 ? 'rgba(255,51,102,0.55)' : 'rgba(255,255,255,0.06)' }} />
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Top cities played */}
+      {topCities.length > 0 && (
+        <div className="dashboard-section">
+          <h3><LocationIcon /> {t('manage.topCities')}</h3>
+          <div className="mt-3 flex flex-col gap-2.5">
+            {topCities.map((c) => {
+              const max = topCities[0].count;
+              return (
+                <div key={c.city} className="flex items-center gap-3">
+                  <span className="w-20 shrink-0 truncate text-xs text-white/70">{c.city}</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div className="h-full rounded-full" style={{ width: `${(c.count / max) * 100}%`, background: 'linear-gradient(to right, rgba(255,51,102,0.35), rgba(255,51,102,0.8))' }} />
+                  </div>
+                  <span className="w-14 shrink-0 text-right text-[11px] text-white/45">×{c.count} · {getCurrencySymbol(preferredCurrency)}{Math.round(c.revenue / 1000 * 10) / 10}K</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
     );
   };

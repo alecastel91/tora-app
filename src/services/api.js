@@ -244,6 +244,14 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async getProfileReach(profileId) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/reach`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
   async getProfile(profileId, viewerProfileId) {
     const qs = viewerProfileId ? `?viewerProfileId=${viewerProfileId}` : '';
     const response = await fetch(`${API_URL}/profiles/${profileId}${qs}`, {
