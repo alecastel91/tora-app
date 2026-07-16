@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import RevenueChart from '../common/RevenueChart';
 import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, BriefcaseIcon, PlaneIcon, ListIcon, EditIcon, TrashIcon, ImageIcon, SlidersIcon, FileTextIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
 import AddContractModal from '../common/AddContractModal';
@@ -85,7 +86,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const [upcomingGigs, setUpcomingGigs] = useState(null); // null means loading, number means loaded
   const [gigsError, setGigsError] = useState(false);
   const [ytdRevenue, setYtdRevenue] = useState(null); // null means loading, number means loaded
-  const [revenueChartData, setRevenueChartData] = useState([]); // Monthly revenue data from 2024 onwards
+  const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
   const [thisYearGigs, setThisYearGigs] = useState(null); // Total gigs this year (completed + upcoming)
   const [expectedRevenue, setExpectedRevenue] = useState(null); // Expected revenue from upcoming gigs
   const [deals, setDeals] = useState([]); // All deals for the artist
@@ -244,7 +245,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             setExpectedRevenue(0);
           }
 
-          // Calculate monthly revenue data from 2024 onwards
+          // Revenue events for the chart (converted once to the preferred currency)
           const startDate = new Date('2024-01-01');
           const historicalDeals = response.deals.filter(deal => {
             const dealDate = new Date(deal.date);
@@ -254,62 +255,29 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             return isFrom2024 && (isCompleted || isAcceptedAndPast);
           });
 
-          // Group by month/year
-          const monthlyRevenue = {};
-          for (const deal of historicalDeals) {
-            const dealDate = new Date(deal.date);
-            const monthKey = `${dealDate.getFullYear()}-${String(dealDate.getMonth() + 1).padStart(2, '0')}`;
-
+          let chartRates = null;
+          if (historicalDeals.some(d => (d.currency || 'USD') !== preferredCurrency)) {
+            try {
+              chartRates = (await apiService.getCurrentRates()).rates;
+            } catch (err) {
+              console.error('Error fetching rates for chart:', err);
+            }
+          }
+          setRevenueEvents(historicalDeals.map(deal => {
             const dealCurrency = deal.currency || 'USD';
             const dealFee = parseFloat(deal.currentFee) || 0;
-
-            // Convert to preferred currency
-            let convertedFee = dealFee;
-            if (dealCurrency !== preferredCurrency) {
-              try {
-                const ratesResponse = await apiService.getCurrentRates();
-                const rates = ratesResponse.rates;
-                const feeInUSD = dealCurrency === 'USD' ? dealFee : dealFee / rates[dealCurrency];
-                convertedFee = preferredCurrency === 'USD' ? feeInUSD : feeInUSD * rates[preferredCurrency];
-              } catch (err) {
-                console.error('Error converting currency for chart:', err);
-              }
+            let amount = dealFee;
+            if (dealCurrency !== preferredCurrency && chartRates) {
+              const feeInUSD = dealCurrency === 'USD' ? dealFee : dealFee / chartRates[dealCurrency];
+              amount = preferredCurrency === 'USD' ? feeInUSD : feeInUSD * chartRates[preferredCurrency];
             }
-
-            if (!monthlyRevenue[monthKey]) {
-              monthlyRevenue[monthKey] = 0;
-            }
-            monthlyRevenue[monthKey] += convertedFee;
-          }
-
-          // Generate array from 2024-01 to current month
-          const chartData = [];
-          const currentDate = new Date();
-          let iterDate = new Date('2024-01-01');
-
-          while (iterDate <= currentDate) {
-            const monthKey = `${iterDate.getFullYear()}-${String(iterDate.getMonth() + 1).padStart(2, '0')}`;
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const monthName = monthNames[iterDate.getMonth()];
-            const year = iterDate.getFullYear();
-
-            chartData.push({
-              monthKey,
-              month: monthName,
-              year: year,
-              amount: Math.round(monthlyRevenue[monthKey] || 0)
-            });
-
-            // Move to next month
-            iterDate.setMonth(iterDate.getMonth() + 1);
-          }
-
-          setRevenueChartData(chartData);
+            return { date: deal.date, amount };
+          }));
         } else {
           // No deals found, set to 0
           setUpcomingGigs(0);
           setYtdRevenue(0);
-          setRevenueChartData([]);
+          setRevenueEvents([]);
           setGigsError(false);
         }
       } catch (error) {
@@ -383,18 +351,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   }, [activeTab]);
 
   // Scroll revenue chart to show latest month
-  useEffect(() => {
-    if (activeTab === 'dashboard' && revenueChartData.length > 0) {
-      // Wait for the chart to render
-      setTimeout(() => {
-        const chartScroll = document.querySelector('.revenue-chart-scroll');
-        if (chartScroll) {
-          // Scroll to the right (end of chart)
-          chartScroll.scrollLeft = chartScroll.scrollWidth;
-        }
-      }, 100);
-    }
-  }, [activeTab, revenueChartData]);
 
   // Update edited artist info when artistProfile changes
   useEffect(() => {
@@ -989,39 +945,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       {/* Revenue Chart */}
       <div className="dashboard-section revenue-overview-section">
         <h3><TrendingUpIcon /> {t('manageArtist.revenueOverview')}</h3>
-        <div className="revenue-chart-scroll">
-          <div className="revenue-chart" style={{ minHeight: '200px' }}>
-            {revenueChartData.length > 0 ? (
-              (() => {
-                // Calculate maxRevenue once outside the loop
-                const maxRevenue = Math.max(...revenueChartData.map(d => d.amount), 1);
-                const currencySymbol = getCurrencySymbol(preferredCurrency);
-
-                return revenueChartData.map((item) => {
-                  const height = maxRevenue > 0 ? (item.amount / maxRevenue) * 100 : 0;
-
-                  return (
-                    <div key={item.monthKey} className="chart-bar-container">
-                      <div className="chart-bar" style={{ height: `${Math.max(height, 2)}%` }}>
-                        {item.amount > 0 && (
-                          <div className="chart-value">
-                            {currencySymbol}{item.amount >= 1000 ? Math.round(item.amount / 1000) + 'K' : Math.round(item.amount)}
-                          </div>
-                        )}
-                      </div>
-                      <div className="chart-label">
-                        {item.month}
-                        <div className="chart-year">{item.year}</div>
-                      </div>
-                    </div>
-                  );
-                });
-              })()
-            ) : (
-              <div className="no-revenue-data">{t('manageArtist.loadingRevenueData')}</div>
-            )}
-          </div>
-        </div>
+        <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />
       </div>
     </div>
   );

@@ -11023,102 +11023,17 @@ textarea.form-textarea:focus {
 
 /* Revenue Chart */
 /* Revenue Chart Scroll Container */
-.revenue-chart-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
-  margin-bottom: 8px;
-  border-radius: var(--tora-radius-md);
-  -webkit-overflow-scrolling: touch;
-}
 
-.revenue-chart-scroll::-webkit-scrollbar {
-  height: 6px;
-}
 
-.revenue-chart-scroll::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: 3px;
-}
 
-.revenue-chart-scroll::-webkit-scrollbar-thumb {
-  background: var(--border-dark);
-  border-radius: 3px;
-}
 
-.revenue-chart-scroll::-webkit-scrollbar-thumb:hover {
-  background: #3a3a3a;
-}
 
-.revenue-chart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  height: 190px;
-  gap: 12px;
-  padding: 24px 16px 50px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  min-width: max-content;
-}
 
-.chart-bar-container {
-  width: 48px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-}
 
-.chart-bar {
-  width: 100%;
-  background: linear-gradient(to top, rgba(255, 51, 102, 0.08), rgba(255, 51, 102, 0.3));
-  border-top: 2px solid var(--primary-pink);
-  border-radius: 3px 3px 0 0;
-  position: relative;
-  min-height: 20px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 5px;
-}
 
-.chart-value {
-  font-size: 10px;
-  font-weight: 700;
-  font-family: 'Space Grotesk', sans-serif;
-  color: white;
-}
 
-.chart-label {
-  margin-top: 8px;
-  font-size: 9px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.4);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
 
-.chart-year {
-  font-size: 9px;
-  color: #666;
-  font-weight: 400;
-}
 
-.no-revenue-data {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
 
 .revenue-trend {
   text-align: center;
@@ -11672,12 +11587,6 @@ textarea.form-textarea:focus {
   .hero-metrics-four {
     grid-template-columns: repeat(2, 1fr);
     max-width: 100%;
-  }
-
-  .revenue-chart {
-    height: 120px;
-    padding: 16px 8px 28px 8px;
-    gap: 4px;
   }
 
   .chart-value {

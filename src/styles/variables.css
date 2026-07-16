@@ -9,12 +9,13 @@
    * page backgrounds and sticky chrome. */
   --bg-black: #000000;
   --bg-dark: #0A0A0A;
-  --bg-card: rgba(255, 255, 255, 0.04);
-  --bg-card-dark: rgba(255, 255, 255, 0.02);
-  /* These four were referenced throughout App.css but never defined
-   * (silently transparent). Defined now as part of the glass palette. */
-  --bg-secondary: rgba(255, 255, 255, 0.03);
-  --bg-gray: rgba(255, 255, 255, 0.03);
+  /* Opaque near-black surface scale (matches the app-wide card palette) —
+   * the old translucent-white values read as light grey over the black
+   * backdrop and let the pink grid bleed through. */
+  --bg-card: #0c0c11;
+  --bg-card-dark: #070709;
+  --bg-secondary: #0a0a0e;
+  --bg-gray: #0a0a0e;
   --bg-primary: #0A0A0C;
   --text-secondary: rgba(255, 255, 255, 0.5);
 
