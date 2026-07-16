@@ -90,6 +90,90 @@ export const CITY_COORDS = {
   'delhi': [77.10, 28.70], 'bangalore': [77.59, 12.97], 'goa': [73.83, 15.30],
   'sydney': [151.21, -33.87], 'melbourne': [144.96, -37.81], 'brisbane': [153.03, -27.47],
   'perth': [115.86, -31.95], 'auckland': [174.76, -36.85],
+  // ---- full signup-picker coverage (every city in profiles.js citiesByCountry) ----
+  // Central America / Caribbean
+  'belize city': [-88.19, 17.50], 'san pedro': [-87.97, 17.92], 'jaco': [-84.63, 9.61],
+  'tamarindo': [-85.84, 10.30], 'santa ana': [-89.56, 13.99], 'antigua': [-90.73, 14.56],
+  'san pedro sula': [-88.03, 15.50], 'granada': [-85.96, 11.93], 'leon': [-86.88, 12.43],
+  'montego bay': [-77.92, 18.47], 'negril': [-78.35, 18.27], 'ocho rios': [-77.10, 18.41],
+  'santiago de cuba': [-75.82, 20.02], 'varadero': [-81.25, 23.15], 'san fernando': [-61.47, 10.28],
+  'port-au-prince': [-72.34, 18.54], "st. john's": [-61.85, 17.12], 'roseau': [-61.39, 15.30],
+  "st. george's": [-61.75, 12.05], 'castries': [-61.01, 14.01],
+  // South America
+  'mar del plata': [-57.55, -38.00], 'barranquilla': [-74.80, 10.96], 'concepcion': [-73.05, -36.83],
+  'arequipa': [-71.54, -16.41], 'santa cruz': [-63.18, -17.78], 'sucre': [-65.26, -19.03],
+  'asuncion': [-57.58, -25.26], 'ciudad del este': [-54.61, -25.51], 'maracaibo': [-71.61, 10.65],
+  'georgetown': [-58.16, 6.80], 'paramaribo': [-55.20, 5.85],
+  // Europe
+  'bruges': [3.22, 51.21], 'novosibirsk': [82.93, 55.03], 'yekaterinburg': [60.60, 56.84],
+  'crete': [25.13, 35.34], 'madeira': [-16.92, 32.65], 'ostrava': [18.29, 49.82],
+  'debrecen': [21.63, 47.53], 'timisoara': [21.23, 45.76], 'dubrovnik': [18.09, 42.65],
+  'galway': [-9.05, 53.27], 'aarhus': [10.20, 56.16], 'odense': [10.40, 55.40],
+  'bergen': [5.32, 60.39], 'stavanger': [5.73, 58.97], 'trondheim': [10.39, 63.43],
+  'malmo': [13.00, 55.60], 'espoo': [24.66, 60.21], 'tampere': [23.76, 61.50],
+  'novi sad': [19.84, 45.25], 'plovdiv': [24.75, 42.14], 'varna': [27.91, 43.21],
+  'ljubljana': [14.51, 46.06], 'maribor': [15.65, 46.55], 'bratislava': [17.11, 48.15],
+  'kosice': [21.26, 48.72], 'tartu': [26.72, 58.38], 'kaunas': [23.90, 54.90],
+  'dnipro': [35.05, 48.46], 'kharkiv': [36.23, 49.99], 'lviv': [24.03, 49.84],
+  'odesa': [30.73, 46.48], 'valletta': [14.51, 35.90], 'limassol': [33.04, 34.68],
+  'nicosia': [33.38, 35.19], 'tirana': [19.82, 41.33], 'yerevan': [44.51, 40.18],
+  'baku': [49.87, 40.41], 'minsk': [27.56, 53.90], 'sarajevo': [18.41, 43.86],
+  'batumi': [41.64, 41.64], 'tbilisi': [44.79, 41.72], 'pristina': [21.17, 42.66],
+  'luxembourg city': [6.13, 49.61], 'chisinau': [28.86, 47.01], 'podgorica': [19.26, 42.44],
+  'skopje': [21.43, 41.99],
+  // Middle East
+  'haifa': [34.99, 32.79], 'jerusalem': [35.22, 31.77], 'abu dhabi': [54.37, 24.45],
+  'sharjah': [55.41, 25.35], 'ankara': [32.85, 39.93], 'antalya': [30.71, 36.90],
+  'izmir': [27.14, 38.42], 'bethlehem': [35.20, 31.70], 'gaza': [34.47, 31.50],
+  'hebron': [35.10, 31.53], 'nablus': [35.26, 32.22], 'ramallah': [35.21, 31.90],
+  'kabul': [69.17, 34.53], 'manama': [50.59, 26.23], 'isfahan': [51.67, 32.65],
+  'mashhad': [59.61, 36.30], 'shiraz': [52.53, 29.59], 'tehran': [51.39, 35.69],
+  'baghdad': [44.36, 33.31], 'basra': [47.78, 30.51], 'erbil': [44.01, 36.19],
+  'amman': [35.93, 31.95], 'aqaba': [35.01, 29.53], 'kuwait city': [47.98, 29.38],
+  'muscat': [58.41, 23.59], 'salalah': [54.09, 17.02], 'doha': [51.53, 25.29],
+  'jeddah': [39.17, 21.49], 'mecca': [39.83, 21.39], 'medina': [39.61, 24.47],
+  'riyadh': [46.68, 24.71], 'aleppo': [37.16, 36.20], 'damascus': [36.29, 33.51],
+  'aden': [45.04, 12.79], "sana'a": [44.21, 15.37],
+  // Asia
+  'fukuoka': [130.40, 33.59], 'hiroshima': [132.46, 34.39], 'kobe': [135.20, 34.69],
+  'nagoya': [136.91, 35.18], 'sapporo': [141.35, 43.06], 'yokohama': [139.64, 35.44],
+  'chengdu': [104.07, 30.67], 'guangzhou': [113.26, 23.13], 'shenzhen': [114.06, 22.55],
+  'busan': [129.08, 35.18], 'daegu': [128.60, 35.87], 'incheon': [126.71, 37.46],
+  'chiang mai': [98.99, 18.79], 'koh samui': [100.01, 9.51], 'pattaya': [100.88, 12.93],
+  'phuket': [98.39, 7.89], 'bandung': [107.61, -6.92], 'surabaya': [112.75, -7.26],
+  'chennai': [80.27, 13.08], 'kolkata': [88.36, 22.57], 'johor bahru': [103.76, 1.49],
+  'penang': [100.33, 5.41], 'da nang': [108.22, 16.05], 'hanoi': [105.85, 21.03],
+  'ho chi minh city': [106.63, 10.82], 'cebu': [123.89, 10.32], 'davao': [125.61, 7.07],
+  'kaohsiung': [120.31, 22.62], 'taichung': [120.68, 24.14], 'chittagong': [91.83, 22.36],
+  'dhaka': [90.41, 23.81], 'islamabad': [73.04, 33.68], 'karachi': [67.01, 24.86],
+  'lahore': [74.35, 31.55], 'kathmandu': [85.32, 27.72], 'pokhara': [83.97, 28.21],
+  'colombo': [79.86, 6.93], 'kandy': [80.63, 7.29], 'mandalay': [96.08, 21.98],
+  'yangon': [96.16, 16.87], 'phnom penh': [104.92, 11.56], 'siem reap': [103.86, 13.36],
+  'luang prabang': [102.13, 19.89], 'vientiane': [102.63, 17.98], 'ulaanbaatar': [106.91, 47.89],
+  'almaty': [76.89, 43.24], 'astana': [71.45, 51.17], 'thimphu': [89.64, 27.47],
+  'bandar seri begawan': [114.94, 4.94], 'bishkek': [74.59, 42.87], 'macao': [113.54, 22.19],
+  'dushanbe': [68.78, 38.56], 'ashgabat': [58.38, 37.95], 'samarkand': [66.96, 39.65],
+  'tashkent': [69.24, 41.30],
+  // Africa
+  'durban': [31.02, -29.86], 'pretoria': [28.19, -25.75], 'alexandria': [29.92, 31.20],
+  'sharm el sheikh': [34.33, 27.91], 'fez': [-5.00, 34.03], 'rabat': [-6.85, 34.02],
+  'mombasa': [39.66, -4.04], 'abuja': [7.49, 9.06], 'port harcourt': [7.01, 4.82],
+  'sousse': [10.64, 35.83], 'tunis': [10.17, 36.81], 'kumasi': [-1.62, 6.69],
+  'dar es salaam': [39.28, -6.79], 'dodoma': [35.74, -6.16], 'kampala': [32.58, 0.35],
+  'addis ababa': [38.75, 9.03], 'luanda': [13.24, -8.84], 'maputo': [32.57, -25.97],
+  'douala': [9.70, 4.05], 'yaounde': [11.52, 3.87], 'dakar': [-17.44, 14.69],
+  'abidjan': [-4.02, 5.34], 'yamoussoukro': [-5.28, 6.82], 'algiers': [3.06, 36.75],
+  'oran': [-0.64, 35.70], 'gaborone': [25.92, -24.65], 'ouagadougou': [-1.52, 12.37],
+  'bujumbura': [29.36, -3.38], 'brazzaville': [15.27, -4.26], 'kinshasa': [15.31, -4.32],
+  'lubumbashi': [27.48, -11.66], 'tripoli': [13.19, 32.89], 'bamako': [-8.00, 12.65],
+  'windhoek': [17.08, -22.56], 'niamey': [2.11, 13.51], 'kigali': [30.06, -1.94],
+  'khartoum': [32.53, 15.55], 'harare': [31.05, -17.83],
+  // Oceania / Pacific
+  'adelaide': [138.60, -34.93], 'canberra': [149.13, -35.28], 'gold coast': [153.40, -28.02],
+  'christchurch': [172.64, -43.53], 'queenstown': [168.66, -45.03], 'wellington': [174.78, -41.29],
+  'nadi': [177.42, -17.80], 'suva': [178.44, -18.14], 'port moresby': [147.18, -9.44],
+  'avarua': [-159.78, -21.21], 'papeete': [-149.57, -17.54], 'hagatna': [144.75, 13.48],
+  'apia': [-171.76, -13.83], "nuku'alofa": [-175.20, -21.14],
 };
 
 // The marquee club-music hubs shown as locked "Premium" pins to FREE members
@@ -111,6 +195,8 @@ export const normalizeCity = (city) =>
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // strip accents
+    .replace(/ł/g, 'l').replace(/ø/g, 'o').replace(/đ/g, 'd') // letters NFD can't decompose
+    .replace(/æ/g, 'ae').replace(/ß/g, 'ss')
     .replace(/\s+/g, ' ');
 
 export const coordsForCity = (city) => CITY_COORDS[normalizeCity(city)] || null;
