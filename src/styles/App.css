@@ -12304,11 +12304,15 @@ textarea.form-textarea:focus {
 
 
 
-/* Tour Screen Layout Fix */
+/* Tour Screen Layout Fix.
+   Height comes from a JS-measured var (TourScreen sets --tour-screen-h to the
+   exact space the scroller gives the screen) — a 100vh calc over-shoots on
+   iPhones because 100vh includes the collapsed-URL-bar area, which made the
+   whole page scroll. dvh fallback for the first paint. */
 .tour-screen.screen.active {
   display: flex !important;
   flex-direction: column;
-  height: calc(100vh - 120px) !important;
+  height: var(--tour-screen-h, calc(100dvh - 126px)) !important;
   min-height: 0 !important;
   overflow: hidden;
   padding: 0 !important;

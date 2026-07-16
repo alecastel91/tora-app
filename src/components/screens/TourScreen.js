@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -79,6 +79,27 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Calendar Matches state
   const [viewingProfile, setViewingProfile] = useState(null);
+
+  // Exact screen height: the CSS 100vh calc over-shoots on iPhones (100vh
+  // includes the collapsed-URL-bar area), which let the whole page scroll.
+  // Measure the space the scroller actually gives us and pin the screen to it.
+  // Re-keyed on viewingProfile — the root remounts around that early return.
+  const screenRef = useRef(null);
+  useEffect(() => {
+    const el = screenRef.current;
+    if (!el) return undefined;
+    const measure = () => {
+      const scroller = el.closest('.app-content');
+      if (!scroller || scroller.clientHeight < 100) return; // hidden keep-mounted panel
+      const padBottom = parseFloat(getComputedStyle(scroller).paddingBottom) || 70;
+      el.style.setProperty('--tour-screen-h', `${Math.max(320, Math.round(scroller.clientHeight - padBottom))}px`);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    const ro = new ResizeObserver(measure); // fires when the hidden tab becomes visible
+    ro.observe(el);
+    return () => { window.removeEventListener('resize', measure); ro.disconnect(); };
+  }, [viewingProfile]);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [message, setMessage] = useState('');
@@ -1805,7 +1826,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   };
 
   return (
-    <div className="screen active matches-screen tour-screen">
+    <div ref={screenRef} className="screen active matches-screen tour-screen">
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           overlays (modals) live outside it. */}
       <div className="relative isolate">

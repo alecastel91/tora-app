@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
-import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon } from '../../utils/icons';
+import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon, GlobeIcon, ListIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
 import Modal from '../common/Modal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
@@ -457,6 +457,28 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     setViewingProfile(profile);
   };
 
+  // Icon-only Globe/List switch — lives on the same line as search + filter
+  // in BOTH views so the chrome never moves when you flip.
+  const viewToggle = (
+    <div className="flex shrink-0 rounded-full border border-white/10 bg-black/35 p-0.5 backdrop-blur-md">
+      {[
+        { key: 'globe', Icon: GlobeIcon, label: t('search.viewGlobe') },
+        { key: 'list', Icon: ListIcon, label: t('search.viewList') },
+      ].map(({ key, Icon, label }) => (
+        <button
+          key={key}
+          onClick={() => setViewMode(key)}
+          aria-label={label}
+          className={`flex h-10 w-10 items-center justify-center rounded-full transition [&_svg]:h-4 [&_svg]:w-4 ${
+            viewMode === key ? 'bg-[#FF3366]/70 text-white' : 'text-white/45'
+          }`}
+        >
+          <Icon />
+        </button>
+      ))}
+    </div>
+  );
+
   // Show viewing profile if selected
   if (viewingProfile) {
     return (
@@ -483,7 +505,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               userCity={user?.city}
               onLockedCity={setGlobeUpsellCity}
               topInset={user && !hasGlobalSearch() ? 118 : 66}
-              bottomInset={52}
+              bottomInset={8}
             />
           </Suspense>
 
@@ -510,6 +532,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                   </span>
                 )}
               </button>
+              {viewToggle}
             </div>
 
             {/* FREE tier only: a compact Premium ad (premium members see no banner) */}
@@ -528,23 +551,6 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             )}
           </div>
 
-          {/* floating view toggle at the bottom of the map — as translucent as the tier pill up top */}
-          <div className="absolute bottom-3 left-1/2 z-20 -translate-x-1/2">
-            <div className="flex rounded-full border border-white/10 bg-black/20 p-0.5 text-xs font-tech uppercase tracking-[0.12em] backdrop-blur-md">
-              {[
-                { key: 'globe', label: t('search.viewGlobe') },
-                { key: 'list', label: t('search.viewList') },
-              ].map((v) => (
-                <button
-                  key={v.key}
-                  onClick={() => setViewMode(v.key)}
-                  className={`rounded-full px-5 py-1.5 transition ${viewMode === v.key ? 'bg-[#FF3366]/70 text-white' : 'text-white/45'}`}
-                >
-                  {v.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       )}
 
@@ -580,6 +586,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               </span>
             )}
           </button>
+          {viewToggle}
         </div>
 
         {/* FREE tier only: compact upgrade pill right under (premium sees no banner) */}
@@ -596,24 +603,6 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             <span className="shrink-0 font-semibold text-[#FF3366]">{t('search.upgradeNow')}</span>
           </button>
         )}
-
-        {/* Globe / List switch below */}
-        <div className="mt-2 flex rounded-full border border-white/10 bg-black/20 p-0.5 text-xs font-tech uppercase tracking-[0.12em]">
-          {[
-            { key: 'globe', label: t('search.viewGlobe') },
-            { key: 'list', label: t('search.viewList') },
-          ].map((v) => (
-            <button
-              key={v.key}
-              onClick={() => setViewMode(v.key)}
-              className={`flex-1 rounded-full px-3 py-1.5 transition ${
-                viewMode === v.key ? 'bg-[#FF3366]/70 text-white' : 'text-white/45'
-              }`}
-            >
-              {v.label}
-            </button>
-          ))}
-        </div>
 
       </div>
 

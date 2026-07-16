@@ -186,17 +186,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
       }
 
-      // atmosphere: one wide soft crimson wash + one tight rim bloom
-      const haloWide = ctx.createRadialGradient(cx, cy, r * 0.92, cx, cy, r * 1.24);
-      haloWide.addColorStop(0, 'rgba(255,51,102,0.13)');
-      haloWide.addColorStop(1, 'rgba(255,51,102,0)');
-      ctx.fillStyle = haloWide;
-      ctx.beginPath(); ctx.arc(cx, cy, r * 1.24, 0, 7); ctx.fill();
-      const haloRim = ctx.createRadialGradient(cx, cy, r * 0.985, cx, cy, r * 1.06);
-      haloRim.addColorStop(0, 'rgba(255,51,102,0.28)');
-      haloRim.addColorStop(1, 'rgba(255,51,102,0)');
-      ctx.fillStyle = haloRim;
-      ctx.beginPath(); ctx.arc(cx, cy, r * 1.06, 0, 7); ctx.fill();
+      // atmosphere: one soft crimson wash (kept gentle on purpose)
+      const halo = ctx.createRadialGradient(cx, cy, r * 0.97, cx, cy, r * 1.16);
+      halo.addColorStop(0, 'rgba(255,51,102,0.20)');
+      halo.addColorStop(1, 'rgba(255,51,102,0)');
+      ctx.fillStyle = halo;
+      ctx.beginPath(); ctx.arc(cx, cy, r * 1.16, 0, 7); ctx.fill();
 
       // ocean sphere — deep, lit from the upper left
       ctx.beginPath(); path(SPHERE);
@@ -243,7 +238,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
       // rim
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7);
-      ctx.strokeStyle = 'rgba(255,51,102,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,51,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
 
       const showLabels = zoomRef.current > 1.5;
       const font = getComputedStyle(document.body).fontFamily;
