@@ -4,8 +4,10 @@ import introGlobe from '../../assets/intro-globe.png';
 // Rotating brand globe — the actual intro-artwork globe icon (extracted from
 // Intro.svg, transparent background). `size` is the glyph size in px; the app
 // boot screen uses a large one, inline loaders the default.
+// Default vertical padding yields to any py-* the caller passes (two py-*
+// utilities on one element resolve by stylesheet order, not class order).
 const LoadingGlobe = ({ label = 'Loading...', size = 28, className = '' }) => (
-  <div className={`flex flex-col items-center justify-center gap-3 py-16 ${className}`}>
+  <div className={`flex flex-col items-center justify-center gap-3 ${/\bpy-/.test(className) ? '' : 'py-16'} ${className}`}>
     <img
       src={introGlobe}
       alt=""
