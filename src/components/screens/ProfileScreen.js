@@ -342,10 +342,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
   // Show full-screen calendar if requested
 
-  // Show full-screen manage profile if requested
-  if (showManageProfile) {
-    return <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} />;
-  }
 
   // Show full-screen represented artists if requested
   if (showRepresentedArtists) {
@@ -383,6 +379,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     AGENT: 'rgba(0, 200, 117, 0.22)',     // #00C875
   }[user?.role] || 'rgba(255, 255, 255, 0.10)';
 
+  function renderProfileBody() {
   return (
     // Own black base so the global pink ambient doesn't bleed in — the Profile
     // shows only its single role colour.
@@ -1002,6 +999,22 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
       )}
     </div>
   );
+  }
+
+  // Manage: full-screen on mobile (master hidden via CSS), a right-hand
+  // detail pane beside the profile column on desktop (master-detail split).
+  if (showManageProfile) {
+    return (
+      <div className="md-split">
+        <div className="md-master">{renderProfileBody()}</div>
+        <div className="md-detail">
+          <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} />
+        </div>
+      </div>
+    );
+  }
+
+  return renderProfileBody();
 };
 
 // Keep-mounted tabs re-render on every App state change; memo keeps

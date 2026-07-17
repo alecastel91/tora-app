@@ -12997,3 +12997,12 @@ textarea.form-textarea:focus {
 .premium-header .back-button:hover {
   border-color: rgba(255, 51, 102, 0.5);
 }
+
+
+/* Master-detail split (desktop docks the detail beside the master; on mobile
+   the detail covers the page exactly as before) */
+@media (max-width: 1023px) {
+  .md-split > .md-master {
+    display: none;
+  }
+}
