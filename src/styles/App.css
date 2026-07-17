@@ -5245,7 +5245,9 @@
 /* Filter Full-Page Screen */
 .filter-screen {
   position: fixed;
-  top: 0;
+  /* below the sticky app header (z-100 paints above this overlay), so the
+     FILTERS header row with its back/close buttons stays visible + clickable */
+  top: 57px;
   left: 0;
   right: 0;
   bottom: 0;

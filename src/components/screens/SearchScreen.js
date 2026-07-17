@@ -23,6 +23,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const stageRef = useRef(null);
   const [stageH, setStageH] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const filtersOnOpen = useRef(null); // snapshot to restore when filters are dismissed via X
   const [filters, setFilters] = useState({
     roles: [],
     zones: [],
@@ -521,7 +522,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     );
     if (viewMode === 'list') {
       return (
-        <div className="md-split">
+        <div className="md-split md-split-wide">
           <div className="md-master">{renderMain()}</div>
           <div className="md-detail">{profileDetail}</div>
         </div>
@@ -563,7 +564,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-black/35 px-4 text-sm text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
               />
               <button
-                onClick={() => setShowFilters(true)}
+                onClick={() => { filtersOnOpen.current = filters; setShowFilters(true); }}
                 aria-label={t('search.filters')}
                 className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white/80 backdrop-blur-md"
               >
@@ -605,7 +606,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-black/35 px-4 text-sm text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
           />
           <button
-            onClick={() => setShowFilters(true)}
+            onClick={() => { filtersOnOpen.current = filters; setShowFilters(true); }}
             aria-label={t('search.filters')}
             className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/35 text-white/80 backdrop-blur-md"
           >
@@ -722,7 +723,16 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               ←
             </button>
             <h2>{t('search.filters')}</h2>
-            <div style={{ width: '32px' }}></div>
+            <button
+              className="back-btn"
+              aria-label={t('common.close')}
+              onClick={() => {
+                if (filtersOnOpen.current) setFilters(filtersOnOpen.current);
+                setShowFilters(false);
+              }}
+            >
+              ×
+            </button>
           </div>
           <div className="filter-screen-content">
           {/* Roles Dropdown */}

@@ -195,9 +195,11 @@
   /* ==== Master-detail (WhatsApp-Web style) ==== */
 
   /* Messages + open chat: the conversations list docks left (400px) and the
-     chat fills the space to its right instead of covering the page. */
+     chat fills the space to its right instead of covering the page.
+     Offset = sidebar + list 400px + content padding 20px + 16px gap, so the
+     chat never overlaps the last pixels of the docked cards. */
   .chat-screen {
-    left: calc(240px + 400px) !important;
+    left: calc(240px + 436px) !important;
     border-left: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -240,10 +242,26 @@
   }
 
   /* A profile opened from the search list renders in-flow inside the detail
-     pane instead of as a fixed overlay */
-  .md-split > .md-detail > .view-profile-screen {
+     pane instead of as a fixed overlay. Same for Find Agent / Find Artist,
+     whose base style is also position:fixed. */
+  .md-split > .md-detail > .view-profile-screen,
+  .md-split > .md-detail > .search-agents-screen,
+  .md-split > .md-detail > .search-artists-screen {
     position: static;
     height: 100%;
+    z-index: auto;
+  }
+
+  .md-split > .md-detail > .search-agents-screen,
+  .md-split > .md-detail > .search-artists-screen {
+    padding-bottom: 0;
+  }
+
+  /* Search keeps its full-width list when a profile opens beside it
+     (board 520px + the screen's own 20px side paddings) */
+  .md-split.md-split-wide > .md-master {
+    flex-basis: 560px;
+    width: 560px;
   }
 
   /* Bookings: the expanded card becomes the right-hand detail pane while
@@ -256,8 +274,9 @@
   .bookings-screen .booking-card.expanded {
     position: fixed;
     top: 57px;
-    left: calc(240px + 400px);
-    width: min(800px, calc(100vw - 240px - 400px));
+    /* sidebar + list 400px + content padding 20px + 16px gap */
+    left: calc(240px + 436px);
+    width: min(800px, calc(100vw - 240px - 436px));
     bottom: 0;
     z-index: 50;
     overflow-y: auto;
@@ -269,25 +288,34 @@
   }
 
   /* Tour inputs (create/edit tour, view gigs, sent proposal) open as
-     right-side drawers instead of centered popups */
+     right-side panes beside the tour screen, which docks left meanwhile */
+  body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {
+    max-width: 420px;
+    margin-left: 0;
+  }
+
   .md-drawer {
-    justify-content: flex-end;
+    top: 57px;
+    /* clears the docked tour column: sidebar + 420px + padding + gap */
+    left: calc(240px + 456px);
+    justify-content: flex-start;
     align-items: stretch;
     padding: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.35);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .md-drawer > .modal-content,
   .md-drawer > .modal-container {
     display: flex;
     flex-direction: column;
-    width: 480px;
-    max-width: 480px;
+    width: min(640px, 100%);
+    max-width: none;
     height: 100%;
     max-height: none;
     margin: 0;
     border-radius: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .md-drawer .modal-body {
@@ -352,8 +380,12 @@
   }
 
   .bookings-screen .booking-card.expanded {
-    left: calc(280px + 420px);
-    width: min(800px, calc(100vw - 280px - 420px));
+    left: calc(280px + 456px);
+    width: min(800px, calc(100vw - 280px - 456px));
+  }
+
+  .md-drawer {
+    left: calc(280px + 456px);
   }
 
   .chat-screen,
@@ -365,7 +397,7 @@
   }
 
   .chat-screen {
-    left: calc(280px + 420px) !important;
+    left: calc(280px + 456px) !important;
   }
 
   .app-container:has(> .chat-screen) .app-content > .tab-panel > .messages-screen {
