@@ -2,9 +2,10 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 // Bandcamp-style revenue chart with calendar paging: Week / Month / Year /
-// All-time filters, ‹ › arrows (and horizontal swipe) step to previous /
-// next periods, and the bars always fit the container — column width adapts
-// to the bucket count. `events` = [{ date, amount }] in the viewer's
+// All-time filters, ‹ › arrows step to previous / next periods, and the bars
+// always fit the container — column width adapts to the bucket count.
+// Tap/press a column (or hover with a mouse) to read its value; dragging
+// scrubs through the columns. `events` = [{ date, amount }] in the viewer's
 // preferred currency; each event is one gig.
 const DAY = 86400e3;
 const PERIODS = ['week', 'month', 'year', 'all'];
@@ -83,6 +84,9 @@ const RevenueChart = ({ events = [], currencySymbol = '€' }) => {
   const { t } = useLanguage();
   const [period, setPeriodRaw] = useState('year');
   const [offset, setOffset] = useState(0); // 0 = current period, 1 = previous…
+  const [hoverIdx, setHoverIdx] = useState(null); // scrubbed column
+  const chartRef = useRef(null);
+  const hoverTimer = useRef(null);
   const setPeriod = (p) => { setPeriodRaw(p); setOffset(0); };
 
   const win = useMemo(() => windowFor(period, offset), [period, offset]);
@@ -124,17 +128,25 @@ const RevenueChart = ({ events = [], currencySymbol = '€' }) => {
   const labelStep = Math.max(1, Math.ceil(buckets.length / 5));
   const showLabel = (i) => i % labelStep === 0 || i === buckets.length - 1;
 
-  // horizontal swipe pages through periods
-  const swipe = useRef(null);
-  const onPointerDown = (e) => { swipe.current = { x: e.clientX, y: e.clientY }; };
-  const onPointerUp = (e) => {
-    if (!swipe.current) return;
-    const dx = e.clientX - swipe.current.x;
-    const dy = e.clientY - swipe.current.y;
-    swipe.current = null;
-    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-    if (dx > 0 && canPrev) setOffset(offset + 1);      // swipe right → back in time
-    else if (dx < 0 && canNext) setOffset(offset - 1); // swipe left → forward
+  // Scrubbing: tap/press a column (or hover with a mouse) to read its value;
+  // moving across the chart steps through the columns one by one.
+  const scrubTo = (clientX) => {
+    const el = chartRef.current;
+    if (!el || buckets.length === 0) return;
+    const rect = el.getBoundingClientRect();
+    const idx = Math.min(buckets.length - 1, Math.max(0, Math.floor(((clientX - rect.left) / rect.width) * buckets.length)));
+    setHoverIdx(idx);
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+  };
+  const onPointerDown = (e) => { scrubTo(e.clientX); };
+  const onPointerMove = (e) => {
+    if (e.pointerType === 'mouse' || e.buttons > 0) scrubTo(e.clientX);
+  };
+  const endScrub = (e) => {
+    if (e.pointerType === 'mouse') { setHoverIdx(null); return; }
+    // touch: let the value linger briefly after release
+    if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => setHoverIdx(null), 1400);
   };
 
   return (
@@ -189,27 +201,48 @@ const RevenueChart = ({ events = [], currencySymbol = '€' }) => {
       )}
       {gigs === 0 && <div className="mb-4" />}
 
-      {/* chart — bars always fit the width; swipe to page */}
-      <div className="relative h-[180px] touch-pan-y" onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+      {/* chart — bars always fit the width; tap/hover a column for its value */}
+      <div
+        ref={chartRef}
+        className="relative h-[180px] touch-pan-y"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endScrub}
+        onPointerCancel={endScrub}
+        onPointerLeave={endScrub}
+      >
         {[1, 0.5].map((f) => (
           <div key={f} className="absolute inset-x-0 border-t border-white/[0.07]" style={{ top: `${(1 - f) * 100}%` }}>
             <span className="absolute -top-2.5 left-0 text-[10px] text-white/30">{fmt(axisMax * f)}</span>
           </div>
         ))}
         <div className="absolute inset-0 flex items-end gap-[2px] pt-3">
-          {buckets.map((b) => (
+          {buckets.map((b, i) => (
             <div key={`${b.start}`} className="flex h-full flex-1 flex-col justify-end">
               <div
                 className="w-full rounded-t-[3px]"
                 style={{
                   height: `${(b.amount / axisMax) * 100}%`,
-                  background: b.amount > 0 ? 'linear-gradient(to top, rgba(255,51,102,0.28), rgba(255,51,102,0.75))' : 'transparent',
-                  minHeight: b.amount > 0 ? 3 : 0,
+                  background: b.amount > 0
+                    ? (i === hoverIdx
+                        ? 'linear-gradient(to top, rgba(255,51,102,0.55), #ff3366)'
+                        : 'linear-gradient(to top, rgba(255,51,102,0.28), rgba(255,51,102,0.75))')
+                    : (i === hoverIdx ? 'rgba(255,255,255,0.10)' : 'transparent'),
+                  minHeight: b.amount > 0 ? 3 : (i === hoverIdx ? 2 : 0),
                 }}
               />
             </div>
           ))}
         </div>
+        {hoverIdx !== null && buckets[hoverIdx] && (
+          <div
+            className="pointer-events-none absolute -top-1 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black/90 px-2.5 py-1.5 text-center"
+            style={{ left: `${Math.min(92, Math.max(8, ((hoverIdx + 0.5) / buckets.length) * 100))}%` }}
+          >
+            <div className="text-sm font-semibold text-white">{fmt(buckets[hoverIdx].amount)}</div>
+            <div className="text-[9px] uppercase tracking-[0.1em] text-white/45">{labelFor(buckets[hoverIdx])}</div>
+          </div>
+        )}
       </div>
 
       {/* x labels */}

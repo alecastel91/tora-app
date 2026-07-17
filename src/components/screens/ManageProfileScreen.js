@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import RevenueChart from '../common/RevenueChart';
@@ -47,6 +47,9 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
   const [topCities, setTopCities] = useState([]); // [{city, count, revenue}]
   const [reach, setReach] = useState(null); // { views, likes, connections }
+  const [sparkIdx, setSparkIdx] = useState(null); // scrubbed sparkline day
+  const sparkRef = useRef(null);
+  const sparkTimer = useRef(null);
   const [thisYearGigs, setThisYearGigs] = useState(null);
   const [expectedRevenue, setExpectedRevenue] = useState(null);
   const [deals, setDeals] = useState([]);
@@ -113,6 +116,21 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
       .then(setReach)
       .catch((err) => console.error('[ManageProfileScreen] reach fetch failed:', err));
   }, [user?.id]);
+
+  // Sparkline scrubbing: tap/hover a day column to read its views count.
+  const scrubSpark = (clientX) => {
+    const el = sparkRef.current;
+    const n = reach?.views?.daily?.length || 0;
+    if (!el || !n) return;
+    const rect = el.getBoundingClientRect();
+    setSparkIdx(Math.min(n - 1, Math.max(0, Math.floor(((clientX - rect.left) / rect.width) * n))));
+    if (sparkTimer.current) clearTimeout(sparkTimer.current);
+  };
+  const endSparkScrub = (e) => {
+    if (e.pointerType === 'mouse') { setSparkIdx(null); return; }
+    if (sparkTimer.current) clearTimeout(sparkTimer.current);
+    sparkTimer.current = setTimeout(() => setSparkIdx(null), 1400);
+  };
 
   const getCurrencySymbol = (currency) => {
     const symbols = { USD: '$', EUR: '€', GBP: '£', JPY: '¥' };
@@ -596,15 +614,34 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
             })}
           </div>
           {reach.views.daily?.some((d) => d.count > 0) && (
-            <div className="mt-3 flex h-10 items-end gap-[2px]">
-              {reach.views.daily.map((d) => {
+            <div
+              ref={sparkRef}
+              className="relative mt-3 flex h-10 touch-pan-y items-end gap-[2px]"
+              onPointerDown={(e) => scrubSpark(e.clientX)}
+              onPointerMove={(e) => { if (e.pointerType === 'mouse' || e.buttons > 0) scrubSpark(e.clientX); }}
+              onPointerUp={endSparkScrub}
+              onPointerCancel={endSparkScrub}
+              onPointerLeave={endSparkScrub}
+            >
+              {reach.views.daily.map((d, i) => {
                 const max = Math.max(...reach.views.daily.map((x) => x.count), 1);
                 return (
                   <div key={d.date} className="flex-1 rounded-t-[2px]"
                        style={{ height: `${Math.max((d.count / max) * 100, d.count > 0 ? 8 : 2)}%`,
-                                background: d.count > 0 ? 'rgba(255,51,102,0.55)' : 'rgba(255,255,255,0.06)' }} />
+                                background: i === sparkIdx
+                                  ? (d.count > 0 ? '#ff3366' : 'rgba(255,255,255,0.18)')
+                                  : (d.count > 0 ? 'rgba(255,51,102,0.55)' : 'rgba(255,255,255,0.06)') }} />
                 );
               })}
+              {sparkIdx !== null && reach.views.daily[sparkIdx] && (
+                <div
+                  className="pointer-events-none absolute -top-9 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black/90 px-2 py-1 text-center"
+                  style={{ left: `${Math.min(90, Math.max(10, ((sparkIdx + 0.5) / reach.views.daily.length) * 100))}%` }}
+                >
+                  <span className="text-xs font-semibold text-white">{reach.views.daily[sparkIdx].count}</span>
+                  <span className="ml-1 text-[9px] text-white/45">{reach.views.daily[sparkIdx].date.slice(5).replace('-', '/')}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
