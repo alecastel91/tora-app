@@ -154,7 +154,7 @@
      centered-column rule above.) */
   .app-content > .tab-panel > .screen.profile-screen {
     max-width: 560px;
-    margin-left: 48px;
+    margin-left: 0;
   }
 
   /* Search is the exception: the globe is a full-bleed map… */
@@ -287,9 +287,9 @@
     padding: 24px 32px;
   }
 
-  /* Tour inputs (create/edit tour, view gigs, sent proposal) open as
-     right-side panes beside the tour screen, which docks left meanwhile */
-  body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {
+  /* Tour lives left-docked so its create/edit/gigs panes open beside it
+     without anything shifting */
+  .app-content > .tab-panel > .screen.tour-screen {
     max-width: 420px;
     margin-left: 0;
   }
@@ -372,7 +372,6 @@
 
   .app-content > .tab-panel > .screen.profile-screen {
     max-width: 600px;
-    margin-left: 64px;
   }
 
   .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {

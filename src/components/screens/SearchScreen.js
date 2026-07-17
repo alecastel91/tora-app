@@ -719,20 +719,18 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                        [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
           />
           <div className="screen-header">
-            <button className="back-btn" onClick={() => setShowFilters(false)}>
-              ←
-            </button>
-            <h2>{t('search.filters')}</h2>
             <button
               className="back-btn"
-              aria-label={t('common.close')}
               onClick={() => {
+                // back = leave without applying: restore the snapshot taken at open
                 if (filtersOnOpen.current) setFilters(filtersOnOpen.current);
                 setShowFilters(false);
               }}
             >
-              ×
+              ←
             </button>
+            <h2>{t('search.filters')}</h2>
+            <div style={{ width: '32px' }}></div>
           </div>
           <div className="filter-screen-content">
           {/* Roles Dropdown */}
