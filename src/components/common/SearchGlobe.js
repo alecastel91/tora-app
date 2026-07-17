@@ -441,16 +441,14 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     else setSheetPx(H);
   };
 
-  // Rotate a place to the front, offset so it stays visible next to the open
-  // panel: north of the 62% bottom sheet on mobile, west of the right-docked
-  // panel on desktop.
+  // Rotate a place to the front. On desktop the stage itself shrinks beside
+  // the docked panel (flex sibling), so the canvas center is already the
+  // visible center; on mobile, offset north of the 62% bottom sheet.
   const focusOn = (lon, lat) => {
     const r = Math.max(viewRef.current.r, 1);
     if (isDesktop) {
-      const offsetPx = PANEL_W / 2; // canvas center → center of the un-covered area
-      const delta = Math.min(35, (Math.asin(Math.min(0.95, offsetPx / r)) * 180) / Math.PI);
       focusing.current = true;
-      targetRot.current = [-(lon + delta), -lat];
+      targetRot.current = [-lon, -lat];
       return;
     }
     const offsetPx = dimsRef.current.h * 0.27; // canvas center → visible-strip center
@@ -666,7 +664,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const panelProfiles = place ? place.profiles.filter((p) => roleOn[p.role]) : [];
 
   return (
-    <div ref={wrapRef} className="absolute inset-0 overflow-hidden bg-[#040407]">
+    <div className="absolute inset-0 flex overflow-hidden bg-[#040407]">
+      {/* Stage — wrapRef's ResizeObserver resizes the canvas when the panel
+          opens/closes, so the globe shrinks instead of being covered. */}
+      <div ref={wrapRef} className="relative min-w-0 flex-1 overflow-hidden">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full touch-none"
@@ -681,13 +682,13 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       {/* Un-mapped count — sits below the parent's search-bar overlay */}
       {unmapped > 0 && (
         <div className="absolute rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40 backdrop-blur-sm"
-             style={{ top: topInset + 8, right: 12 + (isDesktop && sheetOpen ? PANEL_W : 0) }}>
+             style={{ top: topInset + 8, right: 12 }}>
           {t('search.globeUnmapped', { count: unmapped })}
         </div>
       )}
 
       {/* Zoom controls — right edge, above the bottom chrome (shift left of the desktop panel) */}
-      <div className="absolute flex flex-col gap-1.5" style={{ bottom: bottomInset + 64, right: 12 + (isDesktop && sheetOpen ? PANEL_W : 0) }}>
+      <div className="absolute flex flex-col gap-1.5" style={{ bottom: bottomInset + 64, right: 12 }}>
         {['+', '−'].map((sym, i) => (
           <button
             key={sym}
@@ -713,7 +714,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
       {/* Role legend — bottom chrome, above the parent's view toggle */}
       <div className="pointer-events-none absolute left-0 z-20 flex flex-col items-center gap-2"
-           style={{ bottom: bottomInset + 8, right: isDesktop && sheetOpen ? PANEL_W : 0 }}>
+           style={{ bottom: bottomInset + 8, right: 0 }}>
         {!sheetOpen && cities.length > 0 && (
           <div className="text-center text-[10px] font-tech uppercase tracking-[0.15em] text-white/25">
             {t('search.globeHint')}
@@ -741,17 +742,19 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         </div>
       )}
 
+      </div>
+
       {/* Members panel — bottom sheet on mobile (expands to cover the page),
-          right-docked side panel on desktop */}
+          right-docked flex sibling on desktop (the stage shrinks beside it) */}
       {sheetOpen && (
         <>
           {!isDesktop && <div className="absolute inset-0 z-30 bg-black/40" onClick={closeCity} />}
           <aside
             className={isDesktop
-              ? 'absolute right-0 bottom-0 z-40 flex flex-col rounded-tl-2xl border-l border-t border-white/10 bg-[#070709]'
+              ? 'relative z-40 flex shrink-0 flex-col rounded-tl-2xl border-l border-t border-white/10 bg-[#070709]'
               : 'absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#070709]'}
             style={isDesktop
-              ? { width: PANEL_W, top: topInset } /* below the floating search chrome, which stays clickable */
+              ? { width: PANEL_W, marginTop: topInset } /* below the floating search chrome, which stays clickable */
               : { height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
           >
             {!isDesktop && (

@@ -148,29 +148,39 @@
     margin-right: auto;
   }
 
+  /* Profile is the master-detail home base: anchored left with room to
+     breathe; opening a sub-screen (Manage, Edit, Find Agent…) shrinks it
+     into the 400px master column. (.screen repeated to outrank the
+     centered-column rule above.) */
+  .app-content > .tab-panel > .screen.profile-screen {
+    max-width: 560px;
+    margin-left: 48px;
+  }
+
   /* Search is the exception: the globe is a full-bleed map… */
-  .app-content > .tab-panel > .search-screen,
+  .app-content > .tab-panel > .screen.search-screen,
   .app-content > .search-screen {
     max-width: none;
     margin: 0;
   }
 
-  /* …while the list view inside it becomes a centered multi-column board */
+  /* …while the list view is a left-docked column (one name per line);
+     clicking a profile opens it as a right-hand pane */
   .search-screen .search-board {
-    max-width: 1040px;
-    margin: 0 auto;
+    max-width: 520px;
+    margin: 0;
   }
 
   .search-screen .search-header {
-    max-width: 680px;
-    margin-left: auto;
+    max-width: 520px;
+    margin-left: 0;
     margin-right: auto;
   }
 
   .search-results {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 12px;
     align-items: start;
   }
 
@@ -223,6 +233,69 @@
     margin: 0 auto;
   }
 
+  /* Search results docked as the master column fill its 400px */
+  .md-split > .md-master .search-board,
+  .md-split > .md-master .search-header {
+    max-width: none;
+  }
+
+  /* A profile opened from the search list renders in-flow inside the detail
+     pane instead of as a fixed overlay */
+  .md-split > .md-detail > .view-profile-screen {
+    position: static;
+    height: 100%;
+  }
+
+  /* Bookings: the expanded card becomes the right-hand detail pane while
+     the list stays docked left */
+  .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
+    max-width: 400px;
+    margin-left: 0;
+  }
+
+  .bookings-screen .booking-card.expanded {
+    position: fixed;
+    top: 57px;
+    left: calc(240px + 400px);
+    width: min(800px, calc(100vw - 240px - 400px));
+    bottom: 0;
+    z-index: 50;
+    overflow-y: auto;
+    margin: 0;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    padding: 24px 32px;
+  }
+
+  /* Tour inputs (create/edit tour, view gigs, sent proposal) open as
+     right-side drawers instead of centered popups */
+  .md-drawer {
+    justify-content: flex-end;
+    align-items: stretch;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .md-drawer > .modal-content,
+  .md-drawer > .modal-container {
+    display: flex;
+    flex-direction: column;
+    width: 480px;
+    max-width: 480px;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .md-drawer .modal-body {
+    flex: 1;
+    max-height: none !important;
+    overflow-y: auto;
+  }
+
   /* Full-screen overlays offset by the sidebar */
   .chat-screen,
   .filter-screen {
@@ -269,12 +342,18 @@
     width: calc(100% - 280px);
   }
 
-  .search-screen .search-board {
-    max-width: 1240px;
+  .app-content > .tab-panel > .screen.profile-screen {
+    max-width: 600px;
+    margin-left: 64px;
   }
 
-  .search-results {
-    grid-template-columns: repeat(3, 1fr);
+  .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
+    max-width: 420px;
+  }
+
+  .bookings-screen .booking-card.expanded {
+    left: calc(280px + 420px);
+    width: min(800px, calc(100vw - 280px - 420px));
   }
 
   .chat-screen,

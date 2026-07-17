@@ -61,6 +61,9 @@ function App() {
     }
     setActiveTab(tab);
     setMountedTabs((prev) => (prev.includes(tab) ? prev : [...prev, tab]));
+    // An open chat belongs to the Messages context — close it when leaving
+    setActiveChatUser(null);
+    setViewingProfile(null);
   };
   useLayoutEffect(() => {
     if (appContentRef.current) {

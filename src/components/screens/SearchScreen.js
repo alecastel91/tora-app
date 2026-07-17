@@ -506,9 +506,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     </div>
   );
 
-  // Show viewing profile if selected
+  // Show viewing profile if selected. In list view the results stay docked
+  // on the left and the profile opens as a right-hand pane on desktop
+  // (mobile hides the master via CSS — full-screen as before).
   if (viewingProfile) {
-    return (
+    const profileDetail = (
       <ViewProfileScreen
         profile={viewingProfile}
         onClose={() => setViewingProfile(null)}
@@ -517,8 +519,20 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         onOpenPremium={onOpenPremium}
       />
     );
+    if (viewMode === 'list') {
+      return (
+        <div className="md-split">
+          <div className="md-master">{renderMain()}</div>
+          <div className="md-detail">{profileDetail}</div>
+        </div>
+      );
+    }
+    return profileDetail;
   }
 
+  return renderMain();
+
+  function renderMain() {
   return (
     <div className="screen active search-screen" style={viewMode === 'globe' ? { padding: 0, minHeight: 0 } : undefined}>
       {/* ===== GLOBE — the search landing: a full-bleed map with floating chrome ===== */}
@@ -1114,6 +1128,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       )}
     </div>
   );
+  }
 };
 
 // Keep-mounted tabs re-render on every App state change; memo keeps

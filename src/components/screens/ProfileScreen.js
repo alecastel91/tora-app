@@ -319,57 +319,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     }
   };
 
-  // Show manage artist screen if selected
-  if (managingArtist) {
-    return (
-      <ManageArtistScreen
-        artist={managingArtist}
-        onClose={() => setManagingArtist(null)}
-        onSwitchTab={onSwitchTab}
-      />
-    );
-  }
-
-  // Show viewing artist profile if selected
-  if (viewingArtistProfile) {
-    return (
-      <ViewProfileScreen
-        profileId={viewingArtistProfile}
-        onClose={() => setViewingArtistProfile(null)}
-      />
-    );
-  }
-
   // Show full-screen calendar if requested
 
-
-  // Show full-screen represented artists if requested
-  if (showRepresentedArtists) {
-    return (
-      <RepresentedArtistsScreen
-        onClose={() => setShowRepresentedArtists(false)}
-        onSwitchTab={onSwitchTab}
-      />
-    );
-  }
-
-  // Show full-screen edit profile if requested
-  if (showEditProfile) {
-    return <EditProfileScreen onClose={() => setShowEditProfile(false)} />;
-  }
-
-  // Show add profile screen if requested
-  if (showAddProfile) {
-    return (
-      <AddProfileScreen
-        onClose={() => setShowAddProfile(false)}
-        onSuccess={(newProfile) => {
-          // Switch to the new profile
-          switchProfile(newProfile.id);
-        }}
-      />
-    );
-  }
 
   // Bloom behind the avatar takes the profile's canonical role color.
   const roleBloomColor = {
@@ -383,7 +334,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   return (
     // Own black base so the global pink ambient doesn't bleed in — the Profile
     // shows only its single role colour.
-    <div className="screen active px-5 pt-6 pb-5" style={{ backgroundColor: '#000' }}>
+    <div className="screen active profile-screen px-5 pt-6 pb-5" style={{ backgroundColor: '#000' }}>
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           modals live OUTSIDE it so they aren't trapped under the app header. */}
       <div className="relative isolate">
@@ -976,20 +927,6 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
         </Modal>
       )}
 
-      {/* Find Agent Modal for Artists */}
-      {showFindAgent && (
-        <SearchAgentsModal
-          onClose={() => setShowFindAgent(false)}
-          onSelectAgent={handleSelectAgent}
-          currentArtistId={user?.id}
-          onOpenChat={(agent) => {
-            setShowFindAgent(false);
-            setAgentProfile(agent);
-            setShowAgentChat(true);
-          }}
-        />
-      )}
-
       {/* Agent Chat Modal for Artists */}
       {showAgentChat && agentProfile && (
         <ChatScreen
@@ -1001,16 +938,79 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   );
   }
 
-  // Manage: full-screen on mobile (master hidden via CSS), a right-hand
-  // detail pane beside the profile column on desktop (master-detail split).
-  if (showManageProfile) {
+  // Profile sub-screens: full-screen on mobile (master hidden via CSS), a
+  // right-hand detail pane beside the profile column on desktop. These
+  // branches must live AFTER every declaration above — renderProfileBody
+  // reads consts like roleBloomColor (TDZ).
+  const renderSplit = (detail) => (
+    <div className="md-split">
+      <div className="md-master">{renderProfileBody()}</div>
+      <div className="md-detail">{detail}</div>
+    </div>
+  );
+
+  if (managingArtist) {
+    return renderSplit(
+      <ManageArtistScreen
+        artist={managingArtist}
+        onClose={() => setManagingArtist(null)}
+        onSwitchTab={onSwitchTab}
+      />
+    );
+  }
+
+  if (viewingArtistProfile) {
     return (
-      <div className="md-split">
-        <div className="md-master">{renderProfileBody()}</div>
-        <div className="md-detail">
-          <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} />
-        </div>
-      </div>
+      <ViewProfileScreen
+        profileId={viewingArtistProfile}
+        onClose={() => setViewingArtistProfile(null)}
+      />
+    );
+  }
+
+  if (showRepresentedArtists) {
+    return renderSplit(
+      <RepresentedArtistsScreen
+        onClose={() => setShowRepresentedArtists(false)}
+        onSwitchTab={onSwitchTab}
+      />
+    );
+  }
+
+  if (showEditProfile) {
+    return renderSplit(<EditProfileScreen onClose={() => setShowEditProfile(false)} />);
+  }
+
+  if (showAddProfile) {
+    return renderSplit(
+      <AddProfileScreen
+        onClose={() => setShowAddProfile(false)}
+        onSuccess={(newProfile) => {
+          // Switch to the new profile
+          switchProfile(newProfile.id);
+        }}
+      />
+    );
+  }
+
+  if (showFindAgent) {
+    return renderSplit(
+      <SearchAgentsModal
+        onClose={() => setShowFindAgent(false)}
+        onSelectAgent={handleSelectAgent}
+        currentArtistId={user?.id}
+        onOpenChat={(agent) => {
+          setShowFindAgent(false);
+          setAgentProfile(agent);
+          setShowAgentChat(true);
+        }}
+      />
+    );
+  }
+
+  if (showManageProfile) {
+    return renderSplit(
+      <ManageProfileScreen onClose={() => setShowManageProfile(false)} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} />
     );
   }
 

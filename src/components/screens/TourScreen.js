@@ -949,7 +949,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (!showCreateTourModal) return null;
 
     const modalContent = (
-      <div className="create-tour-modal-overlay" onClick={() => setShowCreateTourModal(false)}>
+      <div className="create-tour-modal-overlay md-drawer" onClick={() => setShowCreateTourModal(false)}>
         <div className="modal-content create-tour-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h2>{t('tour.createTour')}</h2>
@@ -1157,7 +1157,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (!showEditTourModal || !selectedTour) return null;
 
     const modalContent = (
-      <div className="create-tour-modal-overlay" onClick={() => setShowEditTourModal(false)}>
+      <div className="create-tour-modal-overlay md-drawer" onClick={() => setShowEditTourModal(false)}>
         <div className="modal-content create-tour-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h2>{t('tour.editTour')}</h2>
@@ -1927,7 +1927,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
       {/* View My Sent Proposal Modal */}
       {showMyProposalModal && myProposalData && ReactDOM.createPortal(
-        <div className="create-tour-modal-overlay" onClick={() => setShowMyProposalModal(false)}>
+        <div className="create-tour-modal-overlay md-drawer" onClick={() => setShowMyProposalModal(false)}>
           <div className="modal-content create-tour-modal view-proposals-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{t('tour.yourProposal')}</h2>
@@ -2030,7 +2030,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
       {/* Tour Gigs Modal */}
       {showTourGigsModal && selectedTour && ReactDOM.createPortal(
-        <div className="modal-overlay" onClick={() => setShowTourGigsModal(false)}>
+        <div className="modal-overlay md-drawer" onClick={() => setShowTourGigsModal(false)}>
           <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{t('tour.tourGigsTitle', { location: selectedTour.country || selectedTour.zone })}</h3>
