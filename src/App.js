@@ -384,7 +384,7 @@ function App() {
   const tabScreens = {
     profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
     search: <SearchScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
-    tour: <TourScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
+    tour: <TourScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,
     bookings: <BookingsScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} />,
     // chatOpen (not a key remount): MessagesScreen refetches once when a
     // chat closes, to pick up read-state changes. A key here remounted the

@@ -288,16 +288,17 @@
   }
 
   /* Tour lives left-docked so its create/edit/gigs panes open beside it
-     without anything shifting */
+     without anything shifting — sized so screen and pane split the space
+     roughly evenly */
   .app-content > .tab-panel > .screen.tour-screen {
-    max-width: 420px;
+    max-width: 480px;
     margin-left: 0;
   }
 
   .md-drawer {
     top: 57px;
-    /* clears the docked tour column: sidebar + 420px + padding + gap */
-    left: calc(240px + 456px);
+    /* clears the docked tour column: sidebar + 480px + padding + gap */
+    left: calc(240px + 516px);
     justify-content: flex-start;
     align-items: stretch;
     padding: 0;
@@ -383,8 +384,12 @@
     width: min(800px, calc(100vw - 280px - 456px));
   }
 
+  .app-content > .tab-panel > .screen.tour-screen {
+    max-width: 560px;
+  }
+
   .md-drawer {
-    left: calc(280px + 456px);
+    left: calc(280px + 596px);
   }
 
   .chat-screen,

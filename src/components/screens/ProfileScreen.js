@@ -287,6 +287,18 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
     AGENT: 'text-role-agent border-role-agent/60',
   };
 
+  // Only one profile sub-screen (manage / edit / roster / find agent / add /
+  // manage artist / view artist) open at a time — opening one closes the rest.
+  const closeSubScreens = () => {
+    setShowManageProfile(false);
+    setShowEditProfile(false);
+    setShowFindAgent(false);
+    setShowAddProfile(false);
+    setShowRepresentedArtists(false);
+    setManagingArtist(null);
+    setViewingArtistProfile(null);
+  };
+
   const handleDeleteProfile = async () => {
     if (!profileToDelete) return;
 
@@ -499,14 +511,14 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
       {/* ===== Actions (2x2 glass grid) ===== */}
       <div className="grid grid-cols-2 gap-2.5 mb-6">
-        <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => setShowEditProfile(true)} />
+        <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
         {user?.role === 'AGENT' ? (
-          <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => setShowRepresentedArtists(true)} />
+          <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => { closeSubScreens(); setShowRepresentedArtists(true); }} />
         ) : (
-          <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => setShowManageProfile(true)} dot={ownHasActions} />
+          <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         )}
         {user?.role === 'ARTIST' && (
-          <ActionCard icon={<SearchIcon />} label={t('profile.findAgentLabel')} onClick={() => setShowFindAgent(true)} />
+          <ActionCard icon={<SearchIcon />} label={t('profile.findAgentLabel')} onClick={() => { closeSubScreens(); setShowFindAgent(true); }} />
         )}
         <ActionCard
           icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}
@@ -553,7 +565,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
             {user?.representingArtists && user.representingArtists.length > 0 ? user.representingArtists.map(artist => (
               <div
                 key={artist.id}
-                onClick={() => setViewingArtistProfile(artist.id)}
+                onClick={() => { closeSubScreens(); setViewingArtistProfile(artist.id); }}
                 className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] p-3 cursor-pointer
                            hover:border-infrared/40 transition-colors"
               >
@@ -570,7 +582,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                   <p className="text-xs text-white/50 truncate">{artist.location}</p>
                 </div>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setManagingArtist(artist); }}
+                  onClick={(e) => { e.stopPropagation(); closeSubScreens(); setManagingArtist(artist); }}
                   className="relative shrink-0 px-3 py-1.5 rounded-lg bg-infrared text-white text-xs font-semibold uppercase tracking-wider hover:bg-infrared-dim transition-colors"
                 >
                   Manage
@@ -582,7 +594,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
             )) : (
               <div className="rounded-xl border border-dashed border-white/15 bg-[#070709] p-6 text-center">
                 <p className="text-sm text-white/50 mb-3">No artists added yet</p>
-                <button onClick={() => setShowRepresentedArtists(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Add Artists</button>
+                <button onClick={() => { closeSubScreens(); setShowRepresentedArtists(true); }} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Add Artists</button>
               </div>
             )}
           </div>
@@ -605,7 +617,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               <div className="rounded-lg border border-white/10 bg-[#070709] p-5 text-center">
                 <p className="text-sm text-white/70 mb-1">{t('profile.useFullSoundcloudUrl')}</p>
                 <p className="text-xs text-white/40 mb-3">Example: https://soundcloud.com/artist/track-name</p>
-                <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
+                <button onClick={() => { closeSubScreens(); setShowEditProfile(true); }} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
             )}
           </div>
@@ -627,7 +639,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               <div className="rounded-lg border border-white/10 bg-[#070709] p-5 text-center">
                 <p className="text-sm text-white/70 mb-1">{t('profile.useFullSpotifyUrl')}</p>
                 <p className="text-xs text-white/40 mb-3">Example: https://open.spotify.com/artist/XXXXX</p>
-                <button onClick={() => setShowEditProfile(true)} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
+                <button onClick={() => { closeSubScreens(); setShowEditProfile(true); }} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
               </div>
             )}
           </div>
@@ -875,6 +887,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                          transition-colors hover:bg-black/30 hover:border-white/30"
               onClick={() => {
                 setShowProfileSwitcher(false);
+                closeSubScreens();
                 setShowAddProfile(true);
               }}
             >

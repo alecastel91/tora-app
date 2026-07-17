@@ -11,7 +11,7 @@ import { citiesByCountry, countriesByZone, genresList } from '../../data/profile
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 
-const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser }) => {
+const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
   const { t } = useLanguage();
   const tourStatusLabel = (st) => ({ ACTIVE: t('tour.statusActive'), COMPLETED: t('tour.statusCompleted'), CANCELLED: t('tour.statusCancelled') }[st] || st);
@@ -798,6 +798,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       feeMax: tour.feeExpectation ? tour.feeExpectation.split(' ')[1]?.split('-')[1] || '' : '',
       additionalNotes: tour.additionalNotes || ''
     });
+    closeTourPanes();
     setShowEditTourModal(true);
   };
 
@@ -902,8 +903,24 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     }
   };
 
+
+  // Only one tour sub-pane (create / edit / gigs / proposal) at a time —
+  // opening one closes whatever else is open.
+  useEffect(() => {
+    if (!isActive) closeTourPanes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
+
+  const closeTourPanes = () => {
+    setShowCreateTourModal(false);
+    setShowEditTourModal(false);
+    setShowTourGigsModal(false);
+    setShowMyProposalModal(false);
+  };
+
   const handleViewTourGigs = async (tour) => {
     setSelectedTour(tour);
+    closeTourPanes();
     setShowTourGigsModal(true);
     setLoadingTourGigs(true);
     setTourGigs([]);
@@ -937,6 +954,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
       // Store proposal data and show modal
       setMyProposalData({ ...myProposal, tour });
+      closeTourPanes();
       setShowMyProposalModal(true);
     } catch (error) {
       console.error('Error fetching proposal:', error);
@@ -1393,7 +1411,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           <div className="tour-kickstart-section">
             <div className="section-header">
               <h3>{t('tour.myTours')}</h3>
-              <button className="btn btn-primary btn-small" onClick={() => setShowCreateTourModal(true)}>
+              <button className="btn btn-primary btn-small" onClick={() => { closeTourPanes(); setShowCreateTourModal(true); }}>
                 <span>+ {t('tour.createTour')}</span>
               </button>
             </div>
