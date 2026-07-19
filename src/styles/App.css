@@ -13015,3 +13015,33 @@ textarea.form-textarea:focus {
     display: none;
   }
 }
+
+/* Achievements flip cards: hover flips on pointer devices, tap toggles via
+   the .flipped class everywhere */
+.ach-card {
+  perspective: 900px;
+}
+.ach-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.ach-card.flipped .ach-card-inner {
+  transform: rotateY(180deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ach-card:hover .ach-card-inner {
+    transform: rotateY(180deg);
+  }
+}
+.ach-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.ach-back {
+  transform: rotateY(180deg);
+}
