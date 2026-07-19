@@ -62,8 +62,12 @@ function App() {
     }
     setActiveTab(tab);
     setMountedTabs((prev) => (prev.includes(tab) ? prev : [...prev, tab]));
-    // Overlays belong to the context they were opened in — close them all
-    // when navigating to another tab
+    closeAllOverlays();
+  };
+
+  // Overlays belong to the context they were opened in — closed on tab
+  // navigation and on logout (a stale overlay otherwise survives re-login).
+  const closeAllOverlays = () => {
     setActiveChatUser(null);
     setViewingProfile(null);
     setShowSettings(false);
@@ -139,7 +143,6 @@ function App() {
     return () => window.removeEventListener('tora:offer-limit', onLimit);
   }, [t]);
 
-  // Available currencies
 
   // Check if user is already logged in
   useEffect(() => {
@@ -300,10 +303,7 @@ function App() {
     setIsAuthenticated(false);
     updateUser(null);
     // next login starts fresh on the Profile tab
-    setShowSettings(false);
-    setShowPremium(false);
-    setActiveChatUser(null);
-    setViewingProfile(null);
+    closeAllOverlays();
     setActiveTab('profile');
   };
 

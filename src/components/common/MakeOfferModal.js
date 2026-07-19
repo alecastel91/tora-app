@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { CURRENCY_OPTIONS } from './CurrencyOptions';
+import ReactDOM from 'react-dom';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { CURRENCIES } from '../../utils/currencies';
 
 const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
   const { t } = useLanguage();
@@ -293,7 +294,10 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
   const isArtistOrAgent = currentUser.role === 'ARTIST' || currentUser.role === 'AGENT';
 
-  return (
+  // Portal to body: the desktop drawer system docks the tour screen via
+  // body:has(> .md-drawer), which only matches direct body children — and
+  // the overlay must escape parent stacking contexts like the chat screen.
+  return ReactDOM.createPortal(
     <div className="make-offer-modal-overlay md-drawer" onClick={onClose}>
       <div className="make-offer-modal" onClick={(e) => e.stopPropagation()}>
         <div className="make-offer-header">
@@ -485,9 +489,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                   onChange={(e) => handleChange('currency', e.target.value)}
                   className="form-input"
                 >
-{CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>{c.code}</option>
-                  ))}
+{CURRENCY_OPTIONS}
                 </select>
               </div>
             </div>
@@ -684,7 +686,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
         </form>
       </div>
     </div>
-  );
+  , document.body);
 };
 
 export default MakeOfferModal;

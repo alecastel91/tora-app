@@ -212,8 +212,9 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
                 let convertedFee = dealFee;
                 if (dealCurrency !== preferredCurrency) {
-                  const feeInUSD = dealCurrency === 'USD' ? dealFee : dealFee / rates[dealCurrency];
-                  convertedFee = preferredCurrency === 'USD' ? feeInUSD : feeInUSD * rates[preferredCurrency];
+                  // missing rate (rate-API outage) must not NaN the sum
+                  const feeInUSD = dealCurrency === 'USD' || !rates[dealCurrency] ? dealFee : dealFee / rates[dealCurrency];
+                  convertedFee = preferredCurrency === 'USD' || !rates[preferredCurrency] ? feeInUSD : feeInUSD * rates[preferredCurrency];
                 }
 
                 totalRevenue += convertedFee;
@@ -242,8 +243,9 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
                 let convertedFee = dealFee;
                 if (dealCurrency !== preferredCurrency) {
-                  const feeInUSD = dealCurrency === 'USD' ? dealFee : dealFee / rates[dealCurrency];
-                  convertedFee = preferredCurrency === 'USD' ? feeInUSD : feeInUSD * rates[preferredCurrency];
+                  // missing rate (rate-API outage) must not NaN the sum
+                  const feeInUSD = dealCurrency === 'USD' || !rates[dealCurrency] ? dealFee : dealFee / rates[dealCurrency];
+                  convertedFee = preferredCurrency === 'USD' || !rates[preferredCurrency] ? feeInUSD : feeInUSD * rates[preferredCurrency];
                 }
 
                 totalExpected += convertedFee;

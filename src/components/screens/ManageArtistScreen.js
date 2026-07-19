@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
 import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, BriefcaseIcon, PlaneIcon, ListIcon, EditIcon, TrashIcon, ImageIcon, SlidersIcon, FileTextIcon } from '../../utils/icons';
@@ -195,9 +196,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 let convertedFee = dealFee;
                 if (dealCurrency !== preferredCurrency) {
                   // Convert to USD first if needed
-                  const feeInUSD = dealCurrency === 'USD' ? dealFee : dealFee / rates[dealCurrency];
+                  // missing rate (rate-API outage) must not NaN the sum
+                  const feeInUSD = dealCurrency === 'USD' || !rates[dealCurrency] ? dealFee : dealFee / rates[dealCurrency];
                   // Then convert from USD to preferred currency
-                  convertedFee = preferredCurrency === 'USD' ? feeInUSD : feeInUSD * rates[preferredCurrency];
+                  convertedFee = preferredCurrency === 'USD' || !rates[preferredCurrency] ? feeInUSD : feeInUSD * rates[preferredCurrency];
                 }
 
                 totalRevenue += convertedFee;
@@ -229,8 +231,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                 // Convert to preferred currency
                 let convertedFee = dealFee;
                 if (dealCurrency !== preferredCurrency) {
-                  const feeInUSD = dealCurrency === 'USD' ? dealFee : dealFee / rates[dealCurrency];
-                  convertedFee = preferredCurrency === 'USD' ? feeInUSD : feeInUSD * rates[preferredCurrency];
+                  // missing rate (rate-API outage) must not NaN the sum
+                  const feeInUSD = dealCurrency === 'USD' || !rates[dealCurrency] ? dealFee : dealFee / rates[dealCurrency];
+                  convertedFee = preferredCurrency === 'USD' || !rates[preferredCurrency] ? feeInUSD : feeInUSD * rates[preferredCurrency];
                 }
 
                 totalExpected += convertedFee;
@@ -842,14 +845,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   };
 
   const formatCurrencyWithSymbol = (amount, currency = 'USD') => {
-    const symbols = {
-      USD: '$',
-      EUR: '€',
-      GBP: '£',
-      JPY: '¥'
-    };
-
-    const symbol = symbols[currency] || '$';
+    const symbol = getCurrencySymbol(currency);
     const formatted = new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
@@ -1751,7 +1747,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           )}
           {artistProfile?.role && (
             <div className="mt-2 inline-block rounded-full border border-role-artist/60 px-2.5 py-0.5 text-[10px] font-tech uppercase tracking-[0.15em] text-role-artist">
-              {artistProfile.role}
+              {roleLabel(artistProfile.role, t)}
             </div>
           )}
           {artistProfile?.genres && artistProfile.genres.length > 0 && (

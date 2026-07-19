@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CURRENCIES } from '../../utils/currencies';
+import { CURRENCY_OPTIONS, CURRENCY_OPTIONS_WITH_SYMBOL } from '../common/CurrencyOptions';
 import ReactDOM from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -149,6 +149,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (!isActive) closeTourPanes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
+
+  // A viewed calendar-match can disappear on refetch — clear the stale id so
+  // the pane doesn't pop back open when a later fetch re-includes it.
+  useEffect(() => {
+    if (typeof viewingProfile === 'string' && !calendarMatches.some((m) => m.profile.id === viewingProfile)) {
+      setViewingProfile(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewingProfile, calendarMatches]);
   const [selectedTourArtist, setSelectedTourArtist] = useState(null);
   const [selectedTour, setSelectedTour] = useState(null);
   const [showEditTourModal, setShowEditTourModal] = useState(false);
@@ -889,6 +898,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     setShowEditTourModal(false);
     setShowTourGigsModal(false);
     setShowMyProposalModal(false);
+    setShowMakeOfferModal(false);
+    setSelectedTourArtist(null);
+    setViewingProfile(null);
   };
 
   const handleViewTourGigs = async (tour) => {
@@ -1039,9 +1051,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   className="form-input"
                   style={{ width: '100px' }}
                 >
-{CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>{c.code}</option>
-                  ))}
+{CURRENCY_OPTIONS}
                 </select>
                 <input
                   type="number"
@@ -1067,9 +1077,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     onChange={(e) => setTourForm({ ...tourForm, feeCurrency: e.target.value })}
                     className="form-input"
                   >
-{CURRENCIES.map((c) => (
-                      <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
-                    ))}
+{CURRENCY_OPTIONS_WITH_SYMBOL}
                   </select>
                 </div>
                 <div className="fee-range-inputs">
@@ -1226,9 +1234,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   className="form-input"
                   style={{ width: '100px' }}
                 >
-{CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>{c.code}</option>
-                  ))}
+{CURRENCY_OPTIONS}
                 </select>
                 <input
                   type="number"
@@ -1254,9 +1260,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     onChange={(e) => setTourForm({ ...tourForm, feeCurrency: e.target.value })}
                     className="form-input"
                   >
-{CURRENCIES.map((c) => (
-                      <option key={c.code} value={c.code}>{c.code}</option>
-                    ))}
+{CURRENCY_OPTIONS}
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flex: 1, alignItems: 'center' }}>
@@ -1859,14 +1863,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       <div className="tour-tabs">
         <button
           className={`tour-tab ${activeTab === 'calendar' ? 'active' : ''}`}
-          onClick={() => { closeTourPanes(); setViewingProfile(null); setShowMakeOfferModal(false); setSelectedTourArtist(null); setActiveTab('calendar'); }}
+          onClick={() => { closeTourPanes(); setActiveTab('calendar'); }}
         >
           <CalendarIcon />
           <span>{t('tour.calendarMatches')}</span>
         </button>
         <button
           className={`tour-tab ${activeTab === 'kickstart' ? 'active' : ''}`}
-          onClick={() => { closeTourPanes(); setViewingProfile(null); setShowMakeOfferModal(false); setSelectedTourArtist(null); setActiveTab('kickstart'); }}
+          onClick={() => { closeTourPanes(); setActiveTab('kickstart'); }}
         >
           <PlaneIcon />
           <span>{t('tour.tourKickstart')}</span>

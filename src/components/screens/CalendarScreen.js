@@ -90,13 +90,12 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
     }
   }, [user?.travelSchedule]);
 
-  // Fetch upcoming events for Promoters/Venues
+  // Fetch upcoming events (all roles — counterparty differs per side)
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
       if (!user?.id) return;
 
       try {
-        console.log('[CalendarScreen] Fetching upcoming events for Promoter/Venue...');
         const response = await apiService.getDeals({ profileId: user.id });
 
         if (response && response.deals) {
@@ -880,7 +879,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
             {/* Upcoming Events Section */}
             <div className="dashboard-section">
               <div className="section-header">
-                <h3><ListIcon /> Upcoming Events</h3>
+                <h3><ListIcon /> {t('calendar.upcomingEvents')}</h3>
               </div>
               {upcomingEvents.length === 0 ? (
                 <div className="no-events-message">
@@ -1092,7 +1091,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                 from this side of the deal (counterparty = the venue) */}
             <div className="dashboard-section">
               <div className="section-header">
-                <h3><ListIcon /> Upcoming Events</h3>
+                <h3><ListIcon /> {t('calendar.upcomingEvents')}</h3>
               </div>
               {upcomingEvents.length === 0 ? (
                 <div className="no-events-message">
@@ -1111,9 +1110,9 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                       <div key={event.id} className="mb-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0c0c11] px-4 py-3">
                         <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl border border-white/10 bg-black/40">
                           <span className="text-[9px] font-tech uppercase tracking-widest text-white/40">
-                            {d.toLocaleDateString(t('dateFormat.locale'), { month: 'short' })}
+                            {d.toLocaleDateString(t('dateFormat.locale'), { month: 'short', timeZone: 'UTC' })}
                           </span>
-                          <span className="text-sm font-semibold text-white">{d.getDate()}</span>
+                          <span className="text-sm font-semibold text-white">{d.getUTCDate()}</span>
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-sm font-medium text-white">{event.eventName || t('bookings.booking')}</div>
