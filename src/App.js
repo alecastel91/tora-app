@@ -463,7 +463,7 @@ function App() {
 
   return (
     <Router>
-      <div className="app-container">
+      <div className={`app-container tab-${activeTab}`}>
       <AppDialogHost />
         <Header
           onOpenSettings={() => setShowSettings(true)}

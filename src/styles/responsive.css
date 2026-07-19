@@ -149,6 +149,13 @@
   }
 
 
+  /* Profile shows a single color story: its role-colored bloom on black.
+     Hide the app's crimson grid ambient while the Profile tab is active so
+     no pink pattern (or column edge) frames the page. */
+  .app-container.tab-profile::before {
+    display: none;
+  }
+
   /* Search is the exception: the globe is a full-bleed map… */
   .app-content > .tab-panel > .screen.search-screen,
   .app-content > .search-screen {
