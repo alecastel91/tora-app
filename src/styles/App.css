@@ -9352,6 +9352,7 @@ textarea.form-textarea:focus {
   align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
+  margin-top: 6px; /* breathing room below the event-name line */
 }
 
 .booking-card-right-section {

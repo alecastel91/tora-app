@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { CURRENCIES } from '../../utils/currencies';
 import ReactDOM from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -432,38 +433,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     console.log('[TourScreen] Opening profile:', profileId);
     setViewingProfile(profileId);
   };
-
-  // Show viewing profile if selected
-  if (viewingProfile) {
-    // Check if viewingProfile is already a profile object (from tour cards)
-    let profileToView = null;
-
-    if (typeof viewingProfile === 'object' && viewingProfile.id) {
-      // Already a profile object from tour artist
-      profileToView = viewingProfile;
-    } else {
-      // It's an ID string, find from calendar matches
-      profileToView = calendarMatches.find(m => {
-        const id = m.profile.id;
-        return id === viewingProfile;
-      })?.profile;
-    }
-
-    if (!profileToView) {
-      // If profile not found, close the view
-      setViewingProfile(null);
-      return null;
-    }
-
-    return (
-      <ViewProfileScreen
-        profile={profileToView}
-        onClose={() => setViewingProfile(null)}
-        onOpenChat={onOpenChat}
-        onNavigateToMessages={onNavigateToMessages}
-      />
-    );
-  }
 
   // Calendar Matches Tab Content
   const renderCalendarMatches = () => {
@@ -1070,10 +1039,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   className="form-input"
                   style={{ width: '100px' }}
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="JPY">JPY</option>
+{CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.code}</option>
+                  ))}
                 </select>
                 <input
                   type="number"
@@ -1099,10 +1067,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     onChange={(e) => setTourForm({ ...tourForm, feeCurrency: e.target.value })}
                     className="form-input"
                   >
-                    <option value="EUR">EUR (€)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="JPY">JPY (¥)</option>
+{CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
+                    ))}
                   </select>
                 </div>
                 <div className="fee-range-inputs">
@@ -1259,10 +1226,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   className="form-input"
                   style={{ width: '100px' }}
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="JPY">JPY</option>
+{CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.code}</option>
+                  ))}
                 </select>
                 <input
                   type="number"
@@ -1288,10 +1254,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                     onChange={(e) => setTourForm({ ...tourForm, feeCurrency: e.target.value })}
                     className="form-input"
                   >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                    <option value="JPY">JPY</option>
+{CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.code}</option>
+                    ))}
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flex: 1, alignItems: 'center' }}>
@@ -1850,6 +1815,35 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     );
   };
 
+  // Viewing an artist: the tour page stays docked left on desktop and the
+  // profile opens as a right-hand pane (mobile hides the master via CSS —
+  // full-screen as before). Lives after every declaration (renderMain reads
+  // consts — TDZ) and hooks (no hook may follow an early return).
+  if (viewingProfile) {
+    const profileToView =
+      typeof viewingProfile === 'object' && viewingProfile.id
+        ? viewingProfile
+        : calendarMatches.find((m) => m.profile.id === viewingProfile)?.profile;
+    if (profileToView) {
+      return (
+        <div className="md-split md-split-wide">
+          <div className="md-master">{renderMain()}</div>
+          <div className="md-detail">
+            <ViewProfileScreen
+              profile={profileToView}
+              onClose={() => setViewingProfile(null)}
+              onOpenChat={onOpenChat}
+              onNavigateToMessages={onNavigateToMessages}
+            />
+          </div>
+        </div>
+      );
+    }
+  }
+
+  return renderMain();
+
+  function renderMain() {
   return (
     <div ref={screenRef} className="screen active matches-screen tour-screen">
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
@@ -1865,14 +1859,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       <div className="tour-tabs">
         <button
           className={`tour-tab ${activeTab === 'calendar' ? 'active' : ''}`}
-          onClick={() => setActiveTab('calendar')}
+          onClick={() => { closeTourPanes(); setViewingProfile(null); setShowMakeOfferModal(false); setSelectedTourArtist(null); setActiveTab('calendar'); }}
         >
           <CalendarIcon />
           <span>{t('tour.calendarMatches')}</span>
         </button>
         <button
           className={`tour-tab ${activeTab === 'kickstart' ? 'active' : ''}`}
-          onClick={() => setActiveTab('kickstart')}
+          onClick={() => { closeTourPanes(); setViewingProfile(null); setShowMakeOfferModal(false); setSelectedTourArtist(null); setActiveTab('kickstart'); }}
         >
           <PlaneIcon />
           <span>{t('tour.tourKickstart')}</span>
@@ -2141,6 +2135,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       )}
     </div>
   );
+  }
 };
 
 // Keep-mounted tabs re-render on every App state change; memo keeps

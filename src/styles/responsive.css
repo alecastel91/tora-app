@@ -342,12 +342,12 @@
   }
 
   /* Settings/Premium cover the viewport at z-1000 — keep the sidebar visible
-     and center their content in a comfortable column */
+     and anchor their content left in a roomy column (like the Profile tab) */
   .settings-screen,
   .premium-screen {
     left: 240px;
-    padding-left: max(24px, calc((100% - 720px) / 2));
-    padding-right: max(24px, calc((100% - 720px) / 2));
+    padding-left: 32px;
+    padding-right: max(24px, calc(100% - 792px)); /* 760px column + 32px left */
   }
 
   /* Overlay screens (view profile, manage, settings…) render as centered

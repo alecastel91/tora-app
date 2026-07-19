@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { CURRENCIES } from '../../utils/currencies';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
@@ -2126,10 +2127,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     onChange={(e) => setReviewData({ ...reviewData, currency: e.target.value })}
                     className="form-select currency-select-full"
                   >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                    <option value="JPY">JPY</option>
+{CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.code}</option>
+                    ))}
                   </select>
                 </div>
 

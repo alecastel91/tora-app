@@ -20,6 +20,7 @@ import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
 import apiService from './services/api';
 import { StarIcon } from './utils/icons';
+import { CURRENCIES } from './utils/currencies';
 import './styles/App.css';
 import './styles/responsive.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
@@ -61,9 +62,12 @@ function App() {
     }
     setActiveTab(tab);
     setMountedTabs((prev) => (prev.includes(tab) ? prev : [...prev, tab]));
-    // An open chat belongs to the Messages context — close it when leaving
+    // Overlays belong to the context they were opened in — close them all
+    // when navigating to another tab
     setActiveChatUser(null);
     setViewingProfile(null);
+    setShowSettings(false);
+    setShowPremium(false);
   };
   useLayoutEffect(() => {
     if (appContentRef.current) {
@@ -136,12 +140,6 @@ function App() {
   }, [t]);
 
   // Available currencies
-  const availableCurrencies = [
-    { code: 'USD', symbol: '$', name: 'US Dollar' },
-    { code: 'EUR', symbol: '€', name: 'Euro' },
-    { code: 'GBP', symbol: '£', name: 'British Pound' },
-    { code: 'JPY', symbol: '¥', name: 'Japanese Yen' }
-  ];
 
   // Check if user is already logged in
   useEffect(() => {
@@ -301,6 +299,12 @@ function App() {
     apiService.logout();
     setIsAuthenticated(false);
     updateUser(null);
+    // next login starts fresh on the Profile tab
+    setShowSettings(false);
+    setShowPremium(false);
+    setActiveChatUser(null);
+    setViewingProfile(null);
+    setActiveTab('profile');
   };
 
   const handlePasswordChange = async () => {
@@ -508,6 +512,12 @@ function App() {
         {/* Settings Screen */}
         {showSettings && (
           <div className="screen active settings-screen">
+            {/* faint engineering grid fading from the top (matches the tab screens) */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-grid
+                         [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+            />
             <div className="settings-header">
               <button className="back-button" onClick={() => setShowSettings(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -712,19 +722,17 @@ function App() {
 
             <div className="settings-section">
               <h3>{t('settingsExtra.preferredCurrency')}</h3>
-              <div className="language-selector">
-                {availableCurrencies.map(curr => (
-                  <button
-                    key={curr.code}
-                    className={`language-option ${preferredCurrency === curr.code ? 'active' : ''}`}
-                    onClick={() => handleCurrencyChange(curr.code)}
-                  >
-                    <span className="lang-name">{curr.symbol} {curr.code}</span>
-                    <span className="lang-native">{curr.name}</span>
-                    {preferredCurrency === curr.code && <span className="checkmark">✓</span>}
-                  </button>
+              <select
+                className="form-input currency-dropdown"
+                value={preferredCurrency}
+                onChange={(e) => handleCurrencyChange(e.target.value)}
+              >
+                {CURRENCIES.map((curr) => (
+                  <option key={curr.code} value={curr.code}>
+                    {curr.symbol}  {curr.code} — {curr.name}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
 
             <div className="settings-section">
@@ -743,28 +751,6 @@ function App() {
               </div>
             </div>
             
-            <div className="settings-section">
-              <h3>{t('settings.privacy')}</h3>
-              <div className="settings-item">
-                <label className="settings-toggle">
-                  <input type="checkbox" defaultChecked />
-                  <span>{t('settings.showProfile')}</span>
-                </label>
-              </div>
-              <div className="settings-item">
-                <label className="settings-toggle">
-                  <input type="checkbox" defaultChecked />
-                  <span>{t('settings.allowMessages')}</span>
-                </label>
-              </div>
-              <div className="settings-item">
-                <label className="settings-toggle">
-                  <input type="checkbox" />
-                  <span>{t('settings.shareLocation')}</span>
-                </label>
-              </div>
-            </div>
-
             <div className="settings-section">
               <h3>{t('settingsExtra.emailPreferences')}</h3>
               <div className="settings-item">
@@ -893,6 +879,12 @@ function App() {
         {/* Premium Upgrade Screen */}
         {showPremium && (
           <div className="screen active premium-screen">
+            {/* faint engineering grid fading from the top (matches the tab screens) */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-grid
+                         [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
+            />
             <div className="premium-header">
               <button className="back-button" onClick={() => setShowPremium(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

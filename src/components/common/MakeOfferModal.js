@@ -4,6 +4,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { CURRENCIES } from '../../utils/currencies';
 
 const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
   const { t } = useLanguage();
@@ -484,10 +485,9 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                   onChange={(e) => handleChange('currency', e.target.value)}
                   className="form-input"
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="JPY">JPY</option>
+{CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.code}</option>
+                  ))}
                 </select>
               </div>
             </div>

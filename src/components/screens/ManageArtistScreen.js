@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
 import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, BriefcaseIcon, PlaneIcon, ListIcon, EditIcon, TrashIcon, ImageIcon, SlidersIcon, FileTextIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
@@ -866,15 +867,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     }
   };
 
-  const getCurrencySymbol = (currency = 'USD') => {
-    const symbols = {
-      USD: '$',
-      EUR: '€',
-      GBP: '£',
-      JPY: '¥'
-    };
-    return symbols[currency] || '$';
-  };
 
   const renderDashboardTab = () => (
     <div className="dashboard-tab">

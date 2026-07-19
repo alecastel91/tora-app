@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getCurrencySymbol } from '../../utils/currencies';
 import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
 import CalendarScreen from './CalendarScreen';
 import RevenueChart from '../common/RevenueChart';
@@ -132,10 +133,6 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
     sparkTimer.current = setTimeout(() => setSparkIdx(null), 1400);
   };
 
-  const getCurrencySymbol = (currency) => {
-    const symbols = { USD: '$', EUR: '€', GBP: '£', JPY: '¥' };
-    return symbols[currency] || '$';
-  };
 
   const formatCurrency = (amount) => {
     if (amount >= 1000) {
