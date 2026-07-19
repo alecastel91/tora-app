@@ -30,10 +30,10 @@
   --text-light: rgba(255, 255, 255, 0.75);
   
   /* Role Colors (canonical) */
-  --role-artist: #6B5FFF;
-  --role-venue: #FF5757;
-  --role-promoter: #FFB800;
-  --role-agent: #00C875;
+  --role-artist: #667EEA;
+  --role-venue: #F5576C;
+  --role-promoter: #FFC107;
+  --role-agent: #43E97B;
   
   /* Status Colors */
   --status-online: #00FF88;

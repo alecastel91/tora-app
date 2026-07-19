@@ -11,10 +11,10 @@
  * wrong (agent gold, promoter cyan); corrected here until the canonical
  * tora-theme.css in tora-application is updated. */
 @theme {
-  --color-role-artist: #6B5FFF;
-  --color-role-venue: #FF5757;
-  --color-role-promoter: #FFB800;
-  --color-role-agent: #00C875;
+  --color-role-artist: #667EEA;
+  --color-role-venue: #F5576C;
+  --color-role-promoter: #FFC107;
+  --color-role-agent: #43E97B;
 }
 
 /* App typography: two families only — Space Grotesk (headings, names, display

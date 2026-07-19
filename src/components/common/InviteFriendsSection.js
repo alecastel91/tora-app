@@ -52,7 +52,7 @@ const InviteFriendsSection = () => {
 
   const statusStyle = {
     PENDING: 'border-white/15 text-white/60',
-    REDEEMED: 'border-[#00C875]/50 text-[#00C875]',
+    REDEEMED: 'border-[#43E97B]/50 text-[#43E97B]',
     EXPIRED: 'border-white/10 text-white/30',
   };
 
@@ -107,7 +107,7 @@ const InviteFriendsSection = () => {
             {busy ? '...' : t('referrals.sendInvite')}
           </button>
           {error && <p className="m-0 mt-2 text-xs text-infrared">{error}</p>}
-          {sent && !error && <p className="m-0 mt-2 text-xs text-[#00C875]">{t('referrals.sentConfirm')}</p>}
+          {sent && !error && <p className="m-0 mt-2 text-xs text-[#43E97B]">{t('referrals.sentConfirm')}</p>}
 
           {data && data.redeemedCount > 0 && (
             <p className="m-0 mt-3 text-xs text-white/50">

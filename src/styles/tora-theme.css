@@ -38,10 +38,10 @@
   --color-text-gray-light: #666666;
 
   /* ===== Role colors ===== */
-  --color-role-artist: #6B5FFF;
-  --color-role-venue: #FF5757;
-  --color-role-promoter: #00D4FF;
-  --color-role-agent: #FFB800;
+  --color-role-artist: #667EEA;
+  --color-role-venue: #F5576C;
+  --color-role-promoter: #FFC107;
+  --color-role-agent: #43E97B;
 
   /* ===== Status ===== */
   --color-status-online: #00FF88;

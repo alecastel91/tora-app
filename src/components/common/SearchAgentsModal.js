@@ -634,7 +634,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                         >
                           <div
                             className="artist-avatar"
-                            style={agent.avatar ? undefined : { background: 'linear-gradient(135deg, #34E3A0 0%, #00C875 100%)' }}
+                            style={agent.avatar ? undefined : { background: 'linear-gradient(135deg, #7BF0A4 0%, #43E97B 100%)' }}
                           >
                             {agent.avatar ? (
                               <img src={agent.avatar} alt={agent.name} />

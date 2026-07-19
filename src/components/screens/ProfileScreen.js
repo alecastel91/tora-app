@@ -349,10 +349,10 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
 
   // Bloom behind the avatar takes the profile's canonical role color.
   const roleBloomColor = {
-    ARTIST: 'rgba(107, 95, 255, 0.26)',   // #6B5FFF
-    VENUE: 'rgba(255, 87, 87, 0.24)',     // #FF5757
-    PROMOTER: 'rgba(255, 184, 0, 0.22)',  // #FFB800
-    AGENT: 'rgba(0, 200, 117, 0.22)',     // #00C875
+    ARTIST: 'rgba(102, 126, 234, 0.26)',   // #667EEA
+    VENUE: 'rgba(245, 87, 108, 0.24)',     // #F5576C
+    PROMOTER: 'rgba(255, 193, 7, 0.22)',  // #FFC107
+    AGENT: 'rgba(67, 233, 123, 0.22)',     // #43E97B
   }[user?.role] || 'rgba(255, 255, 255, 0.10)';
 
   function renderProfileBody() {

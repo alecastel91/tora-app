@@ -333,10 +333,10 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           style={{
             background: `radial-gradient(60% 100% at 50% 0%, ${
               {
-                ARTIST: 'rgba(107, 95, 255, 0.18)',
-                VENUE: 'rgba(255, 87, 87, 0.16)',
-                PROMOTER: 'rgba(255, 184, 0, 0.13)',
-                AGENT: 'rgba(0, 200, 117, 0.13)',
+                ARTIST: 'rgba(102, 126, 234, 0.18)',
+                VENUE: 'rgba(245, 87, 108, 0.16)',
+                PROMOTER: 'rgba(255, 193, 7, 0.13)',
+                AGENT: 'rgba(67, 233, 123, 0.13)',
               }[profile.role] || 'rgba(255, 255, 255, 0.08)'
             }, transparent 70%)`,
           }}

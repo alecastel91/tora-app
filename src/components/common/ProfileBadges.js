@@ -8,12 +8,12 @@ import { useLanguage } from '../../contexts/LanguageContext';
 export const BADGE_ACCENT = {
   founding: '#FF3366',
   yearly: '#FFD700',
-  gigs: '#6B5FFF',
-  events: '#FF5757',
-  closer: '#00C875',
+  gigs: '#667EEA',
+  events: '#F5576C',
+  closer: '#43E97B',
   globetrotter: '#4DA6FF',
-  connector: '#00C875',
-  resident: '#FFB800',
+  connector: '#43E97B',
+  resident: '#FFC107',
   ambassador: '#FF3366',
   crowd: '#FF8A00',
 };

@@ -14,10 +14,10 @@ export function getAvatarClass(role) {
 // can't read the --color-role-* CSS tokens. Keep in sync with
 // styles/variables.css and tora-theme.css.
 export const ROLE_COLOR = {
-  ARTIST: '#6B5FFF',
-  AGENT: '#00C875',
-  PROMOTER: '#FFB800',
-  VENUE: '#FF5757',
+  ARTIST: '#667EEA',
+  AGENT: '#43E97B',
+  PROMOTER: '#FFC107',
+  VENUE: '#F5576C',
 };
 
 // i18n keys for role display labels — render with t(roleLabelKey(role)) and
