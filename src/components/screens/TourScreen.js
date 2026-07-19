@@ -139,6 +139,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Modal states
   const [showMakeOfferModal, setShowMakeOfferModal] = useState(false);
+
+  // Portaled sub-panes escape the hidden keep-mounted panel — close them when
+  // this tab deactivates. MUST live above every early return (viewingProfile
+  // returns at the top of render; a hook below it crashes with "rendered
+  // fewer hooks than expected").
+  useEffect(() => {
+    if (!isActive) closeTourPanes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive]);
   const [selectedTourArtist, setSelectedTourArtist] = useState(null);
   const [selectedTour, setSelectedTour] = useState(null);
   const [showEditTourModal, setShowEditTourModal] = useState(false);
@@ -906,11 +915,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Only one tour sub-pane (create / edit / gigs / proposal) at a time —
   // opening one closes whatever else is open.
-  useEffect(() => {
-    if (!isActive) closeTourPanes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive]);
-
   const closeTourPanes = () => {
     setShowCreateTourModal(false);
     setShowEditTourModal(false);

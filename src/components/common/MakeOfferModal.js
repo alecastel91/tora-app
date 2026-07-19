@@ -293,7 +293,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
   const isArtistOrAgent = currentUser.role === 'ARTIST' || currentUser.role === 'AGENT';
 
   return (
-    <div className="make-offer-modal-overlay" onClick={onClose}>
+    <div className="make-offer-modal-overlay md-drawer" onClick={onClose}>
       <div className="make-offer-modal" onClick={(e) => e.stopPropagation()}>
         <div className="make-offer-header">
           <button className="back-btn" onClick={onClose}>

@@ -297,6 +297,7 @@
 
   .md-drawer {
     top: 57px;
+    bottom: 0; /* no tab bar on desktop */
     /* clears the docked tour column: sidebar + 480px + padding + gap */
     left: calc(240px + 516px);
     justify-content: flex-start;
@@ -307,7 +308,8 @@
   }
 
   .md-drawer > .modal-content,
-  .md-drawer > .modal-container {
+  .md-drawer > .modal-container,
+  .md-drawer > .make-offer-modal {
     display: flex;
     flex-direction: column;
     width: min(640px, 100%);

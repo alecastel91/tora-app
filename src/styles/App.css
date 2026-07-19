@@ -8723,10 +8723,13 @@
 /* Make Offer Modal */
 .make-offer-modal-overlay {
   position: fixed;
-  top: 0;
+  /* between the sticky app header and the tab bar — both paint above this
+     overlay's stacking context, which buried the back arrow and clipped the
+     bottom CTAs when it spanned the full viewport */
+  top: 57px;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 53px;
   background: #000000;
   z-index: 2000;
   display: flex;
@@ -8738,10 +8741,8 @@
 .make-offer-modal {
   width: 100%;
   max-width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  max-height: 100vh;
-  max-height: 100dvh;
+  height: 100%;
+  max-height: 100%;
   background: #000000;
   border-radius: 0;
   display: flex;
