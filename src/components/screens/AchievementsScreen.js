@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { BADGE_ACCENT } from '../common/ProfileBadges';
+import { drawBadgeSVG } from '../../utils/badgeArt';
 import { ShieldIcon } from '../../utils/icons';
 
 // Own achievements hub: the full badge catalog with earned tiers highlighted
@@ -65,7 +66,11 @@ const AchievementsScreen = ({ onClose }) => {
               className={`mb-3 rounded-2xl border bg-[#0c0c11] p-4 ${a.earned ? 'border-white/10' : 'border-white/5 opacity-60'}`}
             >
               <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
+                <span
+                  className={`block h-[92px] w-[76px] shrink-0 ${a.earned ? '' : 'opacity-60 grayscale'}`}
+                  dangerouslySetInnerHTML={{ __html: drawBadgeSVG(a.key, { tier: a.tier, level: a.level || 0, max: a.tierCount || 0 }) }}
+                />
+                <div className="min-w-0 flex-1">
                   <div className="text-[10px] font-tech uppercase tracking-[0.2em]" style={{ color: accent }}>
                     {t(`badges.${a.key}.name`)}
                   </div>
