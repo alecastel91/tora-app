@@ -150,10 +150,20 @@
 
 
   /* Profile shows a single color story: its role-colored bloom on black.
-     Hide the app's crimson grid ambient while the Profile tab is active so
-     no pink pattern (or column edge) frames the page. */
+     While the Profile tab is active, drop the app's crimson ambient
+     entirely — the ::before grid AND the container's pink washes — so the
+     whole page is seamless black around the role bloom. */
+  .app-container.tab-profile {
+    background-image: none;
+  }
+
   .app-container.tab-profile::before {
     display: none;
+  }
+
+  /* Settings content fills its 760px column (base caps it at 600px) */
+  .settings-screen .settings-content {
+    max-width: none;
   }
 
   /* Search is the exception: the globe is a full-bleed map… */
@@ -354,8 +364,10 @@
   .settings-screen,
   .premium-screen {
     left: 240px;
-    padding-left: max(24px, calc((100% - 760px) / 2));
-    padding-right: max(24px, calc((100% - 760px) / 2));
+    /* fixed elements resolve % against the viewport, so subtract the
+       sidebar explicitly to center the 760px column in the content area */
+    padding-left: max(24px, calc((100vw - 240px - 760px) / 2));
+    padding-right: max(24px, calc((100vw - 240px - 760px) / 2));
   }
 
   /* Overlay screens (view profile, manage, settings…) render as centered
@@ -404,6 +416,12 @@
   .settings-screen,
   .premium-screen {
     left: 280px;
+  }
+
+  .settings-screen,
+  .premium-screen {
+    padding-left: max(24px, calc((100vw - 280px - 760px) / 2));
+    padding-right: max(24px, calc((100vw - 280px - 760px) / 2));
   }
 
   .chat-screen {
