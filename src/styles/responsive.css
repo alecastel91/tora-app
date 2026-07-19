@@ -148,13 +148,6 @@
     margin-right: auto;
   }
 
-  /* Profile sits centered like the other screens; opening a sub-screen
-     (Manage, Edit, Find Agent…) shrinks it into the master column. The
-     inline black base is desktop-overridden so the crimson grid ambient
-     shows through — the role-colored bloom stays. */
-  .app-content > .tab-panel > .screen.profile-screen {
-    background-color: transparent !important;
-  }
 
   /* Search is the exception: the globe is a full-bleed map… */
   .app-content > .tab-panel > .screen.search-screen,
@@ -350,12 +343,12 @@
   }
 
   /* Settings/Premium cover the viewport at z-1000 — keep the sidebar visible
-     and anchor their content left in a roomy column (like the Profile tab) */
+     and center their content in a roomy 760px column like the other screens */
   .settings-screen,
   .premium-screen {
     left: 240px;
-    padding-left: 32px;
-    padding-right: max(24px, calc(100% - 792px)); /* 760px column + 32px left */
+    padding-left: max(24px, calc((100% - 760px) / 2));
+    padding-right: max(24px, calc((100% - 760px) / 2));
   }
 
   /* Overlay screens (view profile, manage, settings…) render as centered

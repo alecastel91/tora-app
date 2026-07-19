@@ -730,22 +730,6 @@ function App() {
             </div>
 
             <div className="settings-section">
-              <h3>{t('settings.notifications')}</h3>
-              <div className="settings-item">
-                <label className="settings-toggle">
-                  <input type="checkbox" defaultChecked />
-                  <span>{t('settings.pushNotifications')}</span>
-                </label>
-              </div>
-              <div className="settings-item">
-                <label className="settings-toggle">
-                  <input type="checkbox" defaultChecked />
-                  <span>{t('settings.emailNotifications')}</span>
-                </label>
-              </div>
-            </div>
-            
-            <div className="settings-section">
               <h3>{t('settingsExtra.emailPreferences')}</h3>
               <div className="settings-item">
                 <label className="settings-toggle">
