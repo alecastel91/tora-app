@@ -9,7 +9,7 @@
 
 const MAX_INPUT_BYTES = 10 * 1024 * 1024; // refuse absurd inputs outright
 
-export async function downscaleImageToDataUrl(file, { maxDimension = 1024, quality = 0.85 } = {}) {
+async function downscaleToCanvas(file, maxDimension) {
   if (!file || !file.type.startsWith('image/')) {
     throw new Error('Please choose an image file.');
   }
@@ -27,7 +27,11 @@ export async function downscaleImageToDataUrl(file, { maxDimension = 1024, quali
   canvas.height = height;
   canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
   if (bitmap.close) bitmap.close();
+  return canvas;
+}
 
+export async function downscaleImageToDataUrl(file, { maxDimension = 1024, quality = 0.85 } = {}) {
+  const canvas = await downscaleToCanvas(file, maxDimension);
   // Prefer webp; some older Safari versions silently return PNG for webp
   // requests, so fall back to jpeg if webp didn't actually happen.
   let dataUrl = canvas.toDataURL('image/webp', quality);
@@ -37,11 +41,18 @@ export async function downscaleImageToDataUrl(file, { maxDimension = 1024, quali
   return dataUrl;
 }
 
-/** Same downscale, but returns a Blob for multipart upload. */
-export async function downscaleImageToBlob(file, opts = {}) {
-  const dataUrl = await downscaleImageToDataUrl(file, opts);
-  const res = await fetch(dataUrl);
-  return res.blob();
+/** Same downscale, but returns a Blob for multipart upload.
+ *  Uses canvas.toBlob directly — fetch('data:...') is blocked by the
+ *  production CSP (connect-src has no data: source). */
+export async function downscaleImageToBlob(file, { maxDimension = 1024, quality = 0.85 } = {}) {
+  const canvas = await downscaleToCanvas(file, maxDimension);
+  const toBlob = (type) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+  let blob = await toBlob('image/webp');
+  if (!blob || blob.type !== 'image/webp') {
+    blob = await toBlob('image/jpeg');
+  }
+  if (!blob) throw new Error('Could not process the image.');
+  return blob;
 }
 
 function loadBitmap(file) {
