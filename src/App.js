@@ -512,12 +512,6 @@ function App() {
         {/* Settings Screen */}
         {showSettings && (
           <div className="screen active settings-screen">
-            {/* faint engineering grid fading from the top (matches the tab screens) */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-grid
-                         [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
-            />
             <div className="settings-header">
               <button className="back-button" onClick={() => setShowSettings(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -778,10 +772,10 @@ function App() {
                 <span className="settings-value">1.0.0</span>
               </div>
               <div className="settings-item">
-                <button className="settings-link" onClick={() => console.log('Terms of Service')}>{t('settings.termsOfService')}</button>
+                <button className="settings-link" onClick={() => window.open('https://torahub.io/terms', '_blank', 'noopener')}>{t('settings.termsOfService')}</button>
               </div>
               <div className="settings-item">
-                <button className="settings-link" onClick={() => console.log('Privacy Policy')}>{t('settings.privacyPolicy')}</button>
+                <button className="settings-link" onClick={() => window.open('https://torahub.io/privacy', '_blank', 'noopener')}>{t('settings.privacyPolicy')}</button>
               </div>
             </div>
             
@@ -879,12 +873,6 @@ function App() {
         {/* Premium Upgrade Screen */}
         {showPremium && (
           <div className="screen active premium-screen">
-            {/* faint engineering grid fading from the top (matches the tab screens) */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-grid
-                         [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
-            />
             <div className="premium-header">
               <button className="back-button" onClick={() => setShowPremium(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

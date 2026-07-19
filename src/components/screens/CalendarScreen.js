@@ -93,7 +93,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
   // Fetch upcoming events for Promoters/Venues
   useEffect(() => {
     const fetchUpcomingEvents = async () => {
-      if (!isPromoterOrVenue || !user?.id) return;
+      if (!user?.id) return;
 
       try {
         console.log('[CalendarScreen] Fetching upcoming events for Promoter/Venue...');
@@ -123,7 +123,7 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
     };
 
     fetchUpcomingEvents();
-  }, [user?.id, isPromoterOrVenue]);
+  }, [user?.id]);
 
   // NOTE: We refresh both availableDates and travelSchedule from backend on mount
   // This ensures we have the latest data when switching between CalendarScreen and ManageArtistScreen
@@ -1086,6 +1086,49 @@ const CalendarScreen = ({ onClose, embedded = false }) => {
                 </div>
               )}
               </div>
+            </div>
+
+            {/* Upcoming Events — same data the promoter/venue dashboard shows,
+                from this side of the deal (counterparty = the venue) */}
+            <div className="dashboard-section">
+              <div className="section-header">
+                <h3><ListIcon /> Upcoming Events</h3>
+              </div>
+              {upcomingEvents.length === 0 ? (
+                <div className="no-events-message">
+                  <p>{t('calendar.noUpcomingEvents')}</p>
+                </div>
+              ) : (
+                <div>
+                  {upcomingEvents.map((event) => {
+                    const d = new Date(event.date);
+                    const parts = [
+                      user?.role === 'AGENT' ? event.artist?.name : null,
+                      event.venue?.name,
+                      event.city,
+                    ].filter(Boolean);
+                    return (
+                      <div key={event.id} className="mb-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0c0c11] px-4 py-3">
+                        <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl border border-white/10 bg-black/40">
+                          <span className="text-[9px] font-tech uppercase tracking-widest text-white/40">
+                            {d.toLocaleDateString(t('dateFormat.locale'), { month: 'short' })}
+                          </span>
+                          <span className="text-sm font-semibold text-white">{d.getDate()}</span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-medium text-white">{event.eventName || t('bookings.booking')}</div>
+                          <div className="truncate text-xs text-white/45">{parts.join(' · ')}</div>
+                        </div>
+                        {Number(event.currentFee) > 0 && (
+                          <span className="shrink-0 text-xs font-semibold text-infrared">
+                            {Number(event.currentFee).toLocaleString()} {event.currency}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </>
         )}

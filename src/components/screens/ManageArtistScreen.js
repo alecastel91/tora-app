@@ -1283,10 +1283,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     if (upcomingDeals.length === 0) {
       return (
         <div className="no-events-message">
-          <p>{t('manageArtist.comingSoon')}</p>
-          <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
-            {t('manageArtist.featureInDevelopment')}
-          </p>
+          <p>{t('calendar.noUpcomingEvents')}</p>
         </div>
       );
     }
@@ -1745,68 +1742,26 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     return (
       <div className="artist-info-tab">
         {/* Profile Info Box */}
-        <div style={{
-          padding: '20px',
-          marginBottom: '20px',
-          backgroundColor: '#1a1a1a',
-          borderRadius: '8px',
-          lineHeight: '1.4'
-        }}>
-          {/* Name */}
-          <div style={{
-            fontSize: '14px',
-            fontWeight: '400',
-            marginBottom: '4px',
-            color: '#fff'
-          }}>
+        <div className="mb-4 rounded-2xl border border-white/10 bg-[#0c0c11] p-5 leading-relaxed">
+          <div className="text-base font-semibold text-white">
             {artistProfile?.name || t('manageArtist.artistName')}
           </div>
-
-          {/* Location */}
           {artistProfile?.location && (
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '400',
-              color: '#888',
-              marginBottom: '4px'
-            }}>
-              {artistProfile.location}
-            </div>
+            <div className="mt-0.5 text-sm text-white/45">{artistProfile.location}</div>
           )}
-
-          {/* Role */}
           {artistProfile?.role && (
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '400',
-              color: '#e0e0e0',
-              marginBottom: '4px'
-            }}>
+            <div className="mt-2 inline-block rounded-full border border-role-artist/60 px-2.5 py-0.5 text-[10px] font-tech uppercase tracking-[0.15em] text-role-artist">
               {artistProfile.role}
             </div>
           )}
-
-          {/* Genres */}
           {artistProfile?.genres && artistProfile.genres.length > 0 && (
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '400',
-              color: '#888'
-            }}>
-              {artistProfile.genres.join(', ')}
-            </div>
+            <div className="mt-2 text-xs text-white/45">{artistProfile.genres.join(', ')}</div>
           )}
         </div>
 
         {/* Bio Section */}
-        <div className="profile-bio" style={{
-          padding: '20px',
-          marginBottom: '20px',
-          backgroundColor: '#1a1a1a',
-          borderRadius: '8px',
-          lineHeight: '1.6'
-        }}>
-          <p style={{ margin: 0, color: '#e0e0e0' }}>
+        <div className="mb-5 rounded-2xl border border-white/10 bg-[#0c0c11] p-5">
+          <p className="m-0 text-sm leading-relaxed text-white/75">
             {artistProfile?.bio || t('manageArtist.noBioAvailable')}
           </p>
         </div>
@@ -1814,14 +1769,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         {/* Latest Mix */}
         {artistProfile?.mixtape && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
-            <h3 style={{
-              color: '#ff3366',
-              fontSize: '12px',
-              fontWeight: '600',
-              letterSpacing: '1px',
-              marginBottom: '12px',
-              textTransform: 'uppercase'
-            }}>
+            <h3 className="mb-3 text-[11px] font-tech font-semibold uppercase tracking-[0.15em] text-infrared">
               {t('manageArtist.latestMix')}
             </h3>
             <iframe
@@ -1836,14 +1784,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         {/* Spotify Artist */}
         {artistProfile?.role === 'ARTIST' && artistProfile?.spotify && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
-            <h3 style={{
-              color: '#ff3366',
-              fontSize: '12px',
-              fontWeight: '600',
-              letterSpacing: '1px',
-              marginBottom: '12px',
-              textTransform: 'uppercase'
-            }}>
+            <h3 className="mb-3 text-[11px] font-tech font-semibold uppercase tracking-[0.15em] text-infrared">
               {t('manageArtist.spotifyArtistHeading')}
             </h3>
             <iframe

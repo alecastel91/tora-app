@@ -148,13 +148,12 @@
     margin-right: auto;
   }
 
-  /* Profile is the master-detail home base: anchored left with room to
-     breathe; opening a sub-screen (Manage, Edit, Find Agent…) shrinks it
-     into the 400px master column. (.screen repeated to outrank the
-     centered-column rule above.) */
+  /* Profile sits centered like the other screens; opening a sub-screen
+     (Manage, Edit, Find Agent…) shrinks it into the master column. The
+     inline black base is desktop-overridden so the crimson grid ambient
+     shows through — the role-colored bloom stays. */
   .app-content > .tab-panel > .screen.profile-screen {
-    max-width: 560px;
-    margin-left: 0;
+    background-color: transparent !important;
   }
 
   /* Search is the exception: the globe is a full-bleed map… */
@@ -167,13 +166,13 @@
   /* …while the list view is a left-docked column (one name per line);
      clicking a profile opens it as a right-hand pane */
   .search-screen .search-board {
-    max-width: 520px;
-    margin: 0;
+    max-width: 680px;
+    margin: 0 auto;
   }
 
   .search-screen .search-header {
-    max-width: 520px;
-    margin-left: 0;
+    max-width: 680px;
+    margin-left: auto;
     margin-right: auto;
   }
 
@@ -287,12 +286,21 @@
     padding: 24px 32px;
   }
 
-  /* Tour lives left-docked so its create/edit/gigs panes open beside it
-     without anything shifting — sized so screen and pane split the space
-     roughly evenly */
+  /* Tour sits centered like Bookings; opening a create/edit/gigs pane
+     docks it left so the pane has room beside it */
   .app-content > .tab-panel > .screen.tour-screen {
+    max-width: 760px;
+  }
+
+  body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {
     max-width: 480px;
     margin-left: 0;
+    margin-right: auto;
+  }
+
+  /* Messages list breathes like Bookings until a chat docks it */
+  .app-content > .tab-panel > .screen.messages-screen {
+    max-width: 760px;
   }
 
   .md-drawer {
@@ -373,10 +381,6 @@
     width: calc(100% - 280px);
   }
 
-  .app-content > .tab-panel > .screen.profile-screen {
-    max-width: 600px;
-  }
-
   .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
     max-width: 420px;
   }
@@ -386,7 +390,7 @@
     width: min(800px, calc(100vw - 280px - 456px));
   }
 
-  .app-content > .tab-panel > .screen.tour-screen {
+  body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {
     max-width: 560px;
   }
 

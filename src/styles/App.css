@@ -1987,7 +1987,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #000000;
+  background-color: #000000;
+  /* same crimson engineering-grid ambient as the app frame */
+  background-image:
+    radial-gradient(120% 42% at 50% -10%, rgba(255, 51, 102, 0.14), transparent 60%),
+    linear-gradient(to right, rgba(255, 51, 102, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 51, 102, 0.055) 1px, transparent 1px);
+  background-size: auto, 40px 40px, 40px 40px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -5983,7 +5989,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #000000;
+  background-color: #000000;
+  /* same crimson engineering-grid ambient as the app frame */
+  background-image:
+    radial-gradient(120% 42% at 50% -10%, rgba(255, 51, 102, 0.14), transparent 60%),
+    linear-gradient(to right, rgba(255, 51, 102, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 51, 102, 0.055) 1px, transparent 1px);
+  background-size: auto, 40px 40px, 40px 40px;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -9353,6 +9365,11 @@ textarea.form-textarea:focus {
   gap: 10px;
   flex-wrap: nowrap;
   margin-top: 6px; /* breathing room below the event-name line */
+}
+
+/* expanded card: the chip sits above the event title — keep them apart */
+.booking-card.expanded .party-status-row {
+  margin-bottom: 12px;
 }
 
 .booking-card-right-section {
