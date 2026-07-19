@@ -1987,13 +1987,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #000000;
-  /* same crimson engineering-grid ambient as the app frame */
-  background-image:
-    radial-gradient(120% 42% at 50% -10%, rgba(255, 51, 102, 0.18), transparent 60%),
-    linear-gradient(to right, rgba(255, 51, 102, 0.085) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 51, 102, 0.085) 1px, transparent 1px);
-  background-size: auto, 40px 40px, 40px 40px;
+  background: #000000;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -5989,13 +5983,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #000000;
-  /* same crimson engineering-grid ambient as the app frame */
-  background-image:
-    radial-gradient(120% 42% at 50% -10%, rgba(255, 51, 102, 0.18), transparent 60%),
-    linear-gradient(to right, rgba(255, 51, 102, 0.085) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 51, 102, 0.085) 1px, transparent 1px);
-  background-size: auto, 40px 40px, 40px 40px;
+  background: #000000;
   z-index: 1000;
   display: flex;
   flex-direction: column;

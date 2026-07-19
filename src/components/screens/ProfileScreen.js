@@ -11,6 +11,7 @@ import ManageArtistScreen from './ManageArtistScreen';
 import ManageProfileScreen from './ManageProfileScreen';
 import ViewProfileScreen from './ViewProfileScreen';
 import SearchAgentsModal from '../common/SearchAgentsModal';
+import { RA_LOGO_WHITE } from '../../utils/brandAssets';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { downscaleImageToBlob } from '../../utils/image';
@@ -687,8 +688,8 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
               rel="noopener noreferrer"
               className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors"
             >
-              <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[10px] font-bold font-tech">
-                RA
+              <span className="w-9 h-9 rounded-full bg-black border border-white/20 flex items-center justify-center shrink-0">
+                <img src={RA_LOGO_WHITE} alt="RA" className="w-[22px] h-auto" />
               </span>
               <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
               <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
