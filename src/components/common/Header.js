@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import NotificationDropdown from './NotificationDropdown';
-import { BellIcon, GearIcon, StarIcon } from '../../utils/icons';
+import { BellIcon, GearIcon, StarIcon, ShieldIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
 
-const Header = ({ onOpenSettings, onOpenPremium, accountUser, onSwitchTab }) => {
+const Header = ({ onOpenSettings, onOpenPremium, onOpenAchievements, accountUser, onSwitchTab }) => {
   const { notifications, clearNotificationDot, user } = useAppContext();
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotificationDot, setHasNotificationDot] = useState(true);
@@ -66,6 +66,12 @@ const Header = ({ onOpenSettings, onOpenPremium, accountUser, onSwitchTab }) => 
             <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-infrared
                              shadow-[0_0_6px_rgba(255,51,102,0.7)]" />
           )}
+        </button>
+        <button
+          className={iconBtnClasses}
+          onClick={() => onOpenAchievements && onOpenAchievements()}
+        >
+          <ShieldIcon />
         </button>
         <button
           className={`${iconBtnClasses} ${premiumTint}`}

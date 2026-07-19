@@ -24,6 +24,8 @@ import { CURRENCIES } from './utils/currencies';
 import './styles/App.css';
 import './styles/responsive.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
+import AchievementsScreen from './components/screens/AchievementsScreen';
+import InviteFriendsSection from './components/common/InviteFriendsSection';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import { appConfirm } from './utils/dialogs';
@@ -72,6 +74,7 @@ function App() {
     setViewingProfile(null);
     setShowSettings(false);
     setShowPremium(false);
+    setShowAchievements(false);
   };
   useLayoutEffect(() => {
     if (appContentRef.current) {
@@ -107,6 +110,7 @@ function App() {
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const [showSubscription, setShowSubscription] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscriptionStep, setSubscriptionStep] = useState('payment'); // payment, processing, success
@@ -468,6 +472,7 @@ function App() {
         <Header
           onOpenSettings={() => setShowSettings(true)}
           onOpenPremium={() => setShowPremium(true)}
+          onOpenAchievements={() => setShowAchievements(true)}
           accountUser={accountUser}
           onSwitchTab={switchTab}
         />
@@ -509,6 +514,11 @@ function App() {
         )}
         <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} />
         
+        {/* Achievements Screen */}
+        {showAchievements && (
+          <AchievementsScreen onClose={() => setShowAchievements(false)} />
+        )}
+
         {/* Settings Screen */}
         {showSettings && (
           <div className="screen active settings-screen">
@@ -728,6 +738,8 @@ function App() {
                 ))}
               </select>
             </div>
+
+            <InviteFriendsSection />
 
             <div className="settings-section">
               <h3>{t('settingsExtra.emailPreferences')}</h3>

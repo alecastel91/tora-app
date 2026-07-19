@@ -12,6 +12,7 @@ import ManageProfileScreen from './ManageProfileScreen';
 import ViewProfileScreen from './ViewProfileScreen';
 import SearchAgentsModal from '../common/SearchAgentsModal';
 import { RA_LOGO_WHITE } from '../../utils/brandAssets';
+import ProfileBadges from '../common/ProfileBadges';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { downscaleImageToBlob } from '../../utils/image';
@@ -72,6 +73,17 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   const [showManageProfile, setShowManageProfile] = useState(false);
   const [showRepresentedArtists, setShowRepresentedArtists] = useState(false);
   const [showFindAgent, setShowFindAgent] = useState(false);
+  // Own badges come from the enriched GET /profiles/:id payload
+  const [ownBadges, setOwnBadges] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.id) { setOwnBadges(null); return undefined; }
+    apiService.getProfile(user.id)
+      .then((p) => { if (!cancelled) setOwnBadges(p.badges || []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.id]);
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [showLikesList, setShowLikesList] = useState(false);
   const [showLikersList, setShowLikersList] = useState(false);
@@ -409,6 +421,7 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
                          tracking-[0.2em] font-tech ${roleBadgeClasses[user?.role] || 'text-white/70 border-white/20'}`}>
           {roleLabel(user?.role || 'ARTIST', t)}
         </div>
+        <ProfileBadges badges={ownBadges} />
 
         {user?.genres && user.genres.length > 0 && (
           <div className="flex flex-col items-center mt-3">

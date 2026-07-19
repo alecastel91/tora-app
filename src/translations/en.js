@@ -1383,7 +1383,42 @@ const en = {
     resetView: 'Reset view',
     ok: 'OK',
     confirm: 'Confirm',
-  }
+  },
+  badges: {
+    founding: { name: "Founding Member", description: "Joined TORA as one of its founding members — here before everyone else." },
+    yearly: { name: "Yearly Member", description: "Supports TORA with a yearly membership." },
+    gigs: { name: "Gigs Played", description: "Bookings completed through TORA." },
+    events: { name: "Events Hosted", description: "Events hosted and booked through TORA." },
+    closer: { name: "Deals Closed", description: "Bookings closed for represented artists." },
+    globetrotter: { name: "Globetrotter", description: "Countries played through TORA bookings." },
+    connector: { name: "Connector", description: "Accepted connections across the network." },
+    resident: { name: "Residency", description: "Repeat bookings with the same partner — the industry's strongest trust signal." },
+    ambassador: { name: "Ambassador", description: "Friends brought into TORA through personal invitations." },
+    crowd: { name: "Crowd", description: "Likes received from the network." },
+  },
+  achievements: {
+    title: "Achievements",
+    subtitle: "Your badges and progress across the network",
+    earnedCount: "{{earned}} of {{total}} earned",
+    earned: "Earned",
+    locked: "Locked",
+    progressTo: "Next: {{tier}}",
+    maxTier: "Top tier reached",
+  },
+  referrals: {
+    title: "Invite Friends",
+    verifyToUnlock: "Verify your identity to unlock personal invitations.",
+    intro: "You have {{cap}} invitation slots. Redeemed invitations free their slot.",
+    slotsFree: "{{n}} free",
+    emailPlaceholder: "friend@email.com",
+    sendInvite: "Send Invitation",
+    sentConfirm: "Invitation sent",
+    sendFailed: "Could not send the invitation",
+    joinedCount: "{{n}} joined TORA through you",
+    statusPending: "Pending",
+    statusRedeemed: "Joined",
+    statusExpired: "Expired",
+  },
 };
 
 export default en;

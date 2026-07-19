@@ -244,6 +244,31 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async getAchievements(profileId) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/achievements`, {
+      method: 'GET',
+      headers: this.getHeaders()
+    });
+    return this.handleResponse(response);
+  }
+
+  async getMyInvitations() {
+    const response = await fetch(`${API_URL}/invitations/mine`, {
+      method: 'GET',
+      headers: this.getHeaders()
+    });
+    return this.handleResponse(response);
+  }
+
+  async createMyInvitation({ email, role, currentProfileId }) {
+    const response = await fetch(`${API_URL}/invitations/mine`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ email, role, currentProfileId })
+    });
+    return this.handleResponse(response);
+  }
+
   async getProfileReach(profileId) {
     const response = await fetch(`${API_URL}/profiles/${profileId}/reach`, {
       method: 'GET',

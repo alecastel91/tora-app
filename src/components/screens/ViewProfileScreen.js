@@ -5,6 +5,7 @@ import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon, SlashCircl
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
+import ProfileBadges from '../common/ProfileBadges';
 import { useLanguage } from '../../contexts/LanguageContext';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
@@ -371,6 +372,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {roleLabel(profile.role, t)}
             </div>
           </div>
+          <ProfileBadges badges={profile.badges} />
           {profile.genres && profile.genres.length > 0 && (
             <div className="profile-genres-container">
               <div className={`profile-genres overflow-hidden transition-[max-height] duration-300 ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[60px]'}`}>
