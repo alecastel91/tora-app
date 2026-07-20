@@ -24,6 +24,11 @@ const en = {
   },
 
   offer: {
+    paymentDeadlines: "Payment Deadlines",
+    paymentDeadlinesHint: "Optionally propose when the deposit and the final payment are due. The other side can adjust or remove them when countering; they become binding when the offer is accepted.",
+    counterDeadlinesHint: "Adjust or clear the proposed payment deadlines.",
+    depositDeadline: "Deposit due",
+    finalPaymentDeadline: "Final payment due",
     selectArtistError: 'Please select an artist to book',
     venueRequired: 'Venue name is required',
     zoneRequired: 'Zone is required',
@@ -66,6 +71,7 @@ const en = {
   },
 
   bookings: {
+    overdue: "Overdue",
     loadFailed: 'Failed to load bookings',
     deleteOfferFailed: 'Failed to delete offer',
     contractWithdrawnSuccess: 'Contract withdrawn successfully. You can now send a new contract.',
@@ -702,6 +708,7 @@ const en = {
 
   // Navigation
   nav: {
+    news: "News",
     tour: 'Tour',
     profile: 'Profile',
     search: 'Search',
@@ -1419,6 +1426,29 @@ const en = {
     statusPending: "Pending",
     statusRedeemed: "Joined",
     statusExpired: "Expired",
+  },
+  news: {
+    title: "News",
+    composerPlaceholder: "Share an update with the network...",
+    postCta: "Post",
+    empty: "No posts yet — be the first to share news.",
+    loadMore: "Load more",
+    justNow: "just now",
+    minutesAgo: "{{n}}m ago",
+    hoursAgo: "{{n}}h ago",
+    daysAgo: "{{n}}d ago",
+    commentPlaceholder: "Write a comment...",
+    commentCta: "Reply",
+    report: "Report",
+    reportConfirm: "Report this post to the TORA team?",
+    reportThanks: "Thanks — our team will review this post.",
+    deleteConfirm: "Delete this post?",
+    postFailed: "Something went wrong. Try again.",
+    commentFailed: "Could not post the comment.",
+    upgradeToView: "Profiles outside your country are a Premium feature. The feed stays global for everyone.",
+    milestoneRepresentation: "{{agent}} now represents {{artist}} on TORA.",
+    milestoneVerified: "{{name}} ({{role}}, {{city}}) joined the verified TORA network.",
+    milestoneTour: "{{artist}} completed a tour in {{zone}} — {{n}} confirmed shows.",
   },
 };
 

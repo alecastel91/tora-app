@@ -24,6 +24,11 @@ const es = {
   },
 
   offer: {
+    paymentDeadlines: "Plazos de pago",
+    paymentDeadlinesHint: "Propón opcionalmente cuándo vencen el depósito y el pago final. La otra parte puede ajustarlos o eliminarlos al contraofertar; se vuelven vinculantes al aceptar la oferta.",
+    counterDeadlinesHint: "Ajusta o elimina los plazos de pago propuestos.",
+    depositDeadline: "Depósito antes de",
+    finalPaymentDeadline: "Pago final antes de",
     selectArtistError: 'Selecciona un artista para contratar',
     venueRequired: 'El nombre del local es obligatorio',
     zoneRequired: 'La zona es obligatoria',
@@ -66,6 +71,7 @@ const es = {
   },
 
   bookings: {
+    overdue: "Vencido",
     loadFailed: 'No se pudieron cargar las reservas',
     deleteOfferFailed: 'No se pudo eliminar la oferta',
     contractWithdrawnSuccess: 'Contrato retirado. Ahora puedes enviar uno nuevo.',
@@ -701,6 +707,7 @@ const es = {
   },
 
   nav: {
+    news: "Noticias",
     tour: 'Tour',
     profile: 'Perfil',
     search: 'Buscar',
@@ -1407,6 +1414,29 @@ const es = {
     statusPending: "Pendiente",
     statusRedeemed: "Unido",
     statusExpired: "Caducada",
+  },
+  news: {
+    title: "Noticias",
+    composerPlaceholder: "Comparte una novedad con la red...",
+    postCta: "Publicar",
+    empty: "Aún no hay publicaciones: sé el primero en compartir algo.",
+    loadMore: "Cargar más",
+    justNow: "ahora mismo",
+    minutesAgo: "hace {{n}} min",
+    hoursAgo: "hace {{n}} h",
+    daysAgo: "hace {{n}} días",
+    commentPlaceholder: "Escribe un comentario...",
+    commentCta: "Responder",
+    report: "Denunciar",
+    reportConfirm: "¿Denunciar esta publicación al equipo de TORA?",
+    reportThanks: "Gracias: nuestro equipo la revisará.",
+    deleteConfirm: "¿Eliminar esta publicación?",
+    postFailed: "Algo salió mal. Inténtalo de nuevo.",
+    commentFailed: "No se pudo publicar el comentario.",
+    upgradeToView: "Ver perfiles de otros países es una función Premium. El feed sigue siendo global para todos.",
+    milestoneRepresentation: "{{agent}} ahora representa a {{artist}} en TORA.",
+    milestoneVerified: "{{name}} ({{role}}, {{city}}) se unió a la red verificada de TORA.",
+    milestoneTour: "{{artist}} completó una gira por {{zone}}: {{n}} shows confirmados.",
   },
 };
 

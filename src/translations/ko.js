@@ -24,6 +24,11 @@ const ko = {
   },
 
   offer: {
+    paymentDeadlines: "결제 기한",
+    paymentDeadlinesHint: "보증금과 잔금의 기한을 선택적으로 제안할 수 있습니다. 상대방은 카운터 시 조정하거나 삭제할 수 있으며, 오퍼 수락 시 확정됩니다.",
+    counterDeadlinesHint: "제안된 결제 기한을 조정하거나 지웁니다.",
+    depositDeadline: "보증금 기한",
+    finalPaymentDeadline: "잔금 기한",
     selectArtistError: '부킹할 아티스트를 선택해 주세요',
     venueRequired: '베뉴 이름은 필수입니다',
     zoneRequired: '지역은 필수입니다',
@@ -66,6 +71,7 @@ const ko = {
   },
 
   bookings: {
+    overdue: "기한 초과",
     loadFailed: '부킹을 불러오지 못했습니다',
     deleteOfferFailed: '오퍼를 삭제하지 못했습니다',
     contractWithdrawnSuccess: '계약서를 회수했습니다. 이제 새 계약서를 보낼 수 있습니다.',
@@ -701,6 +707,7 @@ const ko = {
   },
 
   nav: {
+    news: "뉴스",
     tour: '투어',
     profile: '프로필',
     search: '검색',
@@ -1407,6 +1414,29 @@ const ko = {
     statusPending: "대기 중",
     statusRedeemed: "합류함",
     statusExpired: "만료됨",
+  },
+  news: {
+    title: "뉴스",
+    composerPlaceholder: "네트워크에 소식을 공유하세요...",
+    postCta: "게시",
+    empty: "아직 게시물이 없습니다 — 첫 소식을 공유해 보세요.",
+    loadMore: "더 보기",
+    justNow: "방금",
+    minutesAgo: "{{n}}분 전",
+    hoursAgo: "{{n}}시간 전",
+    daysAgo: "{{n}}일 전",
+    commentPlaceholder: "댓글 쓰기...",
+    commentCta: "답글",
+    report: "신고",
+    reportConfirm: "이 게시물을 TORA 팀에 신고할까요?",
+    reportThanks: "감사합니다 — 팀에서 검토하겠습니다.",
+    deleteConfirm: "이 게시물을 삭제할까요?",
+    postFailed: "문제가 발생했습니다. 다시 시도해 주세요.",
+    commentFailed: "댓글을 게시하지 못했습니다.",
+    upgradeToView: "다른 국가의 프로필 열람은 프리미엄 기능입니다. 피드는 모두에게 글로벌로 공개됩니다.",
+    milestoneRepresentation: "{{agent}}님이 TORA에서 {{artist}}님을 대리하게 되었습니다.",
+    milestoneVerified: "{{name}}({{role}}, {{city}})님이 인증된 TORA 네트워크에 합류했습니다.",
+    milestoneTour: "{{artist}}님이 {{zone}} 투어를 완료 — 확정 공연 {{n}}회.",
   },
 };
 

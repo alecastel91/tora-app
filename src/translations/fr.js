@@ -24,6 +24,11 @@ const fr = {
   },
 
   offer: {
+    paymentDeadlines: "Échéances de paiement",
+    paymentDeadlinesHint: "Proposez si vous le souhaitez les dates limites de l'acompte et du paiement final. L'autre partie peut les ajuster ou les retirer en contre-offre ; elles deviennent contractuelles à l'acceptation.",
+    counterDeadlinesHint: "Ajustez ou effacez les échéances de paiement proposées.",
+    depositDeadline: "Acompte avant le",
+    finalPaymentDeadline: "Solde avant le",
     selectArtistError: 'Sélectionnez un artiste à booker',
     venueRequired: 'Le nom de la salle est obligatoire',
     zoneRequired: 'La zone est obligatoire',
@@ -66,6 +71,7 @@ const fr = {
   },
 
   bookings: {
+    overdue: "En retard",
     loadFailed: 'Impossible de charger les réservations',
     deleteOfferFailed: "Impossible de supprimer l'offre",
     contractWithdrawnSuccess: 'Contrat retiré. Vous pouvez maintenant en envoyer un nouveau.',
@@ -701,6 +707,7 @@ const fr = {
   },
 
   nav: {
+    news: "Actus",
     tour: 'Tournée',
     profile: 'Profil',
     search: 'Recherche',
@@ -1407,6 +1414,29 @@ const fr = {
     statusPending: "En attente",
     statusRedeemed: "Inscrit",
     statusExpired: "Expirée",
+  },
+  news: {
+    title: "Actus",
+    composerPlaceholder: "Partagez une actu avec le réseau...",
+    postCta: "Publier",
+    empty: "Aucune publication pour le moment — soyez le premier à partager.",
+    loadMore: "Voir plus",
+    justNow: "à l'instant",
+    minutesAgo: "il y a {{n}} min",
+    hoursAgo: "il y a {{n}} h",
+    daysAgo: "il y a {{n}} j",
+    commentPlaceholder: "Écrire un commentaire...",
+    commentCta: "Répondre",
+    report: "Signaler",
+    reportConfirm: "Signaler cette publication à l'équipe TORA ?",
+    reportThanks: "Merci — notre équipe va l’examiner.",
+    deleteConfirm: "Supprimer cette publication ?",
+    postFailed: "Une erreur est survenue. Réessayez.",
+    commentFailed: "Impossible de publier le commentaire.",
+    upgradeToView: "Consulter les profils d'autres pays est une fonction Premium. Le fil reste mondial pour tous.",
+    milestoneRepresentation: "{{agent}} représente désormais {{artist}} sur TORA.",
+    milestoneVerified: "{{name}} ({{role}}, {{city}}) a rejoint le réseau vérifié TORA.",
+    milestoneTour: "{{artist}} a terminé une tournée en {{zone}} — {{n}} dates confirmées.",
   },
 };
 

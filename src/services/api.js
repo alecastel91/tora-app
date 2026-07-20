@@ -269,6 +269,73 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // ---- News feed ----
+  async getFeed({ profileId, cursor } = {}) {
+    const params = new URLSearchParams();
+    if (profileId) params.set('profileId', profileId);
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch(`${API_URL}/posts?${params}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
+  async createPost({ profileId, text }) {
+    const response = await fetch(`${API_URL}/posts`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, text }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async deletePost(postId, profileId) {
+    const response = await fetch(`${API_URL}/posts/${postId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async togglePostLike(postId, profileId) {
+    const response = await fetch(`${API_URL}/posts/${postId}/like`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async getPostComments(postId, { cursor } = {}) {
+    const params = new URLSearchParams();
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch(`${API_URL}/posts/${postId}/comments?${params}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
+  async createPostComment(postId, { profileId, text }) {
+    const response = await fetch(`${API_URL}/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, text }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async reportPost(postId, { profileId, reason }) {
+    const response = await fetch(`${API_URL}/posts/${postId}/report`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, reason }),
+    });
+    return this.handleResponse(response);
+  }
+
   async getProfileReach(profileId) {
     const response = await fetch(`${API_URL}/profiles/${profileId}/reach`, {
       method: 'GET',

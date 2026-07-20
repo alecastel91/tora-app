@@ -7,6 +7,7 @@ import SearchScreen from './components/screens/SearchScreen';
 import TourScreen from './components/screens/TourScreen';
 import BookingsScreen from './components/screens/BookingsScreen';
 import MessagesScreen from './components/screens/MessagesScreen';
+import NewsScreen from './components/screens/NewsScreen';
 import ChatScreen from './components/screens/ChatScreen';
 import ViewProfileScreen from './components/screens/ViewProfileScreen';
 import LoginScreen from './components/screens/LoginScreen';
@@ -90,7 +91,7 @@ function App() {
       return;
     }
     const warmup = setTimeout(
-      () => setMountedTabs(['profile', 'search', 'tour', 'bookings', 'messages']),
+      () => setMountedTabs(['profile', 'search', 'news', 'tour', 'bookings', 'messages']),
       1000
     );
     return () => clearTimeout(warmup);
@@ -392,6 +393,7 @@ function App() {
   const tabScreens = {
     profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
     search: <SearchScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
+    news: <NewsScreen onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
     tour: <TourScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,
     bookings: <BookingsScreen onOpenChat={setActiveChatUser} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} />,
     // chatOpen (not a key remount): MessagesScreen refetches once when a

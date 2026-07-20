@@ -24,6 +24,11 @@ const zh = {
   },
 
   offer: {
+    paymentDeadlines: "付款期限",
+    paymentDeadlinesHint: "可选择提议定金和尾款的截止日期。对方可在还价时调整或删除；报价被接受后生效。",
+    counterDeadlinesHint: "调整或清除提议的付款期限。",
+    depositDeadline: "定金截止",
+    finalPaymentDeadline: "尾款截止",
     selectArtistError: '请选择要预订的艺人',
     venueRequired: '场地名称为必填项',
     zoneRequired: '地区为必填项',
@@ -66,6 +71,7 @@ const zh = {
   },
 
   bookings: {
+    overdue: "已逾期",
     loadFailed: '无法加载预订',
     deleteOfferFailed: '无法删除报价',
     contractWithdrawnSuccess: '合同已撤回。现在可以发送新的合同。',
@@ -701,6 +707,7 @@ const zh = {
   },
 
   nav: {
+    news: "动态",
     tour: '巡演',
     profile: '档案',
     search: '搜索',
@@ -1407,6 +1414,29 @@ const zh = {
     statusPending: "待使用",
     statusRedeemed: "已加入",
     statusExpired: "已过期",
+  },
+  news: {
+    title: "动态",
+    composerPlaceholder: "与网络分享动态...",
+    postCta: "发布",
+    empty: "还没有帖子——来分享第一条动态吧。",
+    loadMore: "加载更多",
+    justNow: "刚刚",
+    minutesAgo: "{{n}}分钟前",
+    hoursAgo: "{{n}}小时前",
+    daysAgo: "{{n}}天前",
+    commentPlaceholder: "写评论...",
+    commentCta: "回复",
+    report: "举报",
+    reportConfirm: "向TORA团队举报此帖？",
+    reportThanks: "感谢——我们的团队会进行审核。",
+    deleteConfirm: "删除此帖？",
+    postFailed: "出错了，请重试。",
+    commentFailed: "评论发布失败。",
+    upgradeToView: "查看其他国家的档案是高级功能。动态本身对所有人全球可见。",
+    milestoneRepresentation: "{{agent}}现在在TORA上代理{{artist}}。",
+    milestoneVerified: "{{name}}（{{role}}，{{city}}）加入了TORA认证网络。",
+    milestoneTour: "{{artist}}完成了{{zone}}巡演——确认{{n}}场演出。",
   },
 };
 

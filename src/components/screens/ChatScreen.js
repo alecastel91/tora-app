@@ -47,6 +47,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     fee: '',
     currency: 'USD',
     extras: {},
+    depositDeadline: '',
+    finalPaymentDeadline: '',
     notes: ''
   });
   const [showDocumentPicker, setShowDocumentPicker] = useState(false);
@@ -442,10 +444,15 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     }
 
     // Pre-fill review form with current offer values
+    const lastEntry = (selectedOffer.offerHistory || [])[
+      (selectedOffer.offerHistory || []).length - 1
+    ] || {};
     const newReviewData = {
       fee: selectedOffer.currentFee || '',
       currency: selectedOffer.currency || 'USD',
       extras: selectedOffer.extras || {},
+      depositDeadline: lastEntry.depositDeadline || '',
+      finalPaymentDeadline: lastEntry.finalPaymentDeadline || '',
       notes: ''
     };
     console.log('Setting review data:', newReviewData);
@@ -576,12 +583,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     }
 
     // Open review modal with counter-offer data pre-filled
-    setReviewData({
+    setReviewData((prev) => ({
       fee: counterOfferData.fee.replace(/,/g, ''),
       currency: counterOfferData.currency,
       extras: counterOfferData.extras,
+      depositDeadline: prev.depositDeadline || '',
+      finalPaymentDeadline: prev.finalPaymentDeadline || '',
       notes: ''
-    });
+    }));
     setShowCounterOfferDetails(false);
     setShowReviewModal(true);
   };
@@ -676,12 +685,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
         fee: feeValue,
         currency: reviewData.currency,
         additionalTerms: Object.keys(extras).length > 0 ? JSON.stringify(extras) : null,
+        depositDeadline: reviewData.depositDeadline || null,
+        finalPaymentDeadline: reviewData.finalPaymentDeadline || null,
         notes: reviewData.notes || null
       });
 
       setShowReviewModal(false);
       setShowOfferDetails(false);
-      setReviewData({ fee: '', currency: 'USD', extras: {}, notes: '' });
+      setReviewData({ fee: '', currency: 'USD', extras: {}, depositDeadline: '', finalPaymentDeadline: '', notes: '' });
 
       fetchMessages();
     } catch (error) {
@@ -2267,6 +2278,31 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           className="extra-note-input"
                         />
                       )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>{t('offer.paymentDeadlines')}</label>
+                  <p className="m-0 mb-2 text-xs leading-relaxed text-white/45">{t('offer.counterDeadlinesHint')}</p>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>{t('offer.depositDeadline')}</label>
+                      <input
+                        type="date"
+                        value={reviewData.depositDeadline || ''}
+                        onChange={(e) => setReviewData({ ...reviewData, depositDeadline: e.target.value })}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>{t('offer.finalPaymentDeadline')}</label>
+                      <input
+                        type="date"
+                        value={reviewData.finalPaymentDeadline || ''}
+                        onChange={(e) => setReviewData({ ...reviewData, finalPaymentDeadline: e.target.value })}
+                        className="form-input"
+                      />
                     </div>
                   </div>
                 </div>

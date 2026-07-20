@@ -30,6 +30,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
     performanceType: 'DJ Set',
     setStartTime: '',
     setEndTime: '',
+    depositDeadline: '',
+    finalPaymentDeadline: '',
     notes: '',
     selectedArtistId: '',
     selectedArtistName: '',
@@ -236,6 +238,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
         performanceType: formData.performanceType,
         setDuration: setDuration,
         extras: Object.keys(extras).length > 0 ? extras : undefined,
+        depositDeadline: formData.depositDeadline || undefined,
+        finalPaymentDeadline: formData.finalPaymentDeadline || undefined,
         notes: formData.notes,
         artistId: formData.selectedArtistId || undefined,
         artistName: formData.selectedArtistName || undefined
@@ -267,6 +271,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
         performanceType: 'DJ Set',
         setStartTime: '',
         setEndTime: '',
+        depositDeadline: '',
+        finalPaymentDeadline: '',
         notes: '',
         selectedArtistId: '',
         selectedArtistName: '',
@@ -652,6 +658,33 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
                 }}>
                   {setDuration > 0 ? t('offer.durationMinutes', { n: setDuration }) : '--'}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h4>{t('offer.paymentDeadlines')}</h4>
+            <p className="m-0 mb-2.5 text-xs leading-relaxed text-white/45">
+              {t('offer.paymentDeadlinesHint')}
+            </p>
+            <div className="form-row">
+              <div className="form-group">
+                <label>{t('offer.depositDeadline')}</label>
+                <input
+                  type="date"
+                  value={formData.depositDeadline}
+                  onChange={(e) => handleChange('depositDeadline', e.target.value)}
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>{t('offer.finalPaymentDeadline')}</label>
+                <input
+                  type="date"
+                  value={formData.finalPaymentDeadline}
+                  onChange={(e) => handleChange('finalPaymentDeadline', e.target.value)}
+                  className="form-input"
+                />
               </div>
             </div>
           </div>

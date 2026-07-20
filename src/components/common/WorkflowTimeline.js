@@ -156,6 +156,38 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
         </div>
       )}
 
+        {/* Agreed payment deadlines (become binding on accept). Overdue =
+            past the date with the corresponding amount still unconfirmed. */}
+        {(deal.payment?.depositDeadline || deal.payment?.finalPaymentDeadline) && (() => {
+          const today = new Date().toISOString().slice(0, 10);
+          const rows = [];
+          if (deal.payment.depositDeadline) {
+            const overdue = deal.payment.depositDeadline < today && confirmedDeposit <= 0;
+            rows.push({ key: 'deposit', label: t('offer.depositDeadline'), date: deal.payment.depositDeadline, overdue });
+          }
+          if (deal.payment.finalPaymentDeadline) {
+            const overdue = deal.payment.finalPaymentDeadline < today && remaining > 0;
+            rows.push({ key: 'final', label: t('offer.finalPaymentDeadline'), date: deal.payment.finalPaymentDeadline, overdue });
+          }
+          return (
+            <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '8px', fontSize: '11px' }}>
+              {rows.map((r) => (
+                <span
+                  key={r.key}
+                  style={{
+                    padding: '3px 8px', borderRadius: '99px',
+                    border: `1px solid ${r.overdue ? 'rgba(255,51,102,0.6)' : 'rgba(255,255,255,0.14)'}`,
+                    color: r.overdue ? '#FF3366' : 'rgba(255,255,255,0.6)',
+                  }}
+                >
+                  {r.label}: {new Date(r.date + 'T00:00:00Z').toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}
+                  {r.overdue ? ` · ${t('bookings.overdue')}` : ''}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
+
       {/* Progress caption */}
       <div className="text-center mt-3.5">
         {completedSteps === steps.length ? (

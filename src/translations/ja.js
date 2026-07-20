@@ -24,6 +24,11 @@ const ja = {
   },
 
   offer: {
+    paymentDeadlines: "支払い期限",
+    paymentDeadlinesHint: "デポジットと最終支払いの期限を任意で提案できます。相手はカウンター時に変更・削除でき、オファー成立時に確定します。",
+    counterDeadlinesHint: "提案された支払い期限を調整またはクリアします。",
+    depositDeadline: "デポジット期限",
+    finalPaymentDeadline: "最終支払い期限",
     selectArtistError: 'ブッキングするアーティストを選択してください',
     venueRequired: '会場名は必須です',
     zoneRequired: 'ゾーンは必須です',
@@ -66,6 +71,7 @@ const ja = {
   },
 
   bookings: {
+    overdue: "期限超過",
     loadFailed: '予約の読み込みに失敗しました',
     deleteOfferFailed: 'オファーの削除に失敗しました',
     contractWithdrawnSuccess: '契約書を取り下げました。新しい契約書を送付できます。',
@@ -701,6 +707,7 @@ const ja = {
   },
 
   nav: {
+    news: "ニュース",
     tour: 'ツアー',
     profile: 'プロフィール',
     search: '検索',
@@ -1407,6 +1414,29 @@ const ja = {
     statusPending: "保留中",
     statusRedeemed: "参加済み",
     statusExpired: "期限切れ",
+  },
+  news: {
+    title: "ニュース",
+    composerPlaceholder: "ネットワークに近況をシェア...",
+    postCta: "投稿",
+    empty: "まだ投稿がありません — 最初のニュースをシェアしましょう。",
+    loadMore: "もっと見る",
+    justNow: "たった今",
+    minutesAgo: "{{n}}分前",
+    hoursAgo: "{{n}}時間前",
+    daysAgo: "{{n}}日前",
+    commentPlaceholder: "コメントを書く...",
+    commentCta: "返信",
+    report: "報告",
+    reportConfirm: "この投稿をTORAチームに報告しますか？",
+    reportThanks: "ありがとうございます — チームが確認します。",
+    deleteConfirm: "この投稿を削除しますか？",
+    postFailed: "エラーが発生しました。もう一度お試しください。",
+    commentFailed: "コメントを投稿できませんでした。",
+    upgradeToView: "国外のプロフィール閲覧はプレミアム機能です。フィード自体は全員グローバルに見られます。",
+    milestoneRepresentation: "{{agent}}がTORAで{{artist}}のエージェントになりました。",
+    milestoneVerified: "{{name}}（{{role}}・{{city}}）が認証済みTORAネットワークに参加しました。",
+    milestoneTour: "{{artist}}が{{zone}}ツアーを完走 — 確定{{n}}公演。",
   },
 };
 

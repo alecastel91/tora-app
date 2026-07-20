@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon } from '../../utils/icons';
+import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon, NewsIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 import CountBadge from './CountBadge';
 
@@ -9,6 +9,7 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
   const tabs = [
     { id: 'profile', icon: ProfileIcon, label: t('nav.profile') },
     { id: 'search', icon: SearchIcon, label: t('nav.search') },
+    { id: 'news', icon: NewsIcon, label: t('nav.news') },
     { id: 'tour', icon: PlaneIcon, label: t('nav.tour') },
     { id: 'bookings', icon: BookingsIcon, label: t('nav.bookings') },
     { id: 'messages', icon: MessageIcon, label: t('nav.messages') }
