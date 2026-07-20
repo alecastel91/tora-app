@@ -226,9 +226,10 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
       {(posts || []).map((post) => {
         const m = milestone(post);
         const isOwn = post.author?.id === user?.id;
+        const official = !!post.author?.isOfficial;
         const thread = openComments[post.id];
         return (
-          <div key={post.id} className="mb-3 rounded-2xl border border-white/10 bg-[#0c0c11] p-4">
+          <div key={post.id} className={`mb-3 rounded-2xl border bg-[#0c0c11] p-4 ${official ? 'border-infrared/40' : 'border-white/10'}`}>
             {/* header */}
             <div className="flex items-start gap-3">
               <Avatar profile={post.author} onClick={() => openAuthor(post.author)} />
@@ -240,10 +241,16 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                   >
                     {post.author?.name}
                   </button>
-                  <span className="shrink-0 text-[10px] font-tech uppercase tracking-[0.12em]"
-                        style={{ color: `var(--color-role-${(post.author?.role || 'artist').toLowerCase()}, #fff)` }}>
-                    {t(ROLE_LABEL_KEY[post.author?.role] || 'editProfile.artist')}
-                  </span>
+                  {official ? (
+                    <span className="shrink-0 rounded-full border border-infrared/60 bg-infrared/10 px-2 py-0.5 text-[9px] font-tech uppercase tracking-[0.15em] text-infrared">
+                      {t('news.official')}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 text-[10px] font-tech uppercase tracking-[0.12em]"
+                          style={{ color: `var(--color-role-${(post.author?.role || 'artist').toLowerCase()}, #fff)` }}>
+                      {t(ROLE_LABEL_KEY[post.author?.role] || 'editProfile.artist')}
+                    </span>
+                  )}
                 </div>
                 <div className="text-[11px] text-white/35">
                   {[post.author?.city, post.author?.country].filter(Boolean).join(', ')} · {relativeTime(post.createdAt, t)}

@@ -1416,6 +1416,7 @@ const zh = {
     statusExpired: "已过期",
   },
   news: {
+    official: "TORA · 官方",
     title: "动态",
     composerPlaceholder: "与网络分享动态...",
     postCta: "发布",

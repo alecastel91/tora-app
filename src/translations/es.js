@@ -1416,6 +1416,7 @@ const es = {
     statusExpired: "Caducada",
   },
   news: {
+    official: "TORA · Oficial",
     title: "Noticias",
     composerPlaceholder: "Comparte una novedad con la red...",
     postCta: "Publicar",

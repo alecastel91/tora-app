@@ -1416,6 +1416,7 @@ const ko = {
     statusExpired: "만료됨",
   },
   news: {
+    official: "TORA · 공식",
     title: "뉴스",
     composerPlaceholder: "네트워크에 소식을 공유하세요...",
     postCta: "게시",

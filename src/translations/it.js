@@ -1416,6 +1416,7 @@ const it = {
     statusExpired: "Scaduto",
   },
   news: {
+    official: "TORA · Ufficiale",
     title: "News",
     composerPlaceholder: "Condividi un aggiornamento con il network...",
     postCta: "Pubblica",

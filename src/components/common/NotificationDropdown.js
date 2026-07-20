@@ -23,6 +23,9 @@ const TYPE_TO_TAB = {
   NEW_MESSAGE: 'messages',
   // Yearly travel alerts: a liked artist scheduled travel to your city.
   TRAVEL_ALERT: 'search',
+  // News feed
+  CONNECTION_POSTED: 'news',
+  OFFICIAL_POST: 'news',
 };
 
 const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) => {
