@@ -458,7 +458,10 @@
    list visible on the left. The form sits in a centered column inside it. */
 @media (min-width: 1024px) {
   .make-offer-modal-overlay {
-    top: 57px;
+    /* Cover from the very top like the chat conversation it replaces — the
+       overlay (z-2000) sits above the open chat (z-1000), so no chat header
+       or body bleeds through above/behind it. */
+    top: 0;
     left: calc(240px + 436px);
     right: 0;
     bottom: 0;
