@@ -204,6 +204,10 @@ const pt = {
   },
 
   chat: {
+    counterChangedLegend: "Os valores destacados mudaram em relação à oferta anterior.",
+    unskipContract: "Restaurar etapa do contrato",
+    unskipContractConfirm: "Reabrir a etapa do contrato? Será necessário enviar e assinar um contrato para esta reserva. Documentos e pagamentos já registrados permanecem como estão.",
+    failedToUnskipContract: "Não foi possível reabrir a etapa do contrato",
     failedToSendDocument: 'Não foi possível enviar o documento. Tenta novamente.',
     fileTooLarge: 'O ficheiro tem de ter 10 MB ou menos.',
     failedToUploadFile: 'Não foi possível carregar o ficheiro. Tenta novamente.',

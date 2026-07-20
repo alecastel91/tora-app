@@ -204,6 +204,10 @@ const it = {
   },
 
   chat: {
+    counterChangedLegend: "I valori evidenziati sono cambiati rispetto all’offerta precedente.",
+    unskipContract: "Ripristina fase contratto",
+    unskipContractConfirm: "Riaprire la fase del contratto? Sarà necessario inviare e firmare un contratto per questa prenotazione. Documenti e pagamenti già registrati restano invariati.",
+    failedToUnskipContract: "Impossibile riaprire la fase del contratto",
     failedToSendDocument: 'Invio del documento non riuscito. Riprova.',
     fileTooLarge: 'Il file deve essere di massimo 10 MB.',
     failedToUploadFile: 'Caricamento del file non riuscito. Riprova.',

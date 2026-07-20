@@ -204,6 +204,10 @@ const ko = {
   },
 
   chat: {
+    counterChangedLegend: "강조된 값은 이전 오퍼에서 변경된 항목입니다.",
+    unskipContract: "계약 단계 복원",
+    unskipContractConfirm: "계약 단계를 다시 여시겠습니까? 이 예약에는 계약서 전송과 서명이 필요합니다. 이미 기록된 문서와 결제는 그대로 유지됩니다.",
+    failedToUnskipContract: "계약 단계를 다시 열 수 없습니다",
     failedToSendDocument: '문서를 보내지 못했습니다. 다시 시도해 주세요.',
     fileTooLarge: '파일은 10MB 이하여야 합니다.',
     failedToUploadFile: '파일을 업로드하지 못했습니다. 다시 시도해 주세요.',

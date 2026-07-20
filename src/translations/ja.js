@@ -204,6 +204,10 @@ const ja = {
   },
 
   chat: {
+    counterChangedLegend: "ハイライトされた項目は前回のオファーから変更されています。",
+    unskipContract: "契約ステップを再開",
+    unskipContractConfirm: "契約ステップを再開しますか？このブッキングには契約書の送付と署名が必要になります。すでに記録された書類や支払いはそのまま残ります。",
+    failedToUnskipContract: "契約ステップを再開できませんでした",
     failedToSendDocument: '書類の送信に失敗しました。もう一度お試しください。',
     fileTooLarge: 'ファイルは10MB以下にしてください。',
     failedToUploadFile: 'ファイルのアップロードに失敗しました。もう一度お試しください。',

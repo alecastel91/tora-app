@@ -897,6 +897,35 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                   </button>
                 )}
 
+                {/* Reopen a skipped contract — artist-side only, before the
+                    booking is completed. Undoes an accidental skip so a real
+                    contract can be sent; documents and payment stay intact. */}
+                {deal.contract?.skipped === true && deal.status !== 'COMPLETED' && isArtistSideForDeal(deal, currentUser) && (
+                  <button
+                    className="btn btn-outline"
+                    disabled={actionBusy}
+                    onClick={async () => {
+                      if (actionBusy) return;
+                      if (!(await appConfirm(t('chat.unskipContractConfirm')))) return;
+                      setActionBusy(true);
+                      try {
+                        await apiService.unskipContract(deal.id, currentUser.id);
+                        fetchDeals();
+                      } catch (err) {
+                        appAlert(err.message || t('chat.failedToUnskipContract'));
+                      } finally {
+                        setActionBusy(false);
+                      }
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 7v6h6"></path>
+                      <path d="M21 17a9 9 0 0 0-15-6.7L3 13"></path>
+                    </svg>
+                    {t('chat.unskipContract')}
+                  </button>
+                )}
+
                 {/* Document Sharing — artist-side only. Stays visible after
                     everything is shared/skipped so the artist can revisit. */}
                 {deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (

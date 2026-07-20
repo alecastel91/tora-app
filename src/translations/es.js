@@ -204,6 +204,10 @@ const es = {
   },
 
   chat: {
+    counterChangedLegend: "Los valores resaltados cambiaron respecto a la oferta anterior.",
+    unskipContract: "Restaurar paso del contrato",
+    unskipContractConfirm: "¿Reabrir el paso del contrato? Habrá que enviar y firmar un contrato para esta reserva. Los documentos y pagos ya registrados se mantienen.",
+    failedToUnskipContract: "No se pudo reabrir el paso del contrato",
     failedToSendDocument: 'No se pudo enviar el documento. Inténtalo de nuevo.',
     fileTooLarge: 'El archivo debe ser de 10 MB o menos.',
     failedToUploadFile: 'No se pudo subir el archivo. Inténtalo de nuevo.',

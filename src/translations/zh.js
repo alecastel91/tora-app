@@ -204,6 +204,10 @@ const zh = {
   },
 
   chat: {
+    counterChangedLegend: "高亮显示的数值与上一次报价不同。",
+    unskipContract: "恢复合同步骤",
+    unskipContractConfirm: "重新打开合同步骤？此预订将需要发送并签署合同。已记录的文件和付款将保持不变。",
+    failedToUnskipContract: "无法重新打开合同步骤",
     failedToSendDocument: '文件发送失败。请重试。',
     fileTooLarge: '文件不能超过10 MB。',
     failedToUploadFile: '文件上传失败。请重试。',

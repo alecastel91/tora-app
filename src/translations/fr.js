@@ -204,6 +204,10 @@ const fr = {
   },
 
   chat: {
+    counterChangedLegend: "Les valeurs surlignées ont changé par rapport à l’offre précédente.",
+    unskipContract: "Rétablir l’étape du contrat",
+    unskipContractConfirm: "Rouvrir l’étape du contrat ? Un contrat devra être envoyé et signé pour cette réservation. Les documents et paiements déjà enregistrés restent inchangés.",
+    failedToUnskipContract: "Impossible de rouvrir l’étape du contrat",
     failedToSendDocument: "Échec de l'envoi du document. Réessayez.",
     fileTooLarge: 'Le fichier doit faire 10 Mo ou moins.',
     failedToUploadFile: 'Échec du téléversement du fichier. Réessayez.',

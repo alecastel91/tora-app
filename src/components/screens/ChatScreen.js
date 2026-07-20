@@ -2368,63 +2368,59 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             </div>
             <div className="modal-body">
               <div className="offer-detail-section">
-                <div className="offer-detail-row">
-                  <span className="detail-label">{t('chat.feeLabel')}</span>
-                  <span className="detail-value offer-fee" style={counterHighlight('fee')}>
-                    {counterOfferData.fee} {counterOfferData.currency}
-                  </span>
-                </div>
-                {counterOfferData.extras && Object.keys(counterOfferData.extras).length > 0 && (
-                  <div className="offer-detail-row">
-                    <span className="detail-label">{t('chat.extrasLabel')}</span>
-                    <div className="detail-value extras-list" style={counterHighlight('extras')}>
-                      {Object.entries(counterOfferData.extras).map(([key, value]) => (
-                        <div key={key} className="extra-item-row">
-                          <span className="extra-tick">✓</span>
-                          <span className="extra-name">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                          {value && value !== 'Included' && value !== true && (
-                            <span className="extra-note-inline">{value}</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {counterOfferData.notes && (
-                  <div className="offer-detail-row">
-                    <span className="detail-label">{t('chat.notesLabel')}</span>
-                    <span className="detail-value" style={counterHighlight('notes')}>{counterOfferData.notes}</span>
-                  </div>
-                )}
                 {(() => {
-                  if (!counterOfferDeal) return null;
-                  const history = counterOfferDeal.offerHistory || [];
+                  const history = counterOfferDeal?.offerHistory || [];
                   const entry = history[history.length - 1] || {};
+                  const deal = counterOfferDeal;
                   const dateFmt = (d) => new Date(d + 'T00:00:00Z').toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+                  const anyChanged = ['fee', 'performanceType', 'setDuration', 'depositDeadline', 'finalPaymentDeadline', 'technicalRequirements', 'notes', 'extras'].some((f) => isCounterChanged(f));
                   return (
                     <>
-                      {counterOfferDeal.eventName && (
+                      {/* Same field order as the original offer details */}
+                      {deal?.eventName && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.eventName')}</span>
-                          <span className="detail-value">{counterOfferDeal.eventName}</span>
+                          <span className="detail-value">{deal.eventName}</span>
                         </div>
                       )}
-                      {counterOfferDeal.date && (
+                      {deal?.date && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('tour.date')}</span>
-                          <span className="detail-value">{new Date(counterOfferDeal.date).toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}</span>
+                          <span className="detail-value">{new Date(deal.date).toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}</span>
                         </div>
                       )}
-                      {(entry.performanceType || counterOfferDeal.performanceType) && (
+                      {(entry.performanceType || deal?.performanceType) && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.performanceType')}</span>
-                          <span className="detail-value" style={counterHighlight('performanceType')}>{entry.performanceType || counterOfferDeal.performanceType}</span>
+                          <span className="detail-value" style={counterHighlight('performanceType')}>{entry.performanceType || deal.performanceType}</span>
                         </div>
                       )}
-                      {(entry.setDuration || counterOfferDeal.setDuration) && (
+                      {(entry.setDuration || deal?.setDuration) && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.setDuration')}</span>
-                          <span className="detail-value" style={counterHighlight('setDuration')}>{t('offer.durationMinutes', { n: entry.setDuration || counterOfferDeal.setDuration })}</span>
+                          <span className="detail-value" style={counterHighlight('setDuration')}>{t('offer.durationMinutes', { n: entry.setDuration || deal.setDuration })}</span>
+                        </div>
+                      )}
+                      <div className="offer-detail-row">
+                        <span className="detail-label">{t('chat.feeLabel')}</span>
+                        <span className="detail-value offer-fee" style={counterHighlight('fee')}>
+                          {counterOfferData.fee} {counterOfferData.currency}
+                        </span>
+                      </div>
+                      {counterOfferData.extras && Object.keys(counterOfferData.extras).length > 0 && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('chat.extrasLabel')}</span>
+                          <div className="detail-value extras-list" style={counterHighlight('extras')}>
+                            {Object.entries(counterOfferData.extras).map(([key, value]) => (
+                              <div key={key} className="extra-item-row">
+                                <span className="extra-tick">✓</span>
+                                <span className="extra-name">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                {value && value !== 'Included' && value !== true && (
+                                  <span className="extra-note-inline">{value}</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                       {entry.depositDeadline && (
@@ -2444,6 +2440,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                           <span className="detail-label">{t('chat.technicalLabel')}</span>
                           <span className="detail-value" style={counterHighlight('technicalRequirements')}>{entry.technicalRequirements}</span>
                         </div>
+                      )}
+                      {counterOfferData.notes && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('chat.notesLabel')}</span>
+                          <span className="detail-value" style={counterHighlight('notes')}>{counterOfferData.notes}</span>
+                        </div>
+                      )}
+                      {anyChanged && (
+                        <p className="counter-change-legend">
+                          <span className="counter-change-dot" /> {t('chat.counterChangedLegend')}
+                        </p>
                       )}
                     </>
                   );

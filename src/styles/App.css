@@ -8734,19 +8734,20 @@
 /* Make Offer Modal */
 .make-offer-modal-overlay {
   position: fixed;
-  /* between the sticky app header and the tab bar — both paint above this
-     overlay's stacking context, which buried the back arrow and clipped the
-     bottom CTAs when it spanned the full viewport */
-  top: 57px;
-  left: 0;
-  right: 0;
-  bottom: 53px;
+  /* Full screen on mobile — the overlay (z-2000) paints above the app
+     header and tab bar (z-100), so it reads as its own page with no chrome
+     bleeding through behind it. Desktop docking is set in responsive.css. */
+  inset: 0;
   background: #000000;
   z-index: 2000;
   display: flex;
   align-items: stretch;
   justify-content: center;
   padding: 0;
+}
+
+.make-offer-header {
+  padding-top: max(20px, env(safe-area-inset-top, 20px));
 }
 
 .make-offer-modal {
@@ -13259,4 +13260,24 @@ textarea.form-textarea:focus {
 
 .review-modal .extra-note-input::placeholder {
   color: rgba(255, 255, 255, 0.3);
+}
+
+/* Counter-offer change legend: explains the yellow highlight */
+.counter-change-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.counter-change-legend .counter-change-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #FFC107;
+  flex-shrink: 0;
 }

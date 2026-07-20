@@ -204,6 +204,10 @@ const en = {
   },
 
   chat: {
+    counterChangedLegend: "Highlighted values changed from the previous offer.",
+    unskipContract: "Restore Contract Step",
+    unskipContractConfirm: "Reopen the contract step? A contract will need to be sent and signed for this booking. Documents and payments already recorded stay as they are.",
+    failedToUnskipContract: "Could not reopen the contract step",
     failedToSendDocument: 'Failed to send document. Please try again.',
     fileTooLarge: 'File must be 10 MB or smaller.',
     failedToUploadFile: 'Failed to upload file. Please try again.',

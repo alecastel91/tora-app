@@ -842,6 +842,16 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async unskipContract(dealId, profileId) {
+    const response = await fetch(`${API_URL}/deals/${dealId}/unskip-contract`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId })
+    });
+
+    return this.handleResponse(response);
+  }
+
   async withdrawContract(dealId, profileId) {
     const response = await fetch(`${API_URL}/deals/${dealId}/withdraw-contract`, {
       method: 'PUT',
