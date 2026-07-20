@@ -4,7 +4,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { getAvatarClass } from '../../utils/roles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import { HeartIcon, MessageIcon, ShieldIcon, PlaneIcon, HandshakeIcon, ImageIcon, CloseIcon } from '../../utils/icons';
+import { HeartIcon, MessageIcon, PlaneIcon, HandshakeIcon, ImageIcon, CloseIcon } from '../../utils/icons';
 import { downscaleImageToDataUrl } from '../../utils/image';
 
 const ROLE_LABEL_KEY = { ARTIST: 'editProfile.artist', AGENT: 'editProfile.agent', PROMOTER: 'editProfile.promoter', VENUE: 'editProfile.venue' };
@@ -252,8 +252,6 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     switch (post.type) {
       case 'REPRESENTATION':
         return { icon: <HandshakeIcon />, text: t('news.milestoneRepresentation', { agent: d.agentName, artist: d.artistName }) };
-      case 'MEMBER_VERIFIED':
-        return { icon: <ShieldIcon />, text: t('news.milestoneVerified', { name: d.name, role: t(ROLE_LABEL_KEY[d.role] || 'editProfile.artist'), city: d.city }) };
       case 'TOUR_COMPLETED':
         return { icon: <PlaneIcon />, text: t('news.milestoneTour', { artist: d.artistName, zone: d.country || d.zone, n: d.confirmedGigs }) };
       default:
