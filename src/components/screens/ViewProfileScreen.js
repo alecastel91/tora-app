@@ -310,6 +310,53 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     return roleClasses[role] || 'role-badge';
   };
   
+  // Official TORA account: an out-of-scope admin profile. No geography, no
+  // role, no like/connect/message surface, no counters — just identity + bio.
+  if (profile.isOfficial) {
+    return (
+      <div className="screen active view-profile-screen relative">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('common.back')}
+          className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
+                     flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div className="view-profile-content relative isolate">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-5 -top-5 h-64 -z-10"
+            style={{ background: 'radial-gradient(60% 100% at 50% 0%, rgba(255,51,102,0.14), transparent 70%)' }}
+          />
+          <div className="profile-header">
+            <div className="profile-avatar-container">
+              <div className="profile-avatar !border-infrared/40">
+                {profile.avatar ? <img src={profile.avatar} alt={profile.name} /> : 'T'}
+              </div>
+            </div>
+            <div className="profile-name-role-container">
+              <h2 className="profile-name">{profile.name}</h2>
+            </div>
+            <div className="profile-role-centered mt-2">
+              <span className="rounded-full border border-infrared/60 bg-infrared/10 px-3 py-1 text-[10px] font-tech uppercase tracking-[0.15em] text-infrared">
+                {t('news.official')}
+              </span>
+            </div>
+          </div>
+          {profile.bio && (
+            <div className="mx-auto mt-6 max-w-md rounded-2xl border border-white/10 bg-[#0c0c11] p-5">
+              <p className="m-0 whitespace-pre-wrap text-sm leading-relaxed text-white/75">{profile.bio}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="screen active view-profile-screen relative">
       {/* Floating back arrow — no header bar, the page starts at the avatar */}

@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
-import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
+import CitySearch from './CitySearch';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
@@ -68,6 +68,16 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
     fetchRepresentedArtists();
   }, [isOpen, recipientProfile]);
 
+  // A venue making an offer IS the venue — prefill their name (promoters
+  // book many rooms, so they keep typing it). Must run above the early
+  // return: hooks can never sit after a conditional return.
+  useEffect(() => {
+    if (isOpen && currentUser.role === 'VENUE') {
+      setFormData((prev) => (prev.venueName ? prev : { ...prev, venueName: currentUser.name }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleChange = (field, value) => {
@@ -85,32 +95,6 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
   };
 
   // Cascading dropdown handlers for location
-  const handleZoneChange = (zone) => {
-    setFormData({
-      ...formData,
-      zone,
-      country: '', // Reset country when zone changes
-      city: ''     // Reset city when zone changes
-    });
-  };
-
-  const handleCountryChange = (country) => {
-    setFormData({
-      ...formData,
-      country,
-      city: '' // Reset city when country changes
-    });
-  };
-
-  const handleCityChange = (city) => {
-    setFormData({ ...formData, city });
-  };
-
-  // Get available countries based on selected zone
-  const availableCountries = formData.zone ? countriesByZone[formData.zone] || [] : [];
-
-  // Get available cities based on selected country
-  const availableCities = formData.country ? citiesByCountry[formData.country] || [] : [];
 
   // Calculate set duration in minutes based on start and end time
   const calculateSetDuration = () => {
@@ -145,15 +129,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
       setError(t('offer.venueRequired'));
       return;
     }
-    if (!formData.zone) {
-      setError(t('offer.zoneRequired'));
-      return;
-    }
-    if (!formData.country) {
-      setError(t('offer.countryRequired'));
-      return;
-    }
-    if (!formData.city) {
+    if (!formData.city || !formData.country || !formData.zone) {
       setError(t('offer.cityRequired'));
       return;
     }
@@ -300,6 +276,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
 
   const isArtistOrAgent = currentUser.role === 'ARTIST' || currentUser.role === 'AGENT';
 
+
   // Portal to body: the desktop drawer system docks the tour screen via
   // body:has(> .md-drawer), which only matches direct body children — and
   // the overlay must escape parent stacking contexts like the chat screen.
@@ -386,53 +363,14 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>{t('editProfile.zone')} *</label>
-                <select
-                  value={formData.zone}
-                  onChange={(e) => handleZoneChange(e.target.value)}
-                  className="form-input"
-                  required
-                >
-                  <option value="">{t('editProfile.selectZone')}</option>
-                  {zones.map(zone => (
-                    <option key={zone} value={zone}>{zone}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>{t('editProfile.country')} *</label>
-                <select
-                  value={formData.country}
-                  onChange={(e) => handleCountryChange(e.target.value)}
-                  className="form-input"
-                  disabled={!formData.zone}
-                  required
-                >
-                  <option value="">{t('editProfile.selectCountry')}</option>
-                  {availableCountries.map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
             <div className="form-group">
               <label>{t('editProfile.city')} *</label>
-              <select
-                value={formData.city}
-                onChange={(e) => handleCityChange(e.target.value)}
-                className="form-input"
-                disabled={!formData.country}
-                required
-              >
-                <option value="">{t('editProfile.selectCity')}</option>
-                {availableCities.map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
+              <CitySearch
+                city={formData.city}
+                country={formData.country}
+                zone={formData.zone}
+                onSelect={(city, country, zone) => setFormData((prev) => ({ ...prev, city, country, zone }))}
+              />
             </div>
 
             <div className="form-group">

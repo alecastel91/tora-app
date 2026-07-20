@@ -13045,3 +13045,133 @@ textarea.form-textarea:focus {
 .ach-back {
   transform: rotateY(180deg);
 }
+
+/* ------------------------------------------------------------------ */
+/* Popup restyle pass (2026-07): opaque quiet-premium surfaces for the
+   dialogs that had kept their pre-restyle look. */
+
+/* Shared Documents + the whole delete-modal family: opaque dark card
+   instead of the translucent white wash (was hard to read). */
+.delete-modal {
+  background: #131315;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+/* Offer / counter-offer details + Review Offer: opaque surface and a
+   clearer label/value hierarchy. */
+.modal-content.offer-details-modal,
+.review-modal {
+  background: #131315;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.offer-detail-section {
+  gap: 0;
+}
+
+.offer-detail-row {
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.offer-detail-row .detail-label {
+  min-width: 130px;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.offer-detail-row .detail-value {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.offer-detail-row .detail-value.offer-fee {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
+.review-modal .form-group > label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Connection-request flow: quiet hairline option cards replace the old
+   gold-bordered blocks + yellow info banner. */
+.info-banner {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 2px solid var(--primary-pink);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.info-banner svg {
+  color: var(--primary-pink);
+}
+
+.connection-option,
+.connection-option.agent-option,
+.connection-option.artist-option {
+  background: #0c0c11;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.connection-option:hover,
+.connection-option.agent-option:hover,
+.connection-option.artist-option:hover {
+  background: #0c0c11;
+  border-color: rgba(255, 51, 102, 0.55);
+  transform: none;
+}
+
+.connection-option .option-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.connection-option .option-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.connection-option .option-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 2px;
+}
+
+.connection-option .option-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.connection-option .option-description {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
+}

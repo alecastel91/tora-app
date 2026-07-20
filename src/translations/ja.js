@@ -1416,6 +1416,7 @@ const ja = {
     statusExpired: "期限切れ",
   },
   news: {
+    addImage: "画像を追加",
     official: "TORA・公式",
     title: "ニュース",
     composerPlaceholder: "ネットワークに近況をシェア...",

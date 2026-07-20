@@ -281,11 +281,20 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async createPost({ profileId, text }) {
+  async createPost({ profileId, text, image }) {
     const response = await fetch(`${API_URL}/posts`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ profileId, text }),
+      body: JSON.stringify({ profileId, text, image }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async getLinkPreview(url) {
+    const response = await fetch(`${API_URL}/posts/link-preview`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ url }),
     });
     return this.handleResponse(response);
   }

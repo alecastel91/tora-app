@@ -1428,6 +1428,7 @@ const en = {
     statusExpired: "Expired",
   },
   news: {
+    addImage: "Add image",
     official: "TORA · Official",
     title: "News",
     composerPlaceholder: "Share an update with the network...",

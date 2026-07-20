@@ -32,6 +32,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
   const [actionBusy, setActionBusy] = useState(false);
   const [showCounterOfferDetails, setShowCounterOfferDetails] = useState(false);
   const [counterOfferData, setCounterOfferData] = useState(null);
+  const [counterOfferDeal, setCounterOfferDeal] = useState(null); // full deal for the details modal
   const [counterOfferMessage, setCounterOfferMessage] = useState(null);
   const [showDeclineComment, setShowDeclineComment] = useState(false);
   const [declineComment, setDeclineComment] = useState('');
@@ -469,6 +470,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
       appAlert(t('chat.counterOfferOldVersion'));
       return;
     }
+
+    // Full deal in the background: the details modal renders the complete
+    // last offer entry (deadlines, performance, terms) from offerHistory.
+    setCounterOfferDeal(null);
+    apiService.getDeal(msg.dealId, currentUser.id)
+      .then((resp) => setCounterOfferDeal(resp.deal || resp))
+      .catch(() => {});
 
     // Parse the counter-offer message
     const messageText = msg.text;
@@ -2371,6 +2379,58 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <span className="detail-value">{counterOfferData.notes}</span>
                   </div>
                 )}
+                {(() => {
+                  if (!counterOfferDeal) return null;
+                  const history = counterOfferDeal.offerHistory || [];
+                  const entry = history[history.length - 1] || {};
+                  const dateFmt = (d) => new Date(d + 'T00:00:00Z').toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+                  return (
+                    <>
+                      {counterOfferDeal.eventName && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('offer.eventName')}</span>
+                          <span className="detail-value">{counterOfferDeal.eventName}</span>
+                        </div>
+                      )}
+                      {counterOfferDeal.date && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('tour.date')}</span>
+                          <span className="detail-value">{new Date(counterOfferDeal.date).toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}</span>
+                        </div>
+                      )}
+                      {(entry.performanceType || counterOfferDeal.performanceType) && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('offer.performanceType')}</span>
+                          <span className="detail-value">{entry.performanceType || counterOfferDeal.performanceType}</span>
+                        </div>
+                      )}
+                      {(entry.setDuration || counterOfferDeal.setDuration) && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('offer.setDuration')}</span>
+                          <span className="detail-value">{t('offer.durationMinutes', { n: entry.setDuration || counterOfferDeal.setDuration })}</span>
+                        </div>
+                      )}
+                      {entry.depositDeadline && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('offer.depositDeadline')}</span>
+                          <span className="detail-value">{dateFmt(entry.depositDeadline)}</span>
+                        </div>
+                      )}
+                      {entry.finalPaymentDeadline && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('offer.finalPaymentDeadline')}</span>
+                          <span className="detail-value">{dateFmt(entry.finalPaymentDeadline)}</span>
+                        </div>
+                      )}
+                      {entry.technicalRequirements && (
+                        <div className="offer-detail-row">
+                          <span className="detail-label">{t('chat.technicalLabel')}</span>
+                          <span className="detail-value">{entry.technicalRequirements}</span>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
             <div className="modal-footer">

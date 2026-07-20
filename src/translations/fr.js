@@ -1416,6 +1416,7 @@ const fr = {
     statusExpired: "Expirée",
   },
   news: {
+    addImage: "Ajouter une image",
     official: "TORA · Officiel",
     title: "Actus",
     composerPlaceholder: "Partagez une actu avec le réseau...",

@@ -4,7 +4,8 @@ import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { getAvatarClass } from '../../utils/roles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import { HeartIcon, MessageIcon, ShieldIcon, PlaneIcon, HandshakeIcon } from '../../utils/icons';
+import { HeartIcon, MessageIcon, ShieldIcon, PlaneIcon, HandshakeIcon, ImageIcon, CloseIcon } from '../../utils/icons';
+import { downscaleImageToDataUrl } from '../../utils/image';
 
 const ROLE_LABEL_KEY = { ARTIST: 'editProfile.artist', AGENT: 'editProfile.agent', PROMOTER: 'editProfile.promoter', VENUE: 'editProfile.venue' };
 
@@ -18,6 +19,60 @@ const relativeTime = (iso, t) => {
   const days = Math.floor(hours / 24);
   if (days < 7) return t('news.daysAgo', { n: days });
   return new Date(iso).toLocaleDateString();
+};
+
+const URL_RE = /(https?:\/\/[^\s<>"']+)/g;
+
+// Split text into spans + anchors so pasted links are tappable.
+const linkify = (text) => {
+  if (!text) return null;
+  const parts = text.split(URL_RE);
+  return parts.map((part, i) =>
+    /^https?:\/\//.test(part) ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer"
+         className="break-all text-infrared underline decoration-infrared/40 underline-offset-2 hover:decoration-infrared"
+         onClick={(e) => e.stopPropagation()}>
+        {part}
+      </a>
+    ) : part
+  );
+};
+
+const firstUrl = (text) => {
+  if (!text) return null;
+  const m = text.match(URL_RE);
+  return m ? m[0] : null;
+};
+
+// Compact OpenGraph preview card under posts that contain a link
+const LinkPreview = ({ url }) => {
+  const [meta, setMeta] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    apiService.getLinkPreview(url)
+      .then((data) => { if (!cancelled) setMeta(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [url]);
+  if (!meta || (!meta.title && !meta.image)) return null;
+  let domain = '';
+  try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch { /* keep empty */ }
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer"
+       className="mt-3 flex overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] no-underline transition-colors hover:border-white/25"
+       onClick={(e) => e.stopPropagation()}>
+      {meta.image && (
+        <img src={meta.image} alt="" loading="lazy"
+             className="h-[74px] w-[74px] shrink-0 object-cover"
+             onError={(e) => { e.target.style.display = 'none'; }} />
+      )}
+      <div className="min-w-0 flex-1 px-3 py-2">
+        {meta.title && <div className="truncate text-xs font-semibold text-white">{meta.title}</div>}
+        {meta.description && <div className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-white/50">{meta.description}</div>}
+        <div className="mt-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/35">{meta.siteName || domain}</div>
+      </div>
+    </a>
+  );
 };
 
 const Avatar = ({ profile, size = 'h-10 w-10', onClick }) => (
@@ -43,7 +98,9 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [draft, setDraft] = useState('');
+  const [draftImage, setDraftImage] = useState(null); // data URL, client-downscaled
   const [posting, setPosting] = useState(false);
+  const fileInputRef = useRef(null);
   const [openComments, setOpenComments] = useState({}); // postId -> { comments, hasMore, nextCursor }
   const [commentDrafts, setCommentDrafts] = useState({});
   const [menuFor, setMenuFor] = useState(null);
@@ -78,16 +135,32 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
 
   const submitPost = async () => {
     const text = draft.trim();
-    if (!text || posting) return;
+    if ((!text && !draftImage) || posting) return;
     setPosting(true);
     try {
-      const { post } = await apiService.createPost({ profileId: user.id, text });
+      const { post } = await apiService.createPost({ profileId: user.id, text, image: draftImage || undefined });
       setPosts((prev) => [post, ...(prev || [])]);
       setDraft('');
+      setDraftImage(null);
     } catch (e) {
       if (e?.response?.data?.code !== 'VERIFICATION_REQUIRED') appAlert(e.message || t('news.postFailed'));
     } finally {
       setPosting(false);
+    }
+  };
+
+  const pickImage = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      // Client-side downscale keeps uploads tiny (webp ~100-300KB) so the
+      // feed stays fast; the server re-normalizes to 1280px webp.
+      const dataUrl = await downscaleImageToDataUrl(file, { maxDimension: 1280, quality: 0.82 });
+      setDraftImage(dataUrl);
+    } catch (err) {
+      console.error('Image pick failed:', err);
+      appAlert(err?.message || t('news.postFailed'));
     }
   };
 
@@ -164,6 +237,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   // same boundary as the search country-lock.
   const openAuthor = (author) => {
     if (!author) return;
+    if (author.isOfficial) { onOpenProfile && onOpenProfile(author); return; }
     const isFree = (user?.subscriptionTier || 'FREE') === 'FREE';
     if (isFree && author.country && user?.country && author.country !== user.country && author.id !== user.id) {
       appConfirm(t('news.upgradeToView'), { confirmLabel: t('search.upgradeNow') })
@@ -189,10 +263,6 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
 
   return (
     <div className="screen active news-screen px-5 pt-6 pb-24" onClick={() => menuFor && setMenuFor(null)}>
-      <h1 className="m-0 mb-5 font-display text-2xl font-bold uppercase tracking-[0.2em] text-white">
-        {t('news.title')}
-      </h1>
-
       {/* composer */}
       <div className="mb-5 rounded-2xl border border-white/10 bg-[#0c0c11] p-4">
         <div className="flex gap-3">
@@ -206,11 +276,31 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
             className="form-input min-h-[52px] w-full resize-y !border-0 !bg-transparent !p-0 text-sm leading-relaxed"
           />
         </div>
+        {draftImage && (
+          <div className="relative mt-3 inline-block">
+            <img src={draftImage} alt="" className="max-h-40 rounded-xl border border-white/10 object-cover" />
+            <button
+              className="absolute -right-2 -top-2 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-black text-white/80 [&_svg]:h-3 [&_svg]:w-3"
+              onClick={() => setDraftImage(null)}
+              aria-label={t('common.close')}
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        )}
         <div className="mt-2 flex items-center justify-end gap-3">
           {draft.length > 1800 && (
             <span className="text-[10px] text-white/35">{draft.length} / 2000</span>
           )}
-          <button className="btn btn-primary !px-6 !py-2" disabled={posting || !draft.trim()} onClick={submitPost}>
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={pickImage} />
+          <button
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-transparent text-white/60 transition-colors hover:border-white/35 hover:text-white [&_svg]:h-4 [&_svg]:w-4"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label={t('news.addImage')}
+          >
+            <ImageIcon />
+          </button>
+          <button className="btn btn-primary !px-6 !py-2" disabled={posting || (!draft.trim() && !draftImage)} onClick={submitPost}>
             {posting ? '...' : t('news.postCta')}
           </button>
         </div>
@@ -253,7 +343,9 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                   )}
                 </div>
                 <div className="text-[11px] text-white/35">
-                  {[post.author?.city, post.author?.country].filter(Boolean).join(', ')} · {relativeTime(post.createdAt, t)}
+                  {official
+                    ? relativeTime(post.createdAt, t)
+                    : `${[post.author?.city, post.author?.country].filter(Boolean).join(', ')} · ${relativeTime(post.createdAt, t)}`}
                 </div>
               </div>
               {/* menu */}
@@ -293,7 +385,16 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                 <p className="m-0 text-sm leading-relaxed text-white/80">{m.text}</p>
               </div>
             ) : (
-              <p className="m-0 mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/85">{post.text}</p>
+              <>
+                {post.text && (
+                  <p className="m-0 mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/85">{linkify(post.text)}</p>
+                )}
+                {post.imageUrl && (
+                  <img src={post.imageUrl} alt="" loading="lazy"
+                       className="mt-3 max-h-[420px] w-full rounded-xl border border-white/[0.07] object-cover" />
+                )}
+                {!post.imageUrl && firstUrl(post.text) && <LinkPreview url={firstUrl(post.text)} />}
+              </>
             )}
 
             {/* actions */}
@@ -325,7 +426,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                         <span className="truncate text-xs font-semibold text-white">{c.author?.name}</span>
                         <span className="shrink-0 text-[10px] text-white/30">{relativeTime(c.createdAt, t)}</span>
                       </div>
-                      <p className="m-0 mt-0.5 whitespace-pre-wrap text-xs leading-relaxed text-white/75">{c.text}</p>
+                      <p className="m-0 mt-0.5 whitespace-pre-wrap text-xs leading-relaxed text-white/75">{linkify(c.text)}</p>
                     </div>
                   </div>
                 ))}
