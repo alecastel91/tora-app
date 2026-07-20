@@ -958,6 +958,24 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true }) =
                           </button>
                         );
                       }
+                      // Skipped/pending pills open the docs modal for the
+                      // artist side — the direct "go back" path after a skip.
+                      if (isArtistSideForDeal(deal, currentUser)) {
+                        return (
+                          <button
+                            key={cat.key}
+                            type="button"
+                            onClick={() => {
+                              setSelectedDealForWorkflow(deal);
+                              setShowDocumentModal(true);
+                            }}
+                            style={{ ...sharedStyle, border: 'none', cursor: 'pointer', fontSize: '11px' }}
+                            title={t('bookings.manageDocuments')}
+                          >
+                            {pillContent}
+                          </button>
+                        );
+                      }
                       return (
                         <span key={cat.key} style={sharedStyle}>
                           {pillContent}

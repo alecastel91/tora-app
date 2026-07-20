@@ -1416,6 +1416,7 @@ const it = {
     statusExpired: "Scaduto",
   },
   news: {
+    pinned: "In evidenza",
     addImage: "Aggiungi immagine",
     official: "TORA · Ufficiale",
     title: "News",

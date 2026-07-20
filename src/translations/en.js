@@ -1428,6 +1428,7 @@ const en = {
     statusExpired: "Expired",
   },
   news: {
+    pinned: "Pinned",
     addImage: "Add image",
     official: "TORA · Official",
     title: "News",

@@ -281,7 +281,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess }) => {
   // body:has(> .md-drawer), which only matches direct body children — and
   // the overlay must escape parent stacking contexts like the chat screen.
   return ReactDOM.createPortal(
-    <div className="make-offer-modal-overlay md-drawer" onClick={onClose}>
+    <div className="make-offer-modal-overlay" onClick={onClose}>
       <div className="make-offer-modal" onClick={(e) => e.stopPropagation()}>
         <div className="make-offer-header">
           <button className="back-btn" onClick={onClose}>

@@ -452,3 +452,28 @@
   }
 }
 
+
+/* Make an Offer is a full page on desktop: covers the whole content area
+   beside the sidebar, form centered like the settings/premium overlays. */
+@media (min-width: 1024px) {
+  .make-offer-modal-overlay {
+    left: 240px;
+    right: 0;
+    bottom: 0;
+  }
+
+  .make-offer-modal .make-offer-header,
+  .make-offer-modal .make-offer-recipient,
+  .make-offer-modal .make-offer-form {
+    width: 100%;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 1440px) {
+  .make-offer-modal-overlay {
+    left: 280px;
+  }
+}

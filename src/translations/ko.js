@@ -1416,6 +1416,7 @@ const ko = {
     statusExpired: "만료됨",
   },
   news: {
+    pinned: "고정됨",
     addImage: "이미지 추가",
     official: "TORA · 공식",
     title: "뉴스",

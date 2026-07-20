@@ -462,6 +462,24 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
     setShowReviewModal(true);
   };
 
+  // Which fields did the latest counter change vs the previous offer?
+  // Drives the yellow highlight in the counter-offer details modal.
+  const isCounterChanged = (field) => {
+    const history = counterOfferDeal?.offerHistory || [];
+    if (history.length < 2) return false;
+    const last = history[history.length - 1] || {};
+    const prev = history[history.length - 2] || {};
+    if (field === 'fee') return last.fee !== prev.fee || last.currency !== prev.currency;
+    if (field === 'extras') {
+      const norm = (e) => JSON.stringify(e.additionalTerms ?? e.extras ?? null);
+      return norm(last) !== norm(prev);
+    }
+    // Counters omit untouched fields (null) — absence is not a change.
+    if (last[field] === null || last[field] === undefined) return false;
+    return JSON.stringify(last[field]) !== JSON.stringify(prev[field] ?? null);
+  };
+  const counterHighlight = (field) => (isCounterChanged(field) ? { color: '#FFC107' } : undefined);
+
   const handleViewCounterOffer = (msg) => {
     console.log('[ChatScreen] handleViewCounterOffer - message:', msg);
     console.log('[ChatScreen] dealId from message:', msg.dealId);
@@ -1878,12 +1896,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                     <span className="detail-label">{t('chat.extrasLabel')}</span>
                     <div className="detail-value extras-list">
                       {Object.entries(selectedOffer.extras).map(([key, value]) => (
-                        <div key={key} className="extra-item">
-                          <div className="extra-header">
-                            <strong style={{ textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}:</strong>
-                          </div>
-                          {value !== 'Included' && (
-                            <div className="extra-note">{value}</div>
+                        <div key={key} className="extra-item-row">
+                          <span className="extra-tick">✓</span>
+                          <span className="extra-name">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                          {value && value !== 'Included' && value !== true && (
+                            <span className="extra-note-inline">{value}</span>
                           )}
                         </div>
                       ))}
@@ -1906,12 +1923,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       <span className="detail-label">{t('chat.extrasLabel')}</span>
                       <div className="detail-value extras-list">
                         {Object.entries(parsedTerms).filter(([, v]) => v).map(([key, value]) => (
-                          <div key={key} className="extra-item">
-                            <div className="extra-header">
-                              <strong style={{ textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1').trim()}:</strong>
-                            </div>
-                            {value !== 'Included' && value !== true && (
-                              <div className="extra-note">{value}</div>
+                          <div key={key} className="extra-item-row">
+                            <span className="extra-tick">✓</span>
+                            <span className="extra-name">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                            {value && value !== 'Included' && value !== true && (
+                              <span className="extra-note-inline">{value}</span>
                             )}
                           </div>
                         ))}
@@ -2125,29 +2141,31 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
             </div>
             <div className="modal-body">
               <div className="review-form">
-                <div className="form-group">
-                  <label>{t('chat.feeAmountRequired')}</label>
-                  <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    value={reviewData.fee}
-                    onChange={(e) => setReviewData({ ...reviewData, fee: e.target.value })}
-                    onWheel={(e) => e.target.blur()}
-                    placeholder="0"
-                    className="form-input"
-                  />
-                </div>
+                <div className="form-row">
+                  <div className="form-group" style={{ flex: 2 }}>
+                    <label>{t('chat.feeAmountRequired')}</label>
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      value={reviewData.fee}
+                      onChange={(e) => setReviewData({ ...reviewData, fee: e.target.value })}
+                      onWheel={(e) => e.target.blur()}
+                      placeholder="0"
+                      className="form-input"
+                    />
+                  </div>
 
-                <div className="form-group">
-                  <label>{t('chat.currency')}</label>
-                  <select
-                    value={reviewData.currency}
-                    onChange={(e) => setReviewData({ ...reviewData, currency: e.target.value })}
-                    className="form-select currency-select-full"
-                  >
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label>{t('chat.currency')}</label>
+                    <select
+                      value={reviewData.currency}
+                      onChange={(e) => setReviewData({ ...reviewData, currency: e.target.value })}
+                      className="form-select currency-select-full"
+                    >
 {CURRENCY_OPTIONS}
-                  </select>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -2169,10 +2187,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       {!!reviewData.extras.travelIn && (
                         <input
                           type="text"
-                          value={typeof reviewData.extras.travelIn === 'string' ? reviewData.extras.travelIn : 'Included'}
+                          value={reviewData.extras.travelIn === 'Included' || typeof reviewData.extras.travelIn !== 'string' ? '' : reviewData.extras.travelIn}
                           onChange={(e) => setReviewData({
                             ...reviewData,
-                            extras: { ...reviewData.extras, travelIn: e.target.value }
+                            extras: { ...reviewData.extras, travelIn: e.target.value || 'Included' }
                           })}
                           placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
@@ -2196,10 +2214,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       {!!reviewData.extras.travelOut && (
                         <input
                           type="text"
-                          value={typeof reviewData.extras.travelOut === 'string' ? reviewData.extras.travelOut : 'Included'}
+                          value={reviewData.extras.travelOut === 'Included' || typeof reviewData.extras.travelOut !== 'string' ? '' : reviewData.extras.travelOut}
                           onChange={(e) => setReviewData({
                             ...reviewData,
-                            extras: { ...reviewData.extras, travelOut: e.target.value }
+                            extras: { ...reviewData.extras, travelOut: e.target.value || 'Included' }
                           })}
                           placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
@@ -2223,10 +2241,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       {!!reviewData.extras.transportation && (
                         <input
                           type="text"
-                          value={typeof reviewData.extras.transportation === 'string' ? reviewData.extras.transportation : 'Included'}
+                          value={reviewData.extras.transportation === 'Included' || typeof reviewData.extras.transportation !== 'string' ? '' : reviewData.extras.transportation}
                           onChange={(e) => setReviewData({
                             ...reviewData,
-                            extras: { ...reviewData.extras, transportation: e.target.value }
+                            extras: { ...reviewData.extras, transportation: e.target.value || 'Included' }
                           })}
                           placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
@@ -2250,10 +2268,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       {!!reviewData.extras.accommodation && (
                         <input
                           type="text"
-                          value={typeof reviewData.extras.accommodation === 'string' ? reviewData.extras.accommodation : 'Included'}
+                          value={reviewData.extras.accommodation === 'Included' || typeof reviewData.extras.accommodation !== 'string' ? '' : reviewData.extras.accommodation}
                           onChange={(e) => setReviewData({
                             ...reviewData,
-                            extras: { ...reviewData.extras, accommodation: e.target.value }
+                            extras: { ...reviewData.extras, accommodation: e.target.value || 'Included' }
                           })}
                           placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
@@ -2277,10 +2295,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       {!!reviewData.extras.meals && (
                         <input
                           type="text"
-                          value={typeof reviewData.extras.meals === 'string' ? reviewData.extras.meals : 'Included'}
+                          value={reviewData.extras.meals === 'Included' || typeof reviewData.extras.meals !== 'string' ? '' : reviewData.extras.meals}
                           onChange={(e) => setReviewData({
                             ...reviewData,
-                            extras: { ...reviewData.extras, meals: e.target.value }
+                            extras: { ...reviewData.extras, meals: e.target.value || 'Included' }
                           })}
                           placeholder={t('chat.addDetailsPlaceholder')}
                           className="extra-note-input"
@@ -2352,21 +2370,20 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
               <div className="offer-detail-section">
                 <div className="offer-detail-row">
                   <span className="detail-label">{t('chat.feeLabel')}</span>
-                  <span className="detail-value offer-fee">
+                  <span className="detail-value offer-fee" style={counterHighlight('fee')}>
                     {counterOfferData.fee} {counterOfferData.currency}
                   </span>
                 </div>
                 {counterOfferData.extras && Object.keys(counterOfferData.extras).length > 0 && (
                   <div className="offer-detail-row">
                     <span className="detail-label">{t('chat.extrasLabel')}</span>
-                    <div className="detail-value extras-list">
+                    <div className="detail-value extras-list" style={counterHighlight('extras')}>
                       {Object.entries(counterOfferData.extras).map(([key, value]) => (
-                        <div key={key} className="extra-item">
-                          <div className="extra-header">
-                            <strong>{key}:</strong>
-                          </div>
-                          {value !== 'Included' && (
-                            <div className="extra-note">{value}</div>
+                        <div key={key} className="extra-item-row">
+                          <span className="extra-tick">✓</span>
+                          <span className="extra-name">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                          {value && value !== 'Included' && value !== true && (
+                            <span className="extra-note-inline">{value}</span>
                           )}
                         </div>
                       ))}
@@ -2376,7 +2393,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                 {counterOfferData.notes && (
                   <div className="offer-detail-row">
                     <span className="detail-label">{t('chat.notesLabel')}</span>
-                    <span className="detail-value">{counterOfferData.notes}</span>
+                    <span className="detail-value" style={counterHighlight('notes')}>{counterOfferData.notes}</span>
                   </div>
                 )}
                 {(() => {
@@ -2401,31 +2418,31 @@ const ChatScreen = ({ user, onClose, onOpenProfile }) => {
                       {(entry.performanceType || counterOfferDeal.performanceType) && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.performanceType')}</span>
-                          <span className="detail-value">{entry.performanceType || counterOfferDeal.performanceType}</span>
+                          <span className="detail-value" style={counterHighlight('performanceType')}>{entry.performanceType || counterOfferDeal.performanceType}</span>
                         </div>
                       )}
                       {(entry.setDuration || counterOfferDeal.setDuration) && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.setDuration')}</span>
-                          <span className="detail-value">{t('offer.durationMinutes', { n: entry.setDuration || counterOfferDeal.setDuration })}</span>
+                          <span className="detail-value" style={counterHighlight('setDuration')}>{t('offer.durationMinutes', { n: entry.setDuration || counterOfferDeal.setDuration })}</span>
                         </div>
                       )}
                       {entry.depositDeadline && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.depositDeadline')}</span>
-                          <span className="detail-value">{dateFmt(entry.depositDeadline)}</span>
+                          <span className="detail-value" style={counterHighlight('depositDeadline')}>{dateFmt(entry.depositDeadline)}</span>
                         </div>
                       )}
                       {entry.finalPaymentDeadline && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.finalPaymentDeadline')}</span>
-                          <span className="detail-value">{dateFmt(entry.finalPaymentDeadline)}</span>
+                          <span className="detail-value" style={counterHighlight('finalPaymentDeadline')}>{dateFmt(entry.finalPaymentDeadline)}</span>
                         </div>
                       )}
                       {entry.technicalRequirements && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('chat.technicalLabel')}</span>
-                          <span className="detail-value">{entry.technicalRequirements}</span>
+                          <span className="detail-value" style={counterHighlight('technicalRequirements')}>{entry.technicalRequirements}</span>
                         </div>
                       )}
                     </>
