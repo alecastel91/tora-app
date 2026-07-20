@@ -356,6 +356,69 @@ const ProfileScreen = ({ onOpenPremium, accountUser, onSwitchTab }) => {
   }[user?.role] || 'rgba(255, 255, 255, 0.10)';
 
   function renderProfileBody() {
+  // The official TORA account is an admin/broadcast profile: no networking
+  // stats or actions, no role — just identity + the website. It keeps full
+  // app access (search/news/messages via the tab bar).
+  if (user?.isOfficial) {
+    const site = user.website
+      ? (/^https?:\/\//.test(user.website) ? user.website : `https://${user.website}`)
+      : null;
+    return (
+      <div className="screen active profile-screen px-5 pt-6 pb-5" style={{ backgroundColor: '#000' }}>
+        <div className="relative isolate">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-5 -top-6 h-64 -z-10"
+            style={{ background: 'radial-gradient(60% 100% at 50% 0%, rgba(255,51,102,0.20), transparent 70%)' }}
+          />
+          <div className="text-center mb-6">
+            <div className="relative w-28 h-28 mx-auto mb-4">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="group block w-full h-full rounded-full overflow-hidden bg-near-black ring-1 ring-infrared/40
+                           flex items-center justify-center text-4xl font-bold text-white font-space-grotesk"
+              >
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
+                ) : getInitial(user?.name)}
+                <span className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center
+                                 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                                 text-white [&>svg]:w-7 [&>svg]:h-7">
+                  <UploadIcon />
+                </span>
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+            </div>
+            <h2 className="text-3xl font-bold text-white font-space-grotesk tracking-[-0.02em] leading-none mb-3">
+              {user?.name || 'TORA'}
+            </h2>
+            <div className="inline-flex items-center rounded-full border border-infrared/60 bg-infrared/10 px-3.5 py-1
+                            text-[10px] font-semibold uppercase tracking-[0.2em] font-tech text-infrared">
+              {t('profile.adminAccount')}
+            </div>
+            {site && (
+              <div className="mt-4">
+                <a
+                  href={site}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-infrared/40 bg-infrared/5 px-4 py-2
+                             text-sm text-infrared no-underline transition-colors hover:border-infrared/70 [&>svg]:h-4 [&>svg]:w-4"
+                >
+                  <LinkIcon />
+                  {user.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                </a>
+              </div>
+            )}
+          </div>
+          <div className="mx-auto max-w-xs">
+            <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     // Own black base so the global pink ambient doesn't bleed in — the Profile
     // shows only its single role colour.

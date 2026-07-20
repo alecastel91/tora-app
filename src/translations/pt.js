@@ -719,6 +719,7 @@ const pt = {
   },
 
   profile: {
+    adminAccount: "Conta de administrador",
     rooms: 'Salas',
     uploadFailed: 'Não foi possível carregar a imagem. Tenta novamente.',
     deleteFailed: 'Não foi possível eliminar o perfil. Tenta novamente.',

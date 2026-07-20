@@ -719,6 +719,7 @@ const fr = {
   },
 
   profile: {
+    adminAccount: "Compte administrateur",
     rooms: 'Salles',
     uploadFailed: "Échec du téléversement de l'image. Réessayez.",
     deleteFailed: 'Échec de la suppression du profil. Réessayez.',

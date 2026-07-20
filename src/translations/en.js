@@ -721,6 +721,7 @@ const en = {
   
   // Profile Screen
   profile: {
+    adminAccount: "Admin Account",
     rooms: 'Rooms',
     uploadFailed: 'Failed to upload image. Please try again.',
     deleteFailed: 'Failed to delete profile. Please try again.',

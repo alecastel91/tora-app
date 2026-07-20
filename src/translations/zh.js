@@ -719,6 +719,7 @@ const zh = {
   },
 
   profile: {
+    adminAccount: "管理员账户",
     rooms: '厅数',
     uploadFailed: '图片上传失败。请重试。',
     deleteFailed: '档案删除失败。请重试。',

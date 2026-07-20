@@ -719,6 +719,7 @@ const ko = {
   },
 
   profile: {
+    adminAccount: "관리자 계정",
     rooms: '룸',
     uploadFailed: '이미지를 업로드하지 못했습니다. 다시 시도해 주세요.',
     deleteFailed: '프로필을 삭제하지 못했습니다. 다시 시도해 주세요.',

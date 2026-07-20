@@ -719,6 +719,7 @@ const it = {
   },
 
   profile: {
+    adminAccount: "Account amministratore",
     rooms: 'Sale',
     uploadFailed: "Caricamento dell'immagine non riuscito. Riprova.",
     deleteFailed: 'Eliminazione del profilo non riuscita. Riprova.',

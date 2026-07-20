@@ -352,6 +352,19 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               <p className="m-0 whitespace-pre-wrap text-sm leading-relaxed text-white/75">{profile.bio}</p>
             </div>
           )}
+          {profile.website && (
+            <div className="mx-auto mt-3 max-w-md text-center">
+              <a
+                href={/^https?:\/\//.test(profile.website) ? profile.website : `https://${profile.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-infrared/40 bg-infrared/5 px-4 py-2 text-sm text-infrared no-underline transition-colors hover:border-infrared/70 [&>svg]:h-4 [&>svg]:w-4"
+              >
+                <LinkIcon />
+                {profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+              </a>
+            </div>
+          )}
         </div>
       </div>
     );
