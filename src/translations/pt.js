@@ -349,6 +349,9 @@ const pt = {
   },
 
   premium: {
+    processing: "Processando…",
+    paymentFailed: "Não foi possível concluir o pagamento. Tente novamente.",
+    notConfigured: "Os pagamentos estão sendo configurados — volte em breve.",
     preview: 'Pré-visualização',
     feePrivacy: 'Privacidade do cachê da tour',
     title: 'TORA Premium',

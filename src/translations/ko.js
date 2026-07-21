@@ -349,6 +349,9 @@ const ko = {
   },
 
   premium: {
+    processing: "처리 중…",
+    paymentFailed: "결제를 완료하지 못했습니다. 다시 시도해 주세요.",
+    notConfigured: "결제 기능을 준비 중입니다. 잠시 후 다시 확인해 주세요.",
     preview: '미리보기',
     feePrivacy: '투어 요금 비공개',
     title: 'TORA 프리미엄',

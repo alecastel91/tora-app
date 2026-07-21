@@ -349,6 +349,9 @@ const zh = {
   },
 
   premium: {
+    processing: "处理中…",
+    paymentFailed: "付款未能完成，请重试。",
+    notConfigured: "支付功能正在设置中，请稍后再试。",
     preview: '预览',
     feePrivacy: '巡演费用保密',
     title: 'TORA 高级版',

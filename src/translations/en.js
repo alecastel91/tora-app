@@ -349,6 +349,9 @@ const en = {
   },
 
   premium: {
+    processing: "Processing…",
+    paymentFailed: "Payment could not be completed. Please try again.",
+    notConfigured: "Payments are being set up — check back shortly.",
     preview: 'Preview',
     feePrivacy: 'Tour Fee Privacy',
     title: 'TORA Premium',

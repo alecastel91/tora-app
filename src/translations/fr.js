@@ -349,6 +349,9 @@ const fr = {
   },
 
   premium: {
+    processing: "Traitement…",
+    paymentFailed: "Le paiement n’a pas pu être effectué. Réessayez.",
+    notConfigured: "Les paiements sont en cours de configuration — revenez bientôt.",
     preview: 'Aperçu',
     feePrivacy: 'Confidentialité du cachet de tournée',
     title: 'TORA Premium',

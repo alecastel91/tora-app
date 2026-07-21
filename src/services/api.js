@@ -345,6 +345,42 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // ---- Billing (Stripe) ----
+  async startSubscription({ profileId, interval }) {
+    const response = await fetch(`${API_URL}/billing/subscribe`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, interval }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async refreshSubscription({ profileId, subscriptionId }) {
+    const response = await fetch(`${API_URL}/billing/refresh`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, subscriptionId }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async getBillingStatus(profileId) {
+    const response = await fetch(`${API_URL}/billing/status?profileId=${profileId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
+  async cancelSubscription(profileId) {
+    const response = await fetch(`${API_URL}/billing/cancel`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId }),
+    });
+    return this.handleResponse(response);
+  }
+
   async getProfileReach(profileId) {
     const response = await fetch(`${API_URL}/profiles/${profileId}/reach`, {
       method: 'GET',

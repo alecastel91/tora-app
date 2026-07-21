@@ -29,6 +29,7 @@ import AchievementsScreen from './components/screens/AchievementsScreen';
 import InviteFriendsSection from './components/common/InviteFriendsSection';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
+import StripeCheckout from './components/common/StripeCheckout';
 import { appConfirm } from './utils/dialogs';
 
 function App() {
@@ -407,14 +408,6 @@ function App() {
     setShowPremium(false);
     setShowSubscription(true);
     setSubscriptionStep('payment');
-  };
-
-  const handlePaymentSubmit = () => {
-    setSubscriptionStep('processing');
-    // Simulate payment processing
-    setTimeout(() => {
-      setSubscriptionStep('success');
-    }, 2000);
   };
 
   const handleSubscriptionComplete = () => {
@@ -1072,65 +1065,24 @@ function App() {
 
                 <div className="payment-section">
                   <h3>{t('premium.paymentMethod')}</h3>
-                  <div className="payment-methods">
-                    <label className="payment-option">
-                      <input type="radio" name="payment" defaultChecked />
-                      <div className="payment-card">
-                        <span className="payment-icon">💳</span>
-                        <span>{t('premium.creditCard')}</span>
-                      </div>
-                    </label>
-                    <label className="payment-option">
-                      <input type="radio" name="payment" />
-                      <div className="payment-card">
-                        <span className="payment-icon">📱</span>
-                        <span>{t('premium.applePay')}</span>
-                      </div>
-                    </label>
-                    <label className="payment-option">
-                      <input type="radio" name="payment" />
-                      <div className="payment-card">
-                        <span className="payment-icon">🅿️</span>
-                        <span>{t('premium.paypal')}</span>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div className="card-details">
-                    <input 
-                      type="text" 
-                      placeholder={t('premium.cardNumber')} 
-                      className="input-field"
-                      maxLength="19"
-                    />
-                    <div className="card-row">
-                      <input 
-                        type="text" 
-                        placeholder="MM/YY" 
-                        className="input-field"
-                        maxLength="5"
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="CVV" 
-                        className="input-field"
-                        maxLength="3"
-                      />
-                    </div>
-                    <input 
-                      type="text" 
-                      placeholder={t('premium.cardholderName')} 
-                      className="input-field"
-                    />
-                  </div>
-
-                  <button 
-                    className="btn btn-primary btn-full"
-                    onClick={handlePaymentSubmit}
-                  >
-                    {t('premium.subscribeNow')}
-                  </button>
-                  
+                  <StripeCheckout
+                    profileId={user?.id}
+                    interval={selectedPlan === 'yearly' ? 'year' : 'month'}
+                    onSuccess={async () => {
+                      setSubscriptionStep('success');
+                      // Pull the fresh tier onto the active profile so premium
+                      // unlocks immediately across the app.
+                      try {
+                        const data = await apiService.getCurrentUser();
+                        const active = (data.profiles || []).find((p) => p.id === user?.id) || data.profile;
+                        if (active) {
+                          updateUser(active);
+                          setAccountSubscriptionTier(active.subscriptionTier);
+                        }
+                        if (data.user) setAccountUser(data.user);
+                      } catch { /* webhook will reconcile */ }
+                    }}
+                  />
                   <p className="payment-note">
                     🔒 Secure payment processed by Stripe
                   </p>

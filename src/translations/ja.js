@@ -349,6 +349,9 @@ const ja = {
   },
 
   premium: {
+    processing: "処理中…",
+    paymentFailed: "決済を完了できませんでした。もう一度お試しください。",
+    notConfigured: "決済は準備中です。しばらくしてからご確認ください。",
     preview: 'プレビュー',
     feePrivacy: 'ツアー料金の非公開',
     title: 'TORAプレミアム',
