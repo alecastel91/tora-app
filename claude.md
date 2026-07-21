@@ -24,6 +24,31 @@ Vercel env vars (Production scope):
 
 Local `.env` is for local dev only — it points at Project 1. The two stacks are fully isolated (different JWT_SECRETs, different databases). Test users on local don't exist on production and vice versa.
 
+## Recent Updates (July 20-21, 2026) — News tab, deadlines, badges, official account (SHIPPED TO PROD)
+
+Large feature batch merged `feature/tailwind-implementation` → `main` and deployed 2026-07-21. i18n stays 8/8 (~1358 keys).
+
+### News tab (6th bottom-nav entry, `NewsScreen.js`)
+- LinkedIn/X-style feed: composer (verified members post; posting/commenting go through the app's global VERIFICATION_REQUIRED gate), like/comment/report/delete, cursor "load more". Pasted URLs are clickable + get an OpenGraph **LinkPreview** card; **image attachments** downscale client-side (`downscaleImageToDataUrl`, 1280 webp) before upload — feed images lazy-load.
+- Automated **milestone** cards (representation signed, tour completed); a viewer only sees a milestone if they liked/connect/represent the author. No page title.
+- **Official TORA account**: crimson "TORA · Official" pill + border; feed authors carry `isOfficial`; official posts pin to the top (permanent + 48h). Bell notifications `CONNECTION_POSTED`/`OFFICIAL_POST` route to the News tab.
+
+### Payment deadlines + negotiation UI
+- Make Offer + counter forms: optional deposit-due / final-payment-due dates. Counter-offer **details modal** loads the full deal, keeps the original field order (fee mid-list), and highlights **fields changed vs the previous offer in yellow** (`#FFC107`) with a legend footnote. Extras render as green-tick rows (no `key:` labels).
+- Booking card (`WorkflowTimeline`): agreed-deadline chips, red **Overdue** when past-due with money unconfirmed.
+- **Restore Contract Step** button (artist/agent side) reopens a skipped contract via `unskipContract`.
+- **Make an Offer** is now a full-screen page on mobile and docks like a chat conversation on desktop (`responsive.css`, `top:0` over the docked chat).
+
+### Loyalty badges + referrals + palette
+- Minimal **stroke-glyph badges** (`utils/badgeArt.js`): one design per badge, metallic tier-colored stroke, level pips. `BadgeFlipCard` (shared by the Achievements hub + the profile badge overlay) — 2-per-row flip cards, hover(desktop)/tap(mobile) to reveal the description; front shows glyph + tier + metric count + progress. Header shield → `AchievementsScreen`. Referral UI in Settings (`InviteFriendsSection`).
+- **Role palette**: ARTIST `#667EEA` · AGENT `#43E97B` · PROMOTER `#FFC107` · VENUE `#F5576C` (index.css/tora-theme.css tokens + App.css avatar gradients + `utils/roles.js`).
+
+### Official/admin account profile
+- Logged in as the official account, ProfileScreen renders a **minimal admin view** (logo, name, "ADMIN ACCOUNT" pill, torahub.io website link, Edit only — no likes/liked/connections, no networking actions). Others see the official ViewProfile with the website link. Full access comes from the account's YEARLY subscription data (frontend reads `user.subscriptionTier`).
+
+### Popup restyles + city picker
+- Opaque dark cards for Shared Documents / offer-details / Review Offer / connection-request modals (`App.css`). MakeOfferModal replaced the zone/country/city triple-select with the single `CitySearch` autocomplete and autofills the venue name for VENUE initiators.
+
 ## Recent Updates (July 9-10, 2026)
 
 ### Identity verification UI
