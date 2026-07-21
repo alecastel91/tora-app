@@ -28,12 +28,16 @@ const BadgeFlipCard = ({ badge: a, flipped, onToggle }) => {
     >
       <div className="ach-card-inner">
         {/* front */}
-        <div className={`ach-face flex flex-col items-center justify-between rounded-2xl border bg-[#0c0c11] p-4 ${a.earned ? 'border-white/10' : 'border-white/5'}`}>
-          <span
-            className={`mt-1 block h-12 w-12 ${a.earned ? '' : 'opacity-70'}`}
-            dangerouslySetInnerHTML={{ __html: drawBadgeGlyph(a.key, glyphOpts) }}
-          />
-          <div className="text-center">
+        <div className={`ach-face flex flex-col items-center rounded-2xl border bg-[#0c0c11] p-4 ${a.earned ? 'border-white/10' : 'border-white/5'}`}>
+          {/* icon fills the upper space of the tile */}
+          <div className="flex flex-1 items-center justify-center">
+            <span
+              className={`block h-[72px] w-[72px] ${a.earned ? '' : 'opacity-70'}`}
+              dangerouslySetInnerHTML={{ __html: drawBadgeGlyph(a.key, glyphOpts) }}
+            />
+          </div>
+          {/* name/tier/count sit right above the level dots */}
+          <div className="w-full text-center">
             <div className="text-[9px] font-tech uppercase tracking-[0.18em]" style={{ color: a.earned ? accent : 'rgba(255,255,255,.35)' }}>
               {t(`badges.${a.key}.name`)}
             </div>
@@ -45,18 +49,18 @@ const BadgeFlipCard = ({ badge: a, flipped, onToggle }) => {
                 {t(`badges.${a.key}.count`, { n: a.metricValue })}
               </div>
             )}
-          </div>
-          <div className="flex w-full flex-col items-center gap-1.5">
-            {tiered && (
-              <span dangerouslySetInnerHTML={{ __html: drawBadgePips(a.key, glyphOpts) }} />
-            )}
-            {tiered && hasProgress && a.nextThreshold ? (
-              <div className="h-0.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
-                <div className="h-full rounded-full bg-infrared/70" style={{ width: `${pct}%` }} />
-              </div>
-            ) : (
-              <div className="h-0.5 w-full" />
-            )}
+            <div className="mt-2 flex w-full flex-col items-center gap-1.5">
+              {tiered && (
+                <span dangerouslySetInnerHTML={{ __html: drawBadgePips(a.key, glyphOpts) }} />
+              )}
+              {tiered && hasProgress && a.nextThreshold ? (
+                <div className="h-0.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+                  <div className="h-full rounded-full bg-infrared/70" style={{ width: `${pct}%` }} />
+                </div>
+              ) : (
+                <div className="h-0.5 w-full" />
+              )}
+            </div>
           </div>
         </div>
         {/* back */}
