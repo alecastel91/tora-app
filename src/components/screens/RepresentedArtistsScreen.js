@@ -215,26 +215,31 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
           <div className="artists-list">
             {representedArtists.map((artist) => (
               <div key={artist.profileId || artist.id} className="artist-card-row">
-                <div className="artist-avatar-small">
-                  {artist.avatar ? (
-                    <img src={artist.avatar} alt={artist.name} />
-                  ) : (
-                    getInitial(artist.name)
-                  )}
-                </div>
-                <div className="artist-card-content">
-                  <div className="artist-row-info">
-                    <div className="artist-name-inline">{artist.name}</div>
-                    <div className="artist-location-inline">{artist.location}</div>
+                {/* Tapping the card body opens the artist profile; Manage and
+                    Delete stay as their own controls. Removing the VIEW button
+                    frees the space that was squeezing the name/location. */}
+                <div
+                  className="artist-card-main"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleViewProfile(artist)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleViewProfile(artist); } }}
+                >
+                  <div className="artist-avatar-small">
+                    {artist.avatar ? (
+                      <img src={artist.avatar} alt={artist.name} />
+                    ) : (
+                      getInitial(artist.name)
+                    )}
+                  </div>
+                  <div className="artist-card-content">
+                    <div className="artist-row-info">
+                      <div className="artist-name-inline">{artist.name}</div>
+                      <div className="artist-location-inline">{artist.location}</div>
+                    </div>
                   </div>
                 </div>
                 <div className="artist-row-actions">
-                  <button
-                    className="btn btn-outline btn-sm"
-                    onClick={() => handleViewProfile(artist)}
-                  >
-                    {t('roster.view')}
-                  </button>
                   <button
                     className="btn btn-primary btn-sm"
                     onClick={() => handleManageArtist(artist)}
@@ -306,7 +311,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       <AgentUpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        currentTier={user?.agentTier || null}
+        rosterCount={representedArtists.length}
       />
     </div>
   );

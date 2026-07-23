@@ -71,6 +71,9 @@ const InviteFriendsSection = () => {
           <p className="m-0 mb-3 text-sm leading-relaxed text-white/50">
             {t('referrals.intro', { cap: data?.cap ?? 3 })}
           </p>
+          <p className="m-0 mb-3 text-xs font-semibold leading-relaxed text-[#FF7A9C]">
+            {t('referrals.rewardNote')}
+          </p>
 
           {/* slot indicators */}
           <div className="mb-3 flex items-center gap-2">

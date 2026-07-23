@@ -587,7 +587,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
       {/* Message Modal - rendered on top of everything */}
       {showMessageModal && selectedArtist && (
-        <div className="modal-overlay" onClick={handleCancelMessage}>
+        <div className="modal-overlay rep-request-modal" onClick={handleCancelMessage}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{t('findArtist.sendRepresentationRequest')}</h2>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { appAlert } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
-import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon, SlashCircleIcon, LocationIcon } from '../../utils/icons';
+import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon, LocationIcon } from '../../utils/icons';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
+import LimitReachedModal from '../common/LimitReachedModal';
 import apiService from '../../services/api';
 import VerifiedBadge from '../common/VerifiedBadge';
 import ProfileBadges from '../common/ProfileBadges';
@@ -956,88 +957,22 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
       {/* Like Limit Modal */}
       {showLikeLimitModal && likeLimitData && (
-        <div className="modal-overlay" onClick={() => setShowLikeLimitModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{t('search.dailyLikeLimitReached')}</h3>
-              <button className="modal-close" onClick={() => setShowLikeLimitModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="limit-message-centered">
-                <div className="limit-icon">
-                  <SlashCircleIcon />
-                </div>
-                <p className="limit-main-text">{t('search.dailyLikeLimitMessage')}</p>
-              </div>
-
-              <div className="tier-info-box">
-                <p className="tier-details">{t('search.currentPlan')} <strong>{likeLimitData.tier}</strong> • {t('search.likesPerDay', { n: likeLimitData.limit })}</p>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                className="btn btn-outline"
-                onClick={() => setShowLikeLimitModal(false)}
-              >
-                {t('common.close')}
-              </button>
-              <button
-                className="btn btn-upgrade"
-                onClick={() => {
-                  setShowLikeLimitModal(false);
-                  if (onOpenPremium) {
-                    onOpenPremium();
-                  }
-                }}
-              >
-                {t('search.upgrade')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <LimitReachedModal
+          type="likes"
+          data={likeLimitData}
+          onClose={() => setShowLikeLimitModal(false)}
+          onOpenPremium={onOpenPremium}
+        />
       )}
 
       {/* Connection Limit Modal */}
       {showConnectionLimitModal && connectionLimitData && (
-        <div className="modal-overlay" onClick={() => setShowConnectionLimitModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{t('search.monthlyConnectionLimitReached')}</h3>
-              <button className="modal-close" onClick={() => setShowConnectionLimitModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="limit-message-centered">
-                <div className="limit-icon">
-                  <SlashCircleIcon />
-                </div>
-                <p className="limit-main-text">{t('search.monthlyConnectionLimitMessage')}</p>
-              </div>
-
-              <div className="tier-info-box">
-                <p className="tier-details">{t('search.currentPlan')} <strong>{connectionLimitData.tier}</strong> • {t('search.connectionsPerMonth', { n: connectionLimitData.limit })}</p>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                className="btn btn-outline"
-                onClick={() => setShowConnectionLimitModal(false)}
-              >
-                {t('common.close')}
-              </button>
-              <button
-                className="btn btn-upgrade"
-                onClick={() => {
-                  setShowConnectionLimitModal(false);
-                  if (onOpenPremium) {
-                    onOpenPremium();
-                  }
-                }}
-              >
-                {t('search.upgrade')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <LimitReachedModal
+          type="connections"
+          data={connectionLimitData}
+          onClose={() => setShowConnectionLimitModal(false)}
+          onOpenPremium={onOpenPremium}
+        />
       )}
     </div>
   );

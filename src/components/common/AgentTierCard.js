@@ -1,22 +1,20 @@
 import React from 'react';
-import { AGENT_TIER_PRICING, BILLING_INTERVAL, rosterUsage, formatEur } from '../../utils/agentTiers';
+import { isPaidAgent, rosterUsage, AGENT_FREE_ARTISTS } from '../../utils/agentTiers';
+import { useLanguage } from '../../contexts/LanguageContext';
 
+// Settings summary card for AGENT profiles. Reflects the per-seat model:
+// a free plan covers AGENT_FREE_ARTISTS; a paid subscription is unlimited and
+// billed by roster size (see AgentSeatPricing for the band table).
 const AgentTierCard = ({ profile, onManage }) => {
-  const tierKey = profile?.agentTier || null;
-  const tierMeta = tierKey ? AGENT_TIER_PRICING[tierKey] : null;
+  const { t } = useLanguage();
+  const paid = isPaidAgent(profile);
   const usage = rosterUsage(profile);
-  const interval = profile?.agentBillingInterval === BILLING_INTERVAL.YEARLY
-    ? BILLING_INTERVAL.YEARLY
-    : BILLING_INTERVAL.MONTHLY;
+  const interval = profile?.subscriptionTier === 'YEARLY' ? t('agentSeat.perYear') : t('agentSeat.perMonth');
 
-  let priceLine;
-  if (!tierMeta) priceLine = 'Pick a plan to start representing artists';
-  else {
-    const price = interval === BILLING_INTERVAL.YEARLY ? tierMeta.yearlyEur : tierMeta.monthlyEur;
-    priceLine = price != null
-      ? `${formatEur(price)} / ${interval === BILLING_INTERVAL.YEARLY ? 'yr' : 'mo'}`
-      : 'Custom pricing';
-  }
+  const title = paid ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan');
+  const priceLine = paid
+    ? t('agentSeatCard.billedRoster', { n: usage.current, interval })
+    : t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS });
 
   return (
     <div style={{
@@ -27,15 +25,11 @@ const AgentTierCard = ({ profile, onManage }) => {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: '#fff' }}>
-            {tierMeta ? tierMeta.label : 'No plan yet'}
-          </div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>
-            {priceLine}
-          </div>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: '#fff' }}>{title}</div>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>{priceLine}</div>
         </div>
         <button className="btn btn-primary btn-sm" onClick={onManage}>
-          {tierMeta ? 'Manage subscription' : 'Choose plan'}
+          {paid ? t('agentSeatCard.manage') : t('agentSeatCard.choosePlan')}
         </button>
       </div>
       <div style={{
@@ -47,10 +41,8 @@ const AgentTierCard = ({ profile, onManage }) => {
         fontSize: '13px',
         color: usage.atLimit ? '#FF3366' : 'rgba(255,255,255,0.75)',
       }}>
-        <strong>Roster: {usage.current}/{usage.cap === Infinity ? '∞' : usage.cap}</strong>
-        {usage.atLimit && (usage.cap === 0
-          ? ' — Pick a plan to start representing artists.'
-          : ' — Upgrade to add more.')}
+        <strong>{t('agentSeatCard.roster')}: {usage.current}/{usage.cap === Infinity ? '∞' : usage.cap}</strong>
+        {usage.atLimit && ` — ${t('agentSeatCard.subscribeToAdd')}`}
       </div>
     </div>
   );

@@ -15,8 +15,10 @@ import SignupScreen from './components/screens/SignupScreen';
 import ForgotPasswordScreen from './components/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './components/screens/ResetPasswordScreen';
 import Modal from './components/common/Modal';
-import AgentTierLadder from './components/common/AgentTierLadder';
+import AgentSeatPricing from './components/common/AgentSeatPricing';
 import AgentTierCard from './components/common/AgentTierCard';
+import ExtrasShop from './components/common/ExtrasShop';
+import { isPaidAgent, rosterUsage } from './utils/agentTiers';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
 import apiService from './services/api';
@@ -30,7 +32,8 @@ import InviteFriendsSection from './components/common/InviteFriendsSection';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import StripeCheckout from './components/common/StripeCheckout';
-import { appConfirm } from './utils/dialogs';
+import BetaTools from './components/common/BetaTools';
+import { appConfirm, appAlert } from './utils/dialogs';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -115,7 +118,14 @@ function App() {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showSubscription, setShowSubscription] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  // Agent per-seat detail ({ seats, amount, priceLabel, perMonthLabel }) so the
+  // summary shows the roster-based price instead of the personal-tier default.
+  const [planDetail, setPlanDetail] = useState(null);
+  // Real charge quoted by the backend once checkout mounts — on plan changes
+  // this is the prorated difference, not the headline plan price.
+  const [checkoutQuote, setCheckoutQuote] = useState(null);
   const [subscriptionStep, setSubscriptionStep] = useState('payment'); // payment, processing, success
+  const [infoFeature, setInfoFeature] = useState(null); // premium feature whose explainer is open
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [passwordChangeData, setPasswordChangeData] = useState({
     currentPassword: '',
@@ -148,6 +158,13 @@ function App() {
     window.addEventListener('tora:offer-limit', onLimit);
     return () => window.removeEventListener('tora:offer-limit', onLimit);
   }, [t]);
+
+  // Open the Premium screen from anywhere (e.g. the agent at-cap modal).
+  useEffect(() => {
+    const openPremium = () => setShowPremium(true);
+    window.addEventListener('tora:open-premium', openPremium);
+    return () => window.removeEventListener('tora:open-premium', openPremium);
+  }, []);
 
 
   // Check if user is already logged in
@@ -403,17 +420,67 @@ function App() {
     messages: <MessagesScreen onOpenChat={setActiveChatUser} chatOpen={!!activeChatUser} isActive={activeTab === 'messages'} />,
   };
 
-  const handleSelectPlan = (plan) => {
+  // Stripe-hosted billing portal: update card, view invoices, cancel.
+  const handleOpenBillingPortal = async () => {
+    try {
+      const res = await apiService.openBillingPortal({ profileId: user?.id, returnUrl: window.location.href });
+      if (res?.url) window.location.assign(res.url);
+    } catch (e) {
+      appAlert(e.message || t('premium.paymentFailed'));
+    }
+  };
+
+  // Deep link from lifecycle emails: /?upgrade=premium opens the Premium page.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('upgrade') && user?.id) {
+      setShowPremium(true);
+      params.delete('upgrade');
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const handleSelectPlan = (plan, detail = null) => {
     setSelectedPlan(plan);
-    setShowPremium(false);
+    setPlanDetail(detail);
+    setCheckoutQuote(null);
+    // Keep the Premium screen mounted underneath so closing the checkout
+    // returns there (not to the profile page).
     setShowSubscription(true);
     setSubscriptionStep('payment');
   };
 
+  // Closing the checkout mid-flow returns to TORA Premium; on the success
+  // step it finishes and drops the user into the app.
+  const handleCloseSubscription = () => {
+    if (subscriptionStep === 'success') { handleSubscriptionComplete(); return; }
+    setShowSubscription(false);
+    setSelectedPlan(null);
+    setPlanDetail(null);
+  };
+
+  // A feature-table label that reveals a plain-language explainer when tapped.
+  // Keeps the comparison table scannable while making each row self-explaining
+  // for people who don't yet know the app's vocabulary.
+  const FeatureName = ({ k }) => (
+    <button type="button" className="feature-name feature-name-info" onClick={() => setInfoFeature(k)}>
+      <span>{t(`premium.${k}`)}</span>
+      <svg className="feature-info-dot" width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
+        <path d="M12 11v5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="12" cy="7.5" r="1.1" fill="currentColor" />
+      </svg>
+    </button>
+  );
+
   const handleSubscriptionComplete = () => {
     setShowSubscription(false);
+    setShowPremium(false);
     setSubscriptionStep('payment');
     setSelectedPlan(null);
+    setPlanDetail(null);
     // Here you would update the user's premium status
   };
 
@@ -463,6 +530,7 @@ function App() {
   return (
     <Router>
       <div className={`app-container tab-${activeTab}`}>
+        <BetaTools />
       <AppDialogHost />
         <Header
           onOpenSettings={() => setShowSettings(true)}
@@ -555,10 +623,17 @@ function App() {
               <h3>{user?.role === 'AGENT' ? t('settingsExtra.agentPlan') : t('settingsExtra.subscriptionUsage')}</h3>
 
               {user?.role === 'AGENT' ? (
-                <AgentTierCard
-                  profile={user}
-                  onManage={() => { setShowSettings(false); setShowPremium(true); }}
-                />
+                <>
+                  <AgentTierCard
+                    profile={user}
+                    onManage={() => { setShowSettings(false); setShowPremium(true); }}
+                  />
+                  {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
+                    <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleOpenBillingPortal}>
+                      {t('premium.manageBilling')}
+                    </button>
+                  )}
+                </>
               ) : (
                 <div className="subscription-tier-badge">
                   <span className={`tier-label ${user?.subscriptionTier?.toLowerCase() || 'free'}`}>
@@ -584,6 +659,11 @@ function App() {
                       }}
                     >
                       {t('premium.upgradeToYearly')}
+                    </button>
+                  )}
+                  {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
+                    <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleOpenBillingPortal}>
+                      {t('premium.manageBilling')}
                     </button>
                   )}
                 </div>
@@ -705,18 +785,17 @@ function App() {
 
             <div className="settings-section">
               <h3>{t('settings.language')}</h3>
-              <div className="language-selector">
-                {availableLanguages.map(lang => (
-                  <button
-                    key={lang.code}
-                    className={`language-option ${language === lang.code ? 'active' : ''}`}
-                    onClick={() => changeLanguage(lang.code)}
-                  >
-                    <span className="lang-name">{lang.nativeName}</span>
-                    {language === lang.code && <span className="checkmark">✓</span>}
-                  </button>
+              <select
+                className="form-input currency-dropdown"
+                value={language}
+                onChange={(e) => changeLanguage(e.target.value)}
+              >
+                {availableLanguages.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.nativeName}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
 
             <div className="settings-section">
@@ -896,14 +975,14 @@ function App() {
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.searchVisibility')}</div>
+                  <FeatureName k="searchVisibility" />
                   <div className="tier-value">{t('premium.usersCity')}</div>
                   <div className="tier-value">Global</div>
                   <div className="tier-value tier-value-highlight">Global</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.professionalDashboard')}</div>
+                  <FeatureName k="professionalDashboard" />
                   <div className="tier-value">{t('premium.preview')}</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
@@ -911,7 +990,7 @@ function App() {
 
                 {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
                   <div className="features-table-row">
-                    <div className="feature-name">{t('premium.updateTravelSchedule')}</div>
+                    <FeatureName k="updateTravelSchedule" />
                     <div className="tier-value">—</div>
                     <div className="tier-value">✓</div>
                     <div className="tier-value tier-value-highlight">✓</div>
@@ -919,14 +998,14 @@ function App() {
                 )}
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.calendarMatching')}</div>
+                  <FeatureName k="calendarMatching" />
                   <div className="tier-value">—</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.tourKickstarter')}</div>
+                  <FeatureName k="tourKickstarter" />
                   <div className="tier-value">—</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
@@ -934,7 +1013,7 @@ function App() {
 
                 {(user?.role === 'PROMOTER' || user?.role === 'VENUE') && (
                   <div className="features-table-row">
-                    <div className="feature-name">{t('premium.artistTravelAlerts')}</div>
+                    <FeatureName k="artistTravelAlerts" />
                     <div className="tier-value">—</div>
                     <div className="tier-value">—</div>
                     <div className="tier-value tier-value-highlight">✓</div>
@@ -942,7 +1021,7 @@ function App() {
                 )}
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.calendarPrivacy')}</div>
+                  <FeatureName k="calendarPrivacy" />
                   <div className="tier-value">—</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value tier-value-highlight">✓</div>
@@ -950,7 +1029,7 @@ function App() {
 
                 {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
                   <div className="features-table-row">
-                    <div className="feature-name">{t('premium.feePrivacy')}</div>
+                    <FeatureName k="feePrivacy" />
                     <div className="tier-value">—</div>
                     <div className="tier-value">—</div>
                     <div className="tier-value tier-value-highlight">✓</div>
@@ -958,27 +1037,27 @@ function App() {
                 )}
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.messaging')}</div>
+                  <FeatureName k="messaging" />
                   <div className="tier-value">✓</div>
                   <div className="tier-value">✓</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.prioritySearch')}</div>
+                  <FeatureName k="prioritySearch" />
                   <div className="tier-value">—</div>
                   <div className="tier-value">—</div>
                   <div className="tier-value tier-value-highlight">✓</div>
                 </div>
 
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.sendLikes')}</div>
+                  <FeatureName k="sendLikes" />
                   <div className="tier-value">2 x day</div>
                   <div className="tier-value">5 x day</div>
                   <div className="tier-value tier-value-highlight">Unlimited</div>
                 </div>
                 <div className="features-table-row">
-                  <div className="feature-name">{t('premium.sendOffers')}</div>
+                  <FeatureName k="sendOffers" />
                   <div className="tier-value">{t('premium.perMonth', { n: 3 })}</div>
                   <div className="tier-value tier-value-highlight">{t('premium.unlimited')}</div>
                   <div className="tier-value tier-value-highlight">{t('premium.unlimited')}</div>
@@ -991,7 +1070,7 @@ function App() {
 
               <div className="features-table" style={{ marginTop: '0' }}>
                 <div className="features-table-row" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                  <div className="feature-name">{t('premium.connectionRequests')}</div>
+                  <FeatureName k="connectionRequests" />
                   <div className="tier-value">3 x month</div>
                   <div className="tier-value">10 x month</div>
                   <div className="tier-value tier-value-highlight">Unlimited</div>
@@ -1005,21 +1084,66 @@ function App() {
             
             {user?.role === 'AGENT' ? (
               <div style={{ marginTop: '24px' }}>
-                <AgentTierLadder currentTier={user?.agentTier || null} />
+                {/* Current status: seats used / purchased + which plan is active */}
+                {(() => {
+                  const usage = rosterUsage(user);
+                  const capLabel = usage.cap === Infinity ? '∞' : usage.cap;
+                  const pct = usage.cap === Infinity ? 100 : Math.min(100, Math.round((usage.current / Math.max(usage.cap, 1)) * 100));
+                  return (
+                    <div className="agent-status-banner">
+                      <div className="agent-status-main">
+                        <div className="agent-status-roster">
+                          <span className="agent-status-count">{usage.current} / {capLabel}</span>
+                          <span className="agent-status-label">{t('agentSeat.seatsUsed')}</span>
+                        </div>
+                        <div className="agent-status-bar"><span style={{ width: `${pct}%` }} /></div>
+                      </div>
+                      <span className={`agent-status-plan${isPaidAgent(user) ? ' is-paid' : ''}`}>
+                        {isPaidAgent(user) ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan')}
+                      </span>
+                    </div>
+                  );
+                })()}
+                <AgentSeatPricing
+                  rosterCount={user?.representingArtists?.length || 0}
+                  currentSeats={user?.agentSeats || 0}
+                  isPaid={isPaidAgent(user)}
+                  currentInterval={user?.subscriptionTier === 'YEARLY' ? 'year' : 'month'}
+                  onSubscribe={(interval, detail) => handleSelectPlan(interval === 'year' ? 'yearly' : 'monthly', detail)}
+                />
               </div>
-            ) : (
+            ) : (() => {
+              // Reflect the current plan: a Monthly subscriber sees Monthly as
+              // their current plan and Yearly as an upgrade; a Yearly subscriber
+              // is already at the top; FREE/TRIAL sees both as choices.
+              const hasMonthly = user?.subscriptionTier === 'MONTHLY';
+              const hasYearly = user?.subscriptionTier === 'YEARLY';
+              return (
               <>
                 <div className="premium-pricing">
-                  <div className="price-card">
-                    <h4>{t('premium.monthly')}</h4>
-                    <div className="price">€19.90<span>/month</span></div>
-                    <button className="btn btn-outline" onClick={() => handleSelectPlan('monthly')}>Choose Monthly</button>
-                  </div>
-                  <div className="price-card featured">
-                    <div className="badge">Save 21%</div>
+                  {!hasYearly && (
+                    <div className={`price-card${hasMonthly ? ' is-current' : ''}`}>
+                      {hasMonthly && <div className="badge badge-current">{t('premium.currentPlan')}</div>}
+                      <h4>{t('premium.monthly')}</h4>
+                      <div className="price">€19.90<span>/month</span></div>
+                      {hasMonthly ? (
+                        <button className="btn btn-outline" disabled>{t('premium.currentPlan')}</button>
+                      ) : (
+                        <button className="btn btn-outline" onClick={() => handleSelectPlan('monthly')}>{t('premium.chooseMonthly')}</button>
+                      )}
+                    </div>
+                  )}
+                  <div className={`price-card featured${hasYearly ? ' is-current' : ''}`}>
+                    <div className="badge">{hasYearly ? t('premium.currentPlan') : t('premium.yearlySaveBadge')}</div>
                     <h4>{t('premium.yearly')}</h4>
-                    <div className="price">€189.90<span>/year</span></div>
-                    <button className="btn btn-primary" onClick={() => handleSelectPlan('yearly')}>Choose Yearly</button>
+                    <div className="price">€199.90<span>/year</span></div>
+                    {hasYearly ? (
+                      <button className="btn btn-primary" disabled>{t('premium.currentPlan')}</button>
+                    ) : (
+                      <button className="btn btn-primary" onClick={() => handleSelectPlan('yearly')}>
+                        {hasMonthly ? t('premium.upgradeToYearly') : t('premium.chooseYearly')}
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -1027,47 +1151,120 @@ function App() {
                   {t('premium.cancelAnytime')}
                 </p>
               </>
-            )}
+              );
+            })()}
+
+            <ExtrasShop user={user} />
           </div>
           </div>
         )}
 
+        {/* Feature explainer — plain-language description of a table row */}
+        <Modal
+          isOpen={!!infoFeature}
+          onClose={() => setInfoFeature(null)}
+          className="explainer-modal"
+          title={infoFeature ? t(`premium.${infoFeature}`) : ''}
+        >
+          <div className="feature-explainer">
+            <p className="feature-explainer-text">
+              {infoFeature ? t(`premium.explain.${infoFeature}`) : ''}
+            </p>
+            <button className="btn btn-primary btn-full" onClick={() => setInfoFeature(null)}>
+              {t('common.gotIt')}
+            </button>
+          </div>
+        </Modal>
+
         {/* Subscription Modal */}
         <Modal
           isOpen={showSubscription}
-          onClose={() => setShowSubscription(false)}
+          onClose={handleCloseSubscription}
+          className="subscription-modal"
           title={subscriptionStep === 'success' ? t('premium.welcomeTitle') : t('premium.completeSubscription')}
         >
           <div className="subscription-content">
-            {subscriptionStep === 'payment' && (
+            {subscriptionStep === 'payment' && (() => {
+              // Agents subscribe on the per-seat scale (planDetail carries the
+              // configured roster price); everyone else on the personal tier.
+              const isYearly = selectedPlan === 'yearly';
+              const cycleWord = isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth');
+              const priceLabel = planDetail?.priceLabel || (isYearly ? '€199.90' : '€19.90');
+              const perMonthEq = planDetail ? planDetail.perMonthLabel : '€16.66';
+              const planName = planDetail
+                ? `${planDetail.seats} ${t('agentSeat.artists')}`
+                : t('premium.title');
+              const addedSeats = planDetail?.added || 0;
+              return (
               <>
                 <div className="subscription-summary">
-                  <h3>{t('premium.orderSummary')}</h3>
-                  <div className="summary-item">
-                    <span>{t('premium.title')}</span>
-                    <span className="summary-value">
-                      {selectedPlan === 'monthly' ? '€19.90/month' : '€189.90/year'}
-                    </span>
+                  <div className="summary-plan">
+                    <div className="summary-plan-name">
+                      {planName}
+                      <span className="summary-plan-cycle">
+                        {isYearly ? t('premium.yearly') : t('premium.monthly')}
+                      </span>
+                    </div>
+                    <div className="summary-plan-price">
+                      {priceLabel}
+                      <em>/{cycleWord}</em>
+                    </div>
                   </div>
-                  <div className="summary-item">
-                    <span>{t('premium.planType')}</span>
-                    <span className="summary-value">
-                      {selectedPlan === 'monthly' ? t('premium.monthly') : t('premium.yearlySave')}
-                    </span>
-                  </div>
-                  <div className="summary-total">
-                    <span>{t('premium.total')}</span>
-                    <span className="total-value">
-                      {selectedPlan === 'monthly' ? '€19.90' : '€189.90'}
-                    </span>
-                  </div>
+                  {addedSeats > 0 && (
+                    <div className="summary-breakdown">
+                      <div className="summary-breakdown-row">
+                        <span>{t('premium.inPlanSeats', { n: planDetail.currentSeats })}</span>
+                        <span>{planDetail.currentPriceLabel}/{cycleWord}</span>
+                      </div>
+                      <div className="summary-breakdown-row is-add">
+                        <span>{t('premium.addingSeatsRow', { n: addedSeats })}</span>
+                        <span>+{planDetail.addedPriceLabel}/{cycleWord}</span>
+                      </div>
+                    </div>
+                  )}
+                  {isYearly && perMonthEq && (
+                    <div className="summary-saving">
+                      <span className="summary-saving-badge">{t('premium.yearlySaveBadge')}</span>
+                      <span className="summary-saving-eq">≈ {perMonthEq}/{t('agentSeat.perMonth')}</span>
+                    </div>
+                  )}
+                  {(() => {
+                    // The backend quote is the real charge: prorated on plan
+                    // changes, discounted under a launch coupon. Show it as
+                    // "Due today" whenever it differs from the headline price.
+                    const showDue = (checkoutQuote?.change || checkoutQuote?.coupon) && checkoutQuote.amountDue != null;
+                    return (
+                      <>
+                        <div className="summary-total">
+                          <span>{showDue ? t('premium.dueToday') : t('premium.total')}</span>
+                          <span className="total-value">
+                            {showDue ? `€${Number(checkoutQuote.amountDue).toFixed(2)}` : priceLabel}
+                          </span>
+                        </div>
+                        {checkoutQuote?.change && (
+                          <p className="summary-change-note">
+                            {t('premium.thenRecurring', { price: priceLabel, cycle: cycleWord })}
+                          </p>
+                        )}
+                      </>
+                    );
+                  })()}
+                  <p className="summary-renewal">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M20 11a8 8 0 1 0-.6 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M20 5v6h-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {t('premium.autoRenew', { cycle: cycleWord })}
+                  </p>
                 </div>
 
                 <div className="payment-section">
                   <h3>{t('premium.paymentMethod')}</h3>
                   <StripeCheckout
                     profileId={user?.id}
-                    interval={selectedPlan === 'yearly' ? 'year' : 'month'}
+                    interval={isYearly ? 'year' : 'month'}
+                    seats={planDetail?.seats}
+                    onQuote={setCheckoutQuote}
                     onSuccess={async () => {
                       setSubscriptionStep('success');
                       // Pull the fresh tier onto the active profile so premium
@@ -1084,11 +1281,16 @@ function App() {
                     }}
                   />
                   <p className="payment-note">
-                    🔒 Secure payment processed by Stripe
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" strokeWidth="1.7" />
+                      <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                    </svg>
+                    {t('premium.securedByStripe')}
                   </p>
                 </div>
               </>
-            )}
+              );
+            })()}
 
             {subscriptionStep === 'processing' && (
               <div className="processing-state">
@@ -1100,26 +1302,22 @@ function App() {
 
             {subscriptionStep === 'success' && (
               <div className="success-state">
-                <div className="success-icon">✨</div>
+                <div className="success-icon">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
                 <h2>{t('premium.nowPremium')}</h2>
                 <p>{t('premium.welcomeDesc')}</p>
-                
+
                 <div className="success-features">
-                  <div className="success-feature">
-                    <span>✓</span> Global Search Unlocked
-                  </div>
-                  <div className="success-feature">
-                    <span>✓</span> Calendar Matching Active
-                  </div>
-                  <div className="success-feature">
-                    <span>✓</span> Unlimited Messages
-                  </div>
-                  <div className="success-feature">
-                    <span>✓</span> Travel Mode Enabled
-                  </div>
+                  <div className="success-feature"><span>✓</span> {t('premium.successGlobalSearch')}</div>
+                  <div className="success-feature"><span>✓</span> {t('premium.successCalendarMatching')}</div>
+                  <div className="success-feature"><span>✓</span> {t('premium.successUnlimitedMessages')}</div>
+                  <div className="success-feature"><span>✓</span> {t('premium.successTravelMode')}</div>
                 </div>
 
-                <button 
+                <button
                   className="btn btn-primary btn-full"
                   onClick={handleSubscriptionComplete}
                 >

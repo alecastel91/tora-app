@@ -4303,18 +4303,43 @@
   padding: 20px;
 }
 
+/* ---- Deep refined modal surface — ONE definition shared by the message
+   modal, the rep-request modal and the subscription modal, so the look can
+   never drift between them. ---- */
+.message-modal-bottom,
+.rep-request-modal .modal-content,
+.subscription-modal .modal-content {
+  position: relative;
+  background:
+    radial-gradient(120% 70% at 50% -10%, rgba(255, 51, 102, 0.10), transparent 60%),
+    linear-gradient(180deg, #0d0d12 0%, #050507 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  box-shadow:
+    0 40px 90px -30px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+/* Hairline infrared accent across the top edge */
+.message-modal-bottom::before,
+.rep-request-modal .modal-content::before,
+.subscription-modal .modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 51, 102, 0.55), transparent);
+  z-index: 1;
+}
+
 .message-modal-bottom {
   width: 100%;
   max-width: 500px;
-  background: rgba(19, 19, 21, 0.85);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
   padding: 24px;
   animation: scaleIn 0.3s ease;
   max-height: 80vh;
-  overflow-y: auto;
+  overflow: hidden auto;
 }
 
 @keyframes scaleIn {
@@ -4329,36 +4354,41 @@
 }
 
 .message-modal-title {
-  font-size: 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
   font-weight: 600;
+  letter-spacing: 0.04em;
   color: var(--text-white);
-  margin: 0 0 16px 0;
+  margin: 4px 0 18px 0;
   text-align: center;
+  text-wrap: balance;
 }
 
 .message-textarea-bottom {
   width: 100%;
   min-height: 120px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.05);
+  background: #0a0a0e;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   color: var(--text-white);
   font-size: 15px;
+  line-height: 1.5;
   resize: none;
   margin-bottom: 20px;
   font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .message-textarea-bottom::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.32);
   font-size: 14px;
 }
 
 .message-textarea-bottom:focus {
   outline: none;
-  border-color: var(--primary-pink);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 51, 102, 0.55);
+  background: #0c0c12;
 }
 
 .message-input-container {
@@ -4399,6 +4429,26 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   border-radius: 19px;
+}
+
+/* Representation-request modal — surface comes from the shared deep-modal
+   rule (see .message-modal-bottom group); only its own bits live here. */
+.rep-request-modal .modal-header h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+.rep-request-modal .form-control {
+  background: #0a0a0e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-white);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.rep-request-modal .form-control:focus {
+  outline: none;
+  border-color: rgba(255, 51, 102, 0.55);
+  background: #0c0c12;
 }
 
 /* Language Selector */
@@ -6302,8 +6352,8 @@
 }
 
 .price-card {
-  background: #0a0a0e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 24px;
   text-align: center;
@@ -6313,16 +6363,33 @@
 }
 
 .price-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
+/* Featured (Yearly): same deep black, distinguished by an infrared border +
+   the faintest crimson wash in the top corner — not a flat pink fill. */
 .price-card.featured {
-  border-color: rgba(255, 51, 102, 0.5);
-  background: rgba(255, 51, 102, 0.05);
+  border-color: rgba(255, 51, 102, 0.45);
+  background:
+    radial-gradient(140% 90% at 50% 0%, rgba(255, 51, 102, 0.10), transparent 60%),
+    #060608;
 }
 
 .price-card.featured:hover {
-  border-color: rgba(255, 51, 102, 0.7);
+  border-color: rgba(255, 51, 102, 0.65);
+}
+
+/* Current-plan state: muted, non-actionable */
+.price-card.is-current { opacity: 0.7; }
+.price-card .badge-current {
+  background: #141418;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.6);
+}
+.premium-pricing .btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
 }
 
 .price-card .badge {
@@ -6601,6 +6668,643 @@
 .success-feature span {
   color: var(--primary-pink);
   font-weight: 600;
+}
+
+/* ============================================================
+   Premium payment — Obsidian Neon restyle
+   ============================================================ */
+
+/* Tappable feature label with an info affordance. Fills the name column and
+   pins the ⓘ to its right edge so every icon lines up in one clean vertical
+   column, regardless of whether the label wraps to one line or two. */
+.feature-name-info {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-white);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  transition: color 0.15s ease;
+}
+.feature-name-info > span { flex: 1; min-width: 0; }
+.feature-name-info:hover { color: #fff; }
+.feature-name-info .feature-info-dot {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.28);
+  transition: color 0.15s ease;
+}
+.feature-name-info:hover .feature-info-dot,
+.feature-name-info:focus-visible .feature-info-dot { color: var(--primary-pink); }
+.feature-name-info:focus-visible { outline: none; }
+
+/* Feature explainer modal body */
+/* Feature-explainer pop-up. Force symmetric spacing: the description is
+   equidistant from the header divider above and the GOT IT button below.
+   A single padding value on the body + a matching text margin guarantees it,
+   overriding any inherited modal-body asymmetry. */
+.explainer-modal .modal-body {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 20px;
+}
+.explainer-modal .feature-explainer {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+/* Scoped with two classes so it beats the global `.modal-body p` (0,1,1)
+   rule that was silently forcing a 12px bottom margin — that mismatch (22px
+   above vs 12px below) was the asymmetry. Now 22px top and bottom. */
+.explainer-modal .feature-explainer-text {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+  margin: 0 0 22px 0;
+}
+
+/* Order summary card — deep near-black, matching the Manage dashboard
+   metric-cards (the app's most refined surface). No grey wash. */
+.subscription-summary {
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0e;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+.summary-plan {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.summary-plan-name {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-white);
+}
+.summary-plan-cycle {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+.summary-plan-price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-white);
+  white-space: nowrap;
+}
+.summary-plan-price em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 2px;
+}
+.summary-saving {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.summary-saving-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 51, 102, 0.14);
+  color: var(--primary-pink);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.summary-saving-eq {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.subscription-summary .summary-total {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+.subscription-summary .summary-total .total-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary-pink);
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+.summary-plan-price { font-variant-numeric: tabular-nums; }
+
+/* ---- Complete Subscription modal shell — surface comes from the shared
+   deep-modal rule (see .message-modal-bottom group); only its own bits here. */
+.subscription-modal .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+.subscription-modal .modal-header h3 {
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.92);
+}
+.subscription-modal .modal-body { padding: 20px 20px 22px; }
+.subscription-modal .subscription-content { padding: 4px 0 0; }
+
+/* Manage subscription & billing (Stripe portal) button in Settings */
+.manage-billing-btn { margin: 16px 0 26px; }
+
+/* Seat-change breakdown: what's already paid vs. what's being added */
+.summary-breakdown {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.summary-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+.summary-breakdown-row.is-add {
+  color: var(--primary-pink);
+  font-weight: 600;
+}
+
+/* Plan-change note: the recurring price that follows the prorated charge */
+.summary-change-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Auto-renewal microcopy under the total */
+.summary-renewal {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.summary-renewal svg { flex-shrink: 0; opacity: 0.75; }
+
+/* Launch-promo banner inside checkout (coupon applied) */
+.checkout-promo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: rgba(255, 51, 102, 0.08);
+  border: 1px solid rgba(255, 51, 102, 0.25);
+}
+.checkout-promo-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-pink);
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 51, 102, 0.16);
+}
+.checkout-promo-due {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Payment section + Stripe element frame */
+.payment-section h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 14px 0;
+}
+.payment-section .StripeElement,
+.payment-section form { width: 100%; }
+/* Breathing room between the Subscribe CTA and the Stripe reassurance line */
+.payment-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.payment-note svg { flex-shrink: 0; opacity: 0.8; }
+
+/* Success state — circular infrared check badge */
+.success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 22px;
+  border-radius: 50%;
+  color: var(--primary-pink);
+  background: rgba(255, 51, 102, 0.12);
+  border: 1px solid rgba(255, 51, 102, 0.35);
+}
+
+/* ---- Limit-reached modal (likes/connections) ---- */
+.limit-modal-message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 4px 0 10px;
+}
+.limit-modal-usage {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  margin: 0 0 20px;
+}
+.limit-modal-usage strong { color: var(--primary-pink); }
+.limit-modal-extras-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 10px;
+}
+.limit-modal-upgrade { margin-top: 16px; }
+
+/* ---- Extras shop (one-off top-ups on the Premium page) ---- */
+.extras-shop {
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.extras-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 6px;
+}
+.extras-sub {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+.extras-balance {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-pink);
+  margin: 0 0 14px;
+}
+.extras-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.extras-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 15px;
+  background: #0a0a0e;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-white);
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.15s ease;
+}
+.extras-card:hover { border-color: rgba(255, 51, 102, 0.45); }
+.extras-card-label { font-size: 12.5px; font-weight: 500; text-align: left; }
+.extras-card-price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-pink);
+  white-space: nowrap;
+}
+.extras-success {
+  text-align: center;
+  color: #43E97B;
+  font-size: 14px;
+  margin: 6px 0 18px;
+}
+
+/* Agent current-status banner on the Premium page */
+.agent-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  background: #0a0a0e;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+}
+.agent-status-main {
+  flex: 1;
+  min-width: 0;
+}
+.agent-status-roster {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.agent-status-count {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+/* Seat usage progress bar */
+.agent-status-bar {
+  margin-top: 10px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.agent-status-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-pink), #ff6b8a);
+  transition: width 0.3s ease;
+}
+.agent-status-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+.agent-status-plan {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.agent-status-plan.is-paid {
+  color: var(--primary-pink);
+  background: rgba(255, 51, 102, 0.12);
+  border-color: rgba(255, 51, 102, 0.3);
+}
+
+/* ============================================================
+   Agent per-seat pricing panel
+   ============================================================ */
+.agent-seat {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.agent-seat-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.agent-seat-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-white);
+}
+.agent-seat-sub {
+  margin: 5px 0 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 340px;
+}
+.agent-seat-toggle {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+.agent-seat-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.agent-seat-toggle button.is-active {
+  background: var(--primary-pink);
+  color: #fff;
+}
+.agent-seat-save {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.agent-seat-toggle button.is-active .agent-seat-save { opacity: 1; }
+
+/* Estimator */
+.agent-seat-estimator {
+  background: #101015;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--tora-radius-lg);
+  padding: 18px;
+}
+.agent-seat-estimator-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+/* Clarifies included vs. additional seats under the counter */
+.agent-seat-context {
+  margin: -6px 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+}
+.agent-seat-estimator-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.agent-seat-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 3px;
+}
+.agent-seat-stepper button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.agent-seat-stepper button:hover { background: rgba(255, 51, 102, 0.25); }
+.agent-seat-count {
+  min-width: 34px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.agent-seat-range {
+  width: 100%;
+  accent-color: var(--primary-pink);
+  cursor: pointer;
+}
+.agent-seat-estimate-out {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 12px;
+}
+.agent-seat-estimate-total {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.agent-seat-estimate-total em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 1px;
+}
+.agent-seat-estimate-eq {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Band breakdown */
+.agent-seat-bands {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agent-seat-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.015);
+  transition: border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  opacity: 0.55;
+}
+.agent-seat-band.is-active {
+  opacity: 1;
+  border-color: rgba(255, 51, 102, 0.3);
+  background: rgba(255, 51, 102, 0.05);
+}
+.agent-seat-band-range {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-white);
+}
+.agent-seat-band-rate {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.agent-seat-band-rate em {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 3px;
+}
+.agent-seat-note {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+.agent-seat-cta { margin-top: 4px; }
+.agent-seat-foot {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: center;
 }
 
 /* Enhanced Interactive Map Styles */
@@ -6899,6 +7603,25 @@
   object-fit: cover;
 }
 
+/* Whole card body is the tap target → artist profile */
+.artist-card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.artist-card-main:focus-visible {
+  outline: 2px solid rgba(255, 51, 102, 0.5);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
 .artist-card-content {
   flex: 1;
   min-width: 0;
@@ -6914,16 +7637,24 @@
   color: var(--text-white);
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .artist-location-inline {
   color: var(--text-secondary);
   font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .artist-row-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .artist-row-actions .btn-sm {
@@ -13281,3 +14012,48 @@ textarea.form-textarea:focus {
   background: #FFC107;
   flex-shrink: 0;
 }
+
+/* ============================================================
+   Beta environment chrome (banner + feedback FAB) — only renders
+   when VITE_TORA_ENV=beta; zero footprint in prod builds.
+   ============================================================ */
+.beta-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 26px;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #241a00;
+  border-bottom: 1px solid rgba(255, 184, 0, 0.35);
+  color: #FFB800;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+body.beta-env .app-container { padding-top: 26px; }
+body.beta-env .app-header { top: 26px !important; }
+
+.beta-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 92px; /* clears the bottom tab bar */
+  z-index: 1500;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0e;
+  border: 1px solid rgba(255, 51, 102, 0.5);
+  color: var(--text-white);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.beta-fab:hover { border-color: var(--primary-pink); transform: scale(1.05); }

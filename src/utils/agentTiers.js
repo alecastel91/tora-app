@@ -1,40 +1,37 @@
-// Agent pricing ladder — frontend mirror of tora-backend-sql/src/utils/
-// agentTiers.js. Keep in sync if you tweak prices. `artistCap: null`
-// means unlimited (ENTERPRISE). A NULL agentTier on a profile means
-// "no paid tier yet" → 0 artists allowed.
+// Agent billing — frontend mirror of tora-backend/src/config/pricing.js +
+// utils/agentTiers.js. Agents pay PER SEAT (per represented artist) on a
+// graduated scale — there are no fixed tiers. The free plan covers
+// AGENT_FREE_ARTISTS; a paid subscription (MONTHLY/YEARLY) is unlimited and
+// billed by roster size. See AgentSeatPricing for the band table.
 
-export const AGENT_TIER_PRICING = {
-  SOLO:         { label: 'Solo Agent', monthlyEur: 19.90,  yearlyEur: 189.90,  artistCap: 3   },
-  AGENCY_S:     { label: 'Agency S',   monthlyEur: 39.90,  yearlyEur: 379.90,  artistCap: 10  },
-  AGENCY_M:     { label: 'Agency M',   monthlyEur: 69.90,  yearlyEur: 669.90,  artistCap: 25  },
-  AGENCY_L:     { label: 'Agency L',   monthlyEur: 199.90, yearlyEur: 1899.90, artistCap: 50  },
-  AGENCY_LPLUS: { label: 'Agency L+',  monthlyEur: 349.90, yearlyEur: 3349.90, artistCap: 100 },
-  ENTERPRISE:   { label: 'Enterprise', monthlyEur: null,   yearlyEur: null,    artistCap: null },
-};
-
-export const AGENT_TIER_KEYS = Object.keys(AGENT_TIER_PRICING);
+// Free agents can represent this many artists before a subscription is needed.
+export const AGENT_FREE_ARTISTS = 1;
 
 // Mirrors prisma BillingInterval enum.
 export const BILLING_INTERVAL = { MONTHLY: 'MONTHLY', YEARLY: 'YEARLY' };
 
-export function getAgentTierPricing(tier) {
-  return AGENT_TIER_PRICING[tier] || null;
+// A paid agent is one on an active member subscription — roster is uncapped.
+export function isPaidAgent(profile) {
+  return ['MONTHLY', 'YEARLY'].includes(profile?.subscriptionTier);
 }
 
+function rosterCount(profile) {
+  return Array.isArray(profile?.representingArtists) ? profile.representingArtists.length : 0;
+}
+
+// Seat model: a paid agent's cap = purchased seats (profile.agentSeats). Free
+// agents get AGENT_FREE_ARTISTS. Legacy paid agents without a stored seat count
+// fall back to their current roster so they're never retroactively over-cap.
 export function getAgentRosterCap(profile) {
-  if (!profile?.agentTier) return 0;
-  const t = AGENT_TIER_PRICING[profile.agentTier];
-  if (!t) return 0;
-  return t.artistCap === null ? Infinity : t.artistCap;
+  if (!isPaidAgent(profile)) return AGENT_FREE_ARTISTS;
+  const seats = Number(profile?.agentSeats);
+  if (Number.isFinite(seats) && seats > 0) return seats;
+  return Math.max(rosterCount(profile), AGENT_FREE_ARTISTS);
 }
 
 export function rosterUsage(profile) {
   const cap = getAgentRosterCap(profile);
-  const current = Array.isArray(profile?.representingArtists) ? profile.representingArtists.length : 0;
+  const current = rosterCount(profile);
   return { current, cap, atLimit: cap !== Infinity && current >= cap };
 }
 
-export function formatEur(amount) {
-  if (amount === null || amount === undefined) return '—';
-  return `€${amount.toFixed(2).replace(/\.00$/, '')}`;
-}

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { subscribeToInbox } from '../services/realtime';
 import { mockUsers, mockConversations, mockExploreFeed } from '../services/mockData';
 import apiService from '../services/api';
 
@@ -261,6 +262,29 @@ export const AppProvider = ({ children }) => {
     }, 60000);
 
     return () => clearInterval(pollInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // Live refresh: when this profile's inbox gets a realtime signal (new message,
+  // an accepted connection/representation request), refetch soon instead of
+  // waiting for the 60s poll — so e.g. an agent's roster updates when an artist
+  // accepts, no manual refresh. Debounced: inbox broadcasts also fire on every
+  // chat message (MessagesScreen has its own subscription for those), so an
+  // active conversation must collapse into one trailing reload, not one per
+  // message.
+  const inboxReloadTimerRef = useRef(null);
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    const unsub = subscribeToInbox(user.id, () => {
+      if (inboxReloadTimerRef.current) clearTimeout(inboxReloadTimerRef.current);
+      inboxReloadTimerRef.current = setTimeout(() => {
+        if (!isLoadingProfileData) reloadProfileData();
+      }, 2500);
+    });
+    return () => {
+      if (inboxReloadTimerRef.current) clearTimeout(inboxReloadTimerRef.current);
+      if (typeof unsub === 'function') unsub();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 

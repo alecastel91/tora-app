@@ -346,20 +346,38 @@ class ApiService {
   }
 
   // ---- Billing (Stripe) ----
-  async startSubscription({ profileId, interval }) {
+  async startSubscription({ profileId, interval, seats }) {
     const response = await fetch(`${API_URL}/billing/subscribe`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ profileId, interval }),
+      body: JSON.stringify({ profileId, interval, seats }),
     });
     return this.handleResponse(response);
   }
 
-  async refreshSubscription({ profileId, subscriptionId }) {
+  async refreshSubscription({ profileId, subscriptionId, paymentIntentId }) {
     const response = await fetch(`${API_URL}/billing/refresh`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ profileId, subscriptionId }),
+      body: JSON.stringify({ profileId, subscriptionId, paymentIntentId }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async purchaseExtra({ profileId, item }) {
+    const response = await fetch(`${API_URL}/billing/extras`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, item }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async openBillingPortal({ profileId, returnUrl }) {
+    const response = await fetch(`${API_URL}/billing/portal`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId, returnUrl }),
     });
     return this.handleResponse(response);
   }
