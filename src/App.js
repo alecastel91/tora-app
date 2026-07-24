@@ -45,7 +45,10 @@ function App() {
   // 'login' | 'signup' | 'forgot' | 'reset'
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : 'login');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('profile');
+  // Beta lands on News so testers see the pinned intro post first
+  const [activeTab, setActiveTab] = useState(
+    import.meta.env.VITE_TORA_ENV === 'beta' ? 'news' : 'profile',
+  );
 
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
   // Goes through switchTab so the target joins mountedTabs (keep-mounted

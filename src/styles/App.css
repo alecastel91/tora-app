@@ -14038,7 +14038,20 @@ textarea.form-textarea:focus {
   /* Never wrap — a 2nd line would overlap the header below it */
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+.beta-banner-text { flex-shrink: 0; }
+/* When the text overflows, both copies scroll left by their own width for a
+   seamless loop (the second copy is added by BetaTools only in ticker mode) */
+.beta-banner.is-ticker { justify-content: flex-start; padding: 0; }
+.beta-banner.is-ticker .beta-banner-text {
+  padding-left: 56px;
+  animation: beta-ticker 16s linear infinite;
+}
+@keyframes beta-ticker {
+  to { transform: translateX(-100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beta-banner.is-ticker .beta-banner-text { animation: none; }
 }
 /* Anchor the whole app 24px below the banner and give it a fresh containing
    block (transform), so the app's own position:fixed header and position:sticky
@@ -14073,3 +14086,35 @@ body.beta-env #root {
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 .beta-fab:hover { border-color: var(--primary-pink); transform: scale(1.05); }
+
+.beta-shot-attach {
+  width: 100%;
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+.beta-shot-preview {
+  position: relative;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.beta-shot-preview img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+}
+.beta-shot-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
