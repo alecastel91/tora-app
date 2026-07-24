@@ -32,13 +32,18 @@ const BetaTools = () => {
     setBusy(true);
     setError('');
     try {
+      // Capture the active tab — the app is a SPA (tabs don't change the URL),
+      // so read the `tab-<name>` class the app-container carries.
+      const container = document.querySelector('.app-container');
+      const tabClass = container && Array.from(container.classList).find((c) => c.startsWith('tab-'));
+      const page = tabClass ? tabClass.replace('tab-', '') : (window.location.pathname || '/');
       const res = await fetch(`${API_URL}/public/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: message.trim(),
           profileId: user?.id || null,
-          page: window.location.hash || window.location.pathname,
+          page,
         }),
       });
       if (!res.ok) throw new Error('Could not send — try again');
@@ -55,7 +60,7 @@ const BetaTools = () => {
 
   return (
     <>
-      <div className="beta-banner">Test environment — bookings and payments here are not real</div>
+      <div className="beta-banner">Test environment · nothing here is real</div>
 
       <button type="button" className="beta-fab" onClick={() => setOpen(true)} aria-label="Send feedback">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">

@@ -14022,21 +14022,27 @@ textarea.form-textarea:focus {
   top: 0;
   left: 0;
   right: 0;
-  height: 26px;
+  height: 24px;
   z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 10px;
   background: #241a00;
   border-bottom: 1px solid rgba(255, 184, 0, 0.35);
   color: #FFB800;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  /* Never wrap — a 2nd line would overlap the header below it */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-body.beta-env .app-container { padding-top: 26px; }
-body.beta-env .app-header { top: 26px !important; }
+/* Reserve exactly the banner's height so nothing is cropped */
+body.beta-env .app-container { padding-top: 24px; }
+body.beta-env .app-header { top: 24px !important; }
 
 .beta-fab {
   position: fixed;
