@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAppContext } from '../../contexts/AppContext';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -60,7 +61,12 @@ const BetaTools = () => {
 
   return (
     <>
-      <div className="beta-banner">Test environment · nothing here is real</div>
+      {/* Portaled to <body> so it pins to the true screen top, above the
+          transformed #root (which is anchored 24px down — see App.css). */}
+      {createPortal(
+        <div className="beta-banner">Test environment · nothing here is real</div>,
+        document.body,
+      )}
 
       <button type="button" className="beta-fab" onClick={() => setOpen(true)} aria-label="Send feedback">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">

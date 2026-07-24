@@ -14040,9 +14040,19 @@ textarea.form-textarea:focus {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Reserve exactly the banner's height so nothing is cropped */
-body.beta-env .app-container { padding-top: 24px; }
-body.beta-env .app-header { top: 24px !important; }
+/* Anchor the whole app 24px below the banner and give it a fresh containing
+   block (transform), so the app's own position:fixed header and position:sticky
+   sub-tabs re-anchor to this shorter box automatically — no per-element offsets,
+   nothing clipped. `body` is position:fixed, so #root can absolutely fill it. */
+body.beta-env #root {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: auto;
+  transform: translateZ(0);
+}
 
 .beta-fab {
   position: fixed;
