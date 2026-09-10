@@ -1404,6 +1404,10 @@ const fr = {
   },
 
   settings: {
+    deleteAccountWarning: 'Cela supprime définitivement votre compte, tous vos profils, réservations, messages et fichiers. Tout abonnement est annulé. Cette action est irréversible. Saisissez votre mot de passe pour confirmer.',
+    deleteAccountConfirm: 'Supprimer mon compte',
+    accountDeleted: 'Votre compte a été supprimé.',
+    deleteAccountFailed: 'Impossible de supprimer le compte. Réessayez.',
     title: 'Paramètres',
     account: 'Compte',
     email: 'E-mail',

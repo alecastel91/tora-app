@@ -1404,6 +1404,10 @@ const ko = {
   },
 
   settings: {
+    deleteAccountWarning: '계정, 모든 프로필, 부킹, 메시지, 파일이 영구적으로 삭제됩니다. 구독도 해지됩니다. 이 작업은 되돌릴 수 없습니다. 확인을 위해 비밀번호를 입력하세요.',
+    deleteAccountConfirm: '내 계정 삭제',
+    accountDeleted: '계정이 삭제되었습니다.',
+    deleteAccountFailed: '계정을 삭제하지 못했습니다. 다시 시도해 주세요.',
     title: '설정',
     account: '계정',
     email: '이메일',

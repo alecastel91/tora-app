@@ -1404,6 +1404,10 @@ const ja = {
   },
 
   settings: {
+    deleteAccountWarning: 'アカウント、すべてのプロフィール、ブッキング、メッセージ、ファイルが完全に削除されます。サブスクリプションも解約されます。この操作は取り消せません。確認のためパスワードを入力してください。',
+    deleteAccountConfirm: 'アカウントを削除する',
+    accountDeleted: 'アカウントを削除しました。',
+    deleteAccountFailed: 'アカウントを削除できませんでした。もう一度お試しください。',
     title: '設定',
     account: 'アカウント',
     email: 'メール',

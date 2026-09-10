@@ -1404,6 +1404,10 @@ const it = {
   },
 
   settings: {
+    deleteAccountWarning: 'Questo elimina definitivamente il tuo account, tutti i profili, le prenotazioni, i messaggi e i file. Qualsiasi abbonamento viene annullato. L\'operazione non è reversibile. Inserisci la password per confermare.',
+    deleteAccountConfirm: 'Elimina il mio account',
+    accountDeleted: 'Il tuo account è stato eliminato.',
+    deleteAccountFailed: 'Impossibile eliminare l\'account. Riprova.',
     title: 'Impostazioni',
     account: 'Account',
     email: 'Email',

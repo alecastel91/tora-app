@@ -590,6 +590,16 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Self-service account deletion — password re-check server-side.
+  async deleteAccount(password) {
+    const response = await fetch(`${API_URL}/auth/account`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ password })
+    });
+    return this.handleResponse(response);
+  }
+
   async deleteProfile(profileId) {
     const response = await fetch(`${API_URL}/profiles/${profileId}`, {
       method: 'DELETE',

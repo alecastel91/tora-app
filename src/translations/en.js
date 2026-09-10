@@ -1413,6 +1413,10 @@ const en = {
   
   // Settings
   settings: {
+    deleteAccountWarning: 'This permanently deletes your account, all your profiles, bookings, messages and files. Any subscription is cancelled. This cannot be undone. Enter your password to confirm.',
+    deleteAccountConfirm: 'Delete my account',
+    accountDeleted: 'Your account has been deleted.',
+    deleteAccountFailed: 'Could not delete the account. Please try again.',
     title: 'Settings',
     account: 'Account',
     email: 'Email',

@@ -1404,6 +1404,10 @@ const zh = {
   },
 
   settings: {
+    deleteAccountWarning: '这将永久删除您的账户、所有档案、预订、消息和文件。任何订阅都会被取消。此操作无法撤销。请输入密码以确认。',
+    deleteAccountConfirm: '删除我的账户',
+    accountDeleted: '您的账户已删除。',
+    deleteAccountFailed: '无法删除账户,请重试。',
     title: '设置',
     account: '账户',
     email: '邮箱',

@@ -1404,6 +1404,10 @@ const pt = {
   },
 
   settings: {
+    deleteAccountWarning: 'Isso exclui permanentemente sua conta, todos os seus perfis, reservas, mensagens e arquivos. Qualquer assinatura é cancelada. Não é possível desfazer. Digite sua senha para confirmar.',
+    deleteAccountConfirm: 'Excluir minha conta',
+    accountDeleted: 'Sua conta foi excluída.',
+    deleteAccountFailed: 'Não foi possível excluir a conta. Tente novamente.',
     title: 'Definições',
     account: 'Conta',
     email: 'Email',

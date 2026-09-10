@@ -496,6 +496,32 @@ function App() {
     setIsAuthenticated(true);
   };
 
+  // Delete account (Settings): password re-check, then the GDPR cascade.
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteAccountPassword, setDeleteAccountPassword] = useState('');
+  const [deleteAccountError, setDeleteAccountError] = useState('');
+  const [deleteAccountBusy, setDeleteAccountBusy] = useState(false);
+  const closeDeleteAccount = () => {
+    setShowDeleteAccount(false);
+    setDeleteAccountPassword('');
+    setDeleteAccountError('');
+  };
+  const handleDeleteAccount = async () => {
+    if (!deleteAccountPassword || deleteAccountBusy) return;
+    setDeleteAccountBusy(true);
+    setDeleteAccountError('');
+    try {
+      await apiService.deleteAccount(deleteAccountPassword);
+      closeDeleteAccount();
+      handleLogout();
+      appAlert(t('settings.accountDeleted'));
+    } catch (err) {
+      setDeleteAccountError(err.message || t('settings.deleteAccountFailed'));
+    } finally {
+      setDeleteAccountBusy(false);
+    }
+  };
+
   const handleLogout = () => {
     apiService.logout();
     setIsAuthenticated(false);
@@ -1120,11 +1146,36 @@ function App() {
             
             <div className="settings-actions">
               <button className="btn btn-outline" onClick={handleLogout}>{t('settings.signOut') || 'Sign Out'}</button>
-              <button className="btn btn-danger">{t('settings.deleteAccount')}</button>
+              <button className="btn btn-danger" onClick={() => setShowDeleteAccount(true)}>{t('settings.deleteAccount')}</button>
             </div>
             </div>
           </div>
         )}
+
+        {/* Delete Account Modal — App Store + GDPR self-service deletion */}
+        <Modal isOpen={showDeleteAccount} onClose={closeDeleteAccount} title={t('settings.deleteAccount')}>
+          <div className="password-change-content">
+            <p className="text-sm text-white/70 mb-4">{t('settings.deleteAccountWarning')}</p>
+            {deleteAccountError && <div className="error-message">{deleteAccountError}</div>}
+            <div className="form-group">
+              <label>{t('settingsExtra.currentPassword')}</label>
+              <input
+                type="password"
+                value={deleteAccountPassword}
+                onChange={(e) => setDeleteAccountPassword(e.target.value)}
+                placeholder={t('settingsExtra.enterCurrentPassword')}
+                className="form-input"
+                autoComplete="current-password"
+              />
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button className="btn btn-outline btn-full" onClick={closeDeleteAccount} disabled={deleteAccountBusy}>{t('common.cancel')}</button>
+              <button className="btn btn-danger btn-full" onClick={handleDeleteAccount} disabled={deleteAccountBusy || !deleteAccountPassword}>
+                {deleteAccountBusy ? t('common.loading') : t('settings.deleteAccountConfirm')}
+              </button>
+            </div>
+          </div>
+        </Modal>
 
         {/* Password Change Modal */}
         <Modal
