@@ -1008,6 +1008,7 @@ const zh = {
   },
 
   auth: {
+    accountRestored: '欢迎回来,您的账户已恢复。',
     confirmPassword: '确认密码',
     loginFailed: '登录失败。请重试。',
     email: '邮箱',
@@ -1405,9 +1406,9 @@ const zh = {
 
   settings: {
     deleteAccountLiveBookings: '您还有已确认的即将到来的预订。请先取消或完成它们,再删除账户。',
-    deleteAccountWarning: '这将永久删除您的账户、所有档案、预订、消息和文件。任何订阅都会被取消。此操作无法撤销。请输入密码以确认。',
+    deleteAccountWarning: '您的账户将立即停用:档案会隐藏,订阅停止续费。30 天后所有数据将被永久删除。改变主意了?30 天内重新登录即可恢复。请输入密码以确认。',
     deleteAccountConfirm: '删除我的账户',
-    accountDeleted: '您的账户已删除。',
+    accountDeleted: '您的账户已停用,将在 30 天后永久删除。在此之前重新登录即可恢复。',
     deleteAccountFailed: '无法删除账户,请重试。',
     title: '设置',
     account: '账户',

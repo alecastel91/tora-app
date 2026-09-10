@@ -1008,6 +1008,7 @@ const fr = {
   },
 
   auth: {
+    accountRestored: 'Bon retour — votre compte a été restauré.',
     confirmPassword: 'Confirmer le mot de passe',
     loginFailed: 'Échec de la connexion. Réessayez.',
     email: 'E-mail',
@@ -1405,9 +1406,9 @@ const fr = {
 
   settings: {
     deleteAccountLiveBookings: 'Vous avez encore des réservations acceptées à venir. Annulez-les ou terminez-les avant de supprimer votre compte.',
-    deleteAccountWarning: 'Cela supprime définitivement votre compte, tous vos profils, réservations, messages et fichiers. Tout abonnement est annulé. Cette action est irréversible. Saisissez votre mot de passe pour confirmer.',
+    deleteAccountWarning: 'Votre compte sera désactivé maintenant : vos profils disparaissent et tout abonnement cesse de se renouveler. Après 30 jours, tout est définitivement supprimé. Vous changez d\'avis ? Reconnectez-vous dans les 30 jours pour le restaurer. Saisissez votre mot de passe pour confirmer.',
     deleteAccountConfirm: 'Supprimer mon compte',
-    accountDeleted: 'Votre compte a été supprimé.',
+    accountDeleted: 'Votre compte est désactivé et sera définitivement supprimé dans 30 jours. Reconnectez-vous avant pour le restaurer.',
     deleteAccountFailed: 'Impossible de supprimer le compte. Réessayez.',
     title: 'Paramètres',
     account: 'Compte',

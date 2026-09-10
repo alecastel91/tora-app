@@ -1008,6 +1008,7 @@ const ko = {
   },
 
   auth: {
+    accountRestored: '다시 오신 것을 환영합니다. 계정이 복원되었습니다.',
     confirmPassword: '비밀번호 확인',
     loginFailed: '로그인에 실패했습니다. 다시 시도해 주세요.',
     email: '이메일',
@@ -1405,9 +1406,9 @@ const ko = {
 
   settings: {
     deleteAccountLiveBookings: '수락된 예정 부킹이 남아 있습니다. 계정을 삭제하기 전에 취소하거나 완료해 주세요.',
-    deleteAccountWarning: '계정, 모든 프로필, 부킹, 메시지, 파일이 영구적으로 삭제됩니다. 구독도 해지됩니다. 이 작업은 되돌릴 수 없습니다. 확인을 위해 비밀번호를 입력하세요.',
+    deleteAccountWarning: '계정이 지금 비활성화됩니다. 프로필이 숨겨지고 구독 갱신이 중단됩니다. 30일 후 모든 데이터가 영구 삭제됩니다. 마음이 바뀌면 30일 이내에 다시 로그인하여 복원할 수 있습니다. 확인을 위해 비밀번호를 입력하세요.',
     deleteAccountConfirm: '내 계정 삭제',
-    accountDeleted: '계정이 삭제되었습니다.',
+    accountDeleted: '계정이 비활성화되었으며 30일 후 영구 삭제됩니다. 그 전에 다시 로그인하면 복원됩니다.',
     deleteAccountFailed: '계정을 삭제하지 못했습니다. 다시 시도해 주세요.',
     title: '설정',
     account: '계정',

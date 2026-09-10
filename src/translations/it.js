@@ -1008,6 +1008,7 @@ const it = {
   },
 
   auth: {
+    accountRestored: 'Bentornato: il tuo account è stato ripristinato.',
     confirmPassword: 'Conferma password',
     loginFailed: 'Accesso non riuscito. Riprova.',
     email: 'Email',
@@ -1405,9 +1406,9 @@ const it = {
 
   settings: {
     deleteAccountLiveBookings: 'Hai ancora prenotazioni accettate in programma. Annullale o completale prima di eliminare l\'account.',
-    deleteAccountWarning: 'Questo elimina definitivamente il tuo account, tutti i profili, le prenotazioni, i messaggi e i file. Qualsiasi abbonamento viene annullato. L\'operazione non è reversibile. Inserisci la password per confermare.',
+    deleteAccountWarning: 'Il tuo account verrà disattivato subito: i profili scompaiono e qualsiasi abbonamento smette di rinnovarsi. Dopo 30 giorni tutto viene eliminato definitivamente. Hai cambiato idea? Accedi di nuovo entro 30 giorni per ripristinarlo. Inserisci la password per confermare.',
     deleteAccountConfirm: 'Elimina il mio account',
-    accountDeleted: 'Il tuo account è stato eliminato.',
+    accountDeleted: 'Il tuo account è disattivato e verrà eliminato definitivamente tra 30 giorni. Accedi di nuovo prima di allora per ripristinarlo.',
     deleteAccountFailed: 'Impossibile eliminare l\'account. Riprova.',
     title: 'Impostazioni',
     account: 'Account',

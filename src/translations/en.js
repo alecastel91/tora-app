@@ -1008,6 +1008,7 @@ const en = {
   },
 
   auth: {
+    accountRestored: 'Welcome back — your account has been restored.',
     confirmPassword: 'Confirm Password',
     loginFailed: 'Login failed. Please try again.',
     email: 'Email',
@@ -1414,9 +1415,9 @@ const en = {
   // Settings
   settings: {
     deleteAccountLiveBookings: 'You still have upcoming accepted bookings. Cancel or complete them before deleting your account.',
-    deleteAccountWarning: 'This permanently deletes your account, all your profiles, bookings, messages and files. Any subscription is cancelled. This cannot be undone. Enter your password to confirm.',
+    deleteAccountWarning: 'Your account will be deactivated now: your profiles disappear and any subscription stops renewing. After 30 days everything is permanently deleted. Changed your mind? Just log in again within 30 days to restore it. Enter your password to confirm.',
     deleteAccountConfirm: 'Delete my account',
-    accountDeleted: 'Your account has been deleted.',
+    accountDeleted: 'Your account is deactivated and will be permanently deleted in 30 days. Log in again before then to restore it.',
     deleteAccountFailed: 'Could not delete the account. Please try again.',
     title: 'Settings',
     account: 'Account',

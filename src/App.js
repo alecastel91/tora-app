@@ -452,6 +452,9 @@ function App() {
     console.log('[App] Profiles:', data.profiles);
     console.log('[App] Profile:', data.profile);
 
+    // A login inside the 30-day window cancels a pending account deletion.
+    if (data.restored) appAlert(t('auth.accountRestored'));
+
     // Store account-level user data
     if (data.user) {
       setAccountUser(data.user);
