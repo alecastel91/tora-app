@@ -80,6 +80,7 @@ class ApiService {
 
       // Create an error object that mimics axios structure
       const error = new Error(errorData.message || errorData.error || 'Request failed');
+      error.code = errorData.code; // machine-readable reason (e.g. LIVE_BOOKINGS)
       error.response = {
         status: response.status,
         data: errorData

@@ -17,6 +17,7 @@ import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
+import { OFF_STATUSES } from '../../utils/dealStatus';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatTimestamp, formatEventDate } from '../../utils/dates';
@@ -39,7 +40,6 @@ function validatePaymentProof(file) {
 // as they come; the two dead ends sit last and only ever apply to the
 // Cancelled tab.
 const DEAL_DISPLAY_STATUSES = ['PENDING', 'NEGOTIATING', 'ACCEPTED', 'CONTRACT SIGNED', 'DOCS SHARED', 'PAID', 'COMPLETED', 'DECLINED', 'CANCELLED'];
-const OFF_STATUSES = ['DECLINED', 'CANCELLED'];
 const statusesForTab = (tab) => DEAL_DISPLAY_STATUSES.filter((st) => OFF_STATUSES.includes(st) === (tab === 'declined'));
 
 const getDealDisplayStatus = (deal) => {

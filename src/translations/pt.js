@@ -1404,6 +1404,7 @@ const pt = {
   },
 
   settings: {
+    deleteAccountLiveBookings: 'Você ainda tem reservas aceitas por vir. Cancele ou conclua antes de excluir sua conta.',
     deleteAccountWarning: 'Isso exclui permanentemente sua conta, todos os seus perfis, reservas, mensagens e arquivos. Qualquer assinatura é cancelada. Não é possível desfazer. Digite sua senha para confirmar.',
     deleteAccountConfirm: 'Excluir minha conta',
     accountDeleted: 'Sua conta foi excluída.',

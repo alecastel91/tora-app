@@ -36,21 +36,25 @@ root.render(
 );
 // PWA updates: the new service worker takes control right after a deploy
 // (skipWaiting + clientsClaim) but the open page keeps its old bundle until
-// a reload — testers had to hard-refresh twice. Reload once when control
-// changes, unless the member is typing; then wait for the tab to come back.
-if ('serviceWorker' in navigator) {
-  let hadController = !!navigator.serviceWorker.controller;
+// a reload — testers had to hard-refresh twice. Only a page that ALREADY had
+// a controller at load can be stale (a first install has nothing to replace).
+// Reload once when control changes, unless the member is typing; then wait
+// until the tab is next brought back to the front.
+if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+  let pendingReload = false;
   const typing = () => {
     const el = document.activeElement;
     return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
   };
+  const onVisible = () => {
+    if (document.visibilityState !== 'visible') return;
+    document.removeEventListener('visibilitychange', onVisible);
+    window.location.reload();
+  };
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    const wasUpdate = hadController;
-    hadController = true;
-    if (!wasUpdate) return; // first install, nothing stale on screen
+    if (pendingReload) return;
+    pendingReload = true;
     if (!typing()) { window.location.reload(); return; }
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') window.location.reload();
-    }, { once: true });
+    document.addEventListener('visibilitychange', onVisible);
   });
 }

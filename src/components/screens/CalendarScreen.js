@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { isArtistSideForDeal } from '../../utils/contractSigner';
+import { OFF_STATUSES } from '../../utils/dealStatus';
 import { useAppContext } from '../../contexts/AppContext';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { CloseIcon, CalendarIcon, ListIcon } from '../../utils/icons';
@@ -64,9 +66,19 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   const [scheduleToDelete, setScheduleToDelete] = useState(null);
 
   // Upcoming events state for Promoters/Venues
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  // Every live deal (any date) — marks gig days on the month grid.
-  const [monthDeals, setMonthDeals] = useState([]);
+  // Every live deal of this calendar (any date). The month grid marks all
+  // of them; the list below shows the next ten (derived, never a 2nd state).
+  const [deals, setDeals] = useState([]);
+  const upcomingEvents = useMemo(() => {
+    // deal.date is date-only (UTC midnight): compare the calendar day as a
+    // string so a gig "today" never slips to yesterday west of UTC.
+    const n = new Date();
+    const todayIso = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+    return deals
+      .filter((deal) => String(deal.date).slice(0, 10) >= todayIso && ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status))
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+      .slice(0, 10);
+  }, [deals]);
   const [expandedDealId, setExpandedDealId] = useState(null);
   const isPromoterOrVenue = profile?.role === 'PROMOTER' || profile?.role === 'VENUE';
 
@@ -134,23 +146,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           if (targetProfile) {
             response.deals = response.deals.filter((d) => [d.artistId, d.bookedArtistId].includes(profile.id));
           }
-          setMonthDeals(response.deals.filter((d) => !['DECLINED', 'CANCELLED'].includes(d.status)));
-          // Filter for upcoming events (future dates with active statuses)
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-
-          const upcoming = response.deals
-            .filter(deal => {
-              const dealDate = new Date(deal.date);
-              const hasUpcomingDate = dealDate >= today;
-              const hasActiveStatus = ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status);
-              return hasUpcomingDate && hasActiveStatus;
-            })
-            .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort by date ascending
-            .slice(0, 10); // Limit to 10 events
-
-          setUpcomingEvents(upcoming);
-          console.log('[CalendarScreen] Found upcoming events:', upcoming.length);
+          setDeals(response.deals.filter((d) => !OFF_STATUSES.includes(d.status)));
         }
       } catch (error) {
         console.error('[CalendarScreen] Error fetching upcoming events:', error);
@@ -667,26 +663,21 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     });
   };
 
-  // Deals of the month shown, keyed by day number (deal.date is date-only).
+  // Deals of the month shown, keyed by day number (deal.date is date-only),
+  // each with its chip label resolved once: the other party — venue/promoter
+  // on an artist's (or their agent's) calendar, the artist otherwise.
   const dealsByDay = useMemo(() => {
     const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-`;
     const map = {};
-    monthDeals.forEach((deal) => {
+    deals.forEach((deal) => {
       const iso = String(deal.date || '').slice(0, 10);
       if (!iso.startsWith(prefix)) return;
       const day = Number(iso.slice(8, 10));
-      (map[day] = map[day] || []).push(deal);
+      const [mine, other] = isArtistSideForDeal(deal, profile) ? [deal.venue, deal.artist] : [deal.artist, deal.venue];
+      (map[day] = map[day] || []).push({ deal, label: mine?.name || other?.name || '?' });
     });
     return map;
-  }, [monthDeals, currentYear, currentMonth]);
-  const todayKey = (() => { const n = new Date(); return `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}`; })();
-
-  // The chip names the other party: the venue/promoter on an artist's (or
-  // their agent's) calendar, the artist on a venue's or promoter's.
-  const counterpartName = (deal) => {
-    const onArtistSide = [deal.artistId, deal.bookedArtistId].includes(profile?.id) || deal.agentId === user?.id;
-    return (onArtistSide ? deal.venue?.name : deal.artist?.name) || deal.venue?.name || deal.artist?.name || '?';
-  };
+  }, [deals, currentYear, currentMonth, profile]);
 
   // A chip on the grid opens that booking's card in the list below.
   const openDealFromGrid = (dealId) => {
@@ -722,7 +713,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       const isSelected = selectedDates.has(dateKey);
       const schedulePos = getSchedulePosition(day);
       const dayDeals = dealsByDay[day] || [];
-      const isToday = `${currentYear}-${currentMonth}-${day}` === todayKey;
+      const isToday = todayDate.getFullYear() === currentYear && todayDate.getMonth() === currentMonth && todayDate.getDate() === day;
 
       let scheduleClasses = '';
       if (schedulePos.hasSchedule) {
@@ -769,20 +760,23 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'pointer' }}
         >
           <span className="calendar-day-num">{day}</span>
-          {/* Gig marker: a dot on phones, chips inside the cell on desktop */}
-          {dayDeals.length > 0 && <span className="calendar-day-gig" aria-hidden />}
+          {/* Gig marker: the has-gig class draws a dot on phones; on desktop
+              the chips render inside the cell instead. A chip must not start
+              a drag-select or toggle the day, on mouse or touch. */}
           {dayDeals.length > 0 && (
             <div className="calendar-day-events">
-              {dayDeals.slice(0, 2).map((deal) => (
+              {dayDeals.slice(0, 2).map(({ deal, label }) => (
                 <button
                   key={deal.id}
                   type="button"
                   className={`calendar-day-chip${['PENDING', 'NEGOTIATING'].includes(deal.status) ? ' is-pending' : ''}`}
-                  title={counterpartName(deal)}
+                  title={label}
                   onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onTouchEnd={(e) => e.stopPropagation()}
                   onClick={(e) => { e.stopPropagation(); openDealFromGrid(deal.id); }}
                 >
-                  {counterpartName(deal)}
+                  {label}
                 </button>
               ))}
               {dayDeals.length > 2 && <span className="calendar-day-more">+{dayDeals.length - 2}</span>}
@@ -928,8 +922,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
               ) : (
                 <div className="bookings-list">
                 {upcomingEvents.map((event) => {
-                  const dealDate = new Date(event.date);
-                  const dayNumber = dealDate.getDate();
+                  const dayNumber = Number(String(event.date).slice(8, 10)); // date-only, UTC-safe
                   const otherParty = event.artist || {};
                   const isExpanded = expandedDealId === event.id;
 

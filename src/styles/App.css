@@ -11872,31 +11872,42 @@ textarea.form-textarea:focus {
    iPhones because 100vh includes the collapsed-URL-bar area, which made the
    whole page scroll. dvh fallback for the first paint. */
 .tour-screen.screen.active {
-  display: flex !important;
-  flex-direction: column;
-  height: var(--tour-screen-h, calc(100dvh - 126px)) !important;
-  min-height: 0 !important;
-  overflow: hidden;
   padding: 0 !important;
 }
 
-/* The restyle's relative/isolate wrapper sits between .tour-screen (fixed
-   height, overflow hidden) and .tour-tab-content; it must join the flex chain
-   or the scroll container never gets a height limit and wheel scroll dies. */
-.tour-screen.screen.active > .relative.isolate {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
+.tour-tab-content {
+  padding-bottom: 40px;
 }
 
-.tour-tab-content {
-  flex: 1;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  min-height: 0;
-  padding-bottom: 40px;
+/* Phones only: the screen is a fixed-height box whose tab content scrolls,
+   so the sub-tab row stays put above the tab bar. Desktop (responsive.css)
+   lets the page scroll instead. */
+@media (max-width: 1023px) {
+  .tour-screen.screen.active {
+    display: flex !important;
+    flex-direction: column;
+    height: var(--tour-screen-h, calc(100dvh - 126px)) !important;
+    min-height: 0 !important;
+    overflow: hidden;
+  }
+
+  /* The restyle's relative/isolate wrapper sits between .tour-screen (fixed
+     height, overflow hidden) and .tour-tab-content; it must join the flex chain
+     or the scroll container never gets a height limit and wheel scroll dies. */
+  .tour-screen.screen.active > .relative.isolate {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .tour-tab-content {
+    flex: 1;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+  }
 }
 
 /* Tour Kickstart Content */
@@ -13496,18 +13507,19 @@ body.beta-env #root {
 }
 .settings-premium-card .btn { width: 100%; }
 
-/* ===== Calendar day markers (phone): a dot for a gig day; chips and the
-   short weekday names are desktop-only (responsive.css). ===== */
+/* ===== Calendar day markers (phone): a dot for a gig day, drawn from the
+   has-gig class; chips and the short weekday names are desktop-only
+   (responsive.css). Offset keeps the dot inside the round cell. ===== */
 .calendar-day { position: relative; }
-.calendar-day-gig {
+.calendar-day.has-gig::after {
+  content: '';
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 6px;
+  right: 6px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--primary-pink);
-  box-shadow: 0 0 0 2px #0a0a0a;
 }
 .calendar-day-events,
 .calendar-weekday .wd-short { display: none; }

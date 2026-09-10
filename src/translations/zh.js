@@ -1404,6 +1404,7 @@ const zh = {
   },
 
   settings: {
+    deleteAccountLiveBookings: '您还有已确认的即将到来的预订。请先取消或完成它们,再删除账户。',
     deleteAccountWarning: '这将永久删除您的账户、所有档案、预订、消息和文件。任何订阅都会被取消。此操作无法撤销。请输入密码以确认。',
     deleteAccountConfirm: '删除我的账户',
     accountDeleted: '您的账户已删除。',

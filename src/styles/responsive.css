@@ -305,7 +305,7 @@
   }
 
   /* Calendar sub-tab breathes wider: the month grid needs room for chips */
-  .app-content > .tab-panel > .screen.tour-screen:has(.calendar-embedded) {
+  .app-content > .tab-panel > .screen.tour-screen.tour-screen--calendar {
     max-width: 1000px;
   }
 
@@ -338,7 +338,7 @@
     padding: 6px 6px 20px;
     border-right: 1px solid rgba(255, 255, 255, 0.06);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    transition: background 0.15s;
+    transition: none;
   }
   .calendar-grid-inline .calendar-day:nth-child(7n) { border-right: none; }
   .calendar-grid-inline .calendar-day:active { transform: none; }
@@ -362,7 +362,7 @@
     box-shadow: 0 0 0 1px var(--primary-pink);
     color: #fff;
   }
-  .calendar-day-gig { display: none; }
+  .calendar-grid-inline .calendar-day.has-gig::after { display: none; }
   .calendar-day-events {
     display: flex;
     flex-direction: column;
@@ -410,25 +410,10 @@
     right: 4px;
   }
 
-  /* One scroller only: on desktop the page (.app-content) scrolls and the
-     Tour screen stops being a fixed-height box with its own scroll area,
-     which showed a second scrollbar. The sub-tab row sticks to the top. */
-  .tour-screen.screen.active {
-    display: block !important;
-    height: auto !important;
-    overflow: visible;
-  }
-
-  .tour-screen.screen.active > .relative.isolate {
-    display: block;
-  }
-
-  /* Both axes visible: an overflow-x:hidden box is still a scroll container
-     and swallowed wheel events on the calendar. */
+  /* One scroller only: the page (.app-content) scrolls; the phone-only
+     fixed-height Tour box lives in App.css under max-width: 1023px. The
+     sub-tab row sticks to the top. */
   .tour-tab-content {
-    flex: none;
-    overflow: visible;
-    -webkit-overflow-scrolling: auto;
     min-height: 60vh; /* the FREE gate pane still has room to center in */
   }
 
@@ -436,8 +421,7 @@
     position: sticky;
     top: 0;
     z-index: 5;
-    background: rgba(0, 0, 0, 0.92);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.96);
   }
 
   body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {

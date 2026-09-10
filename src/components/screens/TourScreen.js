@@ -192,6 +192,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     const el = screenRef.current;
     if (!el) return undefined;
     const measure = () => {
+      // Phones only: desktop lets the page scroll (responsive.css) and
+      // ignores --tour-screen-h.
+      if (window.matchMedia('(min-width: 1024px)').matches) return;
       const scroller = el.closest('.app-content');
       if (!scroller || scroller.clientHeight < 100) return; // hidden keep-mounted panel
       // NaN-only fallback: desktop legitimately has padding-bottom 0 (sidebar
@@ -2179,7 +2182,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   function renderMain() {
   return (
-    <div ref={screenRef} className="screen active matches-screen tour-screen">
+    <div ref={screenRef} className={`screen active matches-screen tour-screen${activeTab === 'calendar' ? ' tour-screen--calendar' : ''}`}>
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           overlays (modals) live outside it. */}
       <div className="relative isolate">

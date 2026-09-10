@@ -1413,6 +1413,7 @@ const en = {
   
   // Settings
   settings: {
+    deleteAccountLiveBookings: 'You still have upcoming accepted bookings. Cancel or complete them before deleting your account.',
     deleteAccountWarning: 'This permanently deletes your account, all your profiles, bookings, messages and files. Any subscription is cancelled. This cannot be undone. Enter your password to confirm.',
     deleteAccountConfirm: 'Delete my account',
     accountDeleted: 'Your account has been deleted.',

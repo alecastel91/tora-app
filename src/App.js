@@ -513,10 +513,11 @@ function App() {
     try {
       await apiService.deleteAccount(deleteAccountPassword);
       closeDeleteAccount();
+      // The dialog host lives in the signed-in tree: confirm first, then leave.
+      await appAlert(t('settings.accountDeleted'));
       handleLogout();
-      appAlert(t('settings.accountDeleted'));
     } catch (err) {
-      setDeleteAccountError(err.message || t('settings.deleteAccountFailed'));
+      setDeleteAccountError(err.code === 'LIVE_BOOKINGS' ? t('settings.deleteAccountLiveBookings') : (err.message || t('settings.deleteAccountFailed')));
     } finally {
       setDeleteAccountBusy(false);
     }

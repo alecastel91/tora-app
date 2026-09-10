@@ -1404,6 +1404,7 @@ const it = {
   },
 
   settings: {
+    deleteAccountLiveBookings: 'Hai ancora prenotazioni accettate in programma. Annullale o completale prima di eliminare l\'account.',
     deleteAccountWarning: 'Questo elimina definitivamente il tuo account, tutti i profili, le prenotazioni, i messaggi e i file. Qualsiasi abbonamento viene annullato. L\'operazione non è reversibile. Inserisci la password per confermare.',
     deleteAccountConfirm: 'Elimina il mio account',
     accountDeleted: 'Il tuo account è stato eliminato.',
