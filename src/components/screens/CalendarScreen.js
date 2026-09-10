@@ -681,6 +681,13 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   }, [monthDeals, currentYear, currentMonth]);
   const todayKey = (() => { const n = new Date(); return `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}`; })();
 
+  // The chip names the other party: the venue/promoter on an artist's (or
+  // their agent's) calendar, the artist on a venue's or promoter's.
+  const counterpartName = (deal) => {
+    const onArtistSide = [deal.artistId, deal.bookedArtistId].includes(profile?.id) || deal.agentId === user?.id;
+    return (onArtistSide ? deal.venue?.name : deal.artist?.name) || deal.venue?.name || deal.artist?.name || '?';
+  };
+
   // A chip on the grid opens that booking's card in the list below.
   const openDealFromGrid = (dealId) => {
     setExpandedDealId(dealId);
@@ -771,11 +778,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   key={deal.id}
                   type="button"
                   className={`calendar-day-chip${['PENDING', 'NEGOTIATING'].includes(deal.status) ? ' is-pending' : ''}`}
-                  title={deal.artist?.name || deal.venue?.name || ''}
+                  title={counterpartName(deal)}
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => { e.stopPropagation(); openDealFromGrid(deal.id); }}
                 >
-                  {deal.artist?.name || deal.venue?.name || '?'}
+                  {counterpartName(deal)}
                 </button>
               ))}
               {dayDeals.length > 2 && <span className="calendar-day-more">+{dayDeals.length - 2}</span>}
