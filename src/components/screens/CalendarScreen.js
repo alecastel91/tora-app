@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAppContext } from '../../contexts/AppContext';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
@@ -65,6 +65,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
 
   // Upcoming events state for Promoters/Venues
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  // Every live deal (any date) — marks gig days on the month grid.
+  const [monthDeals, setMonthDeals] = useState([]);
   const [expandedDealId, setExpandedDealId] = useState(null);
   const isPromoterOrVenue = profile?.role === 'PROMOTER' || profile?.role === 'VENUE';
 
@@ -132,6 +134,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           if (targetProfile) {
             response.deals = response.deals.filter((d) => [d.artistId, d.bookedArtistId].includes(profile.id));
           }
+          setMonthDeals(response.deals.filter((d) => !['DECLINED', 'CANCELLED'].includes(d.status)));
           // Filter for upcoming events (future dates with active statuses)
           const today = new Date();
           today.setHours(0, 0, 0, 0);
@@ -664,15 +667,37 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     });
   };
 
+  // Deals of the month shown, keyed by day number (deal.date is date-only).
+  const dealsByDay = useMemo(() => {
+    const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-`;
+    const map = {};
+    monthDeals.forEach((deal) => {
+      const iso = String(deal.date || '').slice(0, 10);
+      if (!iso.startsWith(prefix)) return;
+      const day = Number(iso.slice(8, 10));
+      (map[day] = map[day] || []).push(deal);
+    });
+    return map;
+  }, [monthDeals, currentYear, currentMonth]);
+  const todayKey = (() => { const n = new Date(); return `${n.getFullYear()}-${n.getMonth()}-${n.getDate()}`; })();
+
+  // A chip on the grid opens that booking's card in the list below.
+  const openDealFromGrid = (dealId) => {
+    setExpandedDealId(dealId);
+    requestAnimationFrame(() => document.getElementById(`cal-event-${dealId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  };
+
   const renderCalendarDays = () => {
     const days = [];
     const weekDays = t('dateFormat.weekLetters').split(',');
+    const weekShort = t('dateFormat.weekShort').split(',');
 
     // Render weekday headers
     weekDays.forEach((day, index) => {
       days.push(
         <div key={`header-${index}`} className="calendar-weekday">
-          {day}
+          <span className="wd-letter">{day}</span>
+          <span className="wd-short">{weekShort[index] || day}</span>
         </div>
       );
     });
@@ -689,6 +714,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
       const isSelected = selectedDates.has(dateKey);
       const schedulePos = getSchedulePosition(day);
+      const dayDeals = dealsByDay[day] || [];
+      const isToday = `${currentYear}-${currentMonth}-${day}` === todayKey;
 
       let scheduleClasses = '';
       if (schedulePos.hasSchedule) {
@@ -706,8 +733,9 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       days.push(
         <div
           key={`day-${day}`}
-          className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}`}
+          className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}`}
           data-weekday={new Date(currentYear, currentMonth, day).getDay()}
+          data-day={day}
           onClick={() => {
             console.log('[CalendarScreen] onClick fired for day:', day);
             handleDateMouseDown(day);
@@ -727,19 +755,32 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             e.preventDefault();
             // Get the element under the touch point
             const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            if (element && element.classList.contains('calendar-day')) {
-              // Extract day number from the element's text content
-              const dayNum = parseInt(element.textContent);
-              if (!isNaN(dayNum)) {
-                handleDateMouseEnter(dayNum);
-              }
-            }
+            const cell = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.calendar-day[data-day]');
+            if (cell) handleDateMouseEnter(Number(cell.dataset.day));
           }}
           onTouchEnd={() => handleDateMouseUp()}
           style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'pointer' }}
         >
-          {day}
+          <span className="calendar-day-num">{day}</span>
+          {/* Gig marker: a dot on phones, chips inside the cell on desktop */}
+          {dayDeals.length > 0 && <span className="calendar-day-gig" aria-hidden />}
+          {dayDeals.length > 0 && (
+            <div className="calendar-day-events">
+              {dayDeals.slice(0, 2).map((deal) => (
+                <button
+                  key={deal.id}
+                  type="button"
+                  className={`calendar-day-chip${['PENDING', 'NEGOTIATING'].includes(deal.status) ? ' is-pending' : ''}`}
+                  title={deal.artist?.name || deal.venue?.name || ''}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => { e.stopPropagation(); openDealFromGrid(deal.id); }}
+                >
+                  {deal.artist?.name || deal.venue?.name || '?'}
+                </button>
+              ))}
+              {dayDeals.length > 2 && <span className="calendar-day-more">+{dayDeals.length - 2}</span>}
+            </div>
+          )}
           {schedulePos.hasSchedule && (() => {
             // The trip renders as ONE continuous bar: every scheduled day
             // carries a segment; the destination is written once per week
@@ -886,7 +927,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   const isExpanded = expandedDealId === event.id;
 
                   return (
-                    <div key={event.id} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
+                    <div key={event.id} id={`cal-event-${event.id}`} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
                       <div className="booking-date-badge">
                         {dayNumber}
                       </div>
@@ -1108,7 +1149,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                       event.city,
                     ].filter(Boolean);
                     return (
-                      <div key={event.id} className="mb-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0c0c11] px-4 py-3">
+                      <div key={event.id} id={`cal-event-${event.id}`} className="mb-2 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0c0c11] px-4 py-3">
                         <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl border border-white/10 bg-black/40">
                           <span className="text-[9px] font-tech uppercase tracking-widest text-white/40">
                             {d.toLocaleDateString(t('dateFormat.locale'), { month: 'short', timeZone: 'UTC' })}

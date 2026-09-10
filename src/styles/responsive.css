@@ -304,6 +304,112 @@
     max-width: 760px;
   }
 
+  /* Calendar sub-tab breathes wider: the month grid needs room for chips */
+  .app-content > .tab-panel > .screen.tour-screen:has(.calendar-embedded) {
+    max-width: 1000px;
+  }
+
+  /* ===== Outlook-style month grid (desktop only). Rectangular cells,
+     day number top-left, gigs as chips inside the day, the travel ribbon
+     along the bottom edge. Phones keep the round days + dot. ===== */
+  .calendar-grid-inline {
+    gap: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .calendar-grid-inline .calendar-weekday {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .calendar-weekday .wd-letter { display: none; }
+  .calendar-weekday .wd-short { display: inline; }
+  .calendar-grid-inline .calendar-day {
+    aspect-ratio: auto;
+    min-height: 104px;
+    border-radius: 0;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 6px 6px 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    transition: background 0.15s;
+  }
+  .calendar-grid-inline .calendar-day:nth-child(7n) { border-right: none; }
+  .calendar-grid-inline .calendar-day:active { transform: none; }
+  .calendar-grid-inline .calendar-day.empty { background: rgba(0, 0, 0, 0.25); }
+  .calendar-day-num {
+    align-self: flex-start;
+    font-size: 12px;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+  .calendar-grid-inline .calendar-day.available {
+    background: rgba(67, 233, 123, 0.08);
+    box-shadow: none;
+  }
+  .calendar-grid-inline .calendar-day.available .calendar-day-num {
+    background: rgba(67, 233, 123, 0.22);
+  }
+  .calendar-grid-inline .calendar-day.is-today:not(.available) { box-shadow: none; }
+  .calendar-grid-inline .calendar-day.is-today .calendar-day-num {
+    box-shadow: 0 0 0 1px var(--primary-pink);
+    color: #fff;
+  }
+  .calendar-day-gig { display: none; }
+  .calendar-day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 6px;
+    min-width: 0;
+  }
+  .calendar-day-chip {
+    display: block;
+    width: 100%;
+    padding: 3px 6px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 51, 102, 0.2);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .calendar-day-chip:hover { background: rgba(255, 51, 102, 0.35); }
+  .calendar-day-chip.is-pending {
+    background: rgba(255, 193, 7, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.45);
+  }
+  .calendar-day-more {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+    padding-left: 6px;
+  }
+  .calendar-grid-inline .schedule-label {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    font-size: 9px;
+    padding: 0 6px;
+  }
+  .calendar-grid-inline .calendar-day.schedule-single .schedule-label {
+    left: 4px;
+    right: 4px;
+  }
+
   /* One scroller only: on desktop the page (.app-content) scrolls and the
      Tour screen stops being a fixed-height box with its own scroll area,
      which showed a second scrollbar. The sub-tab row sticks to the top. */

@@ -1454,6 +1454,7 @@ const en = {
     december: 'December',
     locale: 'en-US',
     weekLetters: 'S,M,T,W,T,F,S',
+    weekShort: 'Sun,Mon,Tue,Wed,Thu,Fri,Sat',
   },
   
   // RA Events

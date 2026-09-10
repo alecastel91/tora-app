@@ -1444,6 +1444,7 @@ const pt = {
     december: 'Dezembro',
     locale: 'pt-PT',
     weekLetters: 'D,S,T,Q,Q,S,S',
+    weekShort: 'Dom,Seg,Ter,Qua,Qui,Sex,Sáb',
   },
 
   ra: {

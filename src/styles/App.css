@@ -13495,3 +13495,22 @@ body.beta-env #root {
   color: rgba(255, 255, 255, 0.65);
 }
 .settings-premium-card .btn { width: 100%; }
+
+/* ===== Calendar day markers (phone): a dot for a gig day; chips and the
+   short weekday names are desktop-only (responsive.css). ===== */
+.calendar-day { position: relative; }
+.calendar-day-gig {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary-pink);
+  box-shadow: 0 0 0 2px #0a0a0a;
+}
+.calendar-day-events,
+.calendar-weekday .wd-short { display: none; }
+.calendar-grid-inline .calendar-day.is-today:not(.available) {
+  box-shadow: inset 0 0 0 1px rgba(255, 51, 102, 0.55);
+}

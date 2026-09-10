@@ -1444,6 +1444,7 @@ const ko = {
     december: '12월',
     locale: 'ko-KR',
     weekLetters: '일,월,화,수,목,금,토',
+    weekShort: '일,월,화,수,목,금,토',
   },
 
   ra: {

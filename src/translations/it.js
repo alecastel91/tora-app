@@ -1444,6 +1444,7 @@ const it = {
     december: 'Dicembre',
     locale: 'it-IT',
     weekLetters: 'D,L,M,M,G,V,S',
+    weekShort: 'Dom,Lun,Mar,Mer,Gio,Ven,Sab',
   },
 
   ra: {
