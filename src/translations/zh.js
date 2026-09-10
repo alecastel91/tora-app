@@ -1298,6 +1298,12 @@ const zh = {
   },
 
   calendar: {
+    scheduleLevelHint: '只选一个区域即可构成完整的行程。只有在需要更精确时才添加国家或城市。',
+    countryOptional: '国家(可选)',
+    cityOptional: '城市(可选)',
+    savingAs: '将保存为:{{scope}}',
+    zoneWide: '整个区域',
+    countryWide: '整个国家',
     visibilityTitle: '日历可见范围',
     visibilityEveryone: '所有人',
     visibilityConnected: '仅限联系人',

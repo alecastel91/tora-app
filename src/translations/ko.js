@@ -1298,6 +1298,12 @@ const ko = {
   },
 
   calendar: {
+    scheduleLevelHint: '지역만 선택해도 일정으로 충분합니다. 더 정확히 하고 싶을 때만 국가나 도시를 추가하세요.',
+    countryOptional: '국가 (선택)',
+    cityOptional: '도시 (선택)',
+    savingAs: '저장 내용: {{scope}}',
+    zoneWide: '지역 전체',
+    countryWide: '국가 전체',
     visibilityTitle: '캘린더 공개 범위',
     visibilityEveryone: '전체 공개',
     visibilityConnected: '연결된 프로필만',

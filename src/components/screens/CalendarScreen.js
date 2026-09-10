@@ -1141,6 +1141,9 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         title={editingScheduleId ? t('calendar.editSchedule') : t('calendar.addSchedule')}
       >
         <div className="schedule-form">
+          {/* Level guidance: a zone or a country is a complete schedule —
+              country and city only narrow it down. */}
+          <p className="form-hint" style={{ marginTop: 0, marginBottom: 14 }}>{t('calendar.scheduleLevelHint')}</p>
           <div className="form-group">
             <label>{t('calendar.zone')}</label>
             <select
@@ -1163,7 +1166,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
 
           {scheduleForm.zone && (
             <div className="form-group">
-              <label>{t('calendar.country')}</label>
+              <label>{t('calendar.countryOptional')}</label>
               <select
                 value={scheduleForm.country}
                 onChange={(e) => {
@@ -1184,7 +1187,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
 
           {scheduleForm.country && (
             <div className="form-group">
-              <label>{t('calendar.city')}</label>
+              <label>{t('calendar.cityOptional')}</label>
               <select
                 value={scheduleForm.city}
                 onChange={(e) => {
@@ -1200,6 +1203,18 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                 ))}
               </select>
             </div>
+          )}
+
+          {scheduleForm.zone && (
+            <p className="form-hint" style={{ marginTop: -4 }}>
+              {t('calendar.savingAs', {
+                scope: scheduleForm.city
+                  ? `${scheduleForm.city}, ${scheduleForm.country}`
+                  : scheduleForm.country
+                    ? `${scheduleForm.country} · ${t('calendar.countryWide')}`
+                    : `${scheduleForm.zone} · ${t('calendar.zoneWide')}`,
+              })}
+            </p>
           )}
 
           {/* One date per line: iOS native date pills ignore width rules, so

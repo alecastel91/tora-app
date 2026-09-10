@@ -1298,6 +1298,12 @@ const ja = {
   },
 
   calendar: {
+    scheduleLevelHint: 'ゾーンを選ぶだけで渡航スケジュールとして完成です。国や都市は、より正確にしたい場合にだけ追加してください。',
+    countryOptional: '国(任意)',
+    cityOptional: '都市(任意)',
+    savingAs: '保存内容:{{scope}}',
+    zoneWide: 'ゾーン全体',
+    countryWide: '国全体',
     visibilityTitle: 'カレンダーの公開範囲',
     visibilityEveryone: '全員',
     visibilityConnected: 'コネクションのみ',

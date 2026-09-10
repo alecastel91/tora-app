@@ -1298,6 +1298,12 @@ const it = {
   },
 
   calendar: {
+    scheduleLevelHint: 'Scegli una zona: da sola è già un itinerario completo. Aggiungi paese o città solo se vuoi essere più preciso.',
+    countryOptional: 'Paese (facoltativo)',
+    cityOptional: 'Città (facoltativa)',
+    savingAs: 'Verrà salvato come: {{scope}}',
+    zoneWide: 'intera zona',
+    countryWide: 'intero paese',
     visibilityTitle: 'Visibilità del calendario',
     visibilityEveryone: 'Tutti',
     visibilityConnected: 'Solo connessioni',

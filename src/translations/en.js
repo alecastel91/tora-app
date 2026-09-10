@@ -1305,6 +1305,12 @@ const en = {
   
   // Calendar
   calendar: {
+    scheduleLevelHint: 'Pick a zone — that alone is a complete schedule. Add a country or a city only if you want to be more precise.',
+    countryOptional: 'Country (optional)',
+    cityOptional: 'City (optional)',
+    savingAs: 'Saving as: {{scope}}',
+    zoneWide: 'zone-wide',
+    countryWide: 'country-wide',
     visibilityTitle: 'Calendar Visibility',
     visibilityEveryone: 'Everyone',
     visibilityConnected: 'Connections only',
