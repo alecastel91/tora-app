@@ -52,12 +52,12 @@ export const zones = [
 ];
 
 export const countriesByZone = {
-  'Americas': ['Antigua and Barbuda', 'Argentina', 'Bahamas', 'Barbados', 'Belize', 'Bolivia', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Costa Rica', 'Cuba', 'Dominica', 'Dominican Republic', 'Ecuador', 'El Salvador', 'Grenada', 'Guatemala', 'Guyana', 'Haiti', 'Honduras', 'Jamaica', 'Mexico', 'Nicaragua', 'Panama', 'Paraguay', 'Peru', 'Saint Lucia', 'Suriname', 'Trinidad and Tobago', 'United States', 'Uruguay', 'Venezuela'],
-  'Europe': ['Albania', 'Armenia', 'Austria', 'Azerbaijan', 'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Kosovo', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Montenegro', 'Netherlands', 'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'Scotland', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom'],
+  'Americas': ['Antigua and Barbuda', 'Argentina', 'Bahamas', 'Barbados', 'Belize', 'Bolivia', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Costa Rica', 'Cuba', 'Dominica', 'Dominican Republic', 'Ecuador', 'El Salvador', 'Grenada', 'Guatemala', 'Guyana', 'Haiti', 'Honduras', 'Jamaica', 'Mexico', 'Nicaragua', 'Panama', 'Paraguay', 'Peru', 'Puerto Rico', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Suriname', 'Trinidad and Tobago', 'United States', 'Uruguay', 'Venezuela'],
+  'Europe': ['Albania', 'Andorra', 'Armenia', 'Austria', 'Azerbaijan', 'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino', 'Scotland', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom'],
   'Middle East': ['Afghanistan', 'Bahrain', 'Iran', 'Iraq', 'Israel', 'Jordan', 'Kuwait', 'Lebanon', 'Oman', 'Palestine', 'Qatar', 'Saudi Arabia', 'Syria', 'Turkey', 'UAE', 'Yemen'],
-  'Africa': ['Algeria', 'Angola', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroon', 'Congo', 'DR Congo', 'Egypt', 'Ethiopia', 'Ghana', 'Ivory Coast', 'Kenya', 'Libya', 'Mali', 'Morocco', 'Mozambique', 'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'Senegal', 'South Africa', 'Sudan', 'Tanzania', 'Tunisia', 'Uganda', 'Zimbabwe'],
-  'Asia': ['Bangladesh', 'Bhutan', 'Brunei', 'Cambodia', 'China', 'India', 'Indonesia', 'Japan', 'Kazakhstan', 'Kyrgyzstan', 'Laos', 'Macao', 'Malaysia', 'Mongolia', 'Myanmar', 'Nepal', 'Pakistan', 'Philippines', 'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan', 'Tajikistan', 'Thailand', 'Turkmenistan', 'Uzbekistan', 'Vietnam'],
-  'Oceania': ['Australia', 'Cook Islands', 'Fiji', 'French Polynesia', 'Guam', 'New Zealand', 'Papua New Guinea', 'Samoa', 'Tonga']
+  'Africa': ['Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros', 'Congo', 'Djibouti', 'DR Congo', 'Egypt', 'Equatorial Guinea', 'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Ivory Coast', 'Kenya', 'Lesotho', 'Liberia', 'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco', 'Mozambique', 'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'Sao Tome and Principe', 'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa', 'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'],
+  'Asia': ['Bangladesh', 'Bhutan', 'Brunei', 'Cambodia', 'China', 'Hong Kong', 'India', 'Indonesia', 'Japan', 'Kazakhstan', 'Kyrgyzstan', 'Laos', 'Macao', 'Malaysia', 'Maldives', 'Mongolia', 'Myanmar', 'Nepal', 'Pakistan', 'Philippines', 'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan', 'Tajikistan', 'Thailand', 'Timor-Leste', 'Turkmenistan', 'Uzbekistan', 'Vietnam'],
+  'Oceania': ['Australia', 'Cook Islands', 'Fiji', 'French Polynesia', 'Guam', 'Kiribati', 'Marshall Islands', 'Micronesia', 'Nauru', 'New Caledonia', 'New Zealand', 'Palau', 'Papua New Guinea', 'Samoa', 'Solomon Islands', 'Tonga', 'Tuvalu', 'Vanuatu']
 };
 
 export const citiesByCountry = {
@@ -235,7 +235,52 @@ export const citiesByCountry = {
   'French Polynesia': ['Papeete', 'Other'],
   'Guam': ['Hagatna', 'Other'],
   'Samoa': ['Apia', 'Other'],
-  'Tonga': ['Nuku\'alofa', 'Other']
+  'Tonga': ['Nuku\'alofa', 'Other'],
+  'Puerto Rico': ['San Juan', 'Other'],
+  'Saint Kitts and Nevis': ['Basseterre', 'Other'],
+  'Saint Vincent and the Grenadines': ['Kingstown', 'Other'],
+  'Andorra': ['Andorra la Vella', 'Other'],
+  'Liechtenstein': ['Vaduz', 'Other'],
+  'Monaco': ['Monaco', 'Other'],
+  'San Marino': ['San Marino', 'Other'],
+  'Hong Kong': ['Hong Kong', 'Other'],
+  'Maldives': ['Malé', 'Other'],
+  'Timor-Leste': ['Dili', 'Other'],
+  'Benin': ['Cotonou', 'Other'],
+  'Cabo Verde': ['Praia', 'Mindelo', 'Other'],
+  'Central African Republic': ['Bangui', 'Other'],
+  'Chad': ['N\'Djamena', 'Other'],
+  'Comoros': ['Moroni', 'Other'],
+  'Djibouti': ['Djibouti', 'Other'],
+  'Equatorial Guinea': ['Malabo', 'Other'],
+  'Eritrea': ['Asmara', 'Other'],
+  'Eswatini': ['Mbabane', 'Other'],
+  'Gabon': ['Libreville', 'Other'],
+  'Gambia': ['Banjul', 'Other'],
+  'Guinea': ['Conakry', 'Other'],
+  'Guinea-Bissau': ['Bissau', 'Other'],
+  'Lesotho': ['Maseru', 'Other'],
+  'Liberia': ['Monrovia', 'Other'],
+  'Madagascar': ['Antananarivo', 'Other'],
+  'Malawi': ['Lilongwe', 'Blantyre', 'Other'],
+  'Mauritania': ['Nouakchott', 'Other'],
+  'Mauritius': ['Port Louis', 'Grand Baie', 'Other'],
+  'Sao Tome and Principe': ['São Tomé', 'Other'],
+  'Seychelles': ['Victoria', 'Other'],
+  'Sierra Leone': ['Freetown', 'Other'],
+  'Somalia': ['Mogadishu', 'Other'],
+  'South Sudan': ['Juba', 'Other'],
+  'Togo': ['Lomé', 'Other'],
+  'Zambia': ['Lusaka', 'Other'],
+  'Kiribati': ['Tarawa', 'Other'],
+  'Marshall Islands': ['Majuro', 'Other'],
+  'Micronesia': ['Palikir', 'Other'],
+  'Nauru': ['Yaren', 'Other'],
+  'New Caledonia': ['Nouméa', 'Other'],
+  'Palau': ['Koror', 'Other'],
+  'Solomon Islands': ['Honiara', 'Other'],
+  'Tuvalu': ['Funafuti', 'Other'],
+  'Vanuatu': ['Port Vila', 'Other'],
 };
 
 // Helper function to get zone from country
