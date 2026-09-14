@@ -8,6 +8,15 @@
 // currently appears in src/data/profiles.js citiesByCountry; extend as needed.
 
 export const CITY_COORDS = {
+  // Mexico
+  'monterrey': [-100.32, 25.69],
+  'cancún': [-86.85, 21.16],
+  'tijuana': [-117.04, 32.51],
+  'puebla': [-98.21, 19.04],
+  'playa del carmen': [-87.07, 20.63],
+  'oaxaca': [-96.72, 17.07],
+  'mérida': [-89.62, 20.97],
+  'merida': [-89.62, 20.97],
   // North America
   'atlanta': [-84.39, 33.75], 'austin': [-97.74, 30.27], 'boston': [-71.06, 42.36],
   'chicago': [-87.63, 41.88], 'dallas': [-96.80, 32.78], 'denver': [-104.99, 39.74],
