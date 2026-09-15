@@ -389,34 +389,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   };
 
   const handleArtistCityChange = (city) => {
-    if (!city) {
-      setEditedArtistInfo({
-        ...editedArtistInfo,
-        city: '',
-        location: editedArtistInfo.country ?
-          `${editedArtistInfo.country}${editedArtistInfo.zone ? `, ${editedArtistInfo.zone}` : ''}` :
-          editedArtistInfo.zone
-      });
-      return;
-    }
-
-    // Find country for this city
-    const country = Object.entries(citiesByCountry).find(([_, cities]) =>
-      cities.includes(city)
-    )?.[0] || '';
-
-    // Find zone for this country
-    const zone = Object.entries(countriesByZone).find(([_, countries]) =>
-      countries.includes(country)
-    )?.[0] || '';
-
-    setEditedArtistInfo({
-      ...editedArtistInfo,
-      zone,
-      country,
-      city,
-      location: `${city}, ${country}` // Update location as "City, Country"
-    });
+    // The country and zone stay as picked; the city only refines the
+    // location label (a city name can exist under several countries).
+    const { country, zone } = editedArtistInfo;
+    const location = [city || null, country || null, !country && zone ? zone : null].filter(Boolean).join(', ');
+    setEditedArtistInfo({ ...editedArtistInfo, city: city || '', location });
   };
 
   // Artist info save function (full profile edit)

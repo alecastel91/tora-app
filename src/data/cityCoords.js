@@ -21,7 +21,7 @@ export const CITY_COORDS = {
   'praia': [-23.51, 14.93],
   'mindelo': [-24.99, 16.89],
   'bangui': [18.55, 4.39],
-  "n'djamena": [15.05, 12.13],
+  'ndjamena': [15.05, 12.13],
   'moroni': [43.26, -11.7],
   'djibouti': [43.15, 11.59],
   'malabo': [8.78, 3.75],
@@ -57,12 +57,10 @@ export const CITY_COORDS = {
   'port vila': [168.32, -17.73],
   // Mexico
   'monterrey': [-100.32, 25.69],
-  'cancún': [-86.85, 21.16],
   'tijuana': [-117.04, 32.51],
   'puebla': [-98.21, 19.04],
   'playa del carmen': [-87.07, 20.63],
   'oaxaca': [-96.72, 17.07],
-  'mérida': [-89.62, 20.97],
   'merida': [-89.62, 20.97],
   // North America
   'atlanta': [-84.39, 33.75], 'austin': [-97.74, 30.27], 'boston': [-71.06, 42.36],
@@ -229,7 +227,7 @@ export const CITY_COORDS = {
   'christchurch': [172.64, -43.53], 'queenstown': [168.66, -45.03], 'wellington': [174.78, -41.29],
   'nadi': [177.42, -17.80], 'suva': [178.44, -18.14], 'port moresby': [147.18, -9.44],
   'avarua': [-159.78, -21.21], 'papeete': [-149.57, -17.54], 'hagatna': [144.75, 13.48],
-  'apia': [-171.76, -13.83], "nuku'alofa": [-175.20, -21.14],
+  'apia': [-171.76, -13.83], 'nukualofa': [-175.20, -21.14],
 };
 
 // The marquee club-music hubs shown as locked "Premium" pins to FREE members
@@ -251,6 +249,7 @@ export const normalizeCity = (city) =>
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // strip accents
+    .replace(/[’'`]/g, '') // apostrophes (N'Djamena, Nuku'alofa — smart quotes too)
     .replace(/ł/g, 'l').replace(/ø/g, 'o').replace(/đ/g, 'd') // letters NFD can't decompose
     .replace(/æ/g, 'ae').replace(/ß/g, 'ss')
     .replace(/\s+/g, ' ');
