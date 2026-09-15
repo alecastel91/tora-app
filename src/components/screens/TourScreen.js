@@ -1355,11 +1355,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 className="form-input"
               >
                 <option value="">{t('tour.selectZone')}</option>
-                <option value="Europe">Europe</option>
-                <option value="Asia">Asia</option>
-                <option value="Americas">Americas</option>
-                <option value="Africa">Africa</option>
-                <option value="Oceania">Oceania</option>
+                {zones.map((z) => <option key={z} value={z}>{z}</option>)}
               </select>
               <small className="form-hint">{t('tour.zoneHint')}</small>
             </div>
@@ -1373,20 +1369,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   className="form-input"
                 >
                   <option value="">{t('tour.zoneWideTour')}</option>
-                  {(() => {
-                    // For Americas, combine North America and Latin America
-                    if (tourForm.zone === 'Americas') {
-                      const northAmerica = countriesByZone['North America'] || [];
-                      const latinAmerica = countriesByZone['Latin America & Caribbean'] || [];
-                      return [...northAmerica, ...latinAmerica].sort().map(country => (
-                        <option key={country} value={country}>{country}</option>
-                      ));
-                    }
-                    // For other zones, use direct lookup
-                    return (countriesByZone[tourForm.zone] || []).sort().map(country => (
-                      <option key={country} value={country}>{country}</option>
-                    ));
-                  })()}
+                  {(countriesByZone[tourForm.zone] || []).map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
                 </select>
                 <small className="form-hint">{t('tour.countryHint')}</small>
               </div>
@@ -1541,11 +1526,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 className="form-input"
               >
                 <option value="">{t('tour.selectZone')}</option>
-                <option value="Europe">Europe</option>
-                <option value="Asia">Asia</option>
-                <option value="Americas">Americas</option>
-                <option value="Africa">Africa</option>
-                <option value="Oceania">Oceania</option>
+                {zones.map((z) => <option key={z} value={z}>{z}</option>)}
               </select>
               <small className="form-hint">{t('tour.zoneHint')}</small>
             </div>
@@ -1559,20 +1540,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   className="form-input"
                 >
                   <option value="">{t('tour.zoneWideTour')}</option>
-                  {(() => {
-                    // For Americas, combine North America and Latin America
-                    if (tourForm.zone === 'Americas') {
-                      const northAmerica = countriesByZone['North America'] || [];
-                      const latinAmerica = countriesByZone['Latin America & Caribbean'] || [];
-                      return [...northAmerica, ...latinAmerica].sort().map(country => (
-                        <option key={country} value={country}>{country}</option>
-                      ));
-                    }
-                    // For other zones, use direct lookup
-                    return (countriesByZone[tourForm.zone] || []).sort().map(country => (
-                      <option key={country} value={country}>{country}</option>
-                    ));
-                  })()}
+                  {(countriesByZone[tourForm.zone] || []).map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
                 </select>
                 <small className="form-hint">{t('tour.countryHint')}</small>
               </div>
