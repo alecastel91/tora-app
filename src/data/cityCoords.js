@@ -151,8 +151,8 @@ export const CITY_COORDS = {
   'san pedro sula': [-88.03, 15.50], 'granada': [-85.96, 11.93], 'leon': [-86.88, 12.43],
   'montego bay': [-77.92, 18.47], 'negril': [-78.35, 18.27], 'ocho rios': [-77.10, 18.41],
   'santiago de cuba': [-75.82, 20.02], 'varadero': [-81.25, 23.15], 'san fernando': [-61.47, 10.28],
-  'port-au-prince': [-72.34, 18.54], "st. john's": [-61.85, 17.12], 'roseau': [-61.39, 15.30],
-  "st. george's": [-61.75, 12.05], 'castries': [-61.01, 14.01],
+  'port-au-prince': [-72.34, 18.54], 'st. johns': [-61.85, 17.12], 'roseau': [-61.39, 15.30],
+  'st. georges': [-61.75, 12.05], 'castries': [-61.01, 14.01],
   // South America
   'mar del plata': [-57.55, -38.00], 'barranquilla': [-74.80, 10.96], 'concepcion': [-73.05, -36.83],
   'arequipa': [-71.54, -16.41], 'santa cruz': [-63.18, -17.78], 'sucre': [-65.26, -19.03],
@@ -187,7 +187,7 @@ export const CITY_COORDS = {
   'muscat': [58.41, 23.59], 'salalah': [54.09, 17.02], 'doha': [51.53, 25.29],
   'jeddah': [39.17, 21.49], 'mecca': [39.83, 21.39], 'medina': [39.61, 24.47],
   'riyadh': [46.68, 24.71], 'aleppo': [37.16, 36.20], 'damascus': [36.29, 33.51],
-  'aden': [45.04, 12.79], "sana'a": [44.21, 15.37],
+  'aden': [45.04, 12.79], 'sanaa': [44.21, 15.37],
   // Asia
   'fukuoka': [130.40, 33.59], 'hiroshima': [132.46, 34.39], 'kobe': [135.20, 34.69],
   'nagoya': [136.91, 35.18], 'sapporo': [141.35, 43.06], 'yokohama': [139.64, 35.44],
