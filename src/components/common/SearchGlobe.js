@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { geoOrthographic, geoPath, geoGraticule10, geoContains, geoCentroid, geoDistance } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
-import { coordsForCity, normalizeCity, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
+import { coordsForCity, normalizeCity, atlasCountryName, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
 import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -500,7 +500,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     // the 110m geometry, but those profiles still carry country = "Spain".
     const fname = name.toLowerCase();
     const inCountry = citiesRef.current.filter(
-      (c) => geoContains(f, c.coord) || (c.country && c.country.toLowerCase() === fname)
+      (c) => geoContains(f, c.coord) || (c.country && atlasCountryName(c.country) === fname)
     );
     if (locked) {
       // FREE members may open their own country (their whole discovery
@@ -509,7 +509,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       const own = coordsForCity(userCity);
       const allowed = inCountry.length > 0
         || (own && geoContains(f, own))
-        || (userCountry && fname === userCountry.toLowerCase());
+        || (userCountry && fname === atlasCountryName(userCountry));
       if (!allowed) { onLockedCity?.(name); return; }
     }
     setSelectedCountry({

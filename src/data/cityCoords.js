@@ -242,6 +242,31 @@ export const FEATURED_HUBS = [
 ];
 
 // Normalize a free-text city name to a CITY_COORDS key.
+// App country names → world-atlas 110m feature names, for the globe's
+// name fallback (used when a profile's city has no coordinates). Countries
+// absent from the 110m geometry (micro-states, islands) have no entry.
+export const ATLAS_COUNTRY_NAMES = {
+  'United States': 'United States of America',
+  'Czech Republic': 'Czechia',
+  'DR Congo': 'Dem. Rep. Congo',
+  'Congo': 'Congo',
+  'Ivory Coast': "Côte d'Ivoire",
+  'UAE': 'United Arab Emirates',
+  'Bosnia and Herzegovina': 'Bosnia and Herz.',
+  'Dominican Republic': 'Dominican Rep.',
+  'North Macedonia': 'Macedonia',
+  'Central African Republic': 'Central African Rep.',
+  'Eswatini': 'eSwatini',
+  'South Sudan': 'S. Sudan',
+  'Equatorial Guinea': 'Eq. Guinea',
+  'Solomon Islands': 'Solomon Is.',
+  'Timor-Leste': 'Timor-Leste',
+  'Somalia': 'Somalia',
+  'Palestine': 'Palestine',
+  'Western Sahara': 'W. Sahara',
+};
+export const atlasCountryName = (country) => (ATLAS_COUNTRY_NAMES[country] || country || '').toLowerCase();
+
 export const normalizeCity = (city) =>
   (city || '')
     .toString()
