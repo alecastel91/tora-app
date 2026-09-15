@@ -1522,7 +1522,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <label>{t('calendar.zone')} *</label>
               <select
                 value={tourForm.zone}
-                onChange={(e) => setTourForm({ ...tourForm, zone: e.target.value })}
+                onChange={(e) => setTourForm({ ...tourForm, zone: e.target.value, country: '' })}
                 className="form-input"
               >
                 <option value="">{t('tour.selectZone')}</option>

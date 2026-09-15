@@ -6,7 +6,7 @@ import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, ImageIc
 import Modal from '../common/Modal';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
-import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
+import { zones, countriesByZone, citiesByCountry, genresList, getZoneFromCountry } from '../../data/profiles';
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -375,9 +375,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   };
 
   const handleArtistCountryChange = (country) => {
-    const zone = Object.entries(countriesByZone).find(([_, countries]) =>
-      countries.includes(country)
-    )?.[0] || '';
+    const zone = getZoneFromCountry(country) || '';
 
     setEditedArtistInfo({
       ...editedArtistInfo,

@@ -1007,13 +1007,6 @@
 
 /* Looking for section */
 
-
-
-
-
-
-
-
 .legend-dot {
   width: 12px;
   height: 12px;
@@ -3336,152 +3329,7 @@
   width: 100%;
 }
 
-.interactive-map-container {
-  position: relative;
-  background: var(--bg-dark);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--tora-radius-md);
-  overflow: hidden;
-  width: 100%;
-}
-
-.map-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  display: flex;
-  gap: 5px;
-}
-
-.map-control-btn {
-  width: 32px;
-  height: 32px;
-  background: var(--bg-card);
-  border: 1px solid var(--primary-pink);
-  border-radius: var(--tora-radius-sm);
-  color: var(--primary-pink);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: all 0.2s;
-}
-
-.map-control-btn:hover {
-  background: var(--primary-pink);
-  color: white;
-}
-
-.interactive-map {
-  width: 100%;
-  height: 400px;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-}
-
-.map-content {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transition: transform 0.1s;
-  transform-origin: center center;
-}
-
-.world-map-bg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0.7;
-  filter: brightness(0.8) contrast(1.2);
-}
-
-.country-marker {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  z-index: 5;
-}
-
-.country-marker:hover {
-  transform: translate(-50%, -50%) scale(1.5);
-  z-index: 10;
-}
-
-.country-marker.selected {
-  transform: translate(-50%, -50%) scale(1.3);
-  box-shadow: 0 0 0 3px rgba(255, 51, 102, 0.3);
-  z-index: 8;
-}
-
-.country-tooltip {
-  position: absolute;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-card);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--tora-radius-sm);
-  padding: 6px 10px;
-  white-space: nowrap;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  font-size: var(--font-xs);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-
-.country-marker:hover .country-tooltip {
-  display: flex;
-}
-
-.country-tooltip strong {
-  color: var(--text-white);
-  font-size: var(--font-sm);
-}
-
-.country-tooltip span {
-  color: var(--text-gray);
-  font-size: var(--font-xs);
-}
-
-.map-info {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--tora-radius-sm);
-  padding: 8px 12px;
-  font-size: var(--font-sm);
-  color: var(--text-gray);
-}
-
-
 /* Obsidian Neon: glass input, focus animates border to crimson. */
-
-
-
-
-
-
-
 
 .filters-section {
   background: #000000;
@@ -3630,10 +3478,6 @@
   top: 0;
   left: 0;
 }
-
-
-
-
 
 .result-avatar .verified-badge {
   position: absolute;
@@ -3897,10 +3741,6 @@
   object-fit: cover;
 }
 
-
-
-
-
 .message-avatar.avatar-deleted {
   background: #2a2a32 !important;
 }
@@ -4083,10 +3923,6 @@
   border-radius: 50%;
   object-fit: cover;
 }
-
-
-
-
 
 .chat-avatar.avatar-deleted {
   background: #2a2a32 !important;
@@ -5484,7 +5320,6 @@
   background: var(--primary-hover);
 }
 
-
 /* Secondary button style */
 .btn-secondary {
   background: var(--bg-secondary);
@@ -5610,8 +5445,6 @@
   border-color: rgba(255, 51, 102, 0.6);
 }
 
-
-
 .premium-badge {
   background: rgba(255, 215, 0, 0.1);
   border: 1px solid rgba(255, 215, 0, 0.5);
@@ -5639,7 +5472,6 @@
   text-align: center;
   max-width: 400px;
 }
-
 
 .upgrade-card h2 {
   color: var(--text-white);
@@ -5773,10 +5605,6 @@
 .match-avatar.clickable:hover {
   opacity: 0.8;
 }
-
-
-
-
 
 .match-avatar img {
   width: 100%;
@@ -6100,9 +5928,6 @@
   position: relative;
 }
 
-
-
-
 /* Premium Screen Styles */
 .premium-screen {
   position: fixed;
@@ -6311,8 +6136,6 @@
   color: var(--primary);
   position: relative;
 }
-
-
 
 .features-table-row {
   display: grid;
@@ -7384,129 +7207,6 @@
   text-align: center;
 }
 
-/* Enhanced Interactive Map Styles */
-.interactive-map {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-}
-
-.map-control-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--border-dark);
-  background: rgba(26, 26, 26, 0.95);
-  color: var(--text-light);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: bold;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
-}
-
-.map-control-btn:hover {
-  background: var(--primary-pink);
-  color: white;
-  transform: scale(1.05);
-}
-
-/* Country Markers with Profile Counts */
-.country-marker {
-  position: relative;
-  transition: all 0.2s ease;
-  min-width: 16px;
-  min-height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.country-marker.empty {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.country-marker:hover {
-  transform: scale(1.15);
-  z-index: 10;
-}
-
-.profile-count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--primary-pink);
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  z-index: 2;
-}
-
-.profile-count-text {
-  color: var(--primary-pink);
-  font-size: 11px;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-/* Map Legend */
-.map-legend {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(26, 26, 26, 0.95);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--tora-radius-md);
-  padding: 8px 12px;
-  display: flex;
-  gap: 12px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.legend-zone {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.legend-item span {
-  color: var(--text-light);
-  font-size: 14px;
-}
-
-/* Enhanced Country Tooltips */
-.country-tooltip {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  background: rgba(26, 26, 26, 0.98);
-}
-
-/* Map Info Enhancement */
-.map-info {
-  background: rgba(26, 26, 26, 0.95);
-  border: 1px solid var(--border-dark);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
 /* Search Location Limitation Notices */
 .search-limitation-notice {
   background: none;
@@ -7551,18 +7251,7 @@
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
-
 /* Upgrade banner for FREE tier users */
-
-
-
-
-
-
-
-
-
-
 
 /* Represented Artists Screen */
 .represented-artists-screen {
@@ -7738,8 +7427,6 @@
   padding: 4px 10px;
   font-size: 11px;
 }
-
-
 
 .artist-avatar {
   width: 44px;
@@ -8216,8 +7903,6 @@
   overflow-y: auto;
   margin: auto;
 }
-
-
 
 .modal-close-btn {
   background: none;
@@ -10848,17 +10533,6 @@ textarea.form-textarea:focus {
 /* Revenue Chart */
 /* Revenue Chart Scroll Container */
 
-
-
-
-
-
-
-
-
-
-
-
 .revenue-trend {
   text-align: center;
   font-size: 13px;
@@ -11215,8 +10889,6 @@ textarea.form-textarea:focus {
 .calendar-grid-inline .calendar-day.available:hover {
   background: rgba(67, 233, 123, 0.22);
 }
-
-
 
 /* Travel Schedules Section */
 .travel-schedules-section {
@@ -11864,8 +11536,6 @@ textarea.form-textarea:focus {
   border-bottom-color: var(--primary-pink);
 }
 
-
-
 /* Tour Screen Layout Fix.
    Height comes from a JS-measured var (TourScreen sets --tour-screen-h to the
    exact space the scroller gives the screen) — a 100vh calc over-shoots on
@@ -11955,16 +11625,6 @@ textarea.form-textarea:focus {
   padding: 6px 12px;
   font-size: 10px;
 }
-
-
-
-
-
-
-
-
-
-
 
 .tour-empty-state {
   text-align: center;
@@ -12668,12 +12328,10 @@ textarea.form-textarea:focus {
   margin-left: 6px;
 }
 
-
 /* Calendar-match card: pill sits inline with the name, not pushed down */
 .match-name-role .role-badge {
   margin-top: 0;
 }
-
 
 /* Mini calendar chip internals */
 .booking-date-month {
@@ -12692,7 +12350,6 @@ textarea.form-textarea:focus {
   color: #fff;
   line-height: 1;
 }
-
 
 /* Manage header identity row: jewel avatar, SG name, tech location */
 .artist-info-bar .artist-avatar-small {
@@ -12713,7 +12370,6 @@ textarea.form-textarea:focus {
   margin: 0;
 }
 
-
 /* ==========================================================================
  * Canonical form label voice. App.css accumulated nine .form-group label
  * duplicates over time; this final rule settles the cascade for all of them.
@@ -12728,7 +12384,6 @@ textarea.form-textarea:focus {
   letter-spacing: 0.15em;
   font-weight: 600;
 }
-
 
 /* ==========================================================================
  * Canonical sub-screen header. One voice for every full-screen sub-page:
@@ -12791,7 +12446,6 @@ textarea.form-textarea:focus {
 .premium-header .back-button:hover {
   border-color: rgba(255, 51, 102, 0.5);
 }
-
 
 /* Master-detail split (desktop docks the detail beside the master; on mobile
    the detail covers the page exactly as before) */
