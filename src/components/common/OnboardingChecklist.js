@@ -1,5 +1,5 @@
 import { goTab, goProfileThen, goTourSubTab } from '../../utils/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isPremiumViewer } from '../../utils/subscription';
@@ -17,12 +17,25 @@ const OnboardingChecklist = () => {
   const collapseKey = user?.id ? `tora:checklist-collapsed:${user.id}` : null;
   const [collapsed, setCollapsed] = useState(() => !!(collapseKey && localStorage.getItem(collapseKey)));
 
+  // Visited-Tour flag as state: the flag is written by App.switchTab while
+  // this (kept-mounted) Profile tab is hidden, so a render-time read of
+  // localStorage would stay stale until the next reload.
+  const visitedKey = `tora:visited-tour:${user?.id}`;
+  const [visitedTour, setVisitedTour] = useState(() => !!localStorage.getItem(visitedKey));
+  useEffect(() => {
+    const sync = () => setVisitedTour(!!localStorage.getItem(visitedKey));
+    window.addEventListener('tora:visited-tour', sync);
+    window.addEventListener('storage', sync);
+    return () => { window.removeEventListener('tora:visited-tour', sync); window.removeEventListener('storage', sync); };
+  }, [visitedKey]);
+
   if (!user?.id) return null;
 
   // Land directly on the Tour Kickstart sub-tab (same intent flag ViewProfile
   // uses) — and count the visit immediately.
   const goKickstart = () => {
-    localStorage.setItem(`tora:visited-tour:${user.id}`, '1');
+    localStorage.setItem(visitedKey, '1');
+    setVisitedTour(true);
     sessionStorage.setItem('tora:tour-kickstart-intent', '1');
     goTab('tour');
     window.dispatchEvent(new CustomEvent('tora:tour-kickstart'));
@@ -78,7 +91,7 @@ const OnboardingChecklist = () => {
     ...(isPremiumViewer(user)
       ? [{
           key: 'exploreTours',
-          done: !!localStorage.getItem(`tora:visited-tour:${user.id}`),
+          done: visitedTour,
           go: goKickstart,
         }]
       : []),

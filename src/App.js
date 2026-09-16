@@ -119,6 +119,9 @@ function App() {
     // Keyed by the ACTIVE PROFILE id — the same key the checklist reads.
     if (tab === 'tour' && user?.id) {
       localStorage.setItem(`tora:visited-tour:${user.id}`, '1');
+      // The Profile tab stays mounted while the member is on Tour, so the
+      // checklist would not re-read storage — tell it.
+      window.dispatchEvent(new CustomEvent('tora:visited-tour'));
     }
     closeAllOverlays();
   };
