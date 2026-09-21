@@ -2367,9 +2367,16 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   );
                 }
                 if (isSentOrLater) {
+                  // Whose turn it is depends on who already signed, not on
+                  // which side we are on (either party can send a contract).
+                  const c = selectedOffer.contract || {};
+                  const sigs = Array.isArray(c.signatures) ? c.signatures : [];
+                  const sigIsArtistSide = (sig) => (typeof sig.artistSide === 'boolean' ? sig.artistSide : sig.profileId === selectedOffer.artistId);
+                  const mySideSigned = sigs.some((sig) => sigIsArtistSide(sig) === onArtistSide)
+                    || (sigs.length === 0 && c.status === 'SENT' && (c.sentBy ? c.sentBy === currentUser.id : onArtistSide));
                   return (
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textAlign: 'center', width: '100%' }}>
-                      {onArtistSide
+                      {mySideSigned
                         ? t('chat.contractSentWaiting', { name: otherName })
                         : t('chat.contractAwaitingSignature')}
                     </span>

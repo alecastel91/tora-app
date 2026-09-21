@@ -1132,19 +1132,26 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   </>
                 )}
                 {deal.contract && deal.contract.status && deal.contract.status !== 'NOT_SENT' && deal.contract.status !== 'FULLY_SIGNED' && (() => {
-                  // Side-based gate: artist side initiates contracts (via
-                  // send-and-sign), so they always see View + Withdraw.
-                  // Only the venue/booker side ever sees Sign Contract.
-                  // Falling back on per-signature matching was unreliable
-                  // across profile switches and old SENT-without-signature
-                  // test deals.
+                  // Gate by whether MY side has already signed, not by which
+                  // side I am on: either party can be the one who sent the
+                  // contract (the beta seeds a venue-signed one to artists),
+                  // and the side that has not signed yet must get Sign.
                   const onArtistSide = isArtistSideForDeal(deal, currentUser);
                   const isFullySigned = deal.contract.status === 'FULLY_SIGNED';
                   const otherPartyName = onArtistSide
                     ? (deal.venue?.name || t('bookings.theVenue'))
                     : (deal.artist?.name || t('bookings.theArtist'));
+                  const sigs = Array.isArray(deal.contract.signatures) ? deal.contract.signatures : [];
+                  const sigIsArtistSide = (sig) => (typeof sig.artistSide === 'boolean' ? sig.artistSide : sig.profileId === deal.artistId);
+                  const mySideSigned = sigs.some((sig) => sigIsArtistSide(sig) === onArtistSide)
+                    // A SENT contract with no signature record was sent-and-signed by its sender.
+                    || (sigs.length === 0 && deal.contract.status === 'SENT' && (deal.contract.sentBy ? deal.contract.sentBy === currentUser.id : onArtistSide));
 
-                  if (onArtistSide) {
+                  // Only the sender may withdraw (server rule) — the party who
+                  // countersigned a received contract has nothing to withdraw.
+                  const canWithdraw = deal.contract.sentBy ? deal.contract.sentBy === currentUser.id : onArtistSide;
+
+                  if (mySideSigned) {
                     return (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {!isFullySigned && (
@@ -1165,6 +1172,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                           </svg>
                           {t('chat.viewContract')}
                         </button>
+                        {canWithdraw && (
                         <button
                           className="btn btn-secondary"
                           onClick={() => {
@@ -1185,6 +1193,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                           </svg>
                           {t('bookings.withdrawContract')}
                         </button>
+                        )}
                         </div>
                       </div>
                     );
