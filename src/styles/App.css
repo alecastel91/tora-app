@@ -13196,3 +13196,12 @@ body.beta-env #root {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
 }
+
+.agent-seat-estimate-total .price-was {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration-color: rgba(255, 51, 102, 0.8);
+}

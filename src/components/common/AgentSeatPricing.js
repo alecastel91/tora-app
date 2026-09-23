@@ -109,10 +109,16 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
           className="agent-seat-range"
           aria-label={t('agentSeat.estimatorLabel')}
         />
+        {/* Yearly: lead with the per-month equivalent (monthly rate struck
+            through), the yearly total in small print — a year's total reads
+            as expensive. Monthly: the plain monthly figure. */}
         <div className="agent-seat-estimate-out">
-          <span className="agent-seat-estimate-total">{money(est.perPeriod)}<em>/{isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}</em></span>
+          <span className="agent-seat-estimate-total">
+            {isYearly && <s className="price-was">{money(total(estimate))}</s>}
+            {money(est.perMonth)}<em>/{t('agentSeat.perMonth')}</em>
+          </span>
           {isYearly && (
-            <span className="agent-seat-estimate-eq">≈ {money(est.perMonth)}/{t('agentSeat.perMonth')}</span>
+            <span className="agent-seat-estimate-eq">{t('premium.billedYearly', { total: money(est.perPeriod) })}</span>
           )}
         </div>
       </div>
