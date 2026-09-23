@@ -500,6 +500,7 @@ const en = {
     planType: 'Plan Type',
     yearlySave: 'Yearly (2 months free)',
     yearlySaveBadge: '2 months free',
+    billedYearly: 'Billed yearly as {{total}}',
     chooseMonthly: 'Choose Monthly',
     chooseYearly: 'Choose Yearly',
     securedByStripe: 'Secured by Stripe',

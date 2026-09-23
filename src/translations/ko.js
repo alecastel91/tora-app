@@ -550,6 +550,7 @@ const ko = {
     perMonth: '월 {{n}}회',
     unlimited: '무제한',
     yearlySaveBadge: '2개월 무료',
+    billedYearly: '연 {{total}} 일괄 청구',
     chooseMonthly: '월간 선택',
     chooseYearly: '연간 선택',
     securedByStripe: 'Stripe로 안전하게 결제',

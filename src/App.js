@@ -1479,7 +1479,13 @@ function App() {
                   <div className={`price-card featured${hasYearly ? ' is-current' : ''}`}>
                     <div className="badge">{hasYearly ? t('premium.currentPlan') : t('premium.yearlySaveBadge')}</div>
                     <h4>{t('premium.yearly')}</h4>
-                    <div className="price">{money(memberPrice.yearly)}<span>/year</span></div>
+                    {/* Lead with the per-month equivalent — a yearly total reads
+                        as expensive; the struck monthly price shows the saving. */}
+                    <div className="price">
+                      <s className="price-was">{money(memberPrice.monthly)}</s>
+                      {money(memberPrice.yearly / 12)}<span>/month</span>
+                    </div>
+                    <div className="price-billed">{t('premium.billedYearly', { total: money(memberPrice.yearly) })}</div>
                     {hasYearly ? (
                       <button className="btn btn-primary" disabled>{t('premium.currentPlan')}</button>
                     ) : (

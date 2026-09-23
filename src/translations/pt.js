@@ -550,6 +550,7 @@ const pt = {
     perMonth: '{{n}} por mês',
     unlimited: 'Ilimitadas',
     yearlySaveBadge: '2 meses grátis',
+    billedYearly: 'Cobrado {{total}} por ano',
     chooseMonthly: 'Escolher Mensal',
     chooseYearly: 'Escolher Anual',
     securedByStripe: 'Protegido pela Stripe',

@@ -550,6 +550,7 @@ const ja = {
     perMonth: '月{{n}}回',
     unlimited: '無制限',
     yearlySaveBadge: '2か月無料',
+    billedYearly: '年額{{total}}を一括請求',
     chooseMonthly: '月額を選択',
     chooseYearly: '年額を選択',
     securedByStripe: 'Stripeによる安全な決済',

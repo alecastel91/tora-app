@@ -550,6 +550,7 @@ const zh = {
     perMonth: '每月{{n}}次',
     unlimited: '不限',
     yearlySaveBadge: '免费2个月',
+    billedYearly: '按年计费 {{total}}',
     chooseMonthly: '选择月付',
     chooseYearly: '选择年付',
     securedByStripe: '由 Stripe 安全保障',
