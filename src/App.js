@@ -20,7 +20,7 @@ import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
 import { rosterUsage } from './utils/agentTiers';
 import { billingTier } from './utils/subscription';
-import { formatMoney, MEMBER_PRICES, EXTRA_PRICES, normalizeCurrency } from './utils/money';
+import { formatMoney, MEMBER_PRICES, EXTRA_PRICES, normalizeCurrency, yearlyPerMonth } from './utils/money';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
 import apiService from './services/api';
@@ -1467,7 +1467,7 @@ function App() {
                   <div className={`price-card${hasMonthly ? ' is-current' : ''}`}>
                     {hasMonthly && <div className="badge badge-current">{t('premium.currentPlan')}</div>}
                     <h4>{t('premium.monthly')}</h4>
-                    <div className="price">{money(memberPrice.monthly)}<span>/month</span></div>
+                    <div className="price">{money(memberPrice.monthly)}<span>/{t('agentSeat.perMonth')}</span></div>
                     {hasMonthly ? (
                       <button className="btn btn-outline" disabled>{t('premium.currentPlan')}</button>
                     ) : hasYearly ? (
@@ -1483,7 +1483,7 @@ function App() {
                         as expensive; the struck monthly price shows the saving. */}
                     <div className="price">
                       <s className="price-was">{money(memberPrice.monthly)}</s>
-                      {money(memberPrice.yearly / 12)}<span>/month</span>
+                      {money(yearlyPerMonth(memberPrice.yearly))}<span>/{t('agentSeat.perMonth')}</span>
                     </div>
                     <div className="price-billed">{t('premium.billedYearly', { total: money(memberPrice.yearly) })}</div>
                     {hasYearly ? (
@@ -1540,7 +1540,7 @@ function App() {
               const isYearly = selectedPlan === 'yearly';
               const cycleWord = isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth');
               const priceLabel = planDetail?.priceLabel || money(isYearly ? memberPrice.yearly : memberPrice.monthly);
-              const perMonthEq = planDetail ? planDetail.perMonthLabel : money(memberPrice.yearly / 12);
+              const perMonthEq = planDetail ? planDetail.perMonthLabel : money(yearlyPerMonth(memberPrice.yearly));
               const planName = planDetail
                 ? `${planDetail.seats} ${t('agentSeat.artists')}`
                 : t('premium.title');

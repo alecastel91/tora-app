@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney } from '../../utils/money';
+import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney, yearlyPerMonth } from '../../utils/money';
 
 const bandLabel = (band, i) => {
   const from = i === 0 ? 1 : BANDS[i - 1].upTo + 1;
@@ -46,7 +46,7 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
 
   const est = useMemo(() => {
     const mo = total(estimate);
-    return { perPeriod: mo * mult, perMonth: isYearly ? mo * 10 / 12 : mo };
+    return { perPeriod: mo * mult, perMonth: isYearly ? yearlyPerMonth(mo * mult) : mo };
   }, [estimate, mult, isYearly]);
 
   return (
@@ -149,18 +149,17 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
         onClick={() => {
           if (unchanged) return; // nothing to change
           // The seats the agent picked (never below their roster).
-          const seats = Math.max(estimate, minSeats);
-          const perPeriod = total(seats) * mult;
+          const seats = estimate; // already clamped to >= minSeats
           const currentPeriod = total(currentSeats) * mult;
           onSubscribe(interval, {
             seats,
             added: isPaid ? Math.max(0, seats - currentSeats) : 0,
             currentSeats,
             currentPriceLabel: money(currentPeriod),
-            addedPriceLabel: money(perPeriod - currentPeriod),
-            amount: perPeriod,
-            priceLabel: money(perPeriod),
-            perMonthLabel: isYearly ? money(total(seats) * 10 / 12) : null,
+            addedPriceLabel: money(est.perPeriod - currentPeriod),
+            amount: est.perPeriod,
+            priceLabel: money(est.perPeriod),
+            perMonthLabel: isYearly ? money(est.perMonth) : null,
           });
         }}
       >
@@ -169,12 +168,12 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
               ? t('agentSeat.currentSeats', { n: currentSeats })
               : (intervalChanged && additional === 0 && reducing === 0)
                 ? (isYearly
-                    ? t('agentSeat.switchToYearly', { price: money(total(estimate) * mult) })
-                    : t('agentSeat.switchToMonthly', { price: money(total(estimate) * mult) }))
+                    ? t('agentSeat.switchToYearly', { price: money(est.perPeriod) })
+                    : t('agentSeat.switchToMonthly', { price: money(est.perPeriod) }))
                 : reducing > 0
-                  ? t('agentSeat.reduceSeats', { n: estimate, price: money(total(estimate) * mult) })
-                  : t('agentSeat.upgradeSeats', { n: estimate, price: money(total(estimate) * mult) }))
-          : t('agentSeat.buySeats', { n: estimate, price: money(total(estimate) * mult) })}
+                  ? t('agentSeat.reduceSeats', { n: estimate, price: money(est.perPeriod) })
+                  : t('agentSeat.upgradeSeats', { n: estimate, price: money(est.perPeriod) }))
+          : t('agentSeat.buySeats', { n: estimate, price: money(est.perPeriod) })}
       </button>
       <p className="agent-seat-foot">{t('agentSeat.foot')}</p>
     </div>
