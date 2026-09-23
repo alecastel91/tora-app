@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { soundcloudEmbedUrl, spotifyEmbedUrl, expandProfileMediaLinks } from '../../utils/mediaLinks';
+import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
@@ -426,7 +426,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         updatedData.capacity = editedArtistInfo.capacity;
       }
 
-      await apiService.updateProfile(artistId, await expandProfileMediaLinks(updatedData));
+      await apiService.updateProfile(artistId, updatedData);
 
       // Fetch fresh profile data from backend to ensure sync
       const freshProfile = await apiService.getProfile(artistId);
@@ -720,6 +720,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   // Artist Info Tab (Editable Profile Information)
   const renderArtistInfoTab = () => {
+    const artistEmbeds = { soundcloud: soundcloudEmbedUrl(artistProfile?.mixtape), spotify: spotifyEmbedUrl(artistProfile?.spotify) };
 
     return (
       <div className="artist-info-tab">
@@ -749,13 +750,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         </div>
 
         {/* Latest Mix */}
-        {soundcloudEmbedUrl(artistProfile?.mixtape) && (
+        {artistEmbeds.soundcloud && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
             <h3 className="mb-3 text-[11px] font-tech font-semibold uppercase tracking-[0.15em] text-infrared">
               {t('manageArtist.latestMix')}
             </h3>
             <iframe
-              src={soundcloudEmbedUrl(artistProfile.mixtape)}
+              src={artistEmbeds.soundcloud}
               className="embed-iframe soundcloud-embed"
               title={t('manageArtist.soundcloudMix')}
               allow="autoplay"
@@ -764,13 +765,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         )}
 
         {/* Spotify Artist */}
-        {artistProfile?.role === 'ARTIST' && spotifyEmbedUrl(artistProfile?.spotify) && (
+        {artistProfile?.role === 'ARTIST' && artistEmbeds.spotify && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
             <h3 className="mb-3 text-[11px] font-tech font-semibold uppercase tracking-[0.15em] text-infrared">
               {t('manageArtist.spotifyArtistHeading')}
             </h3>
             <iframe
-              src={spotifyEmbedUrl(artistProfile.spotify)}
+              src={artistEmbeds.spotify}
               className="embed-iframe spotify-embed"
               title={t('manageArtist.spotifyArtistProfile')}
               allow="encrypted-media"

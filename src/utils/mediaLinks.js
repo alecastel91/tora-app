@@ -1,77 +1,31 @@
-import apiService from '../services/api';
-
-// SoundCloud / Spotify links → embed URLs. One set of rules for the owner's
-// profile, the public profile and the agent's artist view, and the same
-// rules the Edit Profile hints promise (editProfile.soundcloudHint/spotifyHint).
+// SoundCloud / Spotify links → embed URLs. Pure, hostname-based. One set of
+// rules for the own profile, the public profile and the agent's artist view —
+// the same rules the Edit Profile hints promise. Short share links are
+// expanded to the real page by the backend on save (utils/mediaLinks there),
+// so by the time a link reaches these helpers it is a page URL.
 
 const SC_PLAYER = 'https://w.soundcloud.com/player/?url=';
 const SC_OPTS = '&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true';
 
-/**
- * Track, set or profile page link (soundcloud.com/… or m.soundcloud.com/…)
- * → player embed URL. The app's short share links (on.soundcloud.com) cannot
- * be embedded and return null.
- */
+const parse = (link) => { try { return new URL(String(link || '').trim()); } catch { return null; } };
+
+/** Track, set or profile page (soundcloud.com / m.soundcloud.com) → player embed URL; else null. */
 export function soundcloudEmbedUrl(link) {
-  const url = String(link || '').trim();
-  if (!url || url.includes('on.soundcloud.com')) return null;
-  if (!/(^|\/\/|\.)m?\.?soundcloud\.com\//.test(url) && !url.includes('soundcloud.com/')) return null;
-  return SC_PLAYER + encodeURIComponent(url.replace('m.soundcloud.com', 'soundcloud.com')) + SC_OPTS;
+  const u = parse(link);
+  if (!u || !/^(m\.|www\.)?soundcloud\.com$/i.test(u.hostname)) return null;
+  u.hostname = 'soundcloud.com';
+  return SC_PLAYER + encodeURIComponent(u.toString()) + SC_OPTS;
 }
 
-/** open.spotify.com/artist/<id>[?…] → <id>; anything else (track, album, short link) → null. */
+/** open.spotify.com/artist/<id>[?…] → <id>; track/album/short links → null. */
 export function spotifyArtistId(link) {
-  const url = String(link || '').trim();
-  if (!url.includes('open.spotify.com') || !url.includes('/artist/')) return null;
-  const id = url.split('/artist/')[1]?.split('?')[0]?.split('/')[0];
-  return id || null;
+  const u = parse(link);
+  if (!u || u.hostname.toLowerCase() !== 'open.spotify.com') return null;
+  const m = u.pathname.match(/\/artist\/([A-Za-z0-9]+)/);
+  return m ? m[1] : null;
 }
 
 export function spotifyEmbedUrl(link) {
   const id = spotifyArtistId(link);
   return id ? `https://open.spotify.com/embed/artist/${id}` : null;
-}
-
-// Short share links the apps hand out. They only redirect to the real page,
-// so the embed players cannot use them; the backend follows the redirect
-// (POST /resolve-url, SSRF-hardened) and we store the real URL instead.
-const SHORT_LINK = /(^|\/\/)(on\.soundcloud\.com|spotify\.link|spotify\.app\.link)\//i;
-export const isShortMediaLink = (link) => SHORT_LINK.test(String(link || '').trim());
-
-/** A short share link → its real page URL; anything else (or a failed lookup) unchanged. */
-export async function expandMediaLink(link) {
-  const url = String(link || '').trim();
-  if (!isShortMediaLink(url)) return url;
-  try {
-    const res = await apiService.resolveUrl(url);
-    return cleanResolvedLink(res?.resolvedUrl) || url;
-  } catch {
-    return url;
-  }
-}
-
-/**
- * What the redirect chain lands on is not always the page itself:
- * Spotify sends phones through an app.link interstitial that carries the
- * real page in `$full_url`, and SoundCloud appends share tracking
- * parameters. Unwrap the first, drop the second.
- */
-function cleanResolvedLink(resolved) {
-  if (!resolved) return null;
-  try {
-    let u = new URL(resolved);
-    const full = u.searchParams.get('$full_url') || u.searchParams.get('full_url');
-    if (full && /app\.link$/i.test(u.hostname)) u = new URL(full);
-    if (/soundcloud\.com$/i.test(u.hostname)) u.search = '';
-    if (/spotify\.com$/i.test(u.hostname)) u.search = '';
-    return u.toString();
-  } catch {
-    return resolved;
-  }
-}
-
-/** Expand the short links in a profile patch before it is saved. */
-export async function expandProfileMediaLinks(patch) {
-  const [mixtape, spotify] = await Promise.all([expandMediaLink(patch.mixtape), expandMediaLink(patch.spotify)]);
-  return { ...patch, ...(patch.mixtape !== undefined ? { mixtape } : {}), ...(patch.spotify !== undefined ? { spotify } : {}) };
 }

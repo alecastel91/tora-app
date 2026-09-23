@@ -808,11 +808,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         
         {/* Embedded Media Section */}
         <div className="profile-embeds">
-          {soundcloudEmbedUrl(profile.mixtape) && (
+          {embeds.soundcloud && (
             <div className="embed-card">
               <h4>{t('viewProfile.latestMix')}</h4>
               <iframe
-                src={soundcloudEmbedUrl(profile.mixtape)}
+                src={embeds.soundcloud}
                 frameBorder="0"
                 className="embed-iframe soundcloud-embed"
                 title={t('manageArtist.soundcloudMix')}
@@ -821,11 +821,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </div>
           )}
           
-          {spotifyEmbedUrl(profile.spotify) && (
+          {embeds.spotify && (
             <div className="embed-card">
               <h4>{t('viewProfile.spotifyArtist')}</h4>
               <iframe
-                src={spotifyEmbedUrl(profile.spotify)}
+                src={embeds.spotify}
                 frameBorder="0"
                 allowTransparency="true"
                 allow="encrypted-media"

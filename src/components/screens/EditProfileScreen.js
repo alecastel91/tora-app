@@ -4,7 +4,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { genresList, getZoneFromCountry } from '../../data/profiles';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
-import { expandProfileMediaLinks } from '../../utils/mediaLinks';
 import CitySearch from '../common/CitySearch';
 import { downscaleImageToDataUrl } from '../../utils/image';
 import { appAlert } from '../../utils/dialogs';
@@ -252,9 +251,8 @@ const EditProfileScreen = ({ onClose }) => {
         return;
       }
 
-      // Short share links (on.soundcloud.com, spotify.link) are expanded to
-      // the real page URL so the embeds work; failures keep the typed value.
-      const response = await apiService.updateProfile(profileId, await expandProfileMediaLinks(updatedProfile));
+      // Save to backend (short SoundCloud/Spotify share links are expanded server-side)
+      const response = await apiService.updateProfile(profileId, updatedProfile);
 
       // Update local state with response from backend
       // SQL backend returns { message, profile }, so extract profile

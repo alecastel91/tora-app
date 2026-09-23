@@ -4,7 +4,7 @@ import { celebrateBadges } from '../../utils/celebrations';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
-import { soundcloudEmbedUrl, spotifyArtistId } from '../../utils/mediaLinks';
+import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, LocationIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
 import EditProfileScreen from './EditProfileScreen';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
@@ -176,8 +176,8 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   };
 
   // Embed URLs derived from the profile links (shared rules in utils/mediaLinks).
-  const resolvedSoundCloudUrl = soundcloudEmbedUrl(user?.mixtape);
-  const resolvedSpotifyId = spotifyArtistId(user?.spotify);
+  const soundcloudEmbed = soundcloudEmbedUrl(user?.mixtape);
+  const spotifyEmbed = spotifyEmbedUrl(user?.spotify);
   
   const [editForm] = useState({
     name: user?.name || 'Your Name',
@@ -782,9 +782,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         {user?.mixtape && (
           <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4">
             <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.latestMix')}</h4>
-            {resolvedSoundCloudUrl ? (
+            {soundcloudEmbed ? (
               <iframe
-                src={resolvedSoundCloudUrl}
+                src={soundcloudEmbed}
                 frameBorder="0"
                 className="w-full h-[320px] rounded-lg"
                 title={t('manageArtist.soundcloudMix')}
@@ -802,9 +802,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         {user?.spotify && (
           <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4">
             <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.spotifyArtist')}</h4>
-            {resolvedSpotifyId ? (
+            {spotifyEmbed ? (
               <iframe
-                src={`https://open.spotify.com/embed/artist/${resolvedSpotifyId}`}
+                src={spotifyEmbed}
                 frameBorder="0"
                 allowTransparency="true"
                 allow="encrypted-media"
