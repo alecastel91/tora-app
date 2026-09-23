@@ -999,7 +999,7 @@ const it = {
     upgradeSuffix: 'fai upgrade per aggiungerne altri',
     pickPlanToStart: 'Scegli un piano per iniziare',
     noArtistsYet: 'Ancora nessun artista',
-    agentPlansIntro: 'I piani agente ti permettono di costruire un roster e agire per conto degli artisti. Solo parte da €19,90/mese.',
+    agentPlansIntro: 'I piani agente ti permettono di costruire un roster e agire per conto degli artisti. Paghi per ogni artista rappresentato: la tariffa scende al crescere del roster.',
     startBuilding: 'Inizia a costruire il tuo roster aggiungendo gli artisti che rappresenti.',
     seePlans: 'Vedi i piani',
     addFirstArtist: 'Aggiungi il primo artista',
@@ -1910,7 +1910,7 @@ const it = {
         id: 'premium',
         title: 'Piani e Premium',
         entries: [
-          { q: 'Quanto costa Premium', a: 'Mensile 19,90 €, oppure annuale 199,90 € — due mesi gratis.' },
+          { q: 'Quanto costa Premium', a: 'Mensile o annuale (due mesi gratis). I prezzi sono in euro, yen o dollari USA in base al paese: li trovi nella pagina Premium.' },
           { q: 'Cosa sblocca', a: 'Ricerca globale, più like e richieste di connessione, Tour Kickstart e, con l’annuale: cachet privati sui tour, calendario privato, posizione prioritaria nella ricerca e avvisi di viaggio.' },
           { q: 'Come funzionano gli avvisi di viaggio', a: 'Metti like a un artista: non serve altro. Quando annuncia date di viaggio o tour vicino alla tua città, venue e promoter con piano annuale ricevono automaticamente una notifica. Togli il like per fermare gli avvisi.' },
           { q: 'Cosa non è mai a pagamento', a: 'Ricevere un’offerta e accettarla. A nessuno viene impedito di lavorare per via del proprio piano.' },

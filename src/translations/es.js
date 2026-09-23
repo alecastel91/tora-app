@@ -999,7 +999,7 @@ const es = {
     upgradeSuffix: 'mejora tu plan para añadir más',
     pickPlanToStart: 'Elige un plan para empezar',
     noArtistsYet: 'Aún no hay artistas',
-    agentPlansIntro: 'Los planes de agente te permiten construir un roster y actuar en nombre de los artistas. Desde solo 19,90 €/mes.',
+    agentPlansIntro: 'Los planes de agente te permiten construir un roster y actuar en nombre de los artistas. Pagas por cada artista que representas y la tarifa baja a medida que crece tu roster.',
     startBuilding: 'Empieza a construir tu roster añadiendo a los artistas que representas.',
     seePlans: 'Ver planes',
     addFirstArtist: 'Añadir primer artista',
@@ -1910,7 +1910,7 @@ const es = {
         id: 'premium',
         title: 'Planes y Premium',
         entries: [
-          { q: 'Cuánto cuesta Premium', a: 'Mensual 19,90 €, o anual 199,90 € — dos meses gratis.' },
+          { q: 'Cuánto cuesta Premium', a: 'Mensual o anual (dos meses gratis). Los precios se muestran en tu moneda de facturación, euro, yen o dólar según el país, en la página Premium.' },
           { q: 'Qué desbloquea', a: 'Búsqueda global, más me gusta y solicitudes de conexión, Tour Kickstart y, en el anual: cachés privados en los tours, calendario privado, posición prioritaria en la búsqueda y avisos de viaje.' },
           { q: 'Cómo funcionan los avisos de viaje', a: 'Dale me gusta a un artista: eso es todo. Cuando anuncie fechas de viaje o gira cerca de tu ciudad, las salas y promotores con plan anual reciben una notificación automática. Quita el me gusta para detener los avisos.' },
           { q: 'Qué nunca está de pago', a: 'Recibir una oferta y aceptarla. A nadie se le impide trabajar por su plan.' },

@@ -23,11 +23,11 @@ const appearance = {
   },
 };
 
-const eur = (n) => `€${Number(n).toFixed(2)}`;
+import { formatMoney } from '../../utils/money';
 
 // Launch-promo banner shown when Stripe applied a coupon (founding members now,
 // the H1-2027 25%-off in that window). Surfaces the discount + first charge.
-const PromoBanner = ({ coupon, amountDue, t }) => {
+const PromoBanner = ({ coupon, amountDue, currency, t }) => {
   if (!coupon) return null;
   return (
     <div className="checkout-promo">
@@ -36,7 +36,7 @@ const PromoBanner = ({ coupon, amountDue, t }) => {
       </span>
       <span className="checkout-promo-due">
         {amountDue != null
-          ? t('premium.promoDueToday', { due: eur(amountDue) })
+          ? t('premium.promoDueToday', { due: formatMoney(amountDue, currency) })
           : coupon.name}
       </span>
     </div>
@@ -72,7 +72,7 @@ const AddressStep = ({ onContinue, t }) => {
 };
 
 // Inner form — needs the <Elements> context around it.
-const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon, amountDue, cta, onSuccess }) => {
+const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon, amountDue, currency, cta, onSuccess }) => {
   const { t } = useLanguage();
   const stripe = useStripe();
   const elements = useElements();
@@ -117,7 +117,7 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
 
   return (
     <form onSubmit={submit}>
-      <PromoBanner coupon={coupon} amountDue={amountDue} t={t} />
+      <PromoBanner coupon={coupon} amountDue={amountDue} currency={currency} t={t} />
       <PaymentElement
         options={{ layout: 'tabs' }}
         // The element failing to load (key/account mismatch, network) is
@@ -172,7 +172,7 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, onSuccess, onQu
         setState({ ...res });
         // Report the real charge (prorated on plan changes, discounted under a
         // coupon) so the order summary can show "Due today".
-        if (onQuote) onQuote({ amountDue: res.amountDue ?? null, change: !!res.change, coupon: !!res.coupon });
+        if (onQuote) onQuote({ amountDue: res.amountDue ?? null, currency: res.currency || null, change: !!res.change, coupon: !!res.coupon });
       })
       .catch((e) => {
         if (e.response?.data?.code === 'ADDRESS_REQUIRED') {
@@ -222,7 +222,8 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, onSuccess, onQu
         profileId={profileId}
         coupon={state.coupon}
         amountDue={state.amountDue}
-        cta={extraItem && state.amountDue != null ? t('premium.payNow', { price: eur(state.amountDue) }) : undefined}
+        currency={state.currency}
+        cta={extraItem && state.amountDue != null ? t('premium.payNow', { price: formatMoney(state.amountDue, state.currency) }) : undefined}
         onSuccess={onSuccess}
       />
     </Elements>

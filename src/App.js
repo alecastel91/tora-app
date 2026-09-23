@@ -20,6 +20,7 @@ import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
 import { rosterUsage } from './utils/agentTiers';
 import { billingTier } from './utils/subscription';
+import { formatMoney, MEMBER_PRICES, EXTRA_PRICES, normalizeCurrency } from './utils/money';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
 import apiService from './services/api';
@@ -641,6 +642,16 @@ function App() {
   // Billing status line in Settings — renewal date, or the access-until date
   // after a cancellation.
   const [billingInfo, setBillingInfo] = useState(null);
+  // Account billing currency (EUR | JPY | USD): fixed once a Stripe customer
+  // exists, previewed from the verified country before that. Drives every
+  // price on the Premium page and in checkout.
+  const [billingCurrency, setBillingCurrency] = useState(null);
+  useEffect(() => {
+    if (!showPremium || !user?.id) return;
+    apiService.getBillingStatus(user.id)
+      .then((info) => setBillingCurrency(normalizeCurrency(info?.currency)))
+      .catch(() => setBillingCurrency(null));
+  }, [showPremium, user?.id]);
   const refreshBillingInfo = useCallback(() => {
     if (!user?.id || !['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier)) { setBillingInfo(null); return; }
     apiService.getBillingStatus(user.id).then(setBillingInfo).catch(() => setBillingInfo(null));
@@ -1272,6 +1283,9 @@ function App() {
           // Billing view: a comp (admin-operated) account is shown the public
           // prices — see billingTier. Paid agents keep their real seats/plan.
           const paidAgent = user?.role === 'AGENT' && billingTier(user) !== 'FREE';
+          const cur = billingCurrency || 'USD';
+          const money = (n) => formatMoney(n, cur);
+          const memberPrice = MEMBER_PRICES[cur];
           return (
           <div className="screen active premium-screen">
             <div className="premium-header">
@@ -1396,7 +1410,7 @@ function App() {
               </div>
 
               <div className="premium-extras-note">
-                <div className="extras-text">(5 EXTRA LIKES €2, 7-DAYS UNLIMITED LIKES €5)</div>
+                <div className="extras-text">(5 EXTRA LIKES {money(EXTRA_PRICES.likes_5[cur])}, 7-DAYS UNLIMITED LIKES {money(EXTRA_PRICES.likes_week[cur])})</div>
               </div>
 
               <div className="features-table" style={{ marginTop: '0' }}>
@@ -1409,7 +1423,7 @@ function App() {
               </div>
 
               <div className="premium-extras-note">
-                <div className="extras-text">(1 EXTRA REQUEST €5, 3 EXTRA REQUESTS €12)</div>
+                <div className="extras-text">(1 EXTRA REQUEST {money(EXTRA_PRICES.connections_1[cur])}, 3 EXTRA REQUESTS {money(EXTRA_PRICES.connections_3[cur])})</div>
               </div>
             </div>
             
@@ -1440,6 +1454,7 @@ function App() {
                   currentSeats={paidAgent ? (user?.agentSeats || 0) : 0}
                   isPaid={paidAgent}
                   currentInterval={user?.subscriptionTier === 'YEARLY' ? 'year' : 'month'}
+                  currency={cur}
                   onSubscribe={(interval, detail) => handleSelectPlan(interval === 'year' ? 'yearly' : 'monthly', detail)}
                 />
               </div>
@@ -1457,7 +1472,7 @@ function App() {
                   <div className={`price-card${hasMonthly ? ' is-current' : ''}`}>
                     {hasMonthly && <div className="badge badge-current">{t('premium.currentPlan')}</div>}
                     <h4>{t('premium.monthly')}</h4>
-                    <div className="price">€19.90<span>/month</span></div>
+                    <div className="price">{money(memberPrice.monthly)}<span>/month</span></div>
                     {hasMonthly ? (
                       <button className="btn btn-outline" disabled>{t('premium.currentPlan')}</button>
                     ) : hasYearly ? (
@@ -1469,7 +1484,7 @@ function App() {
                   <div className={`price-card featured${hasYearly ? ' is-current' : ''}`}>
                     <div className="badge">{hasYearly ? t('premium.currentPlan') : t('premium.yearlySaveBadge')}</div>
                     <h4>{t('premium.yearly')}</h4>
-                    <div className="price">€199.90<span>/year</span></div>
+                    <div className="price">{money(memberPrice.yearly)}<span>/year</span></div>
                     {hasYearly ? (
                       <button className="btn btn-primary" disabled>{t('premium.currentPlan')}</button>
                     ) : (
@@ -1523,8 +1538,8 @@ function App() {
               // configured roster price); everyone else on the personal tier.
               const isYearly = selectedPlan === 'yearly';
               const cycleWord = isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth');
-              const priceLabel = planDetail?.priceLabel || (isYearly ? '€199.90' : '€19.90');
-              const perMonthEq = planDetail ? planDetail.perMonthLabel : '€16.66';
+              const priceLabel = planDetail?.priceLabel || money(isYearly ? memberPrice.yearly : memberPrice.monthly);
+              const perMonthEq = planDetail ? planDetail.perMonthLabel : money(memberPrice.yearly / 12);
               const planName = planDetail
                 ? `${planDetail.seats} ${t('agentSeat.artists')}`
                 : t('premium.title');
@@ -1572,7 +1587,7 @@ function App() {
                         <div className="summary-total">
                           <span>{showDue ? t('premium.dueToday') : t('premium.total')}</span>
                           <span className="total-value">
-                            {showDue ? `€${Number(checkoutQuote.amountDue).toFixed(2)}` : priceLabel}
+                            {showDue ? formatMoney(checkoutQuote.amountDue, checkoutQuote.currency || cur) : priceLabel}
                           </span>
                         </div>
                         {checkoutQuote?.change && (

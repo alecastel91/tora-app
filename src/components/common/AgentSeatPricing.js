@@ -1,30 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-// Graduated per-seat bands — mirrors tora-backend/src/config/pricing.js.
-// Each artist is billed at the rate for the band it falls into, so there
-// are no cliffs: representing more artists only ever lowers the marginal cost.
-const BANDS = [
-  { upTo: 3,        monthly: 19.90 },
-  { upTo: 10,       monthly: 14.90 },
-  { upTo: 25,       monthly: 11.90 },
-  { upTo: 50,       monthly: 8.90 },
-  { upTo: Infinity, monthly: 6.90 },
-];
-
-const eur = (n) => `€${n.toFixed(2)}`;
-
-// Total monthly cost for a roster of `n` artists, billed graduated.
-const monthlyTotal = (n) => {
-  let total = 0;
-  let prev = 0;
-  for (const band of BANDS) {
-    if (n <= prev) break;
-    total += (Math.min(n, band.upTo) - prev) * band.monthly;
-    prev = band.upTo;
-  }
-  return total;
-};
+import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney } from '../../utils/money';
 
 const bandLabel = (band, i) => {
   const from = i === 0 ? 1 : BANDS[i - 1].upTo + 1;
@@ -36,7 +13,10 @@ const bandLabel = (band, i) => {
  * ladder: agents pay per artist they represent, on a graduated scale, so
  * the price scales with the roster instead of forcing a package.
  */
-const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', onSubscribe }) => {
+const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', currency = 'USD', onSubscribe }) => {
+  // Account currency (fixed once subscribed); formats every amount below.
+  const eur = (n) => formatMoney(n, currency);
+  const monthlyTotal = (n) => agentMonthlyTotal(n, currency);
   const { t } = useLanguage();
   // Paid agents start on their ACTUAL billing interval, so the CTA reads as
   // "current plan" until they change something (seats or interval). Everyone
@@ -140,7 +120,7 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
       {/* Band breakdown */}
       <div className="agent-seat-bands">
         {BANDS.map((band, i) => {
-          const rate = band.monthly * mult;
+          const rate = band.monthly[currency] * mult;
           const active = estimate > (i === 0 ? 0 : BANDS[i - 1].upTo);
           return (
             <div key={i} className={`agent-seat-band${active ? ' is-active' : ''}`}>

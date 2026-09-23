@@ -999,7 +999,7 @@ const pt = {
     upgradeSuffix: 'faça upgrade para adicionar mais',
     pickPlanToStart: 'Escolha um plano para começar',
     noArtistsYet: 'Ainda não há artistas',
-    agentPlansIntro: 'Os planos de agente permitem você construir um roster e agir em nome dos artistas. A partir de apenas 19,90 €/mês.',
+    agentPlansIntro: 'Os planos de agente permitem você construir um roster e agir em nome dos artistas. Você paga por artista representado e a tarifa cai conforme o roster cresce.',
     startBuilding: 'Comece a construir o seu roster adicionando os artistas que representa.',
     seePlans: 'Ver planos',
     addFirstArtist: 'Adicionar primeiro artista',
@@ -1910,7 +1910,7 @@ const pt = {
         id: 'premium',
         title: 'Planos e Premium',
         entries: [
-          { q: 'Quanto custa o Premium', a: 'Mensal 19,90 €, ou anual 199,90 € — dois meses grátis.' },
+          { q: 'Quanto custa o Premium', a: 'Mensal ou anual (dois meses grátis). Os preços aparecem na sua moeda de cobrança, euro, iene ou dólar conforme o país, na página Premium.' },
           { q: 'O que desbloqueia', a: 'Pesquisa global, mais gostos e pedidos de conexão, Tour Kickstart e, no anual: cachets privados nas tours, calendário privado, posição prioritária na pesquisa e alertas de viagem.' },
           { q: 'Como funcionam os alertas de viagem', a: 'Curta um artista — é só isso. Quando ele anunciar datas de viagem ou tour perto da sua cidade, venues e promotores com plano anual recebem uma notificação automática. Descurta para parar os alertas.' },
           { q: 'O que nunca é pago', a: 'Receber uma proposta e aceitá-la. Ninguém é impedido de trabalhar por causa do plano.' },

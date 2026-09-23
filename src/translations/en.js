@@ -999,7 +999,7 @@ const en = {
     upgradeSuffix: 'upgrade to add more',
     pickPlanToStart: 'Pick a plan to start',
     noArtistsYet: 'No Artists Yet',
-    agentPlansIntro: 'Agent plans let you build a roster and act on artists\' behalf. Solo starts at €19.90/month.',
+    agentPlansIntro: 'Agent plans let you build a roster and act on artists\' behalf. Pay per artist you represent — the rate drops as your roster grows.',
     startBuilding: 'Start building your roster by adding artists you represent.',
     seePlans: 'See plans',
     addFirstArtist: 'Add First Artist',
@@ -1922,7 +1922,7 @@ const en = {
         id: 'premium',
         title: 'Plans and Premium',
         entries: [
-          { q: 'What Premium costs', a: 'Monthly €19.90, or Yearly €199.90 — two months free.' },
+          { q: 'What Premium costs', a: 'Monthly or Yearly (two months free). Prices are shown in your billing currency — euro, yen or US dollar, by country — on the Premium page.' },
           { q: 'What it unlocks', a: 'Global search, more likes and connection requests, Tour Kickstart, and on Yearly: fee privacy on tours, calendar privacy, priority placement in search and travel alerts.' },
           { q: 'How travel alerts work', a: 'Like an artist — that\'s the whole setup. When they announce travel or tour dates near your city, Yearly venues and promoters get a notification automatically. Unlike the artist to stop the alerts.' },
           { q: 'What is never behind a paywall', a: 'Receiving an offer and accepting it. Nobody is ever prevented from taking work because of their plan.' },

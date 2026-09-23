@@ -152,16 +152,7 @@ First Railway deploy after the push crashed on a Supavisor auth-failure lockout 
 ### Agent multi-tier pricing — Phase 4 (tier model + caps, Stripe deferred)
 The SubscriptionTier enum (`FREE/TRIAL/MONTHLY/YEARLY`) doesn't model agents — their value axis is roster size, not personal usage. Added a parallel `AgentTier` ladder with 6 paid tiers + `null = browse-only`.
 
-**⚠️ SUPERSEDED PRICING (kept for history — do NOT copy these numbers).** The named-tier ladder below was replaced in Aug 2026 by **graduated per-seat agent pricing** — the single source of truth is [tora-backend/src/config/pricing.js](../tora-backend/src/config/pricing.js): members €19.90/mo · €199.90/yr; agent seats 1–3 €19.90 · 4–10 €14.90 · 11–25 €11.90 · 26–50 €8.90 · 51+ €6.90 per artist/mo (yearly ×10), 1 free artist. Frontend mirror: `src/utils/agentTiers.js`.
-
-<details><summary>Old May-26 ladder (dead)</summary>
-- SOLO €19.90/mo · €189.90/yr · 3 artists
-- AGENCY_S €39.90/mo · €379.90/yr · 10
-- AGENCY_M €69.90/mo · €669.90/yr · 25
-- AGENCY_L €199.90/mo · €1899.90/yr · 50
-- AGENCY_LPLUS €349.90/mo · €3349.90/yr · 100
-- ENTERPRISE custom · unlimited
-</details>
+**Pricing** is multi-currency (EUR · JPY · USD) since 2026-09-23 — the single source of truth is [tora-backend/src/config/pricing.js](../tora-backend/src/config/pricing.js) (table + routing rules in tora-backend/CLAUDE.md). Frontend mirror: [`src/utils/money.js`](src/utils/money.js) — `MEMBER_PRICES`, `AGENT_BANDS`, `EXTRA_PRICES`, `formatMoney(amount, currency)` (¥3,480 / €19.90 / $22.90). The Premium page reads the account currency from `GET /billing/status` (`currency`, fixed once a Stripe customer exists, previewed from the verified country before that) and every quote from the server carries `amountDue` + `currency`. Never hard-code a currency symbol or amount in a screen or a translation.
 
 **New shared components:**
 - [`src/components/common/AgentTierLadder.js`](src/components/common/AgentTierLadder.js) — 6-tier comparison with monthly/yearly toggle, internal interval state, Select button stubs (Stripe TBD). Used inline in the Premium screen for AGENT users (replaces the generic monthly/yearly cards) and inside `AgentUpgradeModal` for the at-cap quick-upgrade flow on `RepresentedArtistsScreen`.

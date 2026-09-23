@@ -999,7 +999,7 @@ const fr = {
     upgradeSuffix: "passez à l'offre supérieure pour en ajouter plus",
     pickPlanToStart: 'Choisissez une offre pour commencer',
     noArtistsYet: "Pas encore d'artistes",
-    agentPlansIntro: "Les offres agent vous permettent de constituer un roster et d'agir au nom des artistes. À partir de 19,90 €/mois seulement.",
+    agentPlansIntro: 'Les offres agent vous permettent de constituer un roster et d\'agir au nom des artistes. Vous payez par artiste représenté, et le tarif baisse à mesure que le roster grandit.',
     startBuilding: 'Commencez à constituer votre roster en ajoutant les artistes que vous représentez.',
     seePlans: 'Voir les offres',
     addFirstArtist: 'Ajouter un premier artiste',
@@ -1910,7 +1910,7 @@ const fr = {
         id: 'premium',
         title: 'Formules et Premium',
         entries: [
-          { q: 'Le prix de Premium', a: 'Mensuel 19,90 €, ou annuel 199,90 € — deux mois offerts.' },
+          { q: 'Combien coûte Premium', a: 'Mensuel ou annuel (deux mois offerts). Les prix s\'affichent dans votre devise de facturation, euro, yen ou dollar US selon le pays, sur la page Premium.' },
           { q: 'Ce que cela débloque', a: 'Recherche mondiale, plus de j’aime et de demandes de connexion, Tour Kickstart et, en annuel : cachets privés sur les tournées, calendrier privé, placement prioritaire dans la recherche et alertes voyage.' },
           { q: 'Comment fonctionnent les alertes voyage', a: 'Aimez un artiste — c’est tout. Quand il annonce des dates de voyage ou de tournée près de votre ville, les salles et promoteurs en plan annuel reçoivent automatiquement une notification. Retirez le j’aime pour arrêter les alertes.' },
           { q: 'Ce qui n’est jamais payant', a: 'Recevoir une offre et l’accepter. Personne n’est empêché de travailler à cause de sa formule.' },
