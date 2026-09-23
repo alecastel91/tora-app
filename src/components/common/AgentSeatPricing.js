@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney, yearlyPerMonth } from '../../utils/money';
+import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney, yearlyPerMonth, YEARLY_MULT } from '../../utils/money';
 
 const bandLabel = (band, i) => {
   const from = i === 0 ? 1 : BANDS[i - 1].upTo + 1;
@@ -42,7 +42,7 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   const unchanged = isPaid && estimate === currentSeats && !intervalChanged;
 
   const isYearly = interval === 'year';
-  const mult = isYearly ? 10 : 1; // yearly per-artist rate = monthly × 10 (2 months free)
+  const mult = isYearly ? YEARLY_MULT : 1;
 
   const est = useMemo(() => {
     const mo = total(estimate);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
@@ -719,25 +720,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   // Artist Info Tab (Editable Profile Information)
   const renderArtistInfoTab = () => {
-    // Helper to get SoundCloud embed URL
-    const getSoundCloudEmbedUrl = (url) => {
-      if (!url) return null;
-      let soundcloudUrl = url;
-      if (soundcloudUrl.includes('m.soundcloud.com')) {
-        soundcloudUrl = soundcloudUrl.replace('m.soundcloud.com', 'soundcloud.com');
-      }
-      return `https://w.soundcloud.com/player/?url=${encodeURIComponent(soundcloudUrl)}&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
-    };
-
-    // Helper to get Spotify embed URL
-    const getSpotifyEmbedUrl = (url) => {
-      if (!url) return null;
-      if (url.includes('/artist/')) {
-        const artistId = url.split('/artist/')[1]?.split('?')[0];
-        return `https://open.spotify.com/embed/artist/${artistId}`;
-      }
-      return url;
-    };
 
     return (
       <div className="artist-info-tab">
@@ -767,13 +749,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         </div>
 
         {/* Latest Mix */}
-        {artistProfile?.mixtape && (
+        {soundcloudEmbedUrl(artistProfile?.mixtape) && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
             <h3 className="mb-3 text-[11px] font-tech font-semibold uppercase tracking-[0.15em] text-infrared">
               {t('manageArtist.latestMix')}
             </h3>
             <iframe
-              src={getSoundCloudEmbedUrl(artistProfile.mixtape)}
+              src={soundcloudEmbedUrl(artistProfile.mixtape)}
               className="embed-iframe soundcloud-embed"
               title={t('manageArtist.soundcloudMix')}
               allow="autoplay"
@@ -782,13 +764,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         )}
 
         {/* Spotify Artist */}
-        {artistProfile?.role === 'ARTIST' && artistProfile?.spotify && (
+        {artistProfile?.role === 'ARTIST' && spotifyEmbedUrl(artistProfile?.spotify) && (
           <div className="media-section" style={{ marginBottom: '24px' }}>
             <h3 className="mb-3 text-[11px] font-tech font-semibold uppercase tracking-[0.15em] text-infrared">
               {t('manageArtist.spotifyArtistHeading')}
             </h3>
             <iframe
-              src={getSpotifyEmbedUrl(artistProfile.spotify)}
+              src={spotifyEmbedUrl(artistProfile.spotify)}
               className="embed-iframe spotify-embed"
               title={t('manageArtist.spotifyArtistProfile')}
               allow="encrypted-media"

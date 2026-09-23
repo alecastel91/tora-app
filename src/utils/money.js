@@ -7,7 +7,9 @@ export const CURRENCIES = ['EUR', 'JPY', 'USD'];
 export const DEFAULT_CURRENCY = 'USD';
 const SYMBOL = { EUR: '€', JPY: '¥', USD: '$' };
 
-/** Yearly plans are billed as 10 months (2 free): the per-month equivalent of a yearly total. */
+/** Yearly plans are billed as 10 months (2 free). */
+export const YEARLY_MULT = 10;
+/** The per-month equivalent of a yearly total. */
 export const yearlyPerMonth = (yearlyTotal) => yearlyTotal / 12;
 
 export const normalizeCurrency = (c) => (CURRENCIES.includes(String(c || '').toUpperCase()) ? String(c).toUpperCase() : DEFAULT_CURRENCY);

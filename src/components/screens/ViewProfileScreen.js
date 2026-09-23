@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -807,18 +808,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         
         {/* Embedded Media Section */}
         <div className="profile-embeds">
-          {profile.mixtape && (
+          {soundcloudEmbedUrl(profile.mixtape) && (
             <div className="embed-card">
               <h4>{t('viewProfile.latestMix')}</h4>
               <iframe
-                src={(() => {
-                  // Convert mobile SoundCloud URL to regular URL for embed
-                  let soundcloudUrl = profile.mixtape;
-                  if (soundcloudUrl.includes('m.soundcloud.com')) {
-                    soundcloudUrl = soundcloudUrl.replace('m.soundcloud.com', 'soundcloud.com');
-                  }
-                  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(soundcloudUrl)}&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
-                })()}
+                src={soundcloudEmbedUrl(profile.mixtape)}
                 frameBorder="0"
                 className="embed-iframe soundcloud-embed"
                 title={t('manageArtist.soundcloudMix')}
@@ -827,20 +821,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </div>
           )}
           
-          {profile.spotify && (
+          {spotifyEmbedUrl(profile.spotify) && (
             <div className="embed-card">
               <h4>{t('viewProfile.spotifyArtist')}</h4>
               <iframe
-                src={(() => {
-                  // Extract artist ID from URL and convert to embed URL
-                  const spotifyUrl = profile.spotify;
-                  if (spotifyUrl.includes('/artist/')) {
-                    const artistId = spotifyUrl.split('/artist/')[1]?.split('?')[0];
-                    return `https://open.spotify.com/embed/artist/${artistId}`;
-                  }
-                  // If not a proper Spotify artist URL, return as-is
-                  return spotifyUrl;
-                })()}
+                src={spotifyEmbedUrl(profile.spotify)}
                 frameBorder="0"
                 allowTransparency="true"
                 allow="encrypted-media"

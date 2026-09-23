@@ -4,6 +4,7 @@ import { celebrateBadges } from '../../utils/celebrations';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
+import { soundcloudEmbedUrl, spotifyArtistId } from '../../utils/mediaLinks';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, LocationIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
 import EditProfileScreen from './EditProfileScreen';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
@@ -150,8 +151,6 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   const [viewingArtistProfile, setViewingArtistProfile] = useState(null);
   const [managingArtist, setManagingArtist] = useState(null);
   const fileInputRef = useRef(null);
-  const [resolvedSoundCloudUrl, setResolvedSoundCloudUrl] = useState(null);
-  const [resolvedSpotifyId, setResolvedSpotifyId] = useState(null);
 
   // Helper function to calculate trial days/hours remaining
   const getTrialTimeRemaining = () => {
@@ -176,35 +175,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     }
   };
 
-  // Handle SoundCloud URLs
-  React.useEffect(() => {
-    if (user?.mixtape) {
-      // Accept soundcloud.com or m.soundcloud.com URLs (not on.soundcloud.com short links)
-      const isValidSoundCloud = (user.mixtape.includes('soundcloud.com/') || user.mixtape.includes('m.soundcloud.com/'))
-        && !user.mixtape.includes('on.soundcloud.com');
-
-      if (isValidSoundCloud) {
-        // Convert m.soundcloud.com to soundcloud.com for embed
-        const embedUrl = user.mixtape.replace('m.soundcloud.com', 'soundcloud.com');
-        setResolvedSoundCloudUrl(embedUrl);
-      } else {
-        setResolvedSoundCloudUrl(null);
-      }
-    }
-  }, [user?.mixtape]);
-
-  // Handle Spotify URLs
-  React.useEffect(() => {
-    if (user?.spotify) {
-      // Only accept full spotify.com URLs with /artist/
-      if (user.spotify.includes('open.spotify.com') && user.spotify.includes('/artist/')) {
-        const artistId = user.spotify.split('/artist/')[1]?.split('?')[0]?.split('/')[0];
-        setResolvedSpotifyId(artistId);
-      } else {
-        setResolvedSpotifyId(null);
-      }
-    }
-  }, [user?.spotify]);
+  // Embed URLs derived from the profile links (shared rules in utils/mediaLinks).
+  const resolvedSoundCloudUrl = soundcloudEmbedUrl(user?.mixtape);
+  const resolvedSpotifyId = spotifyArtistId(user?.spotify);
   
   const [editForm] = useState({
     name: user?.name || 'Your Name',
@@ -811,7 +784,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
             <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.latestMix')}</h4>
             {resolvedSoundCloudUrl ? (
               <iframe
-                src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(resolvedSoundCloudUrl)}&color=%23ff3366&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`}
+                src={resolvedSoundCloudUrl}
                 frameBorder="0"
                 className="w-full h-[320px] rounded-lg"
                 title={t('manageArtist.soundcloudMix')}
