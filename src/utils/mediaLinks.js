@@ -44,9 +44,29 @@ export async function expandMediaLink(link) {
   if (!isShortMediaLink(url)) return url;
   try {
     const res = await apiService.resolveUrl(url);
-    return res?.resolvedUrl || url;
+    return cleanResolvedLink(res?.resolvedUrl) || url;
   } catch {
     return url;
+  }
+}
+
+/**
+ * What the redirect chain lands on is not always the page itself:
+ * Spotify sends phones through an app.link interstitial that carries the
+ * real page in `$full_url`, and SoundCloud appends share tracking
+ * parameters. Unwrap the first, drop the second.
+ */
+function cleanResolvedLink(resolved) {
+  if (!resolved) return null;
+  try {
+    let u = new URL(resolved);
+    const full = u.searchParams.get('$full_url') || u.searchParams.get('full_url');
+    if (full && /app\.link$/i.test(u.hostname)) u = new URL(full);
+    if (/soundcloud\.com$/i.test(u.hostname)) u.search = '';
+    if (/spotify\.com$/i.test(u.hostname)) u.search = '';
+    return u.toString();
+  } catch {
+    return resolved;
   }
 }
 
