@@ -1189,6 +1189,8 @@ const es = {
     website: 'Sitio web',
     yourArtistName: 'Nombre del artista/local',
     shareLinkHint: 'Si usas un enlace compartido, ábrelo en el navegador y copia la URL completa',
+    soundcloudHint: 'Pega el enlace de un track, un set o tu página de perfil (soundcloud.com/…). Los enlaces cortos de la app de SoundCloud (on.soundcloud.com) no funcionan: ábrelos en el navegador y copia la dirección.',
+    spotifyHint: 'Pega el enlace de tu página de artista (open.spotify.com/artist/…). En la app de Spotify: tu página de artista → ⋯ → Compartir → Copiar enlace. Los enlaces de canciones y álbumes no funcionan.',
   },
 
   explore: {

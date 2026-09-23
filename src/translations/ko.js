@@ -1189,6 +1189,8 @@ const ko = {
     website: '웹사이트',
     yourArtistName: '아티스트/베뉴 이름',
     shareLinkHint: '공유 링크를 사용하는 경우 브라우저에서 열어 전체 URL을 복사하세요',
+    soundcloudHint: '트랙, 세트 또는 프로필 페이지 링크(soundcloud.com/…)를 붙여넣으세요. SoundCloud 앱의 짧은 공유 링크(on.soundcloud.com)는 사용할 수 없습니다. 브라우저에서 열고 주소를 복사하세요.',
+    spotifyHint: '아티스트 페이지 링크(open.spotify.com/artist/…)를 붙여넣으세요. Spotify 앱에서: 아티스트 페이지 → ⋯ → 공유 → 링크 복사. 트랙·앨범 링크는 사용할 수 없습니다.',
   },
 
   explore: {

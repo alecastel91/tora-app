@@ -449,7 +449,7 @@ const EditProfileScreen = ({ onClose }) => {
               placeholder="https://soundcloud.com/..."
             />
             <p className="mt-1 text-[11px] leading-relaxed text-white/40">
-              {t('editProfile.shareLinkHint')}
+              {t('editProfile.soundcloudHint')}
             </p>
           </div>
 
@@ -463,7 +463,7 @@ const EditProfileScreen = ({ onClose }) => {
                 placeholder="https://open.spotify.com/artist/..."
               />
               <p className="mt-1 text-[11px] leading-relaxed text-white/40">
-                {t('editProfile.shareLinkHint')}
+                {t('editProfile.spotifyHint')}
               </p>
             </div>
           )}

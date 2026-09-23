@@ -1189,6 +1189,8 @@ const zh = {
     website: '网站',
     yourArtistName: '艺人/场地名称',
     shareLinkHint: '如果使用分享链接，请在浏览器中打开并复制完整URL',
+    soundcloudHint: '粘贴曲目、合集或个人主页的链接(soundcloud.com/…)。SoundCloud 应用的短分享链接(on.soundcloud.com)无法使用,请在浏览器中打开后复制地址。',
+    spotifyHint: '粘贴你的艺人主页链接(open.spotify.com/artist/…)。在 Spotify 应用中:艺人主页 → ⋯ → 分享 → 复制链接。单曲和专辑链接无法使用。',
   },
 
   explore: {

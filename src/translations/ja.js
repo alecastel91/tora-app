@@ -1189,6 +1189,8 @@ const ja = {
     website: 'ウェブサイト',
     yourArtistName: 'アーティスト/会場名',
     shareLinkHint: '共有リンクを使う場合は、ブラウザで開いて完全なURLをコピーしてください',
+    soundcloudHint: 'トラック、セット、またはプロフィールページのリンク(soundcloud.com/…)を貼り付けてください。SoundCloudアプリの短縮共有リンク(on.soundcloud.com)は使えません。ブラウザで開いてアドレスをコピーしてください。',
+    spotifyHint: 'アーティストページのリンク(open.spotify.com/artist/…)を貼り付けてください。Spotifyアプリでは:アーティストページ → ⋯ → シェア → リンクをコピー。曲やアルバムのリンクは使えません。',
   },
 
   explore: {
