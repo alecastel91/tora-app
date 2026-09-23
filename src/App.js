@@ -265,7 +265,7 @@ function App() {
     setShowGettingStarted(false);
   };
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
-  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback } = useAppContext();
+  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency } = useAppContext();
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
   // after t/setShowPremium so the [t] dependency isn't read before init.
@@ -642,20 +642,14 @@ function App() {
   // Billing status line in Settings — renewal date, or the access-until date
   // after a cancellation.
   const [billingInfo, setBillingInfo] = useState(null);
-  // Account billing currency (EUR | JPY | USD): fixed once a Stripe customer
-  // exists, previewed from the verified country before that. Drives every
-  // price on the Premium page and in checkout.
-  const [billingCurrency, setBillingCurrency] = useState(null);
-  // Used by the Premium page AND the checkout summary (separate subtrees).
-  const cur = billingCurrency || 'USD';
+  // Account billing currency (EUR | JPY | USD) comes with /auth/me: fixed
+  // once a Stripe customer exists, previewed from the verified country before
+  // that. Drives every price on the Premium page and in checkout, and is
+  // shared through the context for the extras/upgrade modals.
+  const cur = normalizeCurrency(accountUser?.billingCurrency);
+  useEffect(() => { setBillingCurrency(cur); }, [cur, setBillingCurrency]);
   const money = (n) => formatMoney(n, cur);
   const memberPrice = MEMBER_PRICES[cur];
-  useEffect(() => {
-    if (!showPremium || !user?.id) return;
-    apiService.getBillingStatus(user.id)
-      .then((info) => setBillingCurrency(normalizeCurrency(info?.currency)))
-      .catch(() => setBillingCurrency(null));
-  }, [showPremium, user?.id]);
   const refreshBillingInfo = useCallback(() => {
     if (!user?.id || !['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier)) { setBillingInfo(null); return; }
     apiService.getBillingStatus(user.id).then(setBillingInfo).catch(() => setBillingInfo(null));

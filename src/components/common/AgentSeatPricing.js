@@ -15,8 +15,8 @@ const bandLabel = (band, i) => {
  */
 const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', currency = 'USD', onSubscribe }) => {
   // Account currency (fixed once subscribed); formats every amount below.
-  const eur = (n) => formatMoney(n, currency);
-  const monthlyTotal = (n) => agentMonthlyTotal(n, currency);
+  const money = (n) => formatMoney(n, currency);
+  const total = (n) => agentMonthlyTotal(n, currency);
   const { t } = useLanguage();
   // Paid agents start on their ACTUAL billing interval, so the CTA reads as
   // "current plan" until they change something (seats or interval). Everyone
@@ -44,7 +44,7 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   const mult = isYearly ? 10 : 1; // yearly per-artist rate = monthly × 10 (2 months free)
 
   const est = useMemo(() => {
-    const mo = monthlyTotal(estimate);
+    const mo = total(estimate);
     return { perPeriod: mo * mult, perMonth: isYearly ? mo * 10 / 12 : mo };
   }, [estimate, mult, isYearly]);
 
@@ -110,9 +110,9 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
           aria-label={t('agentSeat.estimatorLabel')}
         />
         <div className="agent-seat-estimate-out">
-          <span className="agent-seat-estimate-total">{eur(est.perPeriod)}<em>/{isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}</em></span>
+          <span className="agent-seat-estimate-total">{money(est.perPeriod)}<em>/{isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}</em></span>
           {isYearly && (
-            <span className="agent-seat-estimate-eq">≈ {eur(est.perMonth)}/{t('agentSeat.perMonth')}</span>
+            <span className="agent-seat-estimate-eq">≈ {money(est.perMonth)}/{t('agentSeat.perMonth')}</span>
           )}
         </div>
       </div>
@@ -126,7 +126,7 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
             <div key={i} className={`agent-seat-band${active ? ' is-active' : ''}`}>
               <span className="agent-seat-band-range">{bandLabel(band, i)} {t('agentSeat.artists')}</span>
               <span className="agent-seat-band-rate">
-                {eur(rate)}<em>/{t('agentSeat.perArtist')} · {isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}</em>
+                {money(rate)}<em>/{t('agentSeat.perArtist')} · {isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}</em>
               </span>
             </div>
           );
@@ -143,17 +143,17 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
           if (unchanged) return; // nothing to change
           // The seats the agent picked (never below their roster).
           const seats = Math.max(estimate, minSeats);
-          const perPeriod = monthlyTotal(seats) * mult;
-          const currentPeriod = monthlyTotal(currentSeats) * mult;
+          const perPeriod = total(seats) * mult;
+          const currentPeriod = total(currentSeats) * mult;
           onSubscribe(interval, {
             seats,
             added: isPaid ? Math.max(0, seats - currentSeats) : 0,
             currentSeats,
-            currentPriceLabel: eur(currentPeriod),
-            addedPriceLabel: eur(perPeriod - currentPeriod),
+            currentPriceLabel: money(currentPeriod),
+            addedPriceLabel: money(perPeriod - currentPeriod),
             amount: perPeriod,
-            priceLabel: eur(perPeriod),
-            perMonthLabel: isYearly ? eur(monthlyTotal(seats) * 10 / 12) : null,
+            priceLabel: money(perPeriod),
+            perMonthLabel: isYearly ? money(total(seats) * 10 / 12) : null,
           });
         }}
       >
@@ -162,12 +162,12 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
               ? t('agentSeat.currentSeats', { n: currentSeats })
               : (intervalChanged && additional === 0 && reducing === 0)
                 ? (isYearly
-                    ? t('agentSeat.switchToYearly', { price: eur(monthlyTotal(estimate) * mult) })
-                    : t('agentSeat.switchToMonthly', { price: eur(monthlyTotal(estimate) * mult) }))
+                    ? t('agentSeat.switchToYearly', { price: money(total(estimate) * mult) })
+                    : t('agentSeat.switchToMonthly', { price: money(total(estimate) * mult) }))
                 : reducing > 0
-                  ? t('agentSeat.reduceSeats', { n: estimate, price: eur(monthlyTotal(estimate) * mult) })
-                  : t('agentSeat.upgradeSeats', { n: estimate, price: eur(monthlyTotal(estimate) * mult) }))
-          : t('agentSeat.buySeats', { n: estimate, price: eur(monthlyTotal(estimate) * mult) })}
+                  ? t('agentSeat.reduceSeats', { n: estimate, price: money(total(estimate) * mult) })
+                  : t('agentSeat.upgradeSeats', { n: estimate, price: money(total(estimate) * mult) }))
+          : t('agentSeat.buySeats', { n: estimate, price: money(total(estimate) * mult) })}
       </button>
       <p className="agent-seat-foot">{t('agentSeat.foot')}</p>
     </div>

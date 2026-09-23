@@ -516,7 +516,7 @@ const es = {
     upgradeToYearly: 'Pásate al plan anual',
     onYearlyAlready: 'Ya tienes Yearly',
     currentPlan: 'Plan actual',
-    cancelAnytime: 'Cancela cuando quieras. Todos los precios en EUR.',
+    cancelAnytime: 'Cancela cuando quieras. Precios en tu moneda de facturación.',
     autoRenew: 'Se renueva automáticamente cada {{cycle}} · cancela cuando quieras',
     dueToday: 'A pagar hoy',
     manageBilling: 'Gestionar suscripción y facturación',

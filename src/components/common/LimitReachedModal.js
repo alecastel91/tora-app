@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import ExtraPurchaseFlow from './ExtraPurchaseFlow';
-import { extrasForKind } from '../../utils/extras';
+import { extrasForKind, extraPriceLabel } from '../../utils/extras';
+import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
@@ -11,6 +12,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
  */
 const LimitReachedModal = ({ type, data, onClose, onOpenPremium }) => {
   const { t } = useLanguage();
+  const { billingCurrency } = useAppContext();
   const [buying, setBuying] = useState(null);
 
   const isLikes = type === 'likes';
@@ -24,7 +26,7 @@ const LimitReachedModal = ({ type, data, onClose, onOpenPremium }) => {
     <div className="modal-overlay rep-request-modal" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>{buying ? `${t(`premium.${buying.labelKey}`)} · ${buying.price}` : title}</h3>
+          <h3>{buying ? `${t(`premium.${buying.labelKey}`)} · ${extraPriceLabel(buying, billingCurrency)}` : title}</h3>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
@@ -42,7 +44,7 @@ const LimitReachedModal = ({ type, data, onClose, onOpenPremium }) => {
                 {extrasForKind(type).map((item) => (
                   <button key={item.key} type="button" className="extras-card" onClick={() => setBuying(item)}>
                     <span className="extras-card-label">{t(`premium.${item.labelKey}`)}</span>
-                    <span className="extras-card-price">{item.price}</span>
+                    <span className="extras-card-price">{extraPriceLabel(item, billingCurrency)}</span>
                   </button>
                 ))}
               </div>

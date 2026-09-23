@@ -516,7 +516,7 @@ const ko = {
     upgradeToYearly: '연간 플랜으로 업그레이드',
     onYearlyAlready: 'Yearly 이용 중',
     currentPlan: '현재 플랜',
-    cancelAnytime: '언제든지 해지할 수 있습니다. 모든 가격은 EUR 기준입니다.',
+    cancelAnytime: '언제든지 해지할 수 있습니다. 가격은 결제 통화로 표시됩니다.',
     autoRenew: '매 {{cycle}}마다 자동 갱신 · 언제든지 해지 가능',
     dueToday: '오늘 결제',
     manageBilling: '구독 및 결제 관리',

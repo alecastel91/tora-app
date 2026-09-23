@@ -516,7 +516,7 @@ const ja = {
     upgradeToYearly: '年間プランにアップグレード',
     onYearlyAlready: 'Yearlyプランご利用中',
     currentPlan: '現在のプラン',
-    cancelAnytime: 'いつでもキャンセル可能。価格はすべてユーロ表示です。',
+    cancelAnytime: 'いつでもキャンセル可能。価格はお客様の請求通貨で表示されます。',
     autoRenew: '{{cycle}}ごとに自動更新 · いつでも解約可能',
     dueToday: '本日のお支払い',
     manageBilling: 'サブスクリプションと請求の管理',

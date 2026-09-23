@@ -516,7 +516,7 @@ const fr = {
     upgradeToYearly: 'Passer à l\'offre annuelle',
     onYearlyAlready: 'Vous êtes sur Yearly',
     currentPlan: 'Offre actuelle',
-    cancelAnytime: 'Annulez à tout moment. Tous les prix sont en EUR.',
+    cancelAnytime: 'Annulez à tout moment. Prix affichés dans votre devise de facturation.',
     autoRenew: 'Renouvellement automatique chaque {{cycle}} · annulable à tout moment',
     dueToday: 'À payer aujourd\'hui',
     manageBilling: 'Gérer l\'abonnement et la facturation',

@@ -54,6 +54,9 @@ export const AppProvider = ({ children }) => {
 
   // Callback to refresh accountUser in App.js (registered by App.js on mount)
   const [refreshAccountUserCallback, setRefreshAccountUserCallback] = useState(null);
+  // Account billing currency (EUR | JPY | USD) from /auth/me — App.js keeps it
+  // in sync with accountUser so price-bearing components can read it anywhere.
+  const [billingCurrency, setBillingCurrency] = useState('USD');
 
   // Track loading state to prevent duplicate fetches
   const [isLoadingProfileData, setIsLoadingProfileData] = useState(false);
@@ -748,7 +751,9 @@ export const AppProvider = ({ children }) => {
     accountSubscriptionTier,
     setAccountSubscriptionTier,
     setRefreshAccountUserCallback,
-    refreshAccountUser: refreshAccountUserCallback
+    refreshAccountUser: refreshAccountUserCallback,
+    billingCurrency,
+    setBillingCurrency
   };
 
   return (

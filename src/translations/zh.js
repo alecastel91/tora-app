@@ -516,7 +516,7 @@ const zh = {
     upgradeToYearly: '升级为年付',
     onYearlyAlready: '您已订阅 Yearly',
     currentPlan: '当前方案',
-    cancelAnytime: '随时可取消。所有价格均以欧元计。',
+    cancelAnytime: '随时可取消。价格以您的结算货币显示。',
     autoRenew: '每{{cycle}}自动续订 · 可随时取消',
     dueToday: '今日应付',
     manageBilling: '管理订阅与账单',

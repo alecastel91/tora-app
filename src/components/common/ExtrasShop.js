@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import OverlayPortal from './OverlayPortal';
 import ExtraPurchaseFlow from './ExtraPurchaseFlow';
-import { extrasForRole } from '../../utils/extras';
+import { extrasForRole, extraPriceLabel } from '../../utils/extras';
+import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 // One-off extras: consumable top-ups for when a tier limit is hit.
 const ExtrasShop = ({ user }) => {
   const { t } = useLanguage();
+  const { billingCurrency } = useAppContext();
   const [buying, setBuying] = useState(null); // item being purchased
 
   if (!user || user.subscriptionTier === 'YEARLY') return null; // yearly is unlimited
@@ -31,7 +33,7 @@ const ExtrasShop = ({ user }) => {
         {items.map((item) => (
           <button key={item.key} type="button" className="extras-card" onClick={() => setBuying(item)}>
             <span className="extras-card-label">{t(`premium.${item.labelKey}`)}</span>
-            <span className="extras-card-price">{item.price}</span>
+            <span className="extras-card-price">{extraPriceLabel(item, billingCurrency)}</span>
           </button>
         ))}
       </div>
@@ -40,7 +42,7 @@ const ExtrasShop = ({ user }) => {
         <OverlayPortal><div className="message-modal-overlay" onClick={() => setBuying(null)}>
           <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
             <h2 className="message-modal-title">
-              {t(`premium.${buying.labelKey}`)} · {buying.price}
+              {t(`premium.${buying.labelKey}`)} · {extraPriceLabel(buying, billingCurrency)}
             </h2>
             <ExtraPurchaseFlow item={buying} onClose={() => setBuying(null)} />
           </div>
