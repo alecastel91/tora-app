@@ -646,6 +646,10 @@ function App() {
   // exists, previewed from the verified country before that. Drives every
   // price on the Premium page and in checkout.
   const [billingCurrency, setBillingCurrency] = useState(null);
+  // Used by the Premium page AND the checkout summary (separate subtrees).
+  const cur = billingCurrency || 'USD';
+  const money = (n) => formatMoney(n, cur);
+  const memberPrice = MEMBER_PRICES[cur];
   useEffect(() => {
     if (!showPremium || !user?.id) return;
     apiService.getBillingStatus(user.id)
@@ -1283,9 +1287,6 @@ function App() {
           // Billing view: a comp (admin-operated) account is shown the public
           // prices — see billingTier. Paid agents keep their real seats/plan.
           const paidAgent = user?.role === 'AGENT' && billingTier(user) !== 'FREE';
-          const cur = billingCurrency || 'USD';
-          const money = (n) => formatMoney(n, cur);
-          const memberPrice = MEMBER_PRICES[cur];
           return (
           <div className="screen active premium-screen">
             <div className="premium-header">
