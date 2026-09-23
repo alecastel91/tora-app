@@ -1191,8 +1191,8 @@ const en = {
     instagram: 'Instagram',
     website: 'Website',
     yourArtistName: 'Your artist/venue name',
-    soundcloudHint: 'Paste the link of a track, a set or your profile page (soundcloud.com/…). Short share links from the SoundCloud app (on.soundcloud.com) don\'t work — open them in your browser and copy the address instead.',
-    spotifyHint: 'Paste your artist page link (open.spotify.com/artist/…). In the Spotify app: your artist page → ⋯ → Share → Copy link. Track and album links won\'t work.',
+    soundcloudHint: 'Paste the link of a track, a set or your profile page — from your browser or the SoundCloud app\'s Share button, both work.',
+    spotifyHint: 'Paste your artist page link. In the Spotify app: your artist page → ⋯ → Share → Copy link. Track and album links won\'t work.',
   },
   
   // Explore Screen

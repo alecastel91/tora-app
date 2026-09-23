@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
+import { soundcloudEmbedUrl, spotifyEmbedUrl, expandProfileMediaLinks } from '../../utils/mediaLinks';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
@@ -426,7 +426,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         updatedData.capacity = editedArtistInfo.capacity;
       }
 
-      await apiService.updateProfile(artistId, updatedData);
+      await apiService.updateProfile(artistId, await expandProfileMediaLinks(updatedData));
 
       // Fetch fresh profile data from backend to ensure sync
       const freshProfile = await apiService.getProfile(artistId);

@@ -1188,8 +1188,8 @@ const fr = {
     instagram: 'Instagram',
     website: 'Site web',
     yourArtistName: "Nom d'artiste/de salle",
-    soundcloudHint: 'Collez le lien d\'un morceau, d\'un set ou de votre page de profil (soundcloud.com/…). Les liens courts de l\'app SoundCloud (on.soundcloud.com) ne fonctionnent pas : ouvrez-les dans le navigateur et copiez l\'adresse.',
-    spotifyHint: 'Collez le lien de votre page d\'artiste (open.spotify.com/artist/…). Dans l\'app Spotify : votre page d\'artiste → ⋯ → Partager → Copier le lien. Les liens de titres et d\'albums ne fonctionnent pas.',
+    soundcloudHint: 'Collez le lien d\'un morceau, d\'un set ou de votre page de profil, depuis le navigateur ou le bouton Partager de l\'app SoundCloud : les deux fonctionnent.',
+    spotifyHint: 'Collez le lien de votre page d\'artiste. Dans l\'app Spotify : votre page d\'artiste → ⋯ → Partager → Copier le lien. Les liens de titres et d\'albums ne fonctionnent pas.',
   },
 
   explore: {

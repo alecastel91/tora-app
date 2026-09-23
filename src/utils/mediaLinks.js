@@ -1,3 +1,5 @@
+import apiService from '../services/api';
+
 // SoundCloud / Spotify links → embed URLs. One set of rules for the owner's
 // profile, the public profile and the agent's artist view, and the same
 // rules the Edit Profile hints promise (editProfile.soundcloudHint/spotifyHint).
@@ -28,4 +30,28 @@ export function spotifyArtistId(link) {
 export function spotifyEmbedUrl(link) {
   const id = spotifyArtistId(link);
   return id ? `https://open.spotify.com/embed/artist/${id}` : null;
+}
+
+// Short share links the apps hand out. They only redirect to the real page,
+// so the embed players cannot use them; the backend follows the redirect
+// (POST /resolve-url, SSRF-hardened) and we store the real URL instead.
+const SHORT_LINK = /(^|\/\/)(on\.soundcloud\.com|spotify\.link|spotify\.app\.link)\//i;
+export const isShortMediaLink = (link) => SHORT_LINK.test(String(link || '').trim());
+
+/** A short share link → its real page URL; anything else (or a failed lookup) unchanged. */
+export async function expandMediaLink(link) {
+  const url = String(link || '').trim();
+  if (!isShortMediaLink(url)) return url;
+  try {
+    const res = await apiService.resolveUrl(url);
+    return res?.resolvedUrl || url;
+  } catch {
+    return url;
+  }
+}
+
+/** Expand the short links in a profile patch before it is saved. */
+export async function expandProfileMediaLinks(patch) {
+  const [mixtape, spotify] = await Promise.all([expandMediaLink(patch.mixtape), expandMediaLink(patch.spotify)]);
+  return { ...patch, ...(patch.mixtape !== undefined ? { mixtape } : {}), ...(patch.spotify !== undefined ? { spotify } : {}) };
 }

@@ -1188,8 +1188,8 @@ const it = {
     instagram: 'Instagram',
     website: 'Sito web',
     yourArtistName: 'Nome artista/locale',
-    soundcloudHint: 'Incolla il link di un brano, un set o la tua pagina profilo (soundcloud.com/…). I link brevi dell\'app SoundCloud (on.soundcloud.com) non funzionano: aprili nel browser e copia l\'indirizzo.',
-    spotifyHint: 'Incolla il link della tua pagina artista (open.spotify.com/artist/…). Nell\'app Spotify: pagina artista → ⋯ → Condividi → Copia link. I link di brani e album non funzionano.',
+    soundcloudHint: 'Incolla il link di un brano, un set o la tua pagina profilo: va bene sia quello del browser sia quello del pulsante Condividi dell\'app SoundCloud.',
+    spotifyHint: 'Incolla il link della tua pagina artista. Nell\'app Spotify: pagina artista → ⋯ → Condividi → Copia link. I link di brani e album non funzionano.',
   },
 
   explore: {

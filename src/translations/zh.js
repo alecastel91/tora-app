@@ -1188,8 +1188,8 @@ const zh = {
     instagram: 'Instagram',
     website: '网站',
     yourArtistName: '艺人/场地名称',
-    soundcloudHint: '粘贴曲目、合集或个人主页的链接(soundcloud.com/…)。SoundCloud 应用的短分享链接(on.soundcloud.com)无法使用,请在浏览器中打开后复制地址。',
-    spotifyHint: '粘贴你的艺人主页链接(open.spotify.com/artist/…)。在 Spotify 应用中:艺人主页 → ⋯ → 分享 → 复制链接。单曲和专辑链接无法使用。',
+    soundcloudHint: '粘贴曲目、合集或个人主页的链接,来自浏览器或 SoundCloud 应用的分享按钮均可。',
+    spotifyHint: '粘贴你的艺人主页链接。在 Spotify 应用中:艺人主页 → ⋯ → 分享 → 复制链接。单曲和专辑链接无法使用。',
   },
 
   explore: {

@@ -1188,8 +1188,8 @@ const ja = {
     instagram: 'Instagram',
     website: 'ウェブサイト',
     yourArtistName: 'アーティスト/会場名',
-    soundcloudHint: 'トラック、セット、またはプロフィールページのリンク(soundcloud.com/…)を貼り付けてください。SoundCloudアプリの短縮共有リンク(on.soundcloud.com)は使えません。ブラウザで開いてアドレスをコピーしてください。',
-    spotifyHint: 'アーティストページのリンク(open.spotify.com/artist/…)を貼り付けてください。Spotifyアプリでは:アーティストページ → ⋯ → シェア → リンクをコピー。曲やアルバムのリンクは使えません。',
+    soundcloudHint: 'トラック、セット、またはプロフィールページのリンクを貼り付けてください。ブラウザのリンクでも、SoundCloudアプリの共有ボタンのリンクでも構いません。',
+    spotifyHint: 'アーティストページのリンクを貼り付けてください。Spotifyアプリでは:アーティストページ → ⋯ → シェア → リンクをコピー。曲やアルバムのリンクは使えません。',
   },
 
   explore: {
