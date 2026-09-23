@@ -20,9 +20,10 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   const { t } = useLanguage();
   // Paid agents start on their ACTUAL billing interval, so the CTA reads as
   // "current plan" until they change something (seats or interval). Everyone
-  // else lands on Monthly — the first price shown is the small one (comp
-  // accounts arrive here as unpaid, see billingTier).
-  const [interval, setInterval] = useState(isPaid ? currentInterval : 'month');
+  // else lands on Yearly: it now leads with the discounted per-month figure,
+  // so the best deal is also the smallest number on screen (comp accounts
+  // arrive here as unpaid, see billingTier).
+  const [interval, setInterval] = useState(isPaid ? currentInterval : 'year');
   // Seats the agent already holds and won't be charged again for: a paid agent's
   // purchased seats, or a free agent's current roster (their included allowance).
   const baseline = isPaid ? currentSeats : rosterCount;
