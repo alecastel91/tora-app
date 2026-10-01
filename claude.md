@@ -714,3 +714,6 @@ The `api.js` service class organizes endpoints into these groups:
 - YEARLY: unlimited likes/connections + exclusive features
 - Backend handles subscription enforcement; frontend shows appropriate UI gates
 - The API service defaults to `/api` (proxy) or uses `REACT_APP_API_URL` env var
+
+## Lint gate (since 2026-10-01)
+`npm run lint` (ESLint, flat config, `no-undef` only) runs inside `npm run build` and `npm test`, so Vercel refuses a bundle that references a name outside its scope. Three prod crashes came from exactly that (money, embeds, uploading). Never remove the gate from `build`; add globals to eslint.config.js instead of disabling the rule.

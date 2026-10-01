@@ -441,7 +441,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       const agentId = selectedAgent.id;
 
       // Accept the request (either representation or connection)
-      await apiService.acceptRequest(requestId);
+      await apiService.acceptConnectionRequest(requestId);
 
       // Update local state based on request type
       if (reviewingRequest.type === 'CONNECTION_REQUEST') {
@@ -491,7 +491,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       const requestId = reviewingRequest.id;
 
       // Decline the representation request
-      await apiService.declineRequest(requestId);
+      await apiService.declineConnectionRequest(requestId);
 
       // Update local state
       const agentId = selectedAgent.id;

@@ -20,7 +20,7 @@ import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../util
 const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 
 const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, accountUser }) => {
-  const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptConnectionRequest, declineConnectionRequest } = useAppContext();
+  const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptRequest, declineRequest } = useAppContext();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('globe'); // 'globe' | 'list' — the globe IS the search landing
@@ -395,7 +395,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     if (reviewingRequest && selectedProfile) {
       try {
         const requestId = reviewingRequest.id;
-        await acceptConnectionRequest(requestId);
+        await acceptRequest(requestId);
         setShowReviewModal(false);
         setReviewingRequest(null);
         setSelectedProfile(null);
@@ -413,7 +413,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     if (reviewingRequest && selectedProfile) {
       try {
         const requestId = reviewingRequest.id;
-        await declineConnectionRequest(requestId);
+        await declineRequest(requestId);
         setShowReviewModal(false);
         setReviewingRequest(null);
         setSelectedProfile(null);
