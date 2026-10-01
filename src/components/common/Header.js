@@ -5,7 +5,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
-  const { notifications, clearNotificationDot } = useAppContext();
+  const { notifications } = useAppContext();
   const { t } = useLanguage();
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotificationDot, setHasNotificationDot] = useState(true);
@@ -26,12 +26,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
     // Remove the dot when notifications are opened
-    if (!showNotifications) {
-      setHasNotificationDot(false);
-      if (clearNotificationDot) {
-        clearNotificationDot();
-      }
-    }
+    if (!showNotifications) setHasNotificationDot(false);
   };
 
   const handleSettingsClick = () => {
