@@ -296,11 +296,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         // Update artist profile state
         setArtistProfile(freshProfile);
 
-        // Update available dates from fresh data
-        setSelectedDates(new Set(freshProfile.availableDates || []));
-
-        // Update travel schedvelSchedule || []);
-
         // Update documents from fresh data
         setDocuments({
           pressKit: freshProfile.documents?.pressKit || [],

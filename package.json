@@ -23,19 +23,22 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3002",
-    "build": "vite build",
+    "lint": "eslint .",
+    "build": "npm run lint && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 3002",
     "start": "vite --host 0.0.0.0 --port 3002",
     "sync-theme": "cp ../tora-application/src/styles/tora-theme.css src/styles/tora-theme.css",
     "prepare": "husky",
     "check:cities": "node scripts/check-city-coords.mjs",
     "check:i18n": "node scripts/check-translations.js",
-    "test": "TZ=America/Sao_Paulo node --test 'src/**/*.test.mjs'"
+    "test": "npm run lint && TZ=America/Sao_Paulo node --test 'src/**/*.test.mjs'"
   },
   "devDependencies": {
     "@sentry/vite-plugin": "^4.9.1",
     "@tailwindcss/vite": "^4.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
     "husky": "^9.1.7",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.3.1",
