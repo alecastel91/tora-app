@@ -786,6 +786,15 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // The backend has one route per request type; callers hold the request object.
+  acceptRequestByType(request) {
+    return request.type === 'REPRESENTATION_REQUEST' ? this.acceptRepresentationRequest(request.id) : this.acceptConnectionRequest(request.id);
+  }
+
+  declineRequestByType(request) {
+    return request.type === 'REPRESENTATION_REQUEST' ? this.declineRepresentationRequest(request.id) : this.declineConnectionRequest(request.id);
+  }
+
   async declineRepresentationRequest(requestId) {
     const response = await fetch(`${API_URL}/connections/decline-representation/${requestId}`, {
       method: 'POST',

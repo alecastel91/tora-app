@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
+import { profileEmbeds } from '../../utils/mediaLinks';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -71,7 +71,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     return () => { cancelled = true; };
   }, [passedProfile?.id, currentUser?.id]);
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
-  const embeds = { soundcloud: soundcloudEmbedUrl(profile?.mixtape), spotify: spotifyEmbedUrl(profile?.spotify) };
+  const embeds = profileEmbeds(profile);
 
   // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
   const [artistTours, setArtistTours] = useState([]);

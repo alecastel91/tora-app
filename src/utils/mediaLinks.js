@@ -29,3 +29,6 @@ export function spotifyEmbedUrl(link) {
   const id = spotifyArtistId(link);
   return id ? `https://open.spotify.com/embed/artist/${id}` : null;
 }
+
+/** Both embed URLs for a profile row (null when a link does not embed). */
+export const profileEmbeds = (p) => ({ soundcloud: soundcloudEmbedUrl(p?.mixtape), spotify: spotifyEmbedUrl(p?.spotify) });

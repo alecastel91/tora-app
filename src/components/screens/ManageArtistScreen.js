@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { soundcloudEmbedUrl, spotifyEmbedUrl } from '../../utils/mediaLinks';
+import { profileEmbeds } from '../../utils/mediaLinks';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
@@ -715,7 +715,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   // Artist Info Tab (Editable Profile Information)
   const renderArtistInfoTab = () => {
-    const artistEmbeds = { soundcloud: soundcloudEmbedUrl(artistProfile?.mixtape), spotify: spotifyEmbedUrl(artistProfile?.spotify) };
+    const artistEmbeds = profileEmbeds(artistProfile);
 
     return (
       <div className="artist-info-tab">

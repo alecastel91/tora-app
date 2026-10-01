@@ -299,9 +299,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
       const requestId = reviewingRequest.id;
       const artistId = String(selectedArtist.id);
 
-      // Accept the request — the backend has one route per request type.
-      const isRep = reviewingRequest.type === 'REPRESENTATION_REQUEST';
-      await (isRep ? apiService.acceptRepresentationRequest(requestId) : apiService.acceptConnectionRequest(requestId));
+      await apiService.acceptRequestByType(reviewingRequest);
 
       // Update local state based on request type
       if (reviewingRequest.type === 'CONNECTION_REQUEST') {
@@ -347,7 +345,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
     try {
       const requestId = reviewingRequest.id;
 
-      await (reviewingRequest.type === 'REPRESENTATION_REQUEST' ? apiService.declineRepresentationRequest(requestId) : apiService.declineConnectionRequest(requestId));
+      await apiService.declineRequestByType(reviewingRequest);
 
       // Update local state
       const artistId = String(selectedArtist.id);
