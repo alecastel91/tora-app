@@ -71,6 +71,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     return () => { cancelled = true; };
   }, [passedProfile?.id, currentUser?.id]);
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
+  const embeds = { soundcloud: soundcloudEmbedUrl(profile?.mixtape), spotify: spotifyEmbedUrl(profile?.spotify) };
 
   // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
   const [artistTours, setArtistTours] = useState([]);
