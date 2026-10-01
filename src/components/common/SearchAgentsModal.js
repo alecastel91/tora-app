@@ -440,8 +440,9 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       const requestId = reviewingRequest.id;
       const agentId = selectedAgent.id;
 
-      // Accept the request (either representation or connection)
-      await apiService.acceptConnectionRequest(requestId);
+      // Accept the request — the backend has one route per request type.
+      const isRep = reviewingRequest.type === 'REPRESENTATION_REQUEST';
+      await (isRep ? apiService.acceptRepresentationRequest(requestId) : apiService.acceptConnectionRequest(requestId));
 
       // Update local state based on request type
       if (reviewingRequest.type === 'CONNECTION_REQUEST') {
@@ -491,7 +492,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       const requestId = reviewingRequest.id;
 
       // Decline the representation request
-      await apiService.declineConnectionRequest(requestId);
+      await (reviewingRequest.type === 'REPRESENTATION_REQUEST' ? apiService.declineRepresentationRequest(requestId) : apiService.declineConnectionRequest(requestId));
 
       // Update local state
       const agentId = selectedAgent.id;
