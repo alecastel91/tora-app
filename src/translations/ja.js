@@ -802,6 +802,15 @@ const ja = {
     missingFields: '入力してください：{{list}}',
   },
 
+  gear: {
+    category: 'カテゴリ',
+    players: 'プレーヤー',
+    mixers: 'ミキサー',
+    monitors: 'ブースモニター',
+    pa: '音響システム',
+    lighting: '照明',
+    other: 'その他',
+  },
   onboarding: {
     skip: 'スキップ',
     next: '次へ',
@@ -830,6 +839,7 @@ const ja = {
     likeProfiles: '3件のプロフィールにいいね',
     makeConnection: '最初のつながりを作る',
     exploreTours: 'Tour Kickstartを見てみる',
+    addRoomGear: 'ルームと機材を登録する',
   },
   assistant: {
     title: 'TORAアシスタント',
@@ -1073,6 +1083,8 @@ const ja = {
   },
 
   profile: {
+    techSpecs: 'ルームと機材',
+    capacityShort: '人',
     adminAccount: "管理者アカウント",
     rooms: 'フロア',
     venueGalleryTitle: '会場',
@@ -1141,6 +1153,18 @@ const ja = {
     roleFixed: 'ロールはプロフィール作成時に決まります。別のロールが必要な場合は、プロフィール写真のメニューから新しいプロフィールを追加してください。',
     venueRooms: 'フロア / ステージ数',
     venueRoomsPlaceholder: '例: 2',
+    rooms: 'ルームと機材',
+    roomsHint: 'ルームやステージごとに1件。機材はリストから選び、それ以外は「その他」に入力します。公開プロフィールに表示されます。',
+    roomName: 'ルーム名',
+    roomDefaultName: 'ルーム',
+    roomCapacity: 'キャパシティ',
+    addRoom: 'ルームを追加',
+    removeRoom: 'ルームを削除',
+    addGear: '追加',
+    gearSearch: '機種名またはブランド',
+    quantity: '台数',
+    removeGear: '削除',
+    noGearYet: '機材はまだ登録されていません',
     profileIdMissing: 'プロフィールIDが見つかりません。ログアウトして再度ログインしてください。',
     saveFailed: 'プロフィールの保存に失敗しました。もう一度お試しください。',
     basicInformation: '基本情報',

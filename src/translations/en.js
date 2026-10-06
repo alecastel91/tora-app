@@ -802,6 +802,15 @@ const en = {
     missingFields: 'Please complete: {{list}}',
   },
 
+  gear: {
+    category: 'Category',
+    players: 'Players',
+    mixers: 'Mixers',
+    monitors: 'Booth monitors',
+    pa: 'Sound system',
+    lighting: 'Lighting',
+    other: 'Other',
+  },
   onboarding: {
     skip: 'Skip',
     next: 'Next',
@@ -830,6 +839,7 @@ const en = {
     likeProfiles: 'Like 3 profiles',
     makeConnection: 'Make your first connection',
     exploreTours: 'Explore Tour Kickstart',
+    addRoomGear: 'Add your rooms and equipment',
   },
   assistant: {
     title: 'TORA Assistant',
@@ -1075,6 +1085,8 @@ const en = {
   
   // Profile Screen
   profile: {
+    techSpecs: 'Rooms and tech',
+    capacityShort: 'cap.',
     adminAccount: "Admin Account",
     rooms: 'Rooms',
     venueGalleryTitle: 'Venue',
@@ -1144,6 +1156,18 @@ const en = {
     roleFixed: 'Your role is set when the profile is created. For a different role, add another profile from your profile picture menu.',
     venueRooms: 'Rooms / Stages',
     venueRoomsPlaceholder: 'e.g. 2',
+    rooms: 'Rooms and equipment',
+    roomsHint: 'One entry per room or stage. Pick models from the list; anything else goes under Other. Shown on your public profile.',
+    roomName: 'Room name',
+    roomDefaultName: 'Room',
+    roomCapacity: 'Capacity',
+    addRoom: 'Add room',
+    removeRoom: 'Remove room',
+    addGear: 'Add',
+    gearSearch: 'Model or brand',
+    quantity: 'Qty',
+    removeGear: 'Remove',
+    noGearYet: 'No equipment added yet',
     profileIdMissing: 'Profile ID is missing. Please log out and log back in.',
     saveFailed: 'Failed to save profile. Please try again.',
     basicInformation: 'Basic Information',

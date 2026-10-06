@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import RoomGearEditor from '../common/RoomGearEditor';
+import { roomsFromCount } from '../../utils/venueRooms';
 import { genresList, getZoneFromCountry } from '../../data/profiles';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
@@ -62,6 +64,9 @@ const EditProfileScreen = ({ onClose }) => {
     ...user,
     genres: user?.genres || [],
     pastHighlights: Array.isArray(user?.pastHighlights) ? user.pastHighlights : [],
+    // A venue that only ever typed a room count gets that many empty rooms
+    // to fill in; the count stays derived from the list from here on.
+    venueRoomsSpec: Array.isArray(user?.venueRoomsSpec) ? user.venueRoomsSpec : (user?.role === 'VENUE' ? roomsFromCount(user?.venueRooms) : undefined),
     city: initialLocation.city,
     country: initialLocation.country,
     zone: initialLocation.zone
@@ -356,17 +361,10 @@ const EditProfileScreen = ({ onClose }) => {
           )}
 
           {editedUser.role === 'VENUE' && (
-            <div className="form-group">
-              <label>{t('editProfile.venueRooms')}</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={editedUser.venueRooms || ''}
-                onChange={(e) => setEditedUser({ ...editedUser, venueRooms: e.target.value.replace(/[^0-9]/g, '') })}
-                placeholder={t('editProfile.venueRoomsPlaceholder')}
-              />
-            </div>
+            <RoomGearEditor
+              rooms={editedUser.venueRoomsSpec || []}
+              onChange={(rooms) => setEditedUser({ ...editedUser, venueRoomsSpec: rooms, venueRooms: rooms.length ? String(rooms.length) : editedUser.venueRooms })}
+            />
           )}
 
           {editedUser.role === 'AGENT' && (

@@ -802,6 +802,15 @@ const ko = {
     missingFields: '다음 항목을 입력해 주세요: {{list}}',
   },
 
+  gear: {
+    category: '카테고리',
+    players: '플레이어',
+    mixers: '믹서',
+    monitors: '부스 모니터',
+    pa: '음향 시스템',
+    lighting: '조명',
+    other: '기타',
+  },
   onboarding: {
     skip: '건너뛰기',
     next: '다음',
@@ -830,6 +839,7 @@ const ko = {
     likeProfiles: '프로필 3개에 좋아요',
     makeConnection: '첫 연결 만들기',
     exploreTours: 'Tour Kickstart 둘러보기',
+    addRoomGear: '룸과 장비 등록하기',
   },
   assistant: {
     title: 'TORA 어시스턴트',
@@ -1073,6 +1083,8 @@ const ko = {
   },
 
   profile: {
+    techSpecs: '룸과 장비',
+    capacityShort: '명',
     adminAccount: "관리자 계정",
     rooms: '룸',
     venueGalleryTitle: '베뉴',
@@ -1141,6 +1153,18 @@ const ko = {
     roleFixed: '역할은 프로필을 만들 때 정해집니다. 다른 역할이 필요하면 프로필 사진 메뉴에서 새 프로필을 추가하세요.',
     venueRooms: '룸 / 스테이지',
     venueRoomsPlaceholder: '예: 2',
+    rooms: '룸과 장비',
+    roomsHint: '룸 또는 스테이지별로 하나씩. 목록에서 모델을 고르고, 나머지는 기타에 적습니다. 공개 프로필에 표시됩니다.',
+    roomName: '룸 이름',
+    roomDefaultName: '룸',
+    roomCapacity: '수용 인원',
+    addRoom: '룸 추가',
+    removeRoom: '룸 삭제',
+    addGear: '추가',
+    gearSearch: '모델 또는 브랜드',
+    quantity: '수량',
+    removeGear: '삭제',
+    noGearYet: '아직 등록된 장비가 없습니다',
     profileIdMissing: '프로필 ID가 없습니다. 로그아웃 후 다시 로그인해 주세요.',
     saveFailed: '프로필을 저장하지 못했습니다. 다시 시도해 주세요.',
     basicInformation: '기본 정보',

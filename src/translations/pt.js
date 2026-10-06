@@ -802,6 +802,15 @@ const pt = {
     missingFields: 'Completa: {{list}}',
   },
 
+  gear: {
+    category: 'Categoria',
+    players: 'Leitores',
+    mixers: 'Mesas de mistura',
+    monitors: 'Monitores de cabine',
+    pa: 'Sistema de som',
+    lighting: 'Iluminação',
+    other: 'Outro',
+  },
   onboarding: {
     skip: 'Pular',
     next: 'Próximo',
@@ -830,6 +839,7 @@ const pt = {
     likeProfiles: 'Curta 3 perfis',
     makeConnection: 'Faça a sua primeira conexão',
     exploreTours: 'Explore o Tour Kickstart',
+    addRoomGear: 'Adicione as suas salas e equipamento',
   },
   assistant: {
     title: 'Assistente TORA',
@@ -1073,6 +1083,8 @@ const pt = {
   },
 
   profile: {
+    techSpecs: 'Salas e técnica',
+    capacityShort: 'pess.',
     adminAccount: "Conta de administrador",
     rooms: 'Salas',
     venueGalleryTitle: 'Espaço',
@@ -1141,6 +1153,18 @@ const pt = {
     roleFixed: 'O papel é definido ao criar o perfil. Para outro papel, adicione outro perfil a partir do menu da sua foto de perfil.',
     venueRooms: 'Salas / Palcos',
     venueRoomsPlaceholder: 'ex. 2',
+    rooms: 'Salas e equipamento',
+    roomsHint: 'Uma entrada por sala ou palco. Escolha os modelos da lista; o resto vai em Outro. Visível no seu perfil público.',
+    roomName: 'Nome da sala',
+    roomDefaultName: 'Sala',
+    roomCapacity: 'Lotação',
+    addRoom: 'Adicionar sala',
+    removeRoom: 'Remover sala',
+    addGear: 'Adicionar',
+    gearSearch: 'Modelo ou marca',
+    quantity: 'Qtd.',
+    removeGear: 'Remover',
+    noGearYet: 'Ainda sem equipamento',
     profileIdMissing: 'Falta o ID do perfil. Termina a sessão e volte a entrar.',
     saveFailed: 'Não foi possível guardar o perfil. Tente novamente.',
     basicInformation: 'Informações básicas',

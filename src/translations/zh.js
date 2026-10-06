@@ -802,6 +802,15 @@ const zh = {
     missingFields: '请填写：{{list}}',
   },
 
+  gear: {
+    category: '类别',
+    players: '播放器',
+    mixers: '混音台',
+    monitors: 'DJ台监听',
+    pa: '音响系统',
+    lighting: '灯光',
+    other: '其他',
+  },
   onboarding: {
     skip: '跳过',
     next: '下一步',
@@ -830,6 +839,7 @@ const zh = {
     likeProfiles: '给 3 个主页点赞',
     makeConnection: '建立第一个连接',
     exploreTours: '探索 Tour Kickstart',
+    addRoomGear: '添加你的房间与设备',
   },
   assistant: {
     title: 'TORA 助手',
@@ -1073,6 +1083,8 @@ const zh = {
   },
 
   profile: {
+    techSpecs: '房间与设备',
+    capacityShort: '人',
     adminAccount: "管理员账户",
     rooms: '厅数',
     venueGalleryTitle: '场地',
@@ -1141,6 +1153,18 @@ const zh = {
     roleFixed: '角色在创建档案时确定。如需其他角色，请从头像菜单添加新的档案。',
     venueRooms: '厅数 / 舞台数',
     venueRoomsPlaceholder: '例如 2',
+    rooms: '房间与设备',
+    roomsHint: '每个房间或舞台一条。从列表中选择型号，其他设备填在「其他」。会显示在你的公开资料中。',
+    roomName: '房间名称',
+    roomDefaultName: '房间',
+    roomCapacity: '容量',
+    addRoom: '添加房间',
+    removeRoom: '删除房间',
+    addGear: '添加',
+    gearSearch: '型号或品牌',
+    quantity: '数量',
+    removeGear: '删除',
+    noGearYet: '尚未添加设备',
     profileIdMissing: '缺少档案ID。请退出后重新登录。',
     saveFailed: '档案保存失败。请重试。',
     basicInformation: '基本信息',

@@ -1,4 +1,5 @@
 import { goTab, goProfileThen, goTourSubTab } from '../../utils/navigation';
+import { roomsHaveGear } from '../../utils/venueRooms';
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -58,6 +59,15 @@ const OnboardingChecklist = () => {
         detail: { code: 'VERIFICATION_REQUIRED' },
       })),
     },
+    // A venue's pitch to artists is its rooms and gear — and the structured
+    // data TORA collects from it. Lives in Edit profile, no paywall.
+    ...(user.role === 'VENUE'
+      ? [{
+          key: 'addRoomGear',
+          done: roomsHaveGear(user.venueRoomsSpec),
+          go: () => goProfileThen('tora:open-edit-profile'),
+        }]
+      : []),
     // Agents don't manage their own calendar — their activation step is
     // building the roster. The calendar itself lives behind the Premium
     // Manage screen, so for FREE non-agents the item is omitted entirely

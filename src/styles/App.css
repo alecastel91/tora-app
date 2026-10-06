@@ -13205,3 +13205,20 @@ body.beta-env #root {
   color: rgba(255, 255, 255, 0.5);
 }
 .privacy-note svg { flex-shrink: 0; margin-top: 2px; color: rgba(255, 255, 255, 0.4); }
+
+/* Venue rooms + equipment editor (RoomGearEditor) */
+.room-editor { border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; background: rgba(255,255,255,0.02); }
+.room-editor-head { display: flex; gap: 8px; align-items: center; }
+.room-editor-head input { flex: 1; min-width: 0; }
+.room-editor-head .room-capacity { flex: 0 0 90px; }
+.room-remove, .room-gear-list li button { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 18px; line-height: 1; cursor: pointer; padding: 4px 6px; }
+.room-remove:hover, .room-gear-list li button:hover { color: #FF3366; }
+.room-gear-empty { margin: 8px 0; font-size: 12px; color: rgba(255,255,255,0.4); }
+.room-gear-list { list-style: none; margin: 8px 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.room-gear-list li { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.room-gear-list li span:nth-child(2) { flex: 1; }
+.room-gear-cat { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); min-width: 86px; }
+.gear-adder { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.gear-adder select { flex: 0 0 auto; max-width: 150px; }
+.gear-adder input { flex: 1; min-width: 120px; }
+.gear-adder .gear-qty { flex: 0 0 52px; min-width: 0; text-align: center; }
