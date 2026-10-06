@@ -1477,11 +1477,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   </button>
                 )}
 
-                {/* Confirm receipt — artist-side only, only when there's an
-                    unconfirmed payment entry. The compact payment summary
-                    pill is gone now that WorkflowTimeline's payment-progress
-                    block has an inline "view details" CTA. */}
-                {deal.payment && (deal.payment.status === 'DEPOSIT_PAID' || deal.payment.status === 'FULLY_PAID') && (() => {
+                {/* Confirm receipt — artist-side only, whenever money has been
+                    marked but not confirmed. Keyed on the payment summary, not
+                    on payment.status: a seeded or legacy payment without that
+                    field still has a deposit waiting for the artist. */}
+                {deal.payment && (() => {
                   const summary = summarizeDealPayment(deal);
                   const { history, fullPaymentMarked, fullPaymentConfirmed } = summary;
                   const onArtistSide = isArtistSideForDeal(deal, currentUser);
