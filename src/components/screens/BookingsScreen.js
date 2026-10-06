@@ -89,12 +89,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming', 'past', or 'declined'
   const [deals, setDeals] = useState([]);
-  // Set of deal ids that currently have a pending action for this user —
-  // same source as the Bookings tab dot / Manage action-summary. Drives the
-  // per-card highlight so the user can spot WHICH booking needs attention.
-  // Reflects the CURRENT pending actions on every load, so a card keeps its
-  // highlight until the action is handled (matches the persistent tab dot).
-  const [actionableDealIds, setActionableDealIds] = useState(() => new Set());
   const [loading, setLoading] = useState(true);
   const [actionBusy, setActionBusy] = useState(false);
   const [error, setError] = useState('');
@@ -263,19 +257,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         response.deals || [],
         (currentUser.representingArtists || []).map((a) => a.profileId || a.id),
       );
-      // Every deal that currently needs the user's action — highlight them all,
-      // so a card keeps its glow until the action is handled (the set shrinks on
-      // the next refetch once it's resolved).
-      const ids = new Set();
-      for (const item of actionData?.items || []) {
-        const dealId = item?.target?.params?.dealId;
-        if (dealId) ids.add(dealId);
-      }
-      setActionableDealIds(ids);
       // Keep the tab-bar dot in sync with this authoritative refetch (runs on
       // load and after every action), so handling the last action clears the
       // dot immediately instead of lingering until the next 30s poll.
-      onActionCountChange?.(ids.size);
+      onActionCountChange?.(new Set((actionData?.items || []).map((i) => i?.target?.params?.dealId).filter(Boolean)).size);
     } catch (err) {
       console.error('Error fetching deals:', err);
       setError(err.message || t('bookings.loadFailed'));
@@ -580,13 +565,22 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     return sortedClusters;
   };
 
+  // "Needs my action" and the tab badges use the SAME rule as the sentence on
+  // the card (bookingStatusLine.mine) — a red sentence and the filter must
+  // never disagree about whose move it is.
+  const isMyMove = (deal) => {
+    const hasPendingDocs = deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser)
+      && DOC_CATEGORIES.some((c) => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
+    return !!bookingStatusLine(deal, currentUser, t, { hasPendingDocs })?.mine;
+  };
+
   // Inline filters apply to the list only — the tab badges keep counting
   // every actionable deal, filtered or not.
   const filteredDeals = useMemo(() => filterDeals().filter((d) =>
-    (actionFilter !== 'needed' || actionableDealIds.has(d.id))
+    (actionFilter !== 'needed' || isMyMove(d))
     && (statusFilter === 'all' || statusFilter === getDealDisplayStatus(d))),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [deals, activeTab, selectedArtistFilter, actionFilter, statusFilter, actionableDealIds, currentUser?.id, currentUser?.role]);
+    [deals, activeTab, selectedArtistFilter, actionFilter, statusFilter, currentUser?.id, currentUser?.role]);
 
   // Badge counts = bookings waiting on THIS user, per tab. They used to show
   // filteredDeals.length on the open tab only, which just restated the number
@@ -599,13 +593,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   // every deal on every render.
   const actionCounts = useMemo(() => {
     const empty = { upcoming: 0, past: 0, declined: 0 };
-    if (actionableDealIds.size === 0) return empty;
     return Object.keys(empty).reduce((acc, tab) => ({
       ...acc,
-      [tab]: filterDeals(tab).filter((d) => actionableDealIds.has(d.id)).length,
+      [tab]: filterDeals(tab).filter(isMyMove).length,
     }), empty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deals, actionableDealIds, selectedArtistFilter, currentUser?.id, currentUser?.role]);
+  }, [deals, selectedArtistFilter, currentUser?.id, currentUser?.role]);
   const clusteredDeals = clusterDealsByMonth(filteredDeals);
 
   const getStatusBadgeClass = (status) => {
