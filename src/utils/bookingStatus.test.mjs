@@ -50,3 +50,29 @@ test('cancelled booking with an unconfirmed deposit asks the artist to resolve i
   assert.equal(bookingStatusLine(deal, booker, t), null);
   assert.equal(bookingStatusLine({ ...base, status: 'DECLINED' }, artist, t), null);
 });
+
+test('parity with the backend: deposit marked at ARTIST_SIGNED asks the artist to confirm', () => {
+  const deal = { ...base, status: 'ACCEPTED', contract: { status: 'ARTIST_SIGNED', sentBy: 'A' },
+    payment: { depositHistory: [{ amount: 200, confirmedAt: null }], currency: 'EUR' } };
+  assert.equal(bookingStatusLine(deal, artist, t).text, 'bookings.line.confirmPayment|name=CIRCUIT,amount=200 EUR');
+  assert.equal(bookingStatusLine(deal, booker, t).mine, false);
+});
+
+test('SENT without sentBy counts as sent by the artist side', () => {
+  const deal = { ...base, status: 'ACCEPTED', contract: { status: 'SENT' } };
+  assert.equal(bookingStatusLine(deal, booker, t).text, 'bookings.line.signContract|name=Lucio');
+});
+
+test('cancelled booking with confirmed but unsettled money asks the artist to resolve it', () => {
+  const deal = { ...base, status: 'CANCELLED', payment: { depositHistory: [{ amount: 200, confirmedAt: '2026-10-01' }], currency: 'EUR' } };
+  assert.equal(bookingStatusLine(deal, artist, t).text, 'bookings.line.resolve|name=CIRCUIT');
+  assert.equal(bookingStatusLine({ ...deal, payment: { ...deal.payment, settlement: { outcome: 'settled' } } }, artist, t), null);
+});
+
+test('an agent gets no line on a deal they do not lead', () => {
+  const agent = { id: 'G', role: 'AGENT', representingArtists: [{ profileId: 'A' }] };
+  const direct = { ...base, status: 'ACCEPTED', contract: { status: 'FULLY_SIGNED' } }; // artist-direct, no bookedArtistId
+  assert.equal(bookingStatusLine(direct, agent, t), null);
+  const led = { ...direct, bookedArtistId: 'A', agentId: 'G' };
+  assert.equal(bookingStatusLine(led, agent, t).text, 'bookings.line.waitingPayment|name=CIRCUIT');
+});

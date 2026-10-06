@@ -1,34 +1,9 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { GEAR_CATEGORIES, GEAR_ITEMS, OTHER, brandsFor, modelsFor, catalogIdFor, gearLine } from '../../utils/venueRooms';
+import { GEAR_CATEGORIES, MAX_ROOMS, OTHER, brandsFor, modelsFor, catalogIdFor, brandForModel, sheetStateFromItem, gearLine } from '../../utils/venueRooms';
 
-const MAX_ROOMS = 12;
 const blank = (category = 'players') => ({ category, brand: '', brandOther: '', model: '', modelOther: '', quantity: 1, note: '' });
-
-/** Picking a model fills in its brand (the list is category-wide until a brand narrows it). */
-const brandForModel = (category, model, currentBrand) => {
-  if (!model || model === OTHER) return {};
-  const hit = GEAR_ITEMS.find((i) => i.category === category && i.model === model && (!currentBrand || currentBrand === OTHER || i.brand === currentBrand));
-  return hit && hit.brand && hit.brand !== currentBrand ? { brand: hit.brand, brandOther: '' } : {};
-};
-
-/** Fill the sheet from a saved row (brand/model that are not in the catalog land in the free-text fields). */
-const fromItem = (e) => {
-  const brands = brandsFor(e.category);
-  const brandListed = e.brand && brands.includes(e.brand);
-  const models = modelsFor(e.category, brandListed ? e.brand : OTHER);
-  const modelListed = e.model && models.includes(e.model);
-  return {
-    category: e.category,
-    brand: brandListed ? e.brand : (e.brand ? OTHER : ''),
-    brandOther: brandListed ? '' : (e.brand || ''),
-    model: modelListed ? e.model : (e.model ? OTHER : ''),
-    modelOther: modelListed ? '' : (e.model || ''),
-    quantity: e.quantity || 1,
-    note: e.note || '',
-  };
-};
 
 /**
  * Slim sheet for one piece of equipment: category, brand (catalog or Other),
@@ -165,11 +140,11 @@ const RoomGearEditor = ({ rooms, onChange }) => {
               <ul className="room-gear-list">
                 {room.equipment.map((e, ei) => (
                   <li key={ei}>
-                    <button type="button" className="room-gear-row" onClick={() => setSheet({ room: i, index: ei, initial: { ...fromItem(e), editing: true } })}>
+                    <button type="button" className="room-gear-row" onClick={() => setSheet({ room: i, index: ei, initial: { ...sheetStateFromItem(e), editing: true } })}>
                       <span className="room-gear-cat">{t(`gear.${e.category}`)}</span>
                       <span>{gearLine(e)}{e.note ? <em> · {e.note}</em> : null}</span>
                     </button>
-                    <button type="button" onClick={() => update(i, { equipment: room.equipment.filter((_, idx) => idx !== ei) })} aria-label={t('editProfile.removeGear')}>×</button>
+                    <button type="button" className="room-remove" onClick={() => update(i, { equipment: room.equipment.filter((_, idx) => idx !== ei) })} aria-label={t('editProfile.removeGear')}>×</button>
                   </li>
                 ))}
               </ul>

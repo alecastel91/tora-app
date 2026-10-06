@@ -15,17 +15,20 @@ import { OFF_STATUSES } from './dealStatus.js';
 export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = {}) {
   if (!deal || !viewer) return null;
   const artistSide = isArtistSideForDeal(deal, viewer);
+  // An agent only has a move on deals they lead (same rule as the backend's
+  // ledByViewer): on an artist-direct deal of a roster artist they just watch.
+  if (viewer.role === 'AGENT' && !artistSide) return null;
   const name = (artistSide ? deal.venue?.name : deal.artist?.name) || t('bookings.theOtherParty');
   const line = (key, mine, vars = {}) => ({ text: t(`bookings.line.${key}`, { name, ...vars }), mine });
   const summary = summarizeDealPayment(deal);
   const amountOf = (n) => `${n} ${summary.currency || deal.currency || ''}`.trim();
+  const awaiting = summary.totalMarked - summary.totalConfirmed;
 
   if (OFF_STATUSES.includes(deal.status)) {
-    const awaiting = summary.totalMarked - summary.totalConfirmed;
-    if (summary.hasAnyPayment && !deal.payment?.settlement && artistSide && awaiting > 0) {
-      return line('settle', true, { amount: amountOf(awaiting) });
-    }
-    return null;
+    // Money moved on a dead booking: the owed side has to close the question
+    // (backend: payment_to_confirm_received / payment_to_resolve).
+    if (!artistSide || !summary.hasAnyPayment || deal.payment?.settlement) return null;
+    return awaiting > 0 ? line('settle', true, { amount: amountOf(awaiting) }) : line('resolve', true);
   }
 
   if (deal.status === 'PENDING' || deal.status === 'NEGOTIATING') {
@@ -44,24 +47,26 @@ export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = 
 
   const contract = deal.contract || {};
   const status = contract.status || 'NOT_SENT';
-  const committed = status === 'FULLY_SIGNED' || contract.skipped === true;
-  if (!committed) {
-    if (status === 'NOT_SENT') return artistSide ? line('sendContract', true) : line('waitingContract', false);
-    // Whose signature is missing: the side that did not send, then the side that has not signed.
-    const sentByArtistSide = contract.sentBy ? contract.sentBy !== deal.venueId : true;
-    const myTurn = status === 'SENT' ? artistSide !== sentByArtistSide
+  if (status === 'NOT_SENT' && !contract.skipped) return artistSide ? line('sendContract', true) : line('waitingContract', false);
+
+  // Money already marked beats a missing signature: the booker may pay a
+  // deposit as soon as the artist side has signed (same gate as the backend).
+  if (awaiting > 0) {
+    return artistSide
+      ? line('confirmPayment', true, { amount: amountOf(awaiting) })
+      : line('waitingConfirm', false, { amount: amountOf(awaiting) });
+  }
+
+  if (status !== 'FULLY_SIGNED' && !contract.skipped) {
+    // Whose signature is missing: the side that did not send it, then the side that has not signed.
+    const sentByBooker = contract.sentBy === deal.venueId;
+    const myTurn = status === 'SENT' ? artistSide === sentByBooker
       : status === 'ARTIST_SIGNED' ? !artistSide
       : status === 'VENUE_SIGNED' ? artistSide
       : false;
     return myTurn ? line('signContract', true) : line('waitingSignature', false);
   }
 
-  const awaiting = summary.totalMarked - summary.totalConfirmed;
-  if (awaiting > 0) {
-    return artistSide
-      ? line('confirmPayment', true, { amount: amountOf(awaiting) })
-      : line('waitingConfirm', false, { amount: amountOf(awaiting) });
-  }
   if (artistSide && hasPendingDocs) return line('shareDocs', true);
   if (summary.isFullyConfirmed) return line('paid', false);
   return artistSide ? line('waitingPayment', false) : line('sendPayment', true);

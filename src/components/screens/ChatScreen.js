@@ -18,7 +18,7 @@ import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
-import { getAuthedBackendUrl } from '../../utils/urls';
+import { getAuthedBackendUrl, isPdfFile } from '../../utils/urls';
 import { PlaneIcon } from '../../utils/icons';
 import { roleLabel, getAvatarClass } from '../../utils/roles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
@@ -1793,9 +1793,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                         type="button"
                         // A payment proof is usually a photo or screenshot — those open
                         // in the image viewer, not the PDF viewer.
-                        onClick={() => ((msg.documentAttachment.contentType || '').startsWith('image/')
-                          ? setImageViewerUrl(getFullUrl(msg.documentAttachment.url))
-                          : setPdfViewerUrl(getFullUrl(msg.documentAttachment.url)))}
+                        onClick={() => (isPdfFile(msg.documentAttachment)
+                          ? setPdfViewerUrl(getFullUrl(msg.documentAttachment.url))
+                          : setImageViewerUrl(getFullUrl(msg.documentAttachment.url)))}
                         className="btn btn-sm"
                         style={{
                           width: '100%',

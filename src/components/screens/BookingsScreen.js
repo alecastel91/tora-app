@@ -16,7 +16,7 @@ import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
-import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
+import { getAuthedBackendUrl, buildPaymentProofUrl, isPdfFile } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
 import { OFF_STATUSES } from '../../utils/dealStatus';
 import { bookingStatusLine } from '../../utils/bookingStatus';
@@ -135,9 +135,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const openProof = (deal, type, proofMeta, index = null) => {
     const url = buildPaymentProofUrl(deal.id, currentUser?.id, type, index);
     const meta = proofMeta || (type === 'full' ? deal.payment?.fullPaymentProof : deal.payment?.depositProof);
-    const isPdf = meta?.contentType === 'application/pdf'
-      || (meta?.originalName || '').toLowerCase().endsWith('.pdf');
-    if (isPdf) {
+    if (isPdfFile(meta)) {
       setPdfViewerUrl(url);
     } else {
       setProofImageUrl(url);
@@ -568,11 +566,17 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   // "Needs my action" and the tab badges use the SAME rule as the sentence on
   // the card (bookingStatusLine.mine) — a red sentence and the filter must
   // never disagree about whose move it is.
-  const isMyMove = (deal) => {
-    const hasPendingDocs = deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser)
-      && DOC_CATEGORIES.some((c) => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
-    return !!bookingStatusLine(deal, currentUser, t, { hasPendingDocs })?.mine;
-  };
+  // Pending doc categories drive the Share Documents CTA, the Skip button and
+  // the status sentence — one derivation for all three.
+  const pendingDocCategoriesFor = (deal) => (
+    (deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser))
+      ? DOC_CATEGORIES.filter((c) => categoryStatus(deal.sharedDocuments, c.key) === 'pending')
+      : []);
+  const statusLineById = useMemo(() => new Map(deals.map((d) => [
+    d.id, bookingStatusLine(d, currentUser, t, { hasPendingDocs: pendingDocCategoriesFor(d).length > 0 }),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ])), [deals, currentUser?.id, currentUser?.role, t]);
+  const isMyMove = (deal) => !!statusLineById.get(deal.id)?.mine;
 
   // Inline filters apply to the list only — the tab badges keep counting
   // every actionable deal, filtered or not.
@@ -804,12 +808,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     // CTA label and the Skip Documents button render. Used in two separate
     // JSX blocks lower down — compute here so we don't run DOC_CATEGORIES
     // .filter twice per card.
-    const pendingDocCategories = (deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser))
-      ? DOC_CATEGORIES.filter(c => categoryStatus(deal.sharedDocuments, c.key) === 'pending')
-      : [];
+    const pendingDocCategories = pendingDocCategoriesFor(deal);
     const hasPendingDocs = pendingDocCategories.length > 0;
-
-    const statusLine = bookingStatusLine(deal, currentUser, t, { hasPendingDocs });
+    const statusLine = statusLineById.get(deal.id);
 
     return (
       <div key={deal.id} id={`booking-${deal.id}`} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>

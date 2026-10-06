@@ -54,6 +54,10 @@ export function isBackendFileUrl(doc) {
   return doc.type === 'upload' || doc.url.startsWith('/api/') || doc.url.includes('/api/contracts/files/');
 }
 
+/** Proofs and attachments: PDF by declared type or extension, otherwise treated as an image. */
+export const isPdfFile = (meta) => meta?.contentType === 'application/pdf'
+  || /\.pdf$/i.test(meta?.originalName || meta?.title || '');
+
 /**
  * Compose `/api/deals/:dealId/payment-proof` with type + optional history index.
  */

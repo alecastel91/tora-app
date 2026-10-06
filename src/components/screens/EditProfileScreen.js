@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import RoomGearEditor from '../common/RoomGearEditor';
-import { roomsFromCount } from '../../utils/venueRooms';
+import { roomsFromCount, roomsHaveContent } from '../../utils/venueRooms';
 import { genresList, getZoneFromCountry } from '../../data/profiles';
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
@@ -66,7 +66,7 @@ const EditProfileScreen = ({ onClose }) => {
     pastHighlights: Array.isArray(user?.pastHighlights) ? user.pastHighlights : [],
     // A venue that only ever typed a room count gets that many empty rooms
     // to fill in; the count stays derived from the list from here on.
-    venueRoomsSpec: Array.isArray(user?.venueRoomsSpec) ? user.venueRoomsSpec : (user?.role === 'VENUE' ? roomsFromCount(user?.venueRooms) : undefined),
+    venueRoomsSpec: Array.isArray(user?.venueRoomsSpec) ? user.venueRoomsSpec : (user?.role === 'VENUE' ? roomsFromCount(user?.venueRooms, t('editProfile.roomDefaultName')) : undefined),
     city: initialLocation.city,
     country: initialLocation.country,
     zone: initialLocation.zone
@@ -212,6 +212,12 @@ const EditProfileScreen = ({ onClose }) => {
         location, // Use combined location string
         genres: Array.from(selectedGenres)
       };
+
+      // Rooms seeded from the legacy count that the venue never filled in are
+      // not worth storing (and would pin English names); send only real content.
+      if (!Array.isArray(user?.venueRoomsSpec) && Array.isArray(updatedProfile.venueRoomsSpec) && !roomsHaveContent(updatedProfile.venueRoomsSpec)) {
+        delete updatedProfile.venueRoomsSpec;
+      }
 
       // city/country/zone are real profile columns (search filters read
       // them). Only send them when the picker state is COMPLETE — CitySearch
@@ -363,7 +369,7 @@ const EditProfileScreen = ({ onClose }) => {
           {editedUser.role === 'VENUE' && (
             <RoomGearEditor
               rooms={editedUser.venueRoomsSpec || []}
-              onChange={(rooms) => setEditedUser({ ...editedUser, venueRoomsSpec: rooms, venueRooms: rooms.length ? String(rooms.length) : editedUser.venueRooms })}
+              onChange={(rooms) => setEditedUser({ ...editedUser, venueRoomsSpec: rooms, venueRooms: rooms.length ? String(rooms.length) : '' })}
             />
           )}
 

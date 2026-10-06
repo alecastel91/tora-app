@@ -24,6 +24,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3002",
     "lint": "eslint .",
+    "sync-gear-catalog": "cp ../tora-backend/src/config/gearCatalog.json src/data/gearCatalog.json",
     "build": "npm run lint && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 3002",
     "start": "vite --host 0.0.0.0 --port 3002",
