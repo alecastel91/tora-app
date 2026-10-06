@@ -16,6 +16,7 @@ import BetaFeedbackScreen from './BetaFeedbackScreen';
 import SearchAgentsModal from '../common/SearchAgentsModal';
 import { RA_LOGO_WHITE } from '../../utils/brandAssets';
 import ProfileBadges from '../common/ProfileBadges';
+import RoomsTechCard from '../common/RoomsTechCard';
 import BioTranslate from '../common/BioTranslate';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
@@ -744,6 +745,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           title={user.role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')}
         />
       )}
+
+      {/* Rooms and tech — what the venue shows artists (public) */}
+      {user?.role === 'VENUE' && <RoomsTechCard rooms={user?.venueRoomsSpec} />}
 
       {/* Agent Artists Representing Section */}
       {user?.role === 'AGENT' && (

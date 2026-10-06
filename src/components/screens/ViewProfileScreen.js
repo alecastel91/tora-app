@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
-import { roomGearByCategory, gearLabel } from '../../utils/venueRooms';
+import RoomsTechCard from '../common/RoomsTechCard';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -705,25 +705,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         )}
 
         {/* Rooms and tech — public by design: it is the venue's pitch to artists. */}
-        {profile.role === 'VENUE' && Array.isArray(profile.venueRoomsSpec) && profile.venueRoomsSpec.some((r) => r.capacity || (r.equipment || []).length) && (
-          <div className="mb-5 rounded-2xl border border-white/10 bg-[#0a0a0e] p-4">
-            <div className="mb-2 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.techSpecs')}</div>
-            {profile.venueRoomsSpec.map((room, i) => (
-              <div key={i} className={i ? 'mt-3 border-t border-white/10 pt-3' : ''}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-semibold text-white">{room.name}</span>
-                  {room.capacity ? <span className="text-xs text-white/50">{Number(room.capacity).toLocaleString()} {t('profile.capacityShort')}</span> : null}
-                </div>
-                {roomGearByCategory(room).map((g) => (
-                  <div key={g.key} className="mt-1 text-sm text-white/70">
-                    <span className="text-white/40">{t(`gear.${g.key}`)}: </span>
-                    {g.items.map((e) => `${e.quantity > 1 ? `${e.quantity}× ` : ''}${gearLabel(e)}`).join(', ')}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
+        {profile.role === 'VENUE' && <RoomsTechCard rooms={profile.venueRoomsSpec} />}
 
         {/* Who represents this artist — one card per agent, each addressable. */}
         <RepresentationSection
