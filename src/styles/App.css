@@ -8689,21 +8689,17 @@ textarea.form-textarea:focus {
   transform: scale(1.01);
 }
 
-/* Actionable card: this booking has a pending action for the user (same
-   source as the Bookings tab dot). Infrared left-border + glow + subtle
-   wash so the user can spot WHICH card needs attention among many. */
-.booking-card-actionable {
-  border-left: 3px solid #FF3366;
-  border-color: rgba(255, 51, 102, 0.45);
-  border-left-color: #FF3366;
-  background: linear-gradient(90deg, rgba(255, 51, 102, 0.10) 0%, rgba(255, 51, 102, 0.02) 40%, #0a0a0e 100%);
-  box-shadow: 0 0 0 1px rgba(255, 51, 102, 0.15), -4px 0 18px -6px rgba(255, 51, 102, 0.45);
+/* One sentence per card: what is waiting and on whom. Accent when the next
+   move is the viewer's, muted when they are waiting on the other side. */
+.booking-status-line {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.5);
 }
-
-.booking-card-actionable:hover {
-  border-color: rgba(255, 51, 102, 0.6);
-  border-left-color: #FF3366;
-  background: linear-gradient(90deg, rgba(255, 51, 102, 0.14) 0%, rgba(255, 51, 102, 0.03) 40%, #111117 100%);
+.booking-status-line.is-mine {
+  color: #FF3366;
+  font-weight: 600;
 }
 
 .booking-date-badge {

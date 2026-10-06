@@ -79,6 +79,11 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
     const tab = TYPE_TO_TAB[notif.type];
     if (tab && onSwitchTab) {
       onSwitchTab(tab);
+      // Booking notifications carry the deal: land on that card, expanded.
+      const dealId = notif.relatedData?.dealId;
+      if (tab === 'bookings' && dealId) {
+        window.dispatchEvent(new CustomEvent('tora:open-deal', { detail: { dealId } }));
+      }
       const subtab = TYPE_TO_SUBTAB[notif.type];
       if (subtab) {
         window.dispatchEvent(new CustomEvent('tora:messages-subtab', { detail: { subtab } }));

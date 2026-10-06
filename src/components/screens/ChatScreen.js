@@ -14,6 +14,7 @@ import ContractViewer from '../common/ContractViewer';
 import AddContractModal from '../common/AddContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
+import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
@@ -103,6 +104,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   const [showAddContractModal, setShowAddContractModal] = useState(false);
   const [pendingContractToSign, setPendingContractToSign] = useState(null);
   const [pdfViewerUrl, setPdfViewerUrl] = useState(null);
+  const [imageViewerUrl, setImageViewerUrl] = useState(null);
   // When the user opens a contract from a chat card (not from the sign modal),
   // the parent owns the tracking — record this deal id so onLoaded knows
   // what to track. Sign modal opens leave this null and use viewConfirmedSignal.
@@ -1782,13 +1784,18 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                           <p style={{ fontWeight: '600', marginBottom: '2px' }}>{msg.documentAttachment.title}</p>
                           <p style={{ fontSize: '11px', opacity: 0.7, textTransform: 'capitalize' }}>
                             {msg.documentAttachment.category === 'pressKit' ? t('chat.pressKit') :
-                             msg.documentAttachment.category === 'technicalRider' ? t('chat.technicalRider') : t('chat.contract')}
+                             msg.documentAttachment.category === 'technicalRider' ? t('chat.technicalRider') :
+                             msg.documentAttachment.category === 'paymentProof' ? t('bookings.proofOfPayment') : t('chat.contract')}
                           </p>
                         </div>
                       </div>
                       <button
                         type="button"
-                        onClick={() => setPdfViewerUrl(getFullUrl(msg.documentAttachment.url))}
+                        // A payment proof is usually a photo or screenshot — those open
+                        // in the image viewer, not the PDF viewer.
+                        onClick={() => ((msg.documentAttachment.contentType || '').startsWith('image/')
+                          ? setImageViewerUrl(getFullUrl(msg.documentAttachment.url))
+                          : setPdfViewerUrl(getFullUrl(msg.documentAttachment.url)))}
                         className="btn btn-sm"
                         style={{
                           width: '100%',
@@ -3276,6 +3283,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
         />
       )}
 
+      <ImageLightbox url={imageViewerUrl} title={t('bookings.proofOfPayment')} onClose={() => setImageViewerUrl(null)} />
       <PdfViewerModal
         url={pdfViewerUrl}
         onClose={() => { setPdfViewerUrl(null); setPdfViewerTrackDealId(null); }}

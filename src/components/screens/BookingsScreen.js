@@ -10,6 +10,7 @@ import AddContractModal from '../common/AddContractModal';
 import SignContractModal from '../common/SignContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
+import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
@@ -18,6 +19,7 @@ import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary'
 import { getAuthedBackendUrl, buildPaymentProofUrl } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
 import { OFF_STATUSES } from '../../utils/dealStatus';
+import { bookingStatusLine } from '../../utils/bookingStatus';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatTimestamp, formatEventDate } from '../../utils/dates';
@@ -147,6 +149,29 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       setProofImageUrl(url);
     }
   };
+  // A notification row (bell) can ask for one booking: refetch, then once the
+  // list holds it, switch to its tab, expand it and scroll it into view.
+  const pendingOpenDealId = useRef(null);
+  useEffect(() => {
+    const onOpen = (e) => { pendingOpenDealId.current = e.detail?.dealId || null; fetchDeals(); };
+    window.addEventListener('tora:open-deal', onOpen);
+    return () => window.removeEventListener('tora:open-deal', onOpen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    const id = pendingOpenDealId.current;
+    if (!id) return;
+    const deal = deals.find((d) => d.id === id);
+    if (!deal) return;
+    pendingOpenDealId.current = null;
+    const day = new Date(deal.date); day.setHours(0, 0, 0, 0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    selectTab(OFF_STATUSES.includes(deal.status) ? 'declined' : day >= today ? 'upcoming' : 'past');
+    setActionFilter('all');
+    setExpandedDealId(id);
+    setTimeout(() => document.getElementById(`booking-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deals]);
   useEffect(() => {
     fetchDeals();
     // Depend on the stable id, not the whole user object — otherwise
@@ -791,10 +816,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       : [];
     const hasPendingDocs = pendingDocCategories.length > 0;
 
-    const isActionable = actionableDealIds.has(deal.id);
+    const statusLine = bookingStatusLine(deal, currentUser, t, { hasPendingDocs });
 
     return (
-      <div key={deal.id} className={`booking-card ${isExpanded ? 'expanded' : ''}${isActionable ? ' booking-card-actionable' : ''}`}>
+      <div key={deal.id} id={`booking-${deal.id}`} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
         <div className="booking-date-badge">
           <span className="booking-date-month">
             {formatEventDate(dealDate, t('dateFormat.locale'), { month: 'short', day: undefined, year: undefined })}
@@ -825,6 +850,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                 {roleLabel(otherParty.role, t)}
               </span>
             </div>
+            {statusLine && (
+              <p className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</p>
+            )}
             {/* Artist label — shown whenever the deal is for a represented
                 artist and the viewer isn't that artist. Agents viewing their
                 roster need this to tell their bookings apart at a glance. */}
@@ -2452,7 +2480,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         const fullProof = depositHistoryDeal.payment?.fullPaymentProof;
         const onArtistSide = isArtistSideForDeal(depositHistoryDeal, currentUser);
 
-        const renderRow = ({ label, amount, date, confirmedAt, proof, canConfirm, onConfirm, onViewProof }) => (
+        const renderRow = ({ label, amount, date, confirmedAt, proof, proofUrl, canConfirm, onConfirm, onViewProof }) => (
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px',
             padding: '10px 12px',
@@ -2473,6 +2501,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, alignItems: 'stretch' }}>
+              {/* An image proof is shown right here, so the amount, the slip and
+                  the Confirm button sit in one view. PDFs still open the viewer. */}
+              {proof?.storagePath && proofUrl && (proof.contentType || '').startsWith('image/') && (
+                <img src={proofUrl} alt={t('bookings.proofOfPayment')} onClick={onViewProof}
+                  style={{ width: '120px', maxHeight: '90px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.12)', cursor: 'zoom-in' }} />
+              )}
               {proof?.storagePath && (
                 <button type="button" onClick={onViewProof} className="btn btn-outline btn-card-action" style={{ whiteSpace: 'nowrap' }}>
                   {t('bookings.viewProof')}
@@ -2528,6 +2562,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                         setActionBusy(false);
                       }
                     },
+                    proofUrl: buildPaymentProofUrl(depositHistoryDeal.id, currentUser?.id, 'deposit', i),
                     onViewProof: () => openProof(depositHistoryDeal, 'deposit', entry.proof, i),
                   }))}
                   {fullProof && renderRow({
@@ -2550,6 +2585,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                         setActionBusy(false);
                       }
                     },
+                    proofUrl: buildPaymentProofUrl(depositHistoryDeal.id, currentUser?.id, 'full'),
                     onViewProof: () => openProof(depositHistoryDeal, 'full', fullProof),
                   })}
                 </div>
@@ -2562,56 +2598,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         );
       })(), document.body)}
 
-      {/* Image proof viewer (PDF proofs go through the PdfViewer modal above) */}
-      {proofImageUrl && createPortal(
-        <div className="modal-overlay" onClick={() => setProofImageUrl(null)} style={{ padding: 0, zIndex: 10001 }}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: '100vw',
-              // 100dvh accounts for mobile browser chrome — 100vh on iOS
-              // pushes the close button off-screen when the URL bar shows.
-              height: '100dvh',
-              maxHeight: '100dvh',
-              padding: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              borderRadius: 0,
-            }}
-          >
-            <div className="modal-header" style={{ padding: '12px 16px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#0c0c11', borderBottom: '1px solid rgba(255,255,255,0.1)', zIndex: 1 }}>
-              <h3 style={{ margin: 0, fontSize: '15px' }}>{t('bookings.proofOfPayment')}</h3>
-              <button className="modal-close" onClick={() => setProofImageUrl(null)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div style={{ flex: 1, overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#08080b', padding: '16px' }}>
-              <img
-                src={proofImageUrl}
-                alt={t('bookings.proofOfPayment')}
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const fallback = e.currentTarget.nextSibling;
-                  if (fallback) fallback.style.display = 'block';
-                }}
-              />
-              <div style={{ display: 'none', color: '#F5576C', textAlign: 'center', maxWidth: '420px' }}>
-                <p style={{ marginBottom: '8px' }}>{t('bookings.imageLoadFailed')}</p>
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                  Open in a new tab to see browser-level details:&nbsp;
-                  <a href={proofImageUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#FF3366' }}>direct link</a>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body,
-      )}
+      <ImageLightbox url={proofImageUrl} title={t('bookings.proofOfPayment')} onClose={() => setProofImageUrl(null)} />
 
       {/* Withdraw Contract Confirmation Modal */}
       {showWithdrawConfirmation && dealToWithdraw && (

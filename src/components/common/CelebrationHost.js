@@ -57,7 +57,11 @@ const CelebrationHost = () => {
       accent={art.accent}
       eyebrow={t(`celebration.${current.moment}.eyebrow`)}
       title={t(`celebration.${current.moment}.title`)}
-      subtitle={t(`celebration.${current.moment}.subtitle`, current.vars || {})}
+      subtitle={t(`celebration.${current.moment}.subtitle`, {
+        name: t('celebration.thisBooking'),
+        counterpart: t('celebration.theOtherParty'),
+        ...Object.fromEntries(Object.entries(current.vars || {}).filter(([, v]) => v)),
+      })}
       onDismiss={dismiss}
     />
   );

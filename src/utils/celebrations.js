@@ -130,6 +130,7 @@ export function celebrateDealMilestones(profileId, deals, ownedProfileIds = []) 
   if (!profileId || !Array.isArray(deals) || deals.length === 0) return;
   const owned = new Set(ownedProfileIds.filter(Boolean));
 
+  const mine = (id) => id && (id === profileId || owned.has(id));
   const fresh = diffAgainstSeen(
     `tora:deal-moments-seen:${profileId}`,
     deals.flatMap((d) => dealMilestones(d, profileId, owned)),
@@ -137,7 +138,13 @@ export function celebrateDealMilestones(profileId, deals, ownedProfileIds = []) 
   );
 
   for (const m of fresh) {
-    celebrateMoment(m.moment, { name: m.deal.eventName || m.deal.venueName || '' });
+    // The copy names who it was with: the booker for the artist's side, the
+    // artist for the booker's side.
+    const onArtistSide = mine(m.deal.artistId) || mine(m.deal.bookedArtistId);
+    celebrateMoment(m.moment, {
+      name: m.deal.eventName || m.deal.venueName || '',
+      counterpart: (onArtistSide ? m.deal.venue?.name : m.deal.artist?.name) || '',
+    });
   }
 }
 
