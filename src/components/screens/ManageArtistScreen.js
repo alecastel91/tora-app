@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
+import PrivacyNote from '../common/PrivacyNote';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
@@ -1216,9 +1217,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
-        {activeTab === 'dashboard' && renderDashboardTab()}
+        {activeTab === 'dashboard' && <><PrivacyNote>{t('manageArtist.privateDashboard')}</PrivacyNote>{renderDashboardTab()}</>}
         {activeTab === 'info' && renderArtistInfoTab()}
-        {activeTab === 'documents' && renderDocumentsTab()}
+        {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}
       </div>
 
       {/* Artist Info Edit Modal */}

@@ -1487,6 +1487,8 @@ const ko = {
   },
 
   manage: {
+    privateDashboard: '이 내용은 본인만 볼 수 있습니다. 공개 프로필에는 표시되지 않습니다.',
+    privateDocuments: '서류는 비공개입니다. 부킹 안에서 보낼 때만 공유됩니다.',
     dashboardLockedMsg: '프리미엄으로 업그레이드하여 프로페셔널 대시보드를 이용하세요',
     calendarLockedMsg: '프리미엄으로 업그레이드하여 캘린더와 이동 일정을 관리하세요',
     provideTitleAndUrl: '제목과 URL을 모두 입력해 주세요',
@@ -1577,6 +1579,7 @@ const ko = {
   },
 
   manageArtist: {
+    privateDashboard: '이 내용은 본인과 아티스트만 볼 수 있습니다. 공개 프로필에는 표시되지 않습니다.',
     endDateBeforeStart: '종료일이 시작일보다 빠를 수 없습니다. 날짜를 조정해 주세요.',
     scheduleOverlap: '이 일정은 기존 일정과 겹칩니다. 다른 날짜를 선택해 주세요.',
     sessionExpired: '세션이 만료되었습니다. 로그아웃 후 다시 로그인해 주세요.',

@@ -4,6 +4,7 @@ import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, Sliders
 import RevenueChart from '../common/RevenueChart';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
+import PrivacyNote from '../common/PrivacyNote';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
@@ -918,8 +919,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         />
         {activeTab === 'dashboard' && (manageLocked
           ? renderLockedPane(renderDashboardTab(), t('manage.dashboardLockedMsg'))
-          : renderDashboardTab())}
-        {activeTab === 'documents' && renderDocumentsTab()}
+          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab()}</>)}
+        {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}
       </div>
 
       {/* Add/Edit Document Modal */}

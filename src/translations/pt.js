@@ -1487,6 +1487,8 @@ const pt = {
   },
 
   manage: {
+    privateDashboard: 'Só você pode ver isto. Nada daqui aparece no seu perfil público.',
+    privateDocuments: 'Os seus documentos são privados. Só são partilhados quando os envia dentro de uma marcação.',
     dashboardLockedMsg: 'Faça upgrade para Premium para desbloquear o seu painel profissional',
     calendarLockedMsg: 'Faça upgrade para Premium para gerenciar o calendário e a agenda de viagens',
     provideTitleAndUrl: 'Indica o título e o URL',
@@ -1577,6 +1579,7 @@ const pt = {
   },
 
   manageArtist: {
+    privateDashboard: 'Só você e o artista podem ver isto. Nada daqui aparece no perfil público dele.',
     endDateBeforeStart: 'A data de fim não pode ser anterior à de início. Ajusta as datas.',
     scheduleOverlap: 'Esta viagem sobrepõe-se a uma existente. Escolha outras datas.',
     sessionExpired: 'A sua sessão expirou. Termina a sessão e volte a entrar.',

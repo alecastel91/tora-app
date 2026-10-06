@@ -13193,3 +13193,15 @@ body.beta-env #root {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
 }
+
+/* "Only you can see this" line on private screens (PrivacyNote). */
+.privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.5);
+}
+.privacy-note svg { flex-shrink: 0; margin-top: 2px; color: rgba(255, 255, 255, 0.4); }

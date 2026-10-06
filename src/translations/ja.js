@@ -1487,6 +1487,8 @@ const ja = {
   },
 
   manage: {
+    privateDashboard: 'この画面はあなただけに表示されます。公開プロフィールには表示されません。',
+    privateDocuments: '書類は非公開です。ブッキング内で送信したときだけ共有されます。',
     dashboardLockedMsg: 'プレミアムにアップグレードしてプロフェッショナルダッシュボードを解放',
     calendarLockedMsg: 'プレミアムにアップグレードしてカレンダーと渡航スケジュールを管理',
     provideTitleAndUrl: 'タイトルとURLの両方を入力してください',
@@ -1577,6 +1579,7 @@ const ja = {
   },
 
   manageArtist: {
+    privateDashboard: 'この画面はあなたとアーティストだけに表示されます。公開プロフィールには表示されません。',
     endDateBeforeStart: '終了日は開始日より前にできません。日付を調整してください。',
     scheduleOverlap: 'この渡航スケジュールは既存のスケジュールと重複しています。別の日付を選んでください。',
     sessionExpired: 'セッションの有効期限が切れました。ログアウトして再度ログインしてください。',

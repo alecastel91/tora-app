@@ -1487,6 +1487,8 @@ const fr = {
   },
 
   manage: {
+    privateDashboard: 'Vous seul pouvez voir ceci. Rien ici n\'apparaît sur votre profil public.',
+    privateDocuments: 'Vos documents sont privés. Ils ne sont partagés que lorsque vous les envoyez dans une réservation.',
     dashboardLockedMsg: 'Passez à Premium pour débloquer votre tableau de bord professionnel',
     calendarLockedMsg: 'Passez à Premium pour gérer votre calendrier et vos déplacements',
     provideTitleAndUrl: 'Renseignez le titre et l\'URL',
@@ -1577,6 +1579,7 @@ const fr = {
   },
 
   manageArtist: {
+    privateDashboard: 'Seuls vous et l\'artiste pouvez voir ceci. Rien ici n\'apparaît sur son profil public.',
     endDateBeforeStart: 'La date de fin ne peut pas précéder la date de début. Corrigez les dates.',
     scheduleOverlap: 'Ce voyage chevauche un voyage existant. Choisissez d\'autres dates.',
     sessionExpired: 'Votre session a expiré. Déconnectez-vous puis reconnectez-vous.',

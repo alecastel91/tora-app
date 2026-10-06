@@ -1499,6 +1499,8 @@ const en = {
   
   // Common
   manage: {
+    privateDashboard: 'Only you can see this. Nothing here appears on your public profile.',
+    privateDocuments: 'Your documents are private. They are shared only when you send them inside a booking.',
     dashboardLockedMsg: 'Upgrade to Premium to unlock your professional dashboard',
     calendarLockedMsg: 'Upgrade to Premium to manage your calendar and travel schedule',
     provideTitleAndUrl: 'Please provide both title and URL',
@@ -1589,6 +1591,7 @@ const en = {
   },
 
   manageArtist: {
+    privateDashboard: 'Only you and the artist can see this. Nothing here appears on their public profile.',
     endDateBeforeStart: 'End date cannot be before start date. Please adjust your dates.',
     scheduleOverlap: 'This travel schedule overlaps with an existing schedule. Please choose different dates.',
     sessionExpired: 'Your session has expired. Please log out and log back in.',

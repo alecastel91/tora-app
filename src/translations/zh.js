@@ -1487,6 +1487,8 @@ const zh = {
   },
 
   manage: {
+    privateDashboard: '只有你能看到此内容，不会显示在你的公开资料中。',
+    privateDocuments: '你的文件是私密的，只有在预订中发送时才会共享。',
     dashboardLockedMsg: '升级至高级版以解锁专业仪表盘',
     calendarLockedMsg: '升级至高级版以管理日历和行程安排',
     provideTitleAndUrl: '请同时填写标题和URL',
@@ -1577,6 +1579,7 @@ const zh = {
   },
 
   manageArtist: {
+    privateDashboard: '只有你和艺人能看到此内容，不会显示在其公开资料中。',
     endDateBeforeStart: '结束日期不能早于开始日期。请调整日期。',
     scheduleOverlap: '此行程与现有行程重叠。请选择其他日期。',
     sessionExpired: '会话已过期。请退出后重新登录。',
