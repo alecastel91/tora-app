@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { GEAR_CATEGORIES, OTHER, brandsFor, modelsFor, catalogIdFor, gearLine } from '../../utils/venueRooms';
+import { GEAR_CATEGORIES, GEAR_ITEMS, OTHER, brandsFor, modelsFor, catalogIdFor, gearLine } from '../../utils/venueRooms';
 
 const MAX_ROOMS = 12;
 const blank = (category = 'players') => ({ category, brand: '', brandOther: '', model: '', modelOther: '', quantity: 1, note: '' });
+
+/** Picking a model fills in its brand (the list is category-wide until a brand narrows it). */
+const brandForModel = (category, model, currentBrand) => {
+  if (!model || model === OTHER) return {};
+  const hit = GEAR_ITEMS.find((i) => i.category === category && i.model === model && (!currentBrand || currentBrand === OTHER || i.brand === currentBrand));
+  return hit && hit.brand && hit.brand !== currentBrand ? { brand: hit.brand, brandOther: '' } : {};
+};
 
 /** Fill the sheet from a saved row (brand/model that are not in the catalog land in the free-text fields). */
 const fromItem = (e) => {
@@ -86,7 +93,7 @@ const GearSheet = ({ initial, onSave, onClose }) => {
         <div className="form-group">
           <label>{isTyped ? t('editProfile.modelType') : t('editProfile.model')}</label>
           {models.length > 0 ? (
-            <select value={f.model} onChange={(e) => set({ model: e.target.value })}>
+            <select value={f.model} onChange={(e) => set({ model: e.target.value, ...brandForModel(f.category, e.target.value, f.brand) })}>
               <option value="">{t('editProfile.choose')}</option>
               {models.map((m) => <option key={m} value={m}>{m}</option>)}
               <option value={OTHER}>{t('editProfile.modelOther')}</option>
