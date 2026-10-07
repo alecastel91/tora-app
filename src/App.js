@@ -265,7 +265,7 @@ function App() {
     setShowGettingStarted(false);
   };
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
-  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency } = useAppContext();
+  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles } = useAppContext();
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
   // after t/setShowPremium so the [t] dependency isn't read before init.
@@ -1281,6 +1281,13 @@ function App() {
           // Billing view: a comp (admin-operated) account is shown the public
           // prices — see billingTier. Paid agents keep their real seats/plan.
           const paidAgent = user?.role === 'AGENT' && billingTier(user) !== 'FREE';
+          // One plan per account covers every profile on it. The agency plan
+          // is the one that carries seats; a membership covers an agent
+          // profile with its one included artist.
+          const agentProfile = (userProfiles || []).find((p) => p.role === 'AGENT');
+          const onAgencyPlan = !!accountUser?.hasStripeSubscription && !!agentProfile?.agentSeats;
+          const onMembership = !!accountUser?.hasStripeSubscription && !onAgencyPlan && billingTier(user) !== 'FREE';
+          const agencyRoster = agentProfile?.representingArtists?.length || 0;
           return (
           <div className="screen active premium-screen">
             <div className="premium-header">
@@ -1444,6 +1451,9 @@ function App() {
                     </div>
                   );
                 })()}
+                {onMembership && (
+                  <p className="premium-note" style={{ marginTop: 0 }}>{t('premium.membershipCoversAgent')}</p>
+                )}
                 <AgentSeatPricing
                   rosterCount={user?.representingArtists?.length || 0}
                   currentSeats={paidAgent ? (user?.agentSeats || 0) : 0}
@@ -1459,8 +1469,21 @@ function App() {
               // is already at the top; FREE/TRIAL sees both as choices.
               const hasMonthly = billingTier(user) === 'MONTHLY';
               const hasYearly = billingTier(user) === 'YEARLY';
+              // Covered by the account's agency plan: the cards become a way
+              // back to a plain membership, open only once the roster is down
+              // to the one included artist (seats would otherwise be lost).
+              const canLeaveAgency = agencyRoster <= 1;
+              const memberCta = (plan, label) => (onAgencyPlan
+                ? <button className={plan === 'yearly' ? 'btn btn-primary' : 'btn btn-outline'} disabled={!canLeaveAgency} onClick={() => handleSelectPlan(plan)}>{t('premium.switchToMembership')}</button>
+                : label);
               return (
               <>
+                {onAgencyPlan && (
+                  <p className="premium-note" style={{ marginTop: 0 }}>
+                    {t('premium.coveredByAgency')}{canLeaveAgency ? '' : ` ${t('premium.switchBlockedRoster')}`}
+                  </p>
+                )}
+                {onMembership && <p className="premium-note" style={{ marginTop: 0 }}>{t('premium.coversAllProfiles')}</p>}
                 <div className="premium-pricing">
                   {/* Monthly always leads — the first price on the page is
                       the small one. A Yearly subscriber sees it inert. */}
@@ -1468,13 +1491,13 @@ function App() {
                     {hasMonthly && <div className="badge badge-current">{t('premium.currentPlan')}</div>}
                     <h4>{t('premium.monthly')}</h4>
                     <div className="price">{money(memberPrice.monthly)}<span>/{t('agentSeat.perMonth')}</span></div>
-                    {hasMonthly ? (
+                    {memberCta('monthly', hasMonthly ? (
                       <button className="btn btn-outline" disabled>{t('premium.currentPlan')}</button>
                     ) : hasYearly ? (
                       <button className="btn btn-outline" disabled>{t('premium.onYearlyAlready')}</button>
                     ) : (
                       <button className="btn btn-outline" onClick={() => handleSelectPlan('monthly')}>{t('premium.chooseMonthly')}</button>
-                    )}
+                    ))}
                   </div>
                   <div className={`price-card featured${hasYearly ? ' is-current' : ''}`}>
                     <div className="badge">{hasYearly ? t('premium.currentPlan') : t('premium.yearlySaveBadge')}</div>
@@ -1486,13 +1509,13 @@ function App() {
                       {money(yearlyPerMonth(memberPrice.yearly))}<span>/{t('agentSeat.perMonth')}</span>
                     </div>
                     <div className="price-billed">{t('premium.billedYearly', { total: money(memberPrice.yearly) })}</div>
-                    {hasYearly ? (
+                    {memberCta('yearly', hasYearly ? (
                       <button className="btn btn-primary" disabled>{t('premium.currentPlan')}</button>
                     ) : (
                       <button className="btn btn-primary" onClick={() => handleSelectPlan('yearly')}>
                         {hasMonthly ? t('premium.upgradeToYearly') : t('premium.chooseYearly')}
                       </button>
-                    )}
+                    ))}
                   </div>
                 </div>
 
@@ -1621,6 +1644,8 @@ function App() {
                       // unlocks immediately across the app.
                       try {
                         const data = await apiService.getCurrentUser();
+                        // One plan covers the whole account — every profile's tier moved.
+                        replaceProfiles(data.profiles);
                         const active = (data.profiles || []).find((p) => p.id === user?.id) || data.profile;
                         if (active) {
                           updateUser(active);

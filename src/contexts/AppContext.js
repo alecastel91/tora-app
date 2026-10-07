@@ -188,6 +188,14 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // After a billing change every profile on the account may have a new tier:
+  // refresh the list, keep the active one active.
+  const replaceProfiles = (list) => {
+    if (!Array.isArray(list) || list.length === 0) return;
+    setUserProfiles(list);
+    setUser((prev) => list.find((p) => p.id === prev?.id) || prev);
+  };
+
   const switchProfile = (profileId) => {
     const newProfile = userProfiles.find(p => p.id === profileId);
     if (newProfile) {
@@ -717,6 +725,7 @@ export const AppProvider = ({ children }) => {
     updateUser,
     userProfiles,
     switchProfile,
+    replaceProfiles,
     addProfile,
     deleteProfile,
     reloadProfileData,

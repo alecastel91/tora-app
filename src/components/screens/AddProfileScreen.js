@@ -8,7 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const TOTAL_STEPS = 5;
 
-const AddProfileScreen = ({ onClose, onSuccess }) => {
+const AddProfileScreen = ({ onClose, onSuccess, takenRoles = [] }) => {
   const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
@@ -210,7 +210,7 @@ const AddProfileScreen = ({ onClose, onSuccess }) => {
           <div className="form-group">
             <label className={labelClass}>{t('addProfile.selectRole')}</label>
             <div className="grid grid-cols-2 gap-2.5">
-              {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].map(r => {
+              {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].filter((r) => !takenRoles.includes(r)).map(r => {
                 const dot = {
                   ARTIST: 'bg-role-artist', PROMOTER: 'bg-role-promoter',
                   VENUE: 'bg-role-venue', AGENT: 'bg-role-agent',

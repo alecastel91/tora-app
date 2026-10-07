@@ -1022,8 +1022,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
               );
             })}
 
-            {/* Add Profile Button */}
+            {/* Add Profile Button — one profile per role, so at most four */}
             <div
+              hidden={userProfiles.length >= 4}
               className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-3.5 cursor-pointer flex items-center gap-3
                          transition-colors hover:bg-black/30 hover:border-white/30"
               onClick={() => {
@@ -1144,6 +1145,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   if (showAddProfile) {
     return renderSplit(
       <AddProfileScreen
+        takenRoles={userProfiles.map((p) => p.role)}
         onClose={() => setShowAddProfile(false)}
         onSuccess={(newProfile) => {
           // Switch to the new profile
