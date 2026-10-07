@@ -1171,7 +1171,7 @@ const ko = {
     brandName: '브랜드명',
     model: '모델',
     modelType: '종류',
-    modelOther: '목록에 없음',
+    modelOther: '기타 모델',
     modelName: '모델명',
     note: '메모(선택)',
     notePlaceholder: '예: 2024년 설치, 예비 1대',

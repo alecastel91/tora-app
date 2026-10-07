@@ -1171,7 +1171,7 @@ const zh = {
     brandName: '品牌名称',
     model: '型号',
     modelType: '类型',
-    modelOther: '未列出',
+    modelOther: '其他型号',
     modelName: '型号名称',
     note: '备注（可选）',
     notePlaceholder: '例如：2024年安装，备用一台',

@@ -1171,7 +1171,7 @@ const ja = {
     brandName: 'ブランド名',
     model: '機種',
     modelType: '種類',
-    modelOther: 'リストにない',
+    modelOther: 'その他の機種',
     modelName: '機種名',
     note: 'メモ（任意）',
     notePlaceholder: '例：2024年導入、予備1台',

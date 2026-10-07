@@ -1171,7 +1171,7 @@ const es = {
     brandName: 'Nombre de la marca',
     model: 'Modelo',
     modelType: 'Tipo',
-    modelOther: 'No está en la lista',
+    modelOther: 'Otro modelo',
     modelName: 'Nombre del modelo',
     note: 'Nota (opcional)',
     notePlaceholder: 'p. ej. instalado en 2024, uno de repuesto',

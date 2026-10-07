@@ -1171,7 +1171,7 @@ const it = {
     brandName: 'Nome della marca',
     model: 'Modello',
     modelType: 'Tipo',
-    modelOther: 'Non in lista',
+    modelOther: 'Altro modello',
     modelName: 'Nome del modello',
     note: 'Nota (facoltativa)',
     notePlaceholder: 'es. installato nel 2024, uno di scorta',

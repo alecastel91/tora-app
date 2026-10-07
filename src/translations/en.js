@@ -1174,7 +1174,7 @@ const en = {
     brandName: 'Brand name',
     model: 'Model',
     modelType: 'Type',
-    modelOther: 'Not listed',
+    modelOther: 'Other model',
     modelName: 'Model name',
     note: 'Note (optional)',
     notePlaceholder: 'e.g. installed 2024, one spare',
