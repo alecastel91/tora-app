@@ -14,6 +14,7 @@ const ja = {
   },
 
   agentSeatCard: {
+    coveredByMembership: 'メンバーシップの対象',
     perSeatPlan: 'シート単位プラン',
     freePlan: '無料プラン',
     billedRoster: '{{n}}アーティスト · シート単位で請求 / {{interval}}',
@@ -491,6 +492,11 @@ const ja = {
   },
 
   premium: {
+    coversAllProfiles: '1つのメンバーシップでアカウント内のすべてのプロフィールをカバーします。',
+    coveredByAgency: 'このプロフィールはエージェンシープランの対象です。',
+    switchBlockedRoster: '通常のメンバーシップに戻すには、まずロスターをアーティスト1名にしてください。',
+    switchToMembership: 'メンバーシップに切り替える',
+    membershipCoversAgent: 'メンバーシップにより、このプロフィールは担当アーティスト1名まで利用できます。シートを追加するとアカウントはエージェンシープランに切り替わり、すべてのプロフィールが対象になります。',
     processing: "処理中…",
     paymentFailed: "決済を完了できませんでした。もう一度お試しください。",
     notConfigured: "決済は準備中です。しばらくしてからご確認ください。",

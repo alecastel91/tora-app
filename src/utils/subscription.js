@@ -35,3 +35,17 @@ export function isYearlyViewer(user) {
   if (user.role === 'AGENT' && isPaidAgent(user)) return true;
   return user.subscriptionTier === 'YEARLY';
 }
+
+/**
+ * One Stripe plan per account. 'agency' = seats live on the agent profile;
+ * 'membership' = a paid, non-comp profile with no seats; null = nothing paid
+ * (gifted tiers have no Stripe subscription and report null too).
+ */
+export function accountPlan(profiles = [], accountUser) {
+  const agentProfile = profiles.find((p) => p.role === 'AGENT') || null;
+  const agencyRoster = agentProfile?.representingArtists?.length || 0;
+  if (!accountUser?.hasStripeSubscription) return { kind: null, agencyRoster };
+  if (agentProfile?.agentSeats) return { kind: 'agency', agencyRoster };
+  const paid = profiles.some((p) => !isCompAccount(p) && ['MONTHLY', 'YEARLY'].includes(p.subscriptionTier));
+  return { kind: paid ? 'membership' : null, agencyRoster };
+}

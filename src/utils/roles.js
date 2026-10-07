@@ -13,6 +13,9 @@ export function getAvatarClass(role) {
 // Canonical role colors as JS values, for canvas/inline-style consumers that
 // can't read the --color-role-* CSS tokens. Keep in sync with
 // styles/variables.css and tora-theme.css.
+/** One profile per role per account — so an account holds at most ROLES.length profiles. */
+export const ROLES = ['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'];
+
 export const ROLE_COLOR = {
   ARTIST: '#667EEA',
   AGENT: '#43E97B',

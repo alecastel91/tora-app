@@ -14,6 +14,7 @@ const zh = {
   },
 
   agentSeatCard: {
+    coveredByMembership: '已由会员资格覆盖',
     perSeatPlan: '按席位计费方案',
     freePlan: '免费方案',
     billedRoster: '{{n}}位艺人 · 按席位计费 / {{interval}}',
@@ -491,6 +492,11 @@ const zh = {
   },
 
   premium: {
+    coversAllProfiles: '一份会员资格覆盖你账户中的所有资料。',
+    coveredByAgency: '此资料已由你的经纪方案覆盖。',
+    switchBlockedRoster: '如需换回普通会员，请先将名册减至一位艺人。',
+    switchToMembership: '切换为会员',
+    membershipCoversAgent: '你的会员资格覆盖此资料及一位代理艺人。添加席位后，账户将切换为经纪方案，同样覆盖你的所有资料。',
     processing: "处理中…",
     paymentFailed: "付款未能完成，请重试。",
     notConfigured: "支付功能正在设置中，请稍后再试。",

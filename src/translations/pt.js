@@ -14,6 +14,7 @@ const pt = {
   },
 
   agentSeatCard: {
+    coveredByMembership: 'Coberto pela sua subscrição',
     perSeatPlan: 'Plano por artista',
     freePlan: 'Plano gratuito',
     billedRoster: '{{n}} artistas · faturado por artista / {{interval}}',
@@ -491,6 +492,11 @@ const pt = {
   },
 
   premium: {
+    coversAllProfiles: 'Uma só subscrição cobre todos os perfis da sua conta.',
+    coveredByAgency: 'Este perfil está coberto pelo seu plano de agência.',
+    switchBlockedRoster: 'Para voltar a uma subscrição simples, reduza primeiro o seu roster a um artista.',
+    switchToMembership: 'Mudar para subscrição',
+    membershipCoversAgent: 'A sua subscrição cobre este perfil com um artista representado. Adicionar lugares muda a conta para o plano de agência, que também cobre todos os seus perfis.',
     processing: "Processando…",
     paymentFailed: "Não foi possível concluir o pagamento. Tente novamente.",
     notConfigured: "Os pagamentos estão sendo configurados — volte em breve.",

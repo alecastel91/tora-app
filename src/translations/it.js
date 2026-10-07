@@ -14,6 +14,7 @@ const it = {
   },
 
   agentSeatCard: {
+    coveredByMembership: 'Coperto dal tuo abbonamento',
     perSeatPlan: 'Piano per artista',
     freePlan: 'Piano gratuito',
     billedRoster: '{{n}} artisti · fatturato per artista / {{interval}}',
@@ -491,6 +492,11 @@ const it = {
   },
 
   premium: {
+    coversAllProfiles: 'Un solo abbonamento copre tutti i profili del tuo account.',
+    coveredByAgency: 'Questo profilo è coperto dal tuo piano agenzia.',
+    switchBlockedRoster: 'Per tornare a un abbonamento semplice, riduci prima il roster a un artista.',
+    switchToMembership: 'Passa all\'abbonamento',
+    membershipCoversAgent: 'Il tuo abbonamento copre questo profilo con un artista rappresentato. Aggiungendo posti l\'account passa al piano agenzia, che copre anche tutti i tuoi profili.',
     processing: "Elaborazione…",
     paymentFailed: "Pagamento non riuscito. Riprova.",
     notConfigured: "I pagamenti sono in fase di configurazione — riprova a breve.",

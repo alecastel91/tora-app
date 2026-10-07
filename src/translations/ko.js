@@ -14,6 +14,7 @@ const ko = {
   },
 
   agentSeatCard: {
+    coveredByMembership: '멤버십으로 적용 중',
     perSeatPlan: '좌석당 플랜',
     freePlan: '무료 플랜',
     billedRoster: '아티스트 {{n}}명 · 좌석당 청구 / {{interval}}',
@@ -491,6 +492,11 @@ const ko = {
   },
 
   premium: {
+    coversAllProfiles: '멤버십 하나로 계정의 모든 프로필이 적용됩니다.',
+    coveredByAgency: '이 프로필은 에이전시 플랜에 포함되어 있습니다.',
+    switchBlockedRoster: '일반 멤버십으로 돌아가려면 먼저 로스터를 아티스트 1명으로 줄이세요.',
+    switchToMembership: '멤버십으로 전환',
+    membershipCoversAgent: '멤버십으로 이 프로필과 대표 아티스트 1명까지 이용할 수 있습니다. 시트를 추가하면 계정이 에이전시 플랜으로 전환되며, 모든 프로필에 적용됩니다.',
     processing: "처리 중…",
     paymentFailed: "결제를 완료하지 못했습니다. 다시 시도해 주세요.",
     notConfigured: "결제 기능을 준비 중입니다. 잠시 후 다시 확인해 주세요.",

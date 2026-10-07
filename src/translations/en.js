@@ -14,6 +14,7 @@ const en = {
   },
 
   agentSeatCard: {
+    coveredByMembership: 'Covered by your membership',
     perSeatPlan: 'Per-seat plan',
     freePlan: 'Free plan',
     billedRoster: '{{n}} artists · billed per seat / {{interval}}',
@@ -491,6 +492,11 @@ const en = {
   },
 
   premium: {
+    coversAllProfiles: 'One membership covers every profile on your account.',
+    coveredByAgency: 'This profile is covered by your agency plan.',
+    switchBlockedRoster: 'To switch back to a plain membership, reduce your roster to one artist first.',
+    switchToMembership: 'Switch to membership',
+    membershipCoversAgent: 'Your membership covers this profile with one represented artist. Adding seats switches the account to the agency plan, which covers all your profiles too.',
     processing: "Processing…",
     paymentFailed: "Payment could not be completed. Please try again.",
     notConfigured: "Payments are being set up — check back shortly.",

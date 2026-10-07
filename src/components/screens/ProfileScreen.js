@@ -20,7 +20,7 @@ import RoomsTechCard from '../common/RoomsTechCard';
 import BioTranslate from '../common/BioTranslate';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
-import { getAvatarClass, roleLabel } from '../../utils/roles';
+import { getAvatarClass, roleLabel, ROLES } from '../../utils/roles';
 import VerifiedBadge from '../common/VerifiedBadge';
 import VerificationModal from '../common/VerificationModal';
 import PhotoGallery from '../common/PhotoGallery';
@@ -1022,9 +1022,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
               );
             })}
 
-            {/* Add Profile Button — one profile per role, so at most four */}
+            {/* Add Profile Button — one profile per role, so at most ROLES.length */}
+            {userProfiles.length < ROLES.length && (
             <div
-              hidden={userProfiles.length >= 4}
               className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-3.5 cursor-pointer flex items-center gap-3
                          transition-colors hover:bg-black/30 hover:border-white/30"
               onClick={() => {
@@ -1041,6 +1041,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
                 <p className="text-xs text-white/50 mt-1">{t('profile.createAnotherProfile')}</p>
               </div>
             </div>
+            )}
           </div>
         </div>
       </Modal>

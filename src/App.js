@@ -19,7 +19,7 @@ import AgentSeatPricing from './components/common/AgentSeatPricing';
 import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
 import { rosterUsage } from './utils/agentTiers';
-import { billingTier } from './utils/subscription';
+import { billingTier, accountPlan } from './utils/subscription';
 import { formatMoney, MEMBER_PRICES, EXTRA_PRICES, normalizeCurrency, yearlyPerMonth } from './utils/money';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
@@ -875,6 +875,7 @@ function App() {
                 <>
                   <AgentTierCard
                     profile={user}
+                    plan={accountPlan(userProfiles, accountUser).kind}
                     onManage={() => { setShowSettings(false); setShowPremium(true); }}
                   />
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
@@ -900,7 +901,7 @@ function App() {
                         {t('premium.upgradeToPremium')}
                       </button>
                     )}
-                    {user?.subscriptionTier === 'MONTHLY' && (
+                    {user?.subscriptionTier === 'MONTHLY' && accountPlan(userProfiles, accountUser).kind !== 'agency' && (
                       <button
                         className="btn btn-upgrade-small"
                         onClick={() => {
@@ -912,6 +913,8 @@ function App() {
                       </button>
                     )}
                   </div>
+                  {accountPlan(userProfiles, accountUser).kind === 'membership' && <p className="premium-note">{t('premium.coversAllProfiles')}</p>}
+                  {accountPlan(userProfiles, accountUser).kind === 'agency' && <p className="premium-note">{t('premium.coveredByAgency')}</p>}
                   {/* Full-width by design — must sit OUTSIDE the pill row or
                       the row overflows the viewport on MONTHLY. */}
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
@@ -1284,10 +1287,9 @@ function App() {
           // One plan per account covers every profile on it. The agency plan
           // is the one that carries seats; a membership covers an agent
           // profile with its one included artist.
-          const agentProfile = (userProfiles || []).find((p) => p.role === 'AGENT');
-          const onAgencyPlan = !!accountUser?.hasStripeSubscription && !!agentProfile?.agentSeats;
-          const onMembership = !!accountUser?.hasStripeSubscription && !onAgencyPlan && billingTier(user) !== 'FREE';
-          const agencyRoster = agentProfile?.representingArtists?.length || 0;
+          const { kind: planKind, agencyRoster } = accountPlan(userProfiles, accountUser);
+          const onAgencyPlan = planKind === 'agency';
+          const onMembership = planKind === 'membership';
           return (
           <div className="screen active premium-screen">
             <div className="premium-header">
@@ -1645,12 +1647,9 @@ function App() {
                       try {
                         const data = await apiService.getCurrentUser();
                         // One plan covers the whole account — every profile's tier moved.
-                        replaceProfiles(data.profiles);
+                        updateUser(data.profiles?.length ? data.profiles : data.profile);
                         const active = (data.profiles || []).find((p) => p.id === user?.id) || data.profile;
-                        if (active) {
-                          updateUser(active);
-                          setAccountSubscriptionTier(active.subscriptionTier);
-                        }
+                        if (active) setAccountSubscriptionTier(active.subscriptionTier);
                         if (data.user) setAccountUser(data.user);
                       } catch { /* webhook will reconcile */ }
                     }}

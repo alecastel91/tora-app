@@ -139,14 +139,11 @@ export const AppProvider = ({ children }) => {
 
     // Case 1: userData is already an array of profiles (from login/refresh)
     if (Array.isArray(userData)) {
-      console.log('🔍 [AppContext updateUser] Received profiles ARRAY - count:', userData.length);
-      console.log('🔍 [AppContext updateUser] Profiles:', userData.map(p => p.name));
-      console.log('🔍 [AppContext updateUser] First profile id:', userData[0]?.id);
+      if (userData.length === 0) return;
       setUserProfiles(userData);
-      // Set the first profile as active
-      const activeProfile = userData[0];
-      console.log('🔍 [AppContext updateUser] Setting active profile:', activeProfile.name, 'id:', activeProfile.id);
-      setUser(activeProfile);
+      // Keep the active profile when it is still in the list (a billing
+      // refresh); otherwise the first one — the server puts the default first.
+      setUser((prev) => userData.find((p) => p.id === prev?.id) || userData[0]);
     }
     // Case 2: userData has a profiles property (object with profiles array)
     else if (userData.profiles && Array.isArray(userData.profiles)) {
@@ -186,14 +183,6 @@ export const AppProvider = ({ children }) => {
         setUserProfiles([...userProfiles, userData]);
       }
     }
-  };
-
-  // After a billing change every profile on the account may have a new tier:
-  // refresh the list, keep the active one active.
-  const replaceProfiles = (list) => {
-    if (!Array.isArray(list) || list.length === 0) return;
-    setUserProfiles(list);
-    setUser((prev) => list.find((p) => p.id === prev?.id) || prev);
   };
 
   const switchProfile = (profileId) => {
@@ -725,7 +714,6 @@ export const AppProvider = ({ children }) => {
     updateUser,
     userProfiles,
     switchProfile,
-    replaceProfiles,
     addProfile,
     deleteProfile,
     reloadProfileData,

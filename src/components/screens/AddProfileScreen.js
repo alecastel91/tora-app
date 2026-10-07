@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { genresList } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { roleLabel } from '../../utils/roles';
+import { roleLabel, ROLES } from '../../utils/roles';
 import CitySearch from '../common/CitySearch';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -210,7 +210,7 @@ const AddProfileScreen = ({ onClose, onSuccess, takenRoles = [] }) => {
           <div className="form-group">
             <label className={labelClass}>{t('addProfile.selectRole')}</label>
             <div className="grid grid-cols-2 gap-2.5">
-              {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].filter((r) => !takenRoles.includes(r)).map(r => {
+              {ROLES.filter((r) => !takenRoles.includes(r)).map(r => {
                 const dot = {
                   ARTIST: 'bg-role-artist', PROMOTER: 'bg-role-promoter',
                   VENUE: 'bg-role-venue', AGENT: 'bg-role-agent',

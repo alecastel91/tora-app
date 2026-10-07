@@ -5,16 +5,20 @@ import { useLanguage } from '../../contexts/LanguageContext';
 // Settings summary card for AGENT profiles. Reflects the per-seat model:
 // a free plan covers AGENT_FREE_ARTISTS; a paid subscription is unlimited and
 // billed by roster size (see AgentSeatPricing for the band table).
-const AgentTierCard = ({ profile, onManage }) => {
+const AgentTierCard = ({ profile, plan, onManage }) => {
   const { t } = useLanguage();
   const paid = isPaidAgent(profile);
   const usage = rosterUsage(profile);
   const interval = profile?.subscriptionTier === 'YEARLY' ? t('agentSeat.perYear') : t('agentSeat.perMonth');
 
-  const title = paid ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan');
-  const priceLine = paid
-    ? t('agentSeatCard.billedRoster', { n: usage.current, interval })
-    : t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS });
+  // Covered by the account's membership: paid tier, no seats — one included artist.
+  const coveredByMembership = paid && plan === 'membership';
+  const title = coveredByMembership ? t('agentSeatCard.coveredByMembership') : paid ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan');
+  const priceLine = coveredByMembership
+    ? t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS })
+    : paid
+      ? t('agentSeatCard.billedRoster', { n: usage.current, interval })
+      : t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS });
 
   return (
     <div style={{
