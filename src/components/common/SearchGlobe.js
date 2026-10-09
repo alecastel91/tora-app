@@ -81,12 +81,6 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null); // { name, feature, cities, profiles }
-  // Tell the parent what is open so a switch to the list keeps the selection.
-  useEffect(() => {
-    onSelectionChange?.(selectedCity ? { city: selectedCity.name }
-      : selectedCountry ? { country: selectedCountry.profiles?.[0]?.country || selectedCountry.name } : null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCity, selectedCountry]);
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
   const [dims, setDims] = useState({ w: 0, h: 0 });
   // Desktop docks the members panel on the right instead of the bottom sheet
@@ -458,7 +452,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const snapSheet = (px) => {
     sheetAnimating.current = true;
     const H = dimsRef.current.h;
-    if (px < H * 0.25) { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); }
+    if (px < H * 0.25) { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); onSelectionChange?.(null); }
     else if (px < H * 0.8) setSheetPx(Math.round(H * 0.62));
     else setSheetPx(H);
   };
@@ -492,6 +486,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const openCity = (c) => {
     setSelectedCity(c);
     setSelectedCountry(null);
+    onSelectionChange?.({ city: c.name }); // the list can take over this selection
     focusOn(c.coord[0], c.coord[1]);
     setTip(null);
     sheetAnimating.current = true;
@@ -526,13 +521,16 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       profiles: inCountry.flatMap((c) => c.profiles),
     });
     setSelectedCity(null);
+    // The app's country name comes from a member in it; an atlas-only name
+    // ("Czechia") would not match the filters, so an empty country carries nothing.
+    onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null);
     const center = geoCentroid(f);
     focusOn(center[0], center[1]);
     setTip(null);
     sheetAnimating.current = true;
     setSheetPx(Math.round(dimsRef.current.h * 0.62));
   };
-  const closeCity = () => { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); focusing.current = false; };
+  const closeCity = () => { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); focusing.current = false; onSelectionChange?.(null); };
 
   // ---- pointer interaction on the canvas ----
   const onPointerDown = (e) => {

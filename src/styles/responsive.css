@@ -520,6 +520,11 @@
 
 /* Wide Desktop (1440px and up) */
 @media (min-width: 1440px) {
+  .search-agents-screen,
+  .search-artists-screen {
+    left: 280px;
+  }
+
   .tab-bar {
     width: 280px;
   }
@@ -626,12 +631,5 @@
     left: calc(280px + 456px);
   }
 }
-
-@media (min-width: 768px) {
-  /* Edit profile: the inner scroller is a phone device; on desktop the page
-     scrolls and the Save/Cancel bar stays reachable at the bottom. */
-  .edit-profile-content {
-    padding-bottom: 24px;
-  }
 }
 

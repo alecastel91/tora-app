@@ -871,11 +871,11 @@ function App() {
                 </button>
               </div>
 
-              {user?.role === 'AGENT' ? (
+              {(() => { const planKind = accountPlan(userProfiles, accountUser).kind; return user?.role === 'AGENT' ? (
                 <>
                   <AgentTierCard
                     profile={user}
-                    plan={accountPlan(userProfiles, accountUser).kind}
+                    plan={planKind}
                     onManage={() => { setShowSettings(false); setShowPremium(true); }}
                   />
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
@@ -901,7 +901,7 @@ function App() {
                         {t('premium.upgradeToPremium')}
                       </button>
                     )}
-                    {user?.subscriptionTier === 'MONTHLY' && accountPlan(userProfiles, accountUser).kind !== 'agency' && (
+                    {user?.subscriptionTier === 'MONTHLY' && planKind !== 'agency' && (
                       <button
                         className="btn btn-upgrade-small"
                         onClick={() => {
@@ -913,8 +913,8 @@ function App() {
                       </button>
                     )}
                   </div>
-                  {accountPlan(userProfiles, accountUser).kind === 'membership' && <p className="premium-note">{t('premium.coversAllProfiles')}</p>}
-                  {accountPlan(userProfiles, accountUser).kind === 'agency' && <p className="premium-note">{t('premium.coveredByAgency')}</p>}
+                  {planKind === 'membership' && <p className="premium-note">{t('premium.coversAllProfiles')}</p>}
+                  {planKind === 'agency' && <p className="premium-note">{t('premium.coveredByAgency')}</p>}
                   {/* Full-width by design — must sit OUTSIDE the pill row or
                       the row overflows the viewport on MONTHLY. */}
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
@@ -928,7 +928,7 @@ function App() {
                     </>
                   )}
                 </>
-              )}
+              ); })()}
 
               {/* Renewal / cancellation status line. refreshBillingInfo
                   already clears this for non-paid tiers. */}

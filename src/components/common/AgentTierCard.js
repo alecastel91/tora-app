@@ -14,11 +14,9 @@ const AgentTierCard = ({ profile, plan, onManage }) => {
   // Covered by the account's membership: paid tier, no seats — one included artist.
   const coveredByMembership = paid && plan === 'membership';
   const title = coveredByMembership ? t('agentSeatCard.coveredByMembership') : paid ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan');
-  const priceLine = coveredByMembership
-    ? t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS })
-    : paid
-      ? t('agentSeatCard.billedRoster', { n: usage.current, interval })
-      : t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS });
+  const priceLine = paid && !coveredByMembership
+    ? t('agentSeatCard.billedRoster', { n: usage.current, interval })
+    : t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS });
 
   return (
     <div style={{

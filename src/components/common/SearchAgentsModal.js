@@ -694,10 +694,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
 
                     return (
                       <div key={agentId} className="artist-item clickable" onClick={() => handleCardClick(agent)}>
-                        <div
-                          className="artist-info clickable"
-                          onClick={() => handleCardClick(agent)}
-                        >
+                        <div className="artist-info">
                           <div
                             className="artist-avatar"
                             style={agent.avatar ? undefined : { background: 'linear-gradient(135deg, #7BF0A4 0%, #43E97B 100%)' }}

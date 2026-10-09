@@ -154,36 +154,39 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     return () => window.removeEventListener('resize', measure);
   }, [viewMode, viewingProfile]);
 
+  // Globe → list: the open city/country becomes the list filter. FREE members
+  // can only browse their own country, so for them the selection is dropped
+  // rather than tripping the upgrade alert.
   const switchView = (key) => {
-    if (key === 'list' && viewMode === 'globe' && globeSelection) {
+    if (key === 'list' && viewMode === 'globe' && globeSelection && hasGlobalSearch()) {
       const next = globeSelection.city
         ? { ...filters, cities: [globeSelection.city], countries: [], zones: [] }
-        : globeSelection.country
-          ? { ...filters, countries: [globeSelection.country], cities: [], zones: [] }
-          : filters;
-      if (next !== filters) { setFilters(next); searchWith.current = next; }
+        : { ...filters, countries: [globeSelection.country], cities: [], zones: [] };
+      setFilters(next);
+      handleSearch(next);
     }
+    setGlobeSelection(null);
     setViewMode(key);
   };
 
   // Live search: the list follows the query as it is typed (Enter still works).
-  const searchWith = useRef(null);
-  const typedOnce = useRef(false);
+  const lastQuery = useRef(searchQuery);
   useEffect(() => {
-    if (!typedOnce.current) { typedOnce.current = true; return undefined; }
+    if (lastQuery.current === searchQuery) return undefined; // mount, StrictMode re-run
+    lastQuery.current = searchQuery;
     const id = setTimeout(() => handleSearch(), 350);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
-  useEffect(() => {
-    if (searchWith.current && searchWith.current === filters) { searchWith.current = null; handleSearch(); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  // Only the newest request may paint: keystrokes race on slow links.
+  const searchSeq = useRef(0);
 
-  const handleSearch = async () => {
+  const handleSearch = async (nextFilters = filters) => {
+    const f = nextFilters;
+    const seq = ++searchSeq.current;
     // Check if FREE tier user is trying to use location filters
     if (!hasGlobalSearch()) {
-      const hasLocationFilters = filters.zones.length > 0 || filters.countries.length > 0 || filters.cities.length > 0;
+      const hasLocationFilters = f.zones.length > 0 || f.countries.length > 0 || f.cities.length > 0;
 
       if (hasLocationFilters) {
         const tierName = user?.subscriptionTier === 'TRIAL' ? t('search.trialTierName') : t('search.freeTierName');
@@ -211,13 +214,15 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       if (user?.id) params.activeProfileId = user.id;
       // Add filters to params - send all selected values as arrays for OR logic
       if (searchQuery) params.search = searchQuery;
-      if (filters.roles.length > 0) params.roles = filters.roles.join(',');
-      if (filters.zones.length > 0) params.zones = filters.zones.join(',');
-      if (filters.countries.length > 0) params.countries = filters.countries.join(',');
-      if (filters.cities.length > 0) params.cities = filters.cities.join(',');
-      if (filters.genres.length > 0) params.genres = filters.genres.join(',');
+      params.limit = 500; // the globe needs the whole network, not the newest page
+      if (f.roles.length > 0) params.roles = f.roles.join(',');
+      if (f.zones.length > 0) params.zones = f.zones.join(',');
+      if (f.countries.length > 0) params.countries = f.countries.join(',');
+      if (f.cities.length > 0) params.cities = f.cities.join(',');
+      if (f.genres.length > 0) params.genres = f.genres.join(',');
 
       const response = await apiService.searchProfiles(params);
+      if (seq !== searchSeq.current) return; // a newer search is in flight
       // Handle both response formats (old: array, new: object with profiles array)
       const profiles = response.profiles || response;
       // Filter out current user's profile
@@ -228,7 +233,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       // Beta T11: searched with a city filter beyond the member's own city.
       if (import.meta.env.VITE_TORA_ENV === 'beta'
-        && filters.cities.some((c) => c && c !== user?.city)) {
+        && f.cities.some((c) => c && c !== user?.city)) {
         window.dispatchEvent(new CustomEvent('tora:beta-task', { detail: { code: 'T11' } }));
       }
     } catch (error) {
@@ -607,7 +612,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 placeholder={t('search.searchByName')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-black/35 px-4 text-sm text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
               />
               <button
@@ -649,7 +654,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             placeholder={t('search.searchByName')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-black/35 px-4 text-sm text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
           />
           <button

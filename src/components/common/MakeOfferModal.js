@@ -754,10 +754,10 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
             <h4>{t('offer.eventLogistics')}</h4>
 
             {/* Capacity, rooms and stage belong to the booker; an artist or agent countering only sees the lineup. */}
-            {!isArtistOrAgent && (<>
+            {logisticsRequired && (<>
             <div className="form-row">
               <div className="form-group">
-                <label>{t('offer.eventCapacity')}{logisticsRequired ? ' *' : ''}</label>
+                <label>{t('offer.eventCapacity')} *</label>
                 <input
                   type="number"
                   step="1"
@@ -767,12 +767,12 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                   onWheel={(e) => e.target.blur()}
                   placeholder={t('offer.eventCapacityPlaceholder')}
                   className="form-input"
-                  required={logisticsRequired}
+                  required
                 />
               </div>
 
               <div className="form-group">
-                <label>{t('offer.eventRooms')}{logisticsRequired ? ' *' : ''}</label>
+                <label>{t('offer.eventRooms')} *</label>
                 <input
                   type="number"
                   step="1"
@@ -782,20 +782,20 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                   onWheel={(e) => e.target.blur()}
                   placeholder={t('offer.eventRoomsPlaceholder')}
                   className="form-input"
-                  required={logisticsRequired}
+                  required
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label>{t('offer.eventStage')}{logisticsRequired ? ' *' : ''}</label>
+              <label>{t('offer.eventStage')} *</label>
               <input
                 type="text"
                 value={formData.eventStage}
                 onChange={(e) => handleChange('eventStage', e.target.value)}
                 placeholder={t('offer.eventStagePlaceholder')}
                 className="form-input"
-                required={logisticsRequired}
+                required
               />
             </div>
             </>)}

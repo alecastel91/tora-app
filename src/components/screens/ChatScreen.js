@@ -1118,11 +1118,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
             {loadingOlder ? t('chat.loading') : t('chat.loadEarlierMessages')}
           </button>
         )}
-        {loading && filteredMessages.length === 0 && (
-          <div className="chat-empty"><p>{t('chat.loading')}</p></div>
-        )}
-        {!loading && filteredMessages.length === 0 && (
+        {filteredMessages.length === 0 && (
           <div className="chat-empty">
+            {loading ? <p>{t('chat.loading')}</p> : (<>
             {/* Offers are one-directional (venues/promoters send them), so an
                 artist opening an empty chat with a venue is told to pitch. */}
             {['ARTIST', 'AGENT'].includes(currentUser?.role) && ['VENUE', 'PROMOTER'].includes(user?.role) ? (
@@ -1136,6 +1134,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                 <span>{t('messages.sendMessageToBegin')}</span>
               </>
             )}
+            </>)}
           </div>
         )}
         {filteredMessages.map((msg, index) => (

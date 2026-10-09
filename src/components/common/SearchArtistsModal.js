@@ -487,10 +487,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
 
                     return (
                       <div key={artistId} className="artist-item clickable" onClick={() => handleCardClick(artist)}>
-                        <div
-                          className="artist-info clickable"
-                          onClick={() => handleCardClick(artist)}
-                        >
+                        <div className="artist-info">
                           <div className="artist-avatar">
                             {artist.avatar ? (
                               <img src={artist.avatar} alt={artist.name} />
