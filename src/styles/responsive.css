@@ -627,9 +627,9 @@
   /* Edit profile: the inner scroller is a phone device; on desktop the page
      scrolls and the Save/Cancel bar stays reachable at the bottom. */
   .edit-profile-content {
-    overflow: visible;
     padding-bottom: 24px;
   }
+  /* The content stays the scroller; the Save/Cancel bar sticks to its bottom edge. */
   .edit-profile-screen .edit-actions {
     position: sticky;
     bottom: 0;
@@ -639,3 +639,17 @@
     background: linear-gradient(to top, #0a0a0e 70%, rgba(10, 10, 14, 0));
   }
 }
+
+/* Find Agent / Find Artist cards: actions on their own line so the name is never covered. */
+.search-agents-screen .artist-item,
+.search-artists-screen .artist-item {
+  flex-wrap: wrap;
+}
+.search-agents-screen .artist-item > .agent-action-buttons,
+.search-artists-screen .artist-item > .btn,
+.search-artists-screen .artist-item > .agent-action-buttons {
+  flex: 1 1 100%;
+  justify-content: flex-end;
+}
+.search-artists-screen .artist-item > .btn + .btn { margin-left: 8px; flex: 0 0 auto; }
+.search-artists-screen .artist-item > .btn { flex: 0 0 auto; margin-left: auto; }
