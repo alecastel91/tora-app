@@ -253,7 +253,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
   };
 
   const handleCardClick = (agent) => {
-    setViewingProfile(agent.id);
+    setViewingProfile(agent);
   };
 
   const handleConnectClick = (agent) => {
@@ -751,7 +751,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       {/* Profile View Screen - rendered on top */}
       {viewingProfile && (
         <ViewProfileScreen
-          profileId={viewingProfile}
+          profile={viewingProfile}
           onClose={() => setViewingProfile(null)}
         />
       )}
