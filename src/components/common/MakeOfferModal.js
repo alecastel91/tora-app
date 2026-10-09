@@ -753,6 +753,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
           <div className="form-section">
             <h4>{t('offer.eventLogistics')}</h4>
 
+            {/* Capacity, rooms and stage belong to the booker; an artist or agent countering only sees the lineup. */}
+            {!isArtistOrAgent && (<>
             <div className="form-row">
               <div className="form-group">
                 <label>{t('offer.eventCapacity')}{logisticsRequired ? ' *' : ''}</label>
@@ -796,6 +798,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                 required={logisticsRequired}
               />
             </div>
+            </>)}
 
             <div className="form-group">
               <label>{t('offer.lineup')}</label>

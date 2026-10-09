@@ -12749,6 +12749,7 @@ textarea.form-textarea:focus {
    block (transform), so the app's own position:fixed header and position:sticky
    sub-tabs re-anchor to this shorter box automatically — no per-element offsets,
    nothing clipped. `body` is position:fixed, so #root can absolutely fill it. */
+body.beta-env { --beta-banner-h: 24px; }
 body.beta-env #root {
   position: absolute;
   top: 24px;
@@ -13245,3 +13246,12 @@ body.beta-env #root {
   .gear-sheet { max-width: 420px; border-radius: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 18px; }
   .gear-sheet-handle { display: none; }
 }
+
+/* Scrollbars: thin, dark, no track — Windows and Linux otherwise paint the
+   classic grey gutter inside every scrolling section. Scrolling is unchanged. */
+* { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.32); background-clip: padding-box; }
+*::-webkit-scrollbar-corner { background: transparent; }

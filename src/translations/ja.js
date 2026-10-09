@@ -1748,6 +1748,7 @@ const ja = {
   },
 
   findAgent: {
+    viewProfile: 'プロフィールを見る',
     title: '担当エージェント',
     currentAgent: '現在のエージェント',
     currentAgents: '現在のエージェント',
@@ -1798,6 +1799,7 @@ const ja = {
   },
 
   findArtist: {
+    viewProfile: 'プロフィールを見る',
     title: 'アーティストを探す',
     searchPlaceholder: '名前で検索...',
     search: '検索',

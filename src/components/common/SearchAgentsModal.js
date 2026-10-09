@@ -714,6 +714,9 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                           </div>
                         </div>
                         <div className="agent-action-buttons">
+                          <button className="btn btn-sm btn-outline" onClick={(e) => { e.stopPropagation(); handleCardClick(agent); }}>
+                            {t('findAgent.viewProfile')}
+                          </button>
                           {(hasAccepted || isConnected) && onOpenChat && (
                             <button
                               className="btn btn-sm btn-outline"

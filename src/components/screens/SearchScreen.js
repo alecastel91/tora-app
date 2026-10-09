@@ -23,6 +23,9 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptRequest, declineRequest } = useAppContext();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  // What the globe has open (a city or a country); carried into the list
+  // filters when the view switches so the selection is not lost.
+  const [globeSelection, setGlobeSelection] = useState(null);
   const [viewMode, setViewMode] = useState('globe'); // 'globe' | 'list' — the globe IS the search landing
   // "Suggested for you" — complementary-role recommendations shown on the
   // list view's empty state (no query, no filters).
@@ -150,6 +153,32 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [viewMode, viewingProfile]);
+
+  const switchView = (key) => {
+    if (key === 'list' && viewMode === 'globe' && globeSelection) {
+      const next = globeSelection.city
+        ? { ...filters, cities: [globeSelection.city], countries: [], zones: [] }
+        : globeSelection.country
+          ? { ...filters, countries: [globeSelection.country], cities: [], zones: [] }
+          : filters;
+      if (next !== filters) { setFilters(next); searchWith.current = next; }
+    }
+    setViewMode(key);
+  };
+
+  // Live search: the list follows the query as it is typed (Enter still works).
+  const searchWith = useRef(null);
+  const typedOnce = useRef(false);
+  useEffect(() => {
+    if (!typedOnce.current) { typedOnce.current = true; return undefined; }
+    const id = setTimeout(() => handleSearch(), 350);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+  useEffect(() => {
+    if (searchWith.current && searchWith.current === filters) { searchWith.current = null; handleSearch(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const handleSearch = async () => {
     // Check if FREE tier user is trying to use location filters
@@ -511,7 +540,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       ].map(({ key, Icon, label }) => (
         <button
           key={key}
-          onClick={() => setViewMode(key)}
+          onClick={() => switchView(key)}
           aria-label={label}
           className={`flex h-10 w-10 items-center justify-center rounded-full transition [&_svg]:h-4 [&_svg]:w-4 ${
             viewMode === key ? 'bg-infrared/70 text-white' : 'text-white/45'
@@ -558,6 +587,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingGlobe label={t('search.loadingProfiles')} /></div>}>
             <SearchGlobe
               profiles={searchResults}
+              loading={loading}
+              onSelectionChange={setGlobeSelection}
               onSelectProfile={handleProfileClick}
               locked={!hasGlobalSearch()}
               userCity={user?.city}

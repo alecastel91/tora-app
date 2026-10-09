@@ -282,6 +282,15 @@
     margin-left: 0;
   }
 
+  /* Find Artist / Find Agent are fixed full-screen overlays on the phone;
+     on desktop they clear the sidebar like every other overlay. */
+  .search-agents-screen,
+  .search-artists-screen {
+    top: 57px;
+    left: 240px;
+    padding-bottom: 0;
+  }
+
   .bookings-screen .booking-card.expanded {
     position: fixed;
     top: 57px;
@@ -436,7 +445,9 @@
   }
 
   .md-drawer {
-    top: 57px;
+    /* Portaled to <body>, so the beta banner (which pushes #root down) has
+       to be added here — it is 0 outside beta. */
+    top: calc(57px + var(--beta-banner-h, 0px));
     bottom: 0; /* no tab bar on desktop */
     /* clears the docked tour column: sidebar + 480px + padding + gap */
     left: calc(240px + 516px);
@@ -609,5 +620,22 @@
 @media (min-width: 1440px) {
   .make-offer-modal-overlay:not(.md-drawer) {
     left: calc(280px + 456px);
+  }
+}
+
+@media (min-width: 768px) {
+  /* Edit profile: the inner scroller is a phone device; on desktop the page
+     scrolls and the Save/Cancel bar stays reachable at the bottom. */
+  .edit-profile-content {
+    overflow: visible;
+    padding-bottom: 24px;
+  }
+  .edit-profile-screen .form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 20px -20px 0;
+    padding: 12px 20px;
+    background: linear-gradient(to top, #0a0a0e 70%, rgba(10, 10, 14, 0));
   }
 }

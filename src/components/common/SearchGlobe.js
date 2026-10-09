@@ -5,6 +5,7 @@ import worldData from 'world-atlas/countries-110m.json';
 import { coordsForCity, normalizeCity, atlasCountryName, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
 import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
+import LoadingGlobe from './LoadingGlobe';
 
 // Country geometry is decoded once at module load (shared across mounts).
 const LAND = feature(worldData, worldData.objects.countries);
@@ -45,7 +46,7 @@ function groupByCity(profiles) {
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, topInset = 68, bottomInset = 52 }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, loading = false, onSelectionChange, topInset = 68, bottomInset = 52 }) => {
   const { t } = useLanguage();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
@@ -80,6 +81,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null); // { name, feature, cities, profiles }
+  // Tell the parent what is open so a switch to the list keeps the selection.
+  useEffect(() => {
+    onSelectionChange?.(selectedCity ? { city: selectedCity.name }
+      : selectedCountry ? { country: selectedCountry.profiles?.[0]?.country || selectedCountry.name } : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCity, selectedCountry]);
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
   const [dims, setDims] = useState({ w: 0, h: 0 });
   // Desktop docks the members panel on the right instead of the bottom sheet
@@ -699,6 +706,11 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       {/* Stage — wrapRef's ResizeObserver resizes the canvas when the panel
           opens/closes, so the globe shrinks instead of being covered. */}
       <div ref={wrapRef} className="relative min-w-0 flex-1 overflow-hidden">
+      {loading && (!profiles || profiles.length === 0) && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#040407]/70">
+          <LoadingGlobe label={t('search.loadingProfiles')} />
+        </div>
+      )}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full touch-none"

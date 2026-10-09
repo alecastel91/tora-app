@@ -1748,6 +1748,7 @@ const zh = {
   },
 
   findAgent: {
+    viewProfile: '查看资料',
     title: '签约经纪人',
     currentAgent: '当前经纪人',
     currentAgents: '当前经纪人',
@@ -1798,6 +1799,7 @@ const zh = {
   },
 
   findArtist: {
+    viewProfile: '查看资料',
     title: '寻找艺人',
     searchPlaceholder: '按名称搜索...',
     search: '搜索',

@@ -1748,6 +1748,7 @@ const it = {
   },
 
   findAgent: {
+    viewProfile: 'Vedi profilo',
     title: 'Agente rappresentante',
     currentAgent: 'Agente attuale',
     currentAgents: 'Agenti attuali',
@@ -1798,6 +1799,7 @@ const it = {
   },
 
   findArtist: {
+    viewProfile: 'Vedi profilo',
     title: 'TROVA ARTISTA',
     searchPlaceholder: 'Cerca per nome...',
     search: 'Cerca',

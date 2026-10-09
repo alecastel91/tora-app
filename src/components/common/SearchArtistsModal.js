@@ -503,6 +503,9 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                             <p className="artist-location">{artist.location}</p>
                           </div>
                         </div>
+                        <button className="btn btn-sm btn-outline" onClick={(e) => { e.stopPropagation(); handleCardClick(artist); }}>
+                          {t('findArtist.viewProfile')}
+                        </button>
                         <button
                           className={`btn btn-sm ${buttonClass}`}
                           onClick={(e) => {

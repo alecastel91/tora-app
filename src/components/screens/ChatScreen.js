@@ -1118,7 +1118,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
             {loadingOlder ? t('chat.loading') : t('chat.loadEarlierMessages')}
           </button>
         )}
-        {filteredMessages.length === 0 && (
+        {loading && filteredMessages.length === 0 && (
+          <div className="chat-empty"><p>{t('chat.loading')}</p></div>
+        )}
+        {!loading && filteredMessages.length === 0 && (
           <div className="chat-empty">
             {/* Offers are one-directional (venues/promoters send them), so an
                 artist opening an empty chat with a venue is told to pitch. */}

@@ -1748,6 +1748,7 @@ const ko = {
   },
 
   findAgent: {
+    viewProfile: '프로필 보기',
     title: '담당 에이전트',
     currentAgent: '현재 에이전트',
     currentAgents: '현재 에이전트',
@@ -1798,6 +1799,7 @@ const ko = {
   },
 
   findArtist: {
+    viewProfile: '프로필 보기',
     title: '아티스트 찾기',
     searchPlaceholder: '이름으로 검색...',
     search: '검색',
