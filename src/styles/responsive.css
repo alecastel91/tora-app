@@ -630,7 +630,7 @@
     overflow: visible;
     padding-bottom: 24px;
   }
-  .edit-profile-screen .form-actions {
+  .edit-profile-screen .edit-actions {
     position: sticky;
     bottom: 0;
     z-index: 2;
