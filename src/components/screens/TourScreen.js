@@ -933,8 +933,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         </div>
 
         {/* Full-page filters — shared FilterSheet, draft-applied on Apply */}
+        {/* Portaled out of the tour column so nothing in it (sticky tabs, the
+            phone's fixed-height box) can sit on top of the sheet. */}
         {showMatchFilters && (
-          <FilterSheet
+          <OverlayPortal><FilterSheet
             values={{ roles: rolesFilter, period: monthFilter, zone: zoneFilter, country: countryFilter, genres: genresFilter }}
             clearedValues={{ roles: [], period: 'all', zone: 'all', country: 'all', genres: [] }}
             onClose={() => setShowMatchFilters(false)}
@@ -961,7 +963,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               { key: 'genres', label: t('search.genres'), multi: true,
                 options: () => genresList.map((g) => ({ value: g, label: g })) },
             ]}
-          />
+          /></OverlayPortal>
         )}
       </div>
     );
