@@ -132,6 +132,10 @@
   }
 
   .app-content {
+    /* Full width to the window edge so the scrollbar sits at the very edge of
+       the page; the content column itself stays left-docked at 680px. */
+    max-width: none;
+    margin-right: 0;
     margin-left: 240px;
     padding-bottom: 24px;
     width: calc(100% - 240px);
@@ -629,27 +633,5 @@
   .edit-profile-content {
     padding-bottom: 24px;
   }
-  /* The content stays the scroller; the Save/Cancel bar sticks to its bottom edge. */
-  .edit-profile-screen .edit-actions {
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
-    margin: 20px -20px 0;
-    padding: 12px 20px;
-    background: linear-gradient(to top, #0a0a0e 70%, rgba(10, 10, 14, 0));
-  }
 }
 
-/* Find Agent / Find Artist cards: actions on their own line so the name is never covered. */
-.search-agents-screen .artist-item,
-.search-artists-screen .artist-item {
-  flex-wrap: wrap;
-}
-.search-agents-screen .artist-item > .agent-action-buttons,
-.search-artists-screen .artist-item > .btn,
-.search-artists-screen .artist-item > .agent-action-buttons {
-  flex: 1 1 100%;
-  justify-content: flex-end;
-}
-.search-artists-screen .artist-item > .btn + .btn { margin-left: 8px; flex: 0 0 auto; }
-.search-artists-screen .artist-item > .btn { flex: 0 0 auto; margin-left: auto; }

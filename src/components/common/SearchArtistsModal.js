@@ -486,7 +486,7 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                     }
 
                     return (
-                      <div key={artistId} className="artist-item">
+                      <div key={artistId} className="artist-item clickable" onClick={() => handleCardClick(artist)}>
                         <div
                           className="artist-info clickable"
                           onClick={() => handleCardClick(artist)}
@@ -503,9 +503,6 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
                             <p className="artist-location">{artist.location}</p>
                           </div>
                         </div>
-                        <button className="btn btn-sm btn-outline" onClick={(e) => { e.stopPropagation(); handleCardClick(artist); }}>
-                          {t('findArtist.viewProfile')}
-                        </button>
                         <button
                           className={`btn btn-sm ${buttonClass}`}
                           onClick={(e) => {

@@ -1760,7 +1760,6 @@ const en = {
   },
 
   findAgent: {
-    viewProfile: 'View profile',
     title: 'Representing Agent',
     currentAgent: 'Current Agent',
     currentAgents: 'Current Agents',
@@ -1811,7 +1810,6 @@ const en = {
   },
 
   findArtist: {
-    viewProfile: 'View profile',
     title: 'FIND ARTIST',
     searchPlaceholder: 'Search by name...',
     search: 'Search',

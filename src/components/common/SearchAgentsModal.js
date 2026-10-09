@@ -693,7 +693,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                     }
 
                     return (
-                      <div key={agentId} className="artist-item">
+                      <div key={agentId} className="artist-item clickable" onClick={() => handleCardClick(agent)}>
                         <div
                           className="artist-info clickable"
                           onClick={() => handleCardClick(agent)}
@@ -714,9 +714,6 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
                           </div>
                         </div>
                         <div className="agent-action-buttons">
-                          <button className="btn btn-sm btn-outline" onClick={(e) => { e.stopPropagation(); handleCardClick(agent); }}>
-                            {t('findAgent.viewProfile')}
-                          </button>
                           {(hasAccepted || isConnected) && onOpenChat && (
                             <button
                               className="btn btn-sm btn-outline"
