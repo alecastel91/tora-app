@@ -1511,6 +1511,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                       className="btn btn-outline"
                       onClick={() => {
                         setSelectedDealForWorkflow(deal);
+                        setShowDepositAgain(false);
                         setShowPaymentModal(true);
                       }}
                     >

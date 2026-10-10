@@ -326,8 +326,6 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
         // The hidden set-time row keeps its state so unticking restores it; nothing of it is sent.
         setStartTime: formData.timeTbc ? '' : formData.setStartTime,
         setEndTime: formData.timeTbc ? '' : formData.setEndTime,
-        setStartTime: formData.setStartTime,
-        setEndTime: formData.setEndTime,
         fee: feeValue,
         currency: formData.currency,
         performanceType: formData.performanceType,
