@@ -826,8 +826,7 @@ function App() {
             openDeal={chatOpenDeal}
             onOpenDealHandled={() => setChatOpenDeal(null)}
             initialDraft={chatDraft}
-            onDraftHandled={() => setChatDraft(null)}
-            onClose={() => { setActiveChatUser(null); setChatOpenDeal(null); }}
+            onClose={() => { setActiveChatUser(null); setChatOpenDeal(null); setChatDraft(null); }}
             onOpenProfile={(profile) => setViewingProfile(profile)}
           />
         )}

@@ -570,6 +570,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   };
 
   // Helper function to format overlapping dates for display
+  // Tour span as one "d MMM – d MMM yyyy" string for drafts and cards.
+  const tourDatesLabel = (tour) => `${formatEventDate(tour.startDate, t('dateFormat.locale'))} – ${formatEventDate(tour.endDate, t('dateFormat.locale'))}`;
+
   const formatMatchDates = (dates) => {
     if (dates.length === 0) return '';
 
@@ -1978,8 +1981,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           <h4 className="tour-artist-name">{tour.artist?.name || t('tour.unknownArtist')}</h4>
                           <p className="tour-artist-role">{tour.artist?.role || t('tour.artistRoleFallback')}</p>
                           {tour.artist?.id && connectedUsers?.has(tour.artist.id) && (
-                            <button type="button" className="btn btn-outline btn-sm" style={{ marginTop: 6 }}
-                              onClick={(e) => { e.stopPropagation(); handleMessage(tour.artist, t('tour.tourDraft', { name: tour.artist.name, where: tour.country || tour.zone, dates: `${formatEventDate(tour.startDate, t('dateFormat.locale'))} – ${formatEventDate(tour.endDate, t('dateFormat.locale'))}` })); }}>
+                            <button
+                              type="button"
+                              className="btn btn-outline btn-sm"
+                              style={{ marginTop: 6 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMessage(tour.artist, t('tour.tourDraft', { name: tour.artist.name, where: tour.country || tour.zone, dates: tourDatesLabel(tour) }));
+                              }}
+                            >
                               {t('search.message')}
                             </button>
                           )}

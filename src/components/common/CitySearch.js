@@ -62,8 +62,9 @@ const CitySearch = ({ city, country, zone, onSelect, preferCountry = null }) => 
         const res = await fetch(`${API_URL}/cities?q=${encodeURIComponent(term)}`, { signal: controller.signal });
         const data = await res.json();
         // Answering a tour stop: that country's cities come first.
-        const sorted = Array.isArray(data) && preferCountry ? [...data].sort((a, b) => (b.country === preferCountry) - (a.country === preferCountry)) : data;
-        setResults(Array.isArray(sorted) ? sorted : []);
+        const list = Array.isArray(data) ? data : [];
+        // Answering a tour stop: that country's cities first, API order within each half.
+        setResults(preferCountry ? [...list.filter((c) => c.country === preferCountry), ...list.filter((c) => c.country !== preferCountry)] : list);
       } catch (e) {
         if (!(e instanceof DOMException && e.name === 'AbortError')) setResults([]);
       } finally {

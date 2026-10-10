@@ -8,11 +8,11 @@ const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '
  * the native control ignores `step` in its picker on phones and in Chrome,
  * so by-the-minute wheels kept coming back. Value is '' when unset.
  */
-const TimeField = ({ value = '', onChange, disabled = false, 'aria-label': ariaLabel }) => {
+const TimeField = ({ value = '', onChange, disabled = false }) => {
   const [h = '', m = ''] = value ? value.split(':') : [];
-  const set = (hh, mm) => onChange(hh && mm ? `${hh}:${mm}` : hh ? `${hh}:00` : '');
+  const set = (hh, mm) => onChange(hh ? `${hh}:${mm}` : '');
   return (
-    <div className="time-field" aria-label={ariaLabel}>
+    <div className="time-field">
       <select className="form-input" value={h} disabled={disabled} onChange={(e) => set(e.target.value, m || '00')}>
         <option value="">--</option>
         {HOURS.map((x) => <option key={x} value={x}>{x}</option>)}

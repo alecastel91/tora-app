@@ -274,7 +274,7 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
                       )}
                       <p className={`text-xs truncate ${unread ? 'text-white/80 font-semibold' : 'text-white/50'}
                                      ${isDeleted ? 'text-white/40' : ''}`}>
-                        {conv.lastMessage.isSystemMessage && conv.lastMessage.senderId === user?.id ? fromMySide(conv.lastMessage.text, user?.name, t) : conv.lastMessage.text}
+                        {fromMySide(conv.lastMessage.text, conv.lastMessage.isSystemMessage && (conv.lastMessage.fromProfileId ?? conv.lastMessage.from?.id) === user?.id ? user?.name : null, t)}
                       </p>
                     </div>
                   </div>

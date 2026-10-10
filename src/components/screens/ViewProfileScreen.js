@@ -606,7 +606,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesGiven)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
           </div>
-          <button type="button" onClick={() => setListModal('likes')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
+          <button type="button" onClick={() => setListModal('likes')} disabled={passedProfile?.id !== currentUser?.id} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03] disabled:cursor-default disabled:hover:scale-100">
             <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesReceived)}</span>
             <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likedByLabel')}</span>
           </button>

@@ -53,7 +53,7 @@ const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
 
 const isCounterOfferMessage = (m) => !!m?.text && m.text.startsWith('Counter-Offer:');
 
-const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealHandled, initialDraft = null, onDraftHandled }) => {
+const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealHandled, initialDraft = null }) => {
   const { user: currentUser, sendMessage, connectedUsers, reloadProfileData } = useAppContext();
   const { t, language } = useLanguage();
   // Per-message translation state, keyed by message id:
@@ -64,9 +64,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   // (503, DEEPL_API_KEY unset). Hides the Translate button for the session so
   // we don't spam a disabled endpoint.
   const [translateUnavailable, setTranslateUnavailable] = useState(false);
+  // Seeded once per chat (App keys this screen by contact); App clears it on close.
   const [inputMessage, setInputMessage] = useState(initialDraft || '');
-  useEffect(() => { if (initialDraft) onDraftHandled?.(); // eslint-disable-line react-hooks/exhaustive-deps
-  }, []);
   const [userMessages, setUserMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const getFullUrl = (url) => getAuthedBackendUrl(url, currentUser?.id);
@@ -641,7 +640,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
     setCounterOfferDeal(null);
     apiService.getDeal(msg.dealId, currentUser.id)
       .then((resp) => setCounterOfferDeal(resp.deal || resp))
-      .catch(() => {});
+      .catch(() => setCounterOfferDeal({ offerHistory: [] })); // the modal still shows what the message carries
 
     // Parse the counter-offer message
     const messageText = msg.text;

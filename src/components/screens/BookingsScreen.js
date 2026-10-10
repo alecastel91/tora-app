@@ -106,6 +106,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const [showAddContractModal, setShowAddContractModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showDepositAgain, setShowDepositAgain] = useState(false); // reveal the deposit block for a further instalment
   const [selectedDealForWorkflow, setSelectedDealForWorkflow] = useState(null);
   const [documentTypeToShare, setDocumentTypeToShare] = useState(null);
   const [artistProfile, setArtistProfile] = useState(null); // For agent bookings
@@ -1639,6 +1640,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                                 className="btn btn-outline btn-sm"
                                 onClick={() => {
                                   setSelectedDealForWorkflow(deal);
+                                  setShowDepositAgain(false);
                                   setShowPaymentModal(true);
                                 }}
                               >
@@ -2226,18 +2228,24 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Once a deposit is marked, only the balance is offered: the
-                    deposit block is replaced by what was sent and when. */}
+                {/* Once a deposit is marked, the balance is what is offered; the
+                    deposit block is replaced by what was sent and when, with a
+                    way back for a further instalment. */}
                 {(() => {
-                  const sent = summarizeDealPayment(selectedDealForWorkflow).history;
-                  const last = sent[sent.length - 1];
-                  return last ? (
+                  const paySummary = summarizeDealPayment(selectedDealForWorkflow);
+                  const last = paySummary.history[paySummary.history.length - 1];
+                  const depositSent = paySummary.markedDeposit > 0;
+                  return depositSent && !showDepositAgain ? (
                     <p className="payment-deposit-sent">
-                      {t('bookings.depositAlreadySent', { amount: `${formatFee(last.amount)} ${selectedDealForWorkflow.currency || 'USD'}`, date: formatTimestamp(last.date, t('dateFormat.locale')) })}
+                      {last
+                        ? t('bookings.depositAlreadySent', { amount: `${formatFee(last.amount)} ${paySummary.currency}`, date: formatTimestamp(last.date, t('dateFormat.locale')) })
+                        : t('bookings.depositAlreadySent', { amount: `${formatFee(paySummary.markedDeposit)} ${paySummary.currency}`, date: '' })}
+                      {' '}
+                      <button type="button" className="link-btn" onClick={() => setShowDepositAgain(true)}>{t('bookings.addAnotherDeposit')}</button>
                     </p>
                   ) : null;
                 })()}
-                {summarizeDealPayment(selectedDealForWorkflow).history.length === 0 && (
+                {(summarizeDealPayment(selectedDealForWorkflow).markedDeposit === 0 || showDepositAgain) && (
                 <div style={{
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '8px',

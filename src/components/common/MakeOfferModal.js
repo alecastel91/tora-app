@@ -323,12 +323,15 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
         // 'TBC' is stored as the time itself: every reader shows it as-is.
         startTime: formData.timeTbc ? 'TBC' : formData.eventStartTime,
         endTime: formData.timeTbc ? 'TBC' : formData.eventEndTime,
+        // The hidden set-time row keeps its state so unticking restores it; nothing of it is sent.
+        setStartTime: formData.timeTbc ? '' : formData.setStartTime,
+        setEndTime: formData.timeTbc ? '' : formData.setEndTime,
         setStartTime: formData.setStartTime,
         setEndTime: formData.setEndTime,
         fee: feeValue,
         currency: formData.currency,
         performanceType: formData.performanceType,
-        setDuration: setDuration,
+        setDuration: formData.timeTbc ? null : setDuration,
         extras: Object.keys(extras).length > 0 ? extras : undefined,
         depositDeadline: formData.depositDeadline || undefined,
         finalPaymentDeadline: formData.finalPaymentDeadline || undefined,
@@ -371,6 +374,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
         date: '',
         eventStartTime: '',
         eventEndTime: '',
+        timeTbc: false,
         fee: '',
         currency: 'USD',
         performanceType: 'DJ Set',
@@ -538,11 +542,13 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
               />
             </div>
 
-            <label className="offer-tbc-toggle">
-              <input type="checkbox" checked={formData.timeTbc} onChange={(e) => handleChange('timeTbc', e.target.checked)} />
-              <span>{t('offer.timeTbc')}</span>
-              <small>{t('offer.timeTbcHint')}</small>
-            </label>
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input type="checkbox" checked={formData.timeTbc} onChange={(e) => handleChange('timeTbc', e.target.checked)} />
+                <span>{t('offer.timeTbc')}</span>
+              </label>
+              <span className="form-hint">{t('offer.timeTbcHint')}</span>
+            </div>
             {!formData.timeTbc && (
             <div className="form-row">
               <div className="form-group">

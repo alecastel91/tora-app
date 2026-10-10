@@ -130,6 +130,7 @@ const ko = {
   },
 
   bookings: {
+    addAnotherDeposit: '보증금 추가',
     depositAlreadySent: '{{date}}에 {{amount}} 보증금을 송금 완료로 표시했습니다. 아래에서 잔금을 기록하세요.',
     noContractFile: '이 예약에는 아직 계약서 파일이 첨부되지 않았습니다.',
     filterAllStatuses: '전체',
