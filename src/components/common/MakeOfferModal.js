@@ -7,6 +7,7 @@ import { isVerificationGate } from '../../utils/errors';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import CitySearch from './CitySearch';
+import TimeField from './TimeField';
 import VenueSearch from './VenueSearch';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -546,24 +547,18 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
             <div className="form-row">
               <div className="form-group">
                 <label>{t('offer.eventStartTime')}</label>
-                <input
-                  type="time"
-                  step="300"
+                <TimeField
                   value={formData.eventStartTime}
-                  onChange={(e) => handleChange('eventStartTime', e.target.value)}
-                  className="form-input"
-                />
+                  onChange={(v) => handleChange('eventStartTime', v)}
+                  />
               </div>
 
               <div className="form-group">
                 <label>{t('offer.eventEndTime')}</label>
-                <input
-                  type="time"
-                  step="300"
+                <TimeField
                   value={formData.eventEndTime}
-                  onChange={(e) => handleChange('eventEndTime', e.target.value)}
-                  className="form-input"
-                />
+                  onChange={(v) => handleChange('eventEndTime', v)}
+                  />
               </div>
             </div>
             )}
@@ -732,24 +727,18 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
             <div className="form-row">
               <div className="form-group">
                 <label>{t('offer.setStartTime')}</label>
-                <input
-                  type="time"
-                  step="300"
+                <TimeField
                   value={formData.setStartTime}
-                  onChange={(e) => handleChange('setStartTime', e.target.value)}
-                  className="form-input"
-                />
+                  onChange={(v) => handleChange('setStartTime', v)}
+                  />
               </div>
 
               <div className="form-group">
                 <label>{t('offer.setEndTime')}</label>
-                <input
-                  type="time"
-                  step="300"
+                <TimeField
                   value={formData.setEndTime}
-                  onChange={(e) => handleChange('setEndTime', e.target.value)}
-                  className="form-input"
-                />
+                  onChange={(v) => handleChange('setEndTime', v)}
+                  />
               </div>
 
               <div className="form-group">
