@@ -39,6 +39,8 @@ const FilterSheet = ({ sections, values, onApply, onClose, clearedValues }) => {
   const { t } = useLanguage();
   const [draft, setDraft] = useState(values);
   const [openKey, setOpenKey] = useState(null);
+  const [listQuery, setListQuery] = useState('');
+  const matchesList = (opt) => !listQuery || String(opt.label).toLowerCase().includes(listQuery.toLowerCase());
 
   const setField = (section, value) => {
     setDraft((d) => {
@@ -70,7 +72,7 @@ const FilterSheet = ({ sections, values, onApply, onClose, clearedValues }) => {
           <div className="filter-dropdown-group" key={section.key}>
             <div
               className="filter-dropdown-header"
-              onClick={() => setOpenKey(openKey === section.key ? null : section.key)}
+              onClick={() => { setListQuery(''); setOpenKey(openKey === section.key ? null : section.key); }}
             >
               <span>{section.label}</span>
               <span className="dropdown-value">{summaryFor(section)}</span>
@@ -78,7 +80,10 @@ const FilterSheet = ({ sections, values, onApply, onClose, clearedValues }) => {
             </div>
             {openKey === section.key && (
               <div className="filter-dropdown-content max-h-56 overflow-y-auto">
-                {section.options(draft).map((opt) => (
+                {section.options(draft).length > 12 && (
+                  <input type="text" className="filter-list-search" value={listQuery} onChange={(e) => setListQuery(e.target.value)} placeholder={t('search.typeToFilter')} aria-label={t('search.typeToFilter')} autoFocus />
+                )}
+                {section.options(draft).filter(matchesList).map((opt) => (
                   <label key={opt.value} className="filter-dropdown-item">
                     <input
                       type={section.multi ? 'checkbox' : 'radio'}

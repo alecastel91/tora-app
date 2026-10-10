@@ -671,11 +671,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     }
   };
 
-  const handleMessage = (profile) => {
+  const handleMessage = (profile, draft = null) => {
     // onOpenChat lands on the Messages tab itself. Calling
     // onNavigateToMessages as well used to undo it — tab navigation closes
     // overlays, including the chat just opened.
-    if (onOpenChat) onOpenChat(profile);
+    if (onOpenChat) onOpenChat(profile, null, draft);
   };
 
   const handleSendMessage = () => {
@@ -831,7 +831,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       {isConnected ? (
                         <button
                           className="btn btn-message btn-match-full"
-                          onClick={() => handleMessage(match.profile)}
+                          onClick={() => handleMessage(match.profile, t('tour.matchDraft', { name: match.profile.name, dates: match.dates }))}
                         >
                           {t('search.message')}
                         </button>
@@ -1977,6 +1977,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         <div className="tour-artist-details">
                           <h4 className="tour-artist-name">{tour.artist?.name || t('tour.unknownArtist')}</h4>
                           <p className="tour-artist-role">{tour.artist?.role || t('tour.artistRoleFallback')}</p>
+                          {tour.artist?.id && connectedUsers?.has(tour.artist.id) && (
+                            <button type="button" className="btn btn-outline btn-sm" style={{ marginTop: 6 }}
+                              onClick={(e) => { e.stopPropagation(); handleMessage(tour.artist, t('tour.tourDraft', { name: tour.artist.name, where: tour.country || tour.zone, dates: `${formatEventDate(tour.startDate, t('dateFormat.locale'))} – ${formatEventDate(tour.endDate, t('dateFormat.locale'))}` })); }}>
+                              {t('search.message')}
+                            </button>
+                          )}
                           <p className="tour-location-info">
                             <LocationIcon /> {t('tour.tourTitle', { location: tour.country || tour.zone })}
                           </p>
@@ -2252,6 +2258,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           setSelectedTourArtist(null);
         }}
         recipientProfile={selectedTourArtist}
+        preferCountry={selectedTour?.country || null}
         onSuccess={() => {
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);

@@ -60,6 +60,8 @@ const fr = {
   },
 
   offer: {
+    timeTbc: 'Horaire à confirmer',
+    timeTbcHint: 'Laissez les horaires ouverts pour l\'instant ; ils se fixent dans le chat.',
     eventLogistics: "Logistique de l'Événement",
     eventCapacity: "Capacité de l'Événement",
     eventCapacityPlaceholder: "p. ex. 500",
@@ -128,6 +130,7 @@ const fr = {
   },
 
   bookings: {
+    depositAlreadySent: 'Acompte de {{amount}} marqué comme envoyé le {{date}}. Vous indiquez le solde ci-dessous.',
     noContractFile: 'Aucun fichier de contrat n\'est encore joint à cette réservation.',
     filterAllStatuses: 'Tous',
     signaturesTitle: 'Signatures',
@@ -859,6 +862,8 @@ const fr = {
     unavailable: 'L\'assistant n\'est pas disponible pour le moment — réessayez plus tard.',
   },
   tour: {
+    matchDraft: 'Bonjour {{name}}, nous sommes tous les deux libres {{dates}}. Une date chez nous vous tente ?',
+    tourDraft: 'Bonjour {{name}}, j\'ai vu votre tournée {{where}} ({{dates}}). Nous pourrions vous accueillir — quelles dates restent libres ?',
     imInterested: "Ça m'intéresse",
     interested: 'Intéressé',
     interestedCount: 'Intéressés',
@@ -1263,6 +1268,7 @@ const fr = {
   },
 
   search: {
+    typeToFilter: 'Tapez pour filtrer…',
     roleArtist: 'Artiste',
     roleVenue: 'Salle',
     rolePromoter: 'Promoteur',

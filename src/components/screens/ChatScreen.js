@@ -3,6 +3,7 @@ import OverlayPortal from '../common/OverlayPortal';
 import { CURRENCY_OPTIONS } from '../common/CurrencyOptions';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { fromMySide } from '../../utils/systemMessage';
 import { formatEventDate, clampDateRange } from '../../utils/dates';
 import apiService from '../../services/api';
 import { celebrateMoment, MOMENT } from '../../utils/celebrations';
@@ -52,7 +53,7 @@ const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
 
 const isCounterOfferMessage = (m) => !!m?.text && m.text.startsWith('Counter-Offer:');
 
-const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealHandled }) => {
+const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealHandled, initialDraft = null, onDraftHandled }) => {
   const { user: currentUser, sendMessage, connectedUsers, reloadProfileData } = useAppContext();
   const { t, language } = useLanguage();
   // Per-message translation state, keyed by message id:
@@ -63,7 +64,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   // (503, DEEPL_API_KEY unset). Hides the Translate button for the session so
   // we don't spam a disabled endpoint.
   const [translateUnavailable, setTranslateUnavailable] = useState(false);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState(initialDraft || '');
+  useEffect(() => { if (initialDraft) onDraftHandled?.(); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
   const [userMessages, setUserMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const getFullUrl = (url) => getAuthedBackendUrl(url, currentUser?.id);
@@ -1770,7 +1773,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
               })()
             ) : msg.isSystem ? (
               <div className="message-system">
-                <p>{msg.text}</p>
+                <p>{fromMySide(msg.text, msg.isMe ? currentUser?.name : null, t)}</p>
               </div>
             ) : msg.documentAttachment ? (
               <div className={`message ${msg.isMe ? 'message-sent' : 'message-received'}`}>
@@ -2166,7 +2169,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   <div className="offer-detail-row">
                     <span className="detail-label">{t('chat.eventTimeLabel')}</span>
                     <span className="detail-value">
-                      {selectedOffer.startTime} - {selectedOffer.endTime}
+                      {selectedOffer.startTime === 'TBC' ? t('offer.timeTbc') : `${selectedOffer.startTime} - ${selectedOffer.endTime}`}
                     </span>
                   </div>
                 )}
@@ -2695,7 +2698,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
             </div>
             <div className="modal-body">
               <div className="offer-detail-section">
-                {(() => {
+                {!counterOfferDeal ? (<p className="chat-empty"><span>{t('chat.loading')}</span></p>) : (() => {
                   const history = counterOfferDeal?.offerHistory || [];
                   const entry = history[history.length - 1] || {};
                   const deal = counterOfferDeal;

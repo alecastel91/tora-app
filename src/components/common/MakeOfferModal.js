@@ -13,7 +13,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 // The final payment can never be due before the deposit.
 const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
 
-const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer = false }) => {
+const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer = false, preferCountry = null }) => {
   const { t } = useLanguage();
 
   const { user: currentUser } = useAppContext();
@@ -36,6 +36,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
     date: '',
     eventStartTime: '',
     eventEndTime: '',
+    timeTbc: false,
     fee: '',
     currency: 'USD',
     performanceType: 'DJ Set',
@@ -268,7 +269,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
     }
 
     // Validate that set time is within event time
-    if (formData.setStartTime && formData.setEndTime && formData.eventStartTime && formData.eventEndTime) {
+    if (!formData.timeTbc && formData.setStartTime && formData.setEndTime && formData.eventStartTime && formData.eventEndTime) {
       const [eventStartHour, eventStartMin] = formData.eventStartTime.split(':').map(Number);
       const [eventEndHour, eventEndMin] = formData.eventEndTime.split(':').map(Number);
       const [setStartHour, setStartMin] = formData.setStartTime.split(':').map(Number);
@@ -318,8 +319,9 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
         country: formData.country,
         city: formData.city,
         date: formData.date,
-        startTime: formData.eventStartTime,
-        endTime: formData.eventEndTime,
+        // 'TBC' is stored as the time itself: every reader shows it as-is.
+        startTime: formData.timeTbc ? 'TBC' : formData.eventStartTime,
+        endTime: formData.timeTbc ? 'TBC' : formData.eventEndTime,
         setStartTime: formData.setStartTime,
         setEndTime: formData.setEndTime,
         fee: feeValue,
@@ -519,6 +521,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                 city={formData.city}
                 country={formData.country}
                 zone={formData.zone}
+                preferCountry={preferCountry}
                 onSelect={(city, country, zone) => setFormData((prev) => ({ ...prev, city, country, zone }))}
               />
             </div>
@@ -534,11 +537,18 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
               />
             </div>
 
+            <label className="offer-tbc-toggle">
+              <input type="checkbox" checked={formData.timeTbc} onChange={(e) => handleChange('timeTbc', e.target.checked)} />
+              <span>{t('offer.timeTbc')}</span>
+              <small>{t('offer.timeTbcHint')}</small>
+            </label>
+            {!formData.timeTbc && (
             <div className="form-row">
               <div className="form-group">
                 <label>{t('offer.eventStartTime')}</label>
                 <input
                   type="time"
+                  step="300"
                   value={formData.eventStartTime}
                   onChange={(e) => handleChange('eventStartTime', e.target.value)}
                   className="form-input"
@@ -549,12 +559,14 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                 <label>{t('offer.eventEndTime')}</label>
                 <input
                   type="time"
+                  step="300"
                   value={formData.eventEndTime}
                   onChange={(e) => handleChange('eventEndTime', e.target.value)}
                   className="form-input"
                 />
               </div>
             </div>
+            )}
           </div>
 
           <div className="form-section">
@@ -716,11 +728,13 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
               </div>
             </div>
 
+            {!formData.timeTbc && (
             <div className="form-row">
               <div className="form-group">
                 <label>{t('offer.setStartTime')}</label>
                 <input
                   type="time"
+                  step="300"
                   value={formData.setStartTime}
                   onChange={(e) => handleChange('setStartTime', e.target.value)}
                   className="form-input"
@@ -731,6 +745,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                 <label>{t('offer.setEndTime')}</label>
                 <input
                   type="time"
+                  step="300"
                   value={formData.setEndTime}
                   onChange={(e) => handleChange('setEndTime', e.target.value)}
                   className="form-input"
@@ -748,6 +763,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
                 </div>
               </div>
             </div>
+            )}
           </div>
 
           <div className="form-section">

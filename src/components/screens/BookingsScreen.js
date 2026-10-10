@@ -969,7 +969,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                 <div className="booking-detail-row">
                   <span className="detail-label">{t('chat.eventTimeLabel')}</span>
                   <span className="detail-value">
-                    {deal.startTime} - {deal.endTime}
+                    {deal.startTime === 'TBC' ? t('offer.timeTbc') : `${deal.startTime} - ${deal.endTime}`}
                   </span>
                 </div>
               )}
@@ -2226,6 +2226,18 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Once a deposit is marked, only the balance is offered: the
+                    deposit block is replaced by what was sent and when. */}
+                {(() => {
+                  const sent = summarizeDealPayment(selectedDealForWorkflow).history;
+                  const last = sent[sent.length - 1];
+                  return last ? (
+                    <p className="payment-deposit-sent">
+                      {t('bookings.depositAlreadySent', { amount: `${formatFee(last.amount)} ${selectedDealForWorkflow.currency || 'USD'}`, date: formatTimestamp(last.date, t('dateFormat.locale')) })}
+                    </p>
+                  ) : null;
+                })()}
+                {summarizeDealPayment(selectedDealForWorkflow).history.length === 0 && (
                 <div style={{
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '8px',
@@ -2302,6 +2314,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                     {t('bookings.markDepositPaid')}
                   </button>
                 </div>
+                )}
                 <button
                   className="btn btn-primary"
                   style={{ width: '100%', justifyContent: 'center' }}

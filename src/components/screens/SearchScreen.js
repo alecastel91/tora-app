@@ -23,6 +23,12 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptRequest, declineRequest } = useAppContext();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  // Type-to-filter inside the long filter lists (203 countries, all genres).
+  const [listQuery, setListQuery] = useState('');
+  const matchesList = (label) => !listQuery || String(label).toLowerCase().includes(listQuery.toLowerCase());
+  const listFilterInput = (
+    <input type="text" className="filter-list-search" value={listQuery} onChange={(e) => setListQuery(e.target.value)} placeholder={t('search.typeToFilter')} aria-label={t('search.typeToFilter')} autoFocus />
+  );
   // What the globe has open (a city or a country); carried into the list
   // filters when the view switches so the selection is not lost.
   const [globeSelection, setGlobeSelection] = useState(null);
@@ -864,7 +870,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           <div className="filter-dropdown-group">
             <div 
               className="filter-dropdown-header"
-              onClick={() => setOpenDropdown(openDropdown === 'countries' ? null : 'countries')}
+              onClick={() => { setListQuery(''); setOpenDropdown(openDropdown === 'countries' ? null : 'countries'); }}
             >
               <span>{t('search.countries')}</span>
               <span className="dropdown-value">
@@ -877,7 +883,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             </div>
             {openDropdown === 'countries' && (
               <div className="filter-dropdown-content scrollable">
-                {getAvailableCountries().map(country => (
+                {listFilterInput}
+                {getAvailableCountries().filter(matchesList).map(country => (
                   <label key={country} className="filter-dropdown-item">
                     <input
                       type="checkbox"
@@ -895,7 +902,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           <div className="filter-dropdown-group">
             <div 
               className="filter-dropdown-header"
-              onClick={() => setOpenDropdown(openDropdown === 'cities' ? null : 'cities')}
+              onClick={() => { setListQuery(''); setOpenDropdown(openDropdown === 'cities' ? null : 'cities'); }}
             >
               <span>{t('search.cities')}</span>
               <span className="dropdown-value">
@@ -908,7 +915,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             </div>
             {openDropdown === 'cities' && (
               <div className="filter-dropdown-content scrollable">
-                {getAvailableCities().map(city => (
+                {listFilterInput}
+                {getAvailableCities().filter(matchesList).map(city => (
                   <label key={city} className="filter-dropdown-item">
                     <input
                       type="checkbox"
@@ -926,7 +934,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           <div className="filter-dropdown-group">
             <div 
               className="filter-dropdown-header"
-              onClick={() => setOpenDropdown(openDropdown === 'genres' ? null : 'genres')}
+              onClick={() => { setListQuery(''); setOpenDropdown(openDropdown === 'genres' ? null : 'genres'); }}
             >
               <span>{t('search.genres')}</span>
               <span className="dropdown-value">
@@ -939,7 +947,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             </div>
             {openDropdown === 'genres' && (
               <div className="filter-dropdown-content scrollable">
-                {genresList.map(genre => (
+                {listFilterInput}
+                {genresList.filter(matchesList).map(genre => (
                   <label key={genre} className="filter-dropdown-item">
                     <input
                       type="checkbox"

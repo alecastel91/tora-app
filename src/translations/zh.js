@@ -60,6 +60,8 @@ const zh = {
   },
 
   offer: {
+    timeTbc: '时间待定',
+    timeTbcHint: '先不填时间，可以在聊天中商定。',
     eventLogistics: "活动详情",
     eventCapacity: "活动容量",
     eventCapacityPlaceholder: "例如：500",
@@ -128,6 +130,7 @@ const zh = {
   },
 
   bookings: {
+    depositAlreadySent: '已于{{date}}将{{amount}}定金标记为已付。请在下方记录余款。',
     noContractFile: '此预订尚未附上合同文件。',
     filterAllStatuses: '全部',
     signaturesTitle: '签名',
@@ -859,6 +862,8 @@ const zh = {
     unavailable: '助手当前不可用，请稍后再试。',
   },
   tour: {
+    matchDraft: '{{name}}你好，我们在{{dates}}都有空。有兴趣和我们合作一场吗？',
+    tourDraft: '{{name}}你好，看到你的{{where}}巡演（{{dates}}）。我们可以接待你，还有哪些日期有空？',
     imInterested: '我感兴趣',
     interested: '已感兴趣',
     interestedCount: '感兴趣',
@@ -1263,6 +1268,7 @@ const zh = {
   },
 
   search: {
+    typeToFilter: '输入以筛选…',
     roleArtist: '艺人',
     roleVenue: '场地',
     rolePromoter: '主办方',

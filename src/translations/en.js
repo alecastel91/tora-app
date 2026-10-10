@@ -60,6 +60,8 @@ const en = {
   },
 
   offer: {
+    timeTbc: 'Time to be confirmed',
+    timeTbcHint: 'Leave the times open for now; they can be agreed in the chat.',
     eventLogistics: "Event Logistics",
     eventCapacity: "Event Capacity",
     eventCapacityPlaceholder: "e.g., 500",
@@ -128,6 +130,7 @@ const en = {
   },
 
   bookings: {
+    depositAlreadySent: 'Deposit of {{amount}} marked as sent on {{date}}. Below you mark the remaining balance.',
     noContractFile: 'No contract file is attached to this booking yet.',
     filterAllStatuses: 'All',
     signaturesTitle: 'Signatures',
@@ -859,6 +862,8 @@ const en = {
     unavailable: 'The assistant isn\'t available right now — please try again later.',
   },
   tour: {
+    matchDraft: 'Hi {{name}}, we both have {{dates}} open. Would you be up for a date with us?',
+    tourDraft: 'Hi {{name}}, I saw your {{where}} tour ({{dates}}). We could host you — which dates are still open?',
     imInterested: "I'm interested",
     interested: 'Interested',
     interestedCount: 'Interested',
@@ -1268,6 +1273,7 @@ const en = {
   
   // Search Screen
   search: {
+    typeToFilter: 'Type to filter…',
     roleArtist: 'Artist',
     roleVenue: 'Venue',
     rolePromoter: 'Promoter',

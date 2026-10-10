@@ -17,7 +17,7 @@ const COUNTRY_ZONES = Object.entries(countriesByZone).flatMap(([zone, countries]
  * onSelect(city, country, zone) — empty strings while the pick is incomplete,
  * so callers can gate their Next button on all three being set.
  */
-const CitySearch = ({ city, country, zone, onSelect }) => {
+const CitySearch = ({ city, country, zone, onSelect, preferCountry = null }) => {
   const { t } = useLanguage();
   const [query, setQuery] = useState(city && country ? `${city}, ${country}` : city || '');
   const [results, setResults] = useState([]);
@@ -61,7 +61,9 @@ const CitySearch = ({ city, country, zone, onSelect }) => {
       try {
         const res = await fetch(`${API_URL}/cities?q=${encodeURIComponent(term)}`, { signal: controller.signal });
         const data = await res.json();
-        setResults(Array.isArray(data) ? data : []);
+        // Answering a tour stop: that country's cities come first.
+        const sorted = Array.isArray(data) && preferCountry ? [...data].sort((a, b) => (b.country === preferCountry) - (a.country === preferCountry)) : data;
+        setResults(Array.isArray(sorted) ? sorted : []);
       } catch (e) {
         if (!(e instanceof DOMException && e.name === 'AbortError')) setResults([]);
       } finally {

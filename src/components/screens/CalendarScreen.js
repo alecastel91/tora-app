@@ -1000,7 +1000,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                             <div className="booking-detail-row">
                               <span className="detail-label">Event Time:</span>
                               <span className="detail-value">
-                                {event.startTime} - {event.endTime}
+                                {event.startTime === 'TBC' ? t('offer.timeTbc') : `${event.startTime} - ${event.endTime}`}
                               </span>
                             </div>
                           )}

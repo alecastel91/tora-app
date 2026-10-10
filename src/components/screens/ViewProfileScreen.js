@@ -94,6 +94,9 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     setListData({});
     setGigs(null);
     if (!passedProfile?.id) return undefined;
+    // Who liked a profile is owner-only on the server (F2-09): asking for
+    // anyone else is a guaranteed 403 in the console.
+    if (passedProfile.id !== currentUser?.id) { setLikers([]); return undefined; }
     apiService.getProfileLikers(passedProfile.id)
       .then((d) => { if (!cancelled) setLikers(d.likers || []); })
       .catch(() => { if (!cancelled) setLikers([]); });

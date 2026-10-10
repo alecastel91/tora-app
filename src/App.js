@@ -135,13 +135,14 @@ function App() {
   // opened and the user arrived at the conversation list instead. Doing both
   // here makes the order explicit (clear, then set) and gives the three
   // screens one thing to call.
-  const openChatInMessages = (profile, deal = null) => {
+  const openChatInMessages = (profile, deal = null, draft = null) => {
     if (!profile) return;
     closeAllOverlays();
     setActiveTab('messages');
     setMountedTabs((prev) => (prev.includes('messages') ? prev : [...prev, 'messages']));
     setActiveChatUser(profile);
     setChatOpenDeal(deal);
+    setChatDraft(draft);
   };
 
   // Overlays belong to the context they were opened in — closed on tab
@@ -195,6 +196,7 @@ function App() {
   const [activeChatUser, setActiveChatUser] = useState(null);
   // Deal the chat should open on arrival (Bookings "Review" CTA) — consumed once.
   const [chatOpenDeal, setChatOpenDeal] = useState(null);
+  const [chatDraft, setChatDraft] = useState(null); // prefilled composer text (tour match / tour card)
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showPremium, setShowPremium] = useState(false);
@@ -823,6 +825,8 @@ function App() {
             user={activeChatUser}
             openDeal={chatOpenDeal}
             onOpenDealHandled={() => setChatOpenDeal(null)}
+            initialDraft={chatDraft}
+            onDraftHandled={() => setChatDraft(null)}
             onClose={() => { setActiveChatUser(null); setChatOpenDeal(null); }}
             onOpenProfile={(profile) => setViewingProfile(profile)}
           />

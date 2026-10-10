@@ -60,6 +60,8 @@ const ko = {
   },
 
   offer: {
+    timeTbc: '시간 추후 확정',
+    timeTbcHint: '시간은 비워 두고 채팅에서 정할 수 있습니다.',
     eventLogistics: "이벤트 상세",
     eventCapacity: "수용 인원",
     eventCapacityPlaceholder: "예: 500",
@@ -128,6 +130,7 @@ const ko = {
   },
 
   bookings: {
+    depositAlreadySent: '{{date}}에 {{amount}} 보증금을 송금 완료로 표시했습니다. 아래에서 잔금을 기록하세요.',
     noContractFile: '이 예약에는 아직 계약서 파일이 첨부되지 않았습니다.',
     filterAllStatuses: '전체',
     signaturesTitle: '서명',
@@ -859,6 +862,8 @@ const ko = {
     unavailable: '어시스턴트를 지금은 사용할 수 없습니다. 나중에 다시 시도해 주세요.',
   },
   tour: {
+    matchDraft: '{{name}}님 안녕하세요, 저희 둘 다 {{dates}}에 비어 있어요. 함께 공연하실 의향이 있으신가요?',
+    tourDraft: '{{name}}님 안녕하세요, {{where}} 투어({{dates}})를 봤습니다. 저희가 호스트할 수 있어요. 아직 비어 있는 날짜가 있나요?',
     imInterested: '관심 있어요',
     interested: '관심 표시됨',
     interestedCount: '관심',
@@ -1263,6 +1268,7 @@ const ko = {
   },
 
   search: {
+    typeToFilter: '입력해서 필터…',
     roleArtist: '아티스트',
     roleVenue: '베뉴',
     rolePromoter: '프로모터',

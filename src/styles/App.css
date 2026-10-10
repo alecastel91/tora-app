@@ -13267,3 +13267,16 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 /* Finder cards: the whole card opens the profile; the city wraps instead of truncating. */
 .artist-item.clickable { cursor: pointer; }
 .artist-item .artist-location { white-space: normal; overflow: visible; }
+
+/* Type-to-filter box at the top of long filter lists */
+.filter-list-search { width: 100%; box-sizing: border-box; margin: 4px 0 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); color: #fff; font-size: 13px; }
+.filter-list-search:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+
+/* Offer form: "time to be confirmed" toggle */
+.offer-tbc-toggle { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center; margin: 0 0 12px; cursor: pointer; }
+.offer-tbc-toggle input { margin: 0; }
+.offer-tbc-toggle span { font-size: 13px; color: #fff; }
+.offer-tbc-toggle small { grid-column: 2; font-size: 11px; color: rgba(255,255,255,0.45); }
+
+/* Payment modal: a deposit already marked */
+.payment-deposit-sent { margin: 0; padding: 10px 12px; border-radius: 8px; background: rgba(67,233,123,0.08); border: 1px solid rgba(67,233,123,0.3); font-size: 12px; color: rgba(255,255,255,0.8); }

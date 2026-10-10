@@ -60,6 +60,8 @@ const pt = {
   },
 
   offer: {
+    timeTbc: 'Hora a confirmar',
+    timeTbcHint: 'Deixe as horas em aberto por agora; podem ser combinadas no chat.',
     eventLogistics: "Logística do Evento",
     eventCapacity: "Capacidade do Evento",
     eventCapacityPlaceholder: "ex.: 500",
@@ -128,6 +130,7 @@ const pt = {
   },
 
   bookings: {
+    depositAlreadySent: 'Depósito de {{amount}} marcado como enviado em {{date}}. Abaixo regista o restante.',
     noContractFile: 'Ainda não há um arquivo de contrato anexado a esta reserva.',
     filterAllStatuses: 'Todos',
     signaturesTitle: 'Assinaturas',
@@ -859,6 +862,8 @@ const pt = {
     unavailable: 'O assistente não está disponível agora — tente novamente mais tarde.',
   },
   tour: {
+    matchDraft: 'Olá {{name}}, ambos temos {{dates}} livre. Gostaria de uma data connosco?',
+    tourDraft: 'Olá {{name}}, vi a sua tour {{where}} ({{dates}}). Podíamos recebê-lo — que datas ainda estão livres?',
     imInterested: 'Tenho interesse',
     interested: 'Interessado',
     interestedCount: 'Interessados',
@@ -1263,6 +1268,7 @@ const pt = {
   },
 
   search: {
+    typeToFilter: 'Escreva para filtrar…',
     roleArtist: 'Artista',
     roleVenue: 'Casa',
     rolePromoter: 'Promotor',

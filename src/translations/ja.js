@@ -60,6 +60,8 @@ const ja = {
   },
 
   offer: {
+    timeTbc: '時間は後日確定',
+    timeTbcHint: '時間は今は未定のままにして、チャットで決められます。',
     eventLogistics: "イベント詳細",
     eventCapacity: "収容人数",
     eventCapacityPlaceholder: "例：500",
@@ -128,6 +130,7 @@ const ja = {
   },
 
   bookings: {
+    depositAlreadySent: '{{date}}に{{amount}}のデポジットを送金済みにしました。残額は下で記録します。',
     noContractFile: 'このブッキングにはまだ契約書ファイルが添付されていません。',
     filterAllStatuses: 'すべて',
     signaturesTitle: '署名',
@@ -859,6 +862,8 @@ const ja = {
     unavailable: 'アシスタントは現在利用できません。後でもう一度お試しください。',
   },
   tour: {
+    matchDraft: '{{name}}さん、こんにちは。{{dates}}はお互い空いています。一緒にやりませんか？',
+    tourDraft: '{{name}}さん、こんにちは。{{where}}ツアー（{{dates}}）を拝見しました。お迎えできます。まだ空いている日程はありますか？',
     imInterested: '興味を示す',
     interested: '興味あり',
     interestedCount: '興味あり',
@@ -1263,6 +1268,7 @@ const ja = {
   },
 
   search: {
+    typeToFilter: '入力して絞り込む…',
     roleArtist: 'アーティスト',
     roleVenue: 'ベニュー',
     rolePromoter: 'プロモーター',
