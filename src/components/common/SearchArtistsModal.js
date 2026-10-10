@@ -523,13 +523,15 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
       </div>
 
       {/* Profile View Modal - rendered on top */}
+      {/* Portaled: the finder is itself a fixed overlay, so a sibling viewer
+          would paint beneath it. */}
       {viewingProfile && (
-        <>
+        <OverlayPortal>
           <ViewProfileScreen
             profile={viewingProfile}
             onClose={() => setViewingProfile(null)}
           />
-        </>
+        </OverlayPortal>
       )}
 
       {/* Connection Modal - rendered on top of everything */}
