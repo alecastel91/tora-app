@@ -13259,8 +13259,10 @@ body.beta-env #root {
 *::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.32); }
 *::-webkit-scrollbar-corner { background: transparent; }
 
-/* A filter sheet portaled to <body> sits outside #root's beta-banner shift. */
+/* Overlays portaled to <body> sit outside #root's beta-banner shift, and a
+   profile viewer opened from a finder must paint above that finder (z 1000). */
 body > .filter-screen { top: calc(57px + var(--beta-banner-h, 0px)); }
+body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-index: calc(var(--z-overlay) + 1); }
 
 /* Finder cards: the whole card opens the profile; the city wraps instead of truncating. */
 .artist-item.clickable { cursor: pointer; }
