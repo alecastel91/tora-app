@@ -131,7 +131,7 @@ const it = {
 
   bookings: {
     addAnotherDeposit: 'Aggiungi un altro acconto',
-    depositAlreadySent: 'Acconto di {{amount}} segnato come inviato il {{date}}. Qui sotto registri il saldo.',
+    depositAlreadySent: 'Acconto di {{amount}} inviato il {{date}}.',
     noContractFile: 'A questa prenotazione non è ancora allegato un file di contratto.',
     filterAllStatuses: 'Tutti',
     signaturesTitle: 'Firme',

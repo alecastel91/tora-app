@@ -13273,7 +13273,8 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .filter-list-search:focus { outline: none; border-color: rgba(255,255,255,0.3); }
 
 /* Payment modal: a deposit already marked */
-.payment-deposit-sent { margin: 0; padding: 10px 12px; border-radius: 8px; background: rgba(67,233,123,0.08); border: 1px solid rgba(67,233,123,0.3); font-size: 12px; color: rgba(255,255,255,0.8); }
+.payment-deposit-sent { margin: 0; font-size: 12px; line-height: 1.4; color: rgba(255,255,255,0.5); }
+.payment-deposit-sent .link-btn { color: rgba(255,255,255,0.75); text-decoration: underline; }
 
 /* Hour:minute control (5-minute steps) */
 .time-field { display: flex; align-items: center; gap: 4px; }

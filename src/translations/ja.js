@@ -131,7 +131,7 @@ const ja = {
 
   bookings: {
     addAnotherDeposit: 'デポジットを追加する',
-    depositAlreadySent: '{{date}}に{{amount}}のデポジットを送金済みにしました。残額は下で記録します。',
+    depositAlreadySent: '{{date}}に{{amount}}のデポジットを送金済み。',
     noContractFile: 'このブッキングにはまだ契約書ファイルが添付されていません。',
     filterAllStatuses: 'すべて',
     signaturesTitle: '署名',

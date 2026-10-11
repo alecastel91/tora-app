@@ -131,7 +131,7 @@ const zh = {
 
   bookings: {
     addAnotherDeposit: '再添加一笔定金',
-    depositAlreadySent: '已于{{date}}将{{amount}}定金标记为已付。请在下方记录余款。',
+    depositAlreadySent: '已于{{date}}支付定金{{amount}}。',
     noContractFile: '此预订尚未附上合同文件。',
     filterAllStatuses: '全部',
     signaturesTitle: '签名',

@@ -131,7 +131,7 @@ const es = {
 
   bookings: {
     addAnotherDeposit: 'Añadir otro depósito',
-    depositAlreadySent: 'Depósito de {{amount}} marcado como enviado el {{date}}. Abajo registras el resto.',
+    depositAlreadySent: 'Depósito de {{amount}} enviado el {{date}}.',
     noContractFile: 'Esta reserva aún no tiene un archivo de contrato adjunto.',
     filterAllStatuses: 'Todos',
     signaturesTitle: 'Firmas',
