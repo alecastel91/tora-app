@@ -1165,7 +1165,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                     ? (deal.venue?.name || t('bookings.theVenue'))
                     : (deal.artist?.name || t('bookings.theArtist'));
                   const sigs = Array.isArray(deal.contract.signatures) ? deal.contract.signatures : [];
-                  const sigIsArtistSide = (sig) => (typeof sig.artistSide === 'boolean' ? sig.artistSide : sig.profileId === deal.artistId);
+                  // Side comes from the signature record itself: an agent signing for
+                  // their artist has signedBy = agentId, so ids alone would put that
+                  // signature on the venue side.
+                  const sigIsArtistSide = (sig) => (typeof sig.artistSide === 'boolean' ? sig.artistSide
+                    : sig.role ? sig.role === 'ARTIST'
+                    : (sig.profileId || sig.signedBy) === deal.artistId);
                   const mySideSigned = sigs.some((sig) => sigIsArtistSide(sig) === onArtistSide)
                     // A SENT contract with no signature record was sent-and-signed by its sender.
                     || (sigs.length === 0 && deal.contract.status === 'SENT' && (deal.contract.sentBy ? deal.contract.sentBy === currentUser.id : onArtistSide));

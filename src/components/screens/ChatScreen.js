@@ -1795,11 +1795,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                       </div>
                       <button
                         type="button"
-                        // A payment proof is usually a photo or screenshot — those open
-                        // in the image viewer, not the PDF viewer.
-                        onClick={() => (isPdfFile(msg.documentAttachment)
-                          ? setPdfViewerUrl(getFullUrl(msg.documentAttachment.url))
-                          : setImageViewerUrl(getFullUrl(msg.documentAttachment.url)))}
+                        // Only a payment proof can be a photo; press kits, riders and
+                        // contracts are PDFs even when the attachment carries no contentType.
+                        onClick={() => (msg.documentAttachment.category === 'paymentProof' && !isPdfFile(msg.documentAttachment)
+                          ? setImageViewerUrl(getFullUrl(msg.documentAttachment.url))
+                          : setPdfViewerUrl(getFullUrl(msg.documentAttachment.url)))}
                         className="btn btn-sm"
                         style={{
                           width: '100%',
