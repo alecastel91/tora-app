@@ -1876,6 +1876,7 @@ const pt = {
     blockEffectBookings: 'As marcações já acordadas continuam visíveis para ambos: contratos e pagamentos nunca se perdem',
     blockDone: '{{name}} está bloqueado.',
     blockFailed: 'Não conseguimos bloquear este membro. Tente novamente.',
+    blockedBanner: 'Você bloqueou {{name}}.',
     blockedTitle: 'Membros bloqueados',
     blockedEmpty: 'Não bloqueou ninguém.',
     alsoProfiles: 'e mais {{n}} perfil(is)',

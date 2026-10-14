@@ -1876,6 +1876,7 @@ const zh = {
     blockEffectBookings: '已达成的预订对双方保留，合同与付款记录不会丢失',
     blockDone: '已拉黑 {{name}}。',
     blockFailed: '拉黑失败，请重试。',
+    blockedBanner: '你已屏蔽 {{name}}。',
     blockedTitle: '已拉黑的成员',
     blockedEmpty: '你还没有拉黑任何人。',
     alsoProfiles: '及其他 {{n}} 个资料',

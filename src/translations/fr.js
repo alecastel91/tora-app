@@ -1876,6 +1876,7 @@ const fr = {
     blockEffectBookings: 'Les réservations déjà conclues restent visibles pour les deux : contrats et paiements ne sont jamais perdus',
     blockDone: '{{name}} est bloqué.',
     blockFailed: 'Nous n\'avons pas pu bloquer ce membre. Réessayez.',
+    blockedBanner: 'Vous avez bloqué {{name}}.',
     blockedTitle: 'Membres bloqués',
     blockedEmpty: 'Vous n\'avez bloqué personne.',
     alsoProfiles: 'et {{n}} autre(s) profil(s)',

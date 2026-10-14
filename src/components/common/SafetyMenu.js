@@ -9,14 +9,24 @@ import { REPORT_REASONS, REPORT_TARGETS, BLOCK_EFFECT_KEYS } from '../../utils/s
 
 /**
  * Report + block, the two controls App Review guideline 1.2 asks for on any
- * surface carrying user content. One component so the profile and the chat
- * offer the same thing in the same place: an overflow button, a reason
- * picker, and a block that spells out what it does before it happens.
+ * surface carrying user content. One component so every surface offers the
+ * same reason picker and the same block confirmation, in two shapes:
+ *
+ *   variant="menu"   an overflow button with a dropdown — the chat header,
+ *                    where there is no end of the page to put anything at.
+ *   variant="footer" a quiet row at the end of a profile. Safety actions are
+ *                    rare and deliberate; at the top they crowd the back arrow
+ *                    and invite mis-taps, at the end they are found when
+ *                    looked for.
  *
  * `targetType` is what Report acts on (a profile, or one message); blocking
  * always acts on the PERSON behind `profile`, never a single profile of theirs.
+ * When `blocked` is set the only action offered is the undo.
  */
-const SafetyMenu = ({ profile, targetType = REPORT_TARGETS.PROFILE, targetId, onBlocked, className = '' }) => {
+const SafetyMenu = ({
+  profile, targetType = REPORT_TARGETS.PROFILE, targetId,
+  variant = 'menu', blocked = false, onBlocked, onUnblocked, className = '',
+}) => {
   const { t } = useLanguage();
   const { user } = useAppContext();
   const [open, setOpen] = useState(false);
@@ -55,6 +65,18 @@ const SafetyMenu = ({ profile, targetType = REPORT_TARGETS.PROFILE, targetId, on
     }
   };
 
+  const unblock = async () => {
+    setOpen(false);
+    const ok = await appConfirm(t('safety.unblockConfirm', { name: profile.name }), { confirmLabel: t('safety.unblock') });
+    if (!ok) return;
+    try {
+      await apiService.unblockMember(profile.userId);
+      if (onUnblocked) onUnblocked();
+    } catch (err) {
+      appAlert(err.message || t('safety.unblockFailed'));
+    }
+  };
+
   const block = async () => {
     setOpen(false);
     const ok = await appConfirm(
@@ -71,30 +93,51 @@ const SafetyMenu = ({ profile, targetType = REPORT_TARGETS.PROFILE, targetId, on
     }
   };
 
-  return (
-    <div ref={wrapRef} className={`safety-menu ${className}`}>
-      <button
-        type="button"
-        aria-label={t('safety.moreActions')}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="safety-menu-trigger"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <circle cx="12" cy="5" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="12" cy="19" r="1.8" />
-        </svg>
-      </button>
+  const reportLabel = targetType === REPORT_TARGETS.MESSAGE ? t('safety.reportMessage') : t('safety.reportProfile');
 
-      {open && (
-        <div className="safety-menu-list" role="menu">
-          <button type="button" role="menuitem" onClick={() => { setOpen(false); setReporting(true); }}>
-            {targetType === REPORT_TARGETS.MESSAGE ? t('safety.reportMessage') : t('safety.reportProfile')}
+  return (
+    <div ref={wrapRef} className={`${variant === 'footer' ? 'safety-footer' : 'safety-menu'} ${className}`}>
+      {variant === 'footer' ? (
+        blocked ? (
+          <button type="button" className="safety-footer-action" onClick={unblock}>
+            {t('safety.unblock')}
           </button>
-          <button type="button" role="menuitem" className="is-danger" onClick={block}>
-            {t('safety.blockMember', { name: profile.name })}
+        ) : (
+          <>
+            <button type="button" className="safety-footer-action" onClick={() => setReporting(true)}>
+              {reportLabel}
+            </button>
+            <button type="button" className="safety-footer-action is-danger" onClick={block}>
+              {t('safety.blockMember', { name: profile.name })}
+            </button>
+          </>
+        )
+      ) : (
+        <>
+          <button
+            type="button"
+            aria-label={t('safety.moreActions')}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="safety-menu-trigger"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="12" cy="5" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="12" cy="19" r="1.8" />
+            </svg>
           </button>
-        </div>
+
+          {open && (
+            <div className="safety-menu-list" role="menu">
+              <button type="button" role="menuitem" onClick={() => { setOpen(false); setReporting(true); }}>
+                {reportLabel}
+              </button>
+              <button type="button" role="menuitem" className="is-danger" onClick={block}>
+                {t('safety.blockMember', { name: profile.name })}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {reporting && (
@@ -102,7 +145,7 @@ const SafetyMenu = ({ profile, targetType = REPORT_TARGETS.PROFILE, targetId, on
           <div className="modal-overlay" onClick={() => !busy && setReporting(false)}>
             <div className="modal-content safety-report-modal" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h2>{targetType === REPORT_TARGETS.MESSAGE ? t('safety.reportMessage') : t('safety.reportProfile')}</h2>
+                <h2>{reportLabel}</h2>
                 <button className="modal-close" onClick={() => !busy && setReporting(false)} aria-label={t('common.close')}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 6L6 18M6 6l12 12" />

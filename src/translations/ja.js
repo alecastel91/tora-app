@@ -1876,6 +1876,7 @@ const ja = {
     blockEffectBookings: '成立済みのブッキングは双方に残ります。契約と支払いの記録は失われません',
     blockDone: '{{name}}をブロックしました。',
     blockFailed: 'ブロックできませんでした。もう一度お試しください。',
+    blockedBanner: '{{name}}さんをブロックしています。',
     blockedTitle: 'ブロック中のメンバー',
     blockedEmpty: 'ブロックしているメンバーはいません。',
     alsoProfiles: '他{{n}}件のプロフィール',

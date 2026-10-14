@@ -1876,6 +1876,7 @@ const ko = {
     blockEffectBookings: '이미 성사된 부킹은 양쪽에 남습니다. 계약과 결제 기록은 사라지지 않습니다',
     blockDone: '{{name}}을(를) 차단했습니다.',
     blockFailed: '차단하지 못했습니다. 다시 시도해 주세요.',
+    blockedBanner: '{{name}}님을 차단했습니다.',
     blockedTitle: '차단한 멤버',
     blockedEmpty: '차단한 멤버가 없습니다.',
     alsoProfiles: '외 {{n}}개 프로필',

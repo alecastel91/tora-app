@@ -5777,7 +5777,9 @@
 /* View Profile Screen (Full Page) */
 .view-profile-screen {
   /* Page, not popup: sits between the app header (57px) and the tab bar
-     (53px) so global navigation stays visible and usable. */
+     (53px) so global navigation stays visible and usable. The desktop
+     overrides in responsive.css match this selector, so it stays at this
+     specificity — only `display` is re-stated below, where it has to win. */
   position: fixed;
   top: 57px;
   left: 0;
@@ -5790,6 +5792,17 @@
   overflow: hidden;
 }
 
+/* `.screen.active { display: block }` outranks the rule above, so the flex
+   column never applied: the scroller sized itself off a max-height guess
+   instead of the page, and the last ~90px of every profile sat below the fold
+   with no way to scroll to it. Re-stated at matching specificity, the way
+   .edit-profile-screen already does. */
+.view-profile-screen.screen.active {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .view-profile-content {
   flex: 1;
   overflow-y: scroll;
@@ -5798,7 +5811,6 @@
   padding: 20px;
   padding-bottom: 120px;
   min-height: 0;
-  max-height: calc(100vh - 60px);
   position: relative;
 }
 
@@ -13303,6 +13315,33 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 }
 .safety-menu-list button:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
 .safety-menu-list button.is-danger { color: #FF3366; }
+/* Footer variant: the quiet row at the end of a profile. Deliberately plain —
+   these are rare actions, and a styled button here competes with Message. */
+.safety-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.safety-footer-action {
+  border: none;
+  background: none;
+  padding: 6px 4px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.safety-footer-action:hover { color: rgba(255, 255, 255, 0.8); }
+.safety-footer-action.is-danger:hover { color: #FF3366; }
+/* Inside the blocked card the row is the only control, so it carries no rule */
+.view-profile-content .safety-footer:only-child,
+.safety-footer:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
 .chat-header-menu { margin-left: auto; flex-shrink: 0; }
 .chat-header-menu .safety-menu-trigger { width: 36px; height: 36px; background: transparent; border-color: rgba(255, 255, 255, 0.12); }
 .safety-report-modal .safety-reasons { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }

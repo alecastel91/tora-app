@@ -1888,6 +1888,7 @@ const en = {
     blockEffectBookings: 'Bookings you already agreed stay visible to both, so contracts and payments are never lost',
     blockDone: '{{name}} is blocked.',
     blockFailed: 'We could not block this member. Please try again.',
+    blockedBanner: 'You blocked {{name}}.',
     blockedTitle: 'Blocked members',
     blockedEmpty: 'You have not blocked anyone.',
     alsoProfiles: 'and {{n}} other profile(s)',

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import RoomsTechCard from '../common/RoomsTechCard';
 import SafetyMenu from '../common/SafetyMenu';
+import { BLOCK_EFFECT_KEYS } from '../../utils/safety';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -63,6 +64,9 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   // fields like bio. Enrich with the full profile; the passed object renders
   // immediately as the fallback.
   const [fullProfile, setFullProfile] = useState(null);
+  // Bumped after an unblock so the same screen refetches and turns back into
+  // the real profile, rather than making the member find their way here again.
+  const [reloadKey, setReloadKey] = useState(0);
   useEffect(() => {
     let cancelled = false;
     setFullProfile(null);
@@ -71,7 +75,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       .then((data) => { if (!cancelled) setFullProfile(data.profile || data); })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [passedProfile?.id, currentUser?.id]);
+  }, [passedProfile?.id, currentUser?.id, reloadKey]);
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
   const embeds = profileEmbeds(profile);
 
@@ -419,6 +423,53 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     return roleClasses[role] || 'role-badge';
   };
   
+  // Someone this member blocked. The server sends back a name and nothing
+  // else, so there is a real page here instead of a profile that refuses to
+  // open — which is what a 404 looked like — and the undo sits on it.
+  if (profile.blockedByMe) {
+    return (
+      <div className="screen active view-profile-screen relative">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('common.back')}
+          className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
+                     flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div className="view-profile-content relative isolate">
+          <div className="profile-header">
+            <div className="profile-avatar-container">
+              <div className="profile-avatar opacity-40 grayscale">
+                {profile.profileImage || profile.avatar
+                  ? <img src={profile.profileImage || profile.avatar} alt="" />
+                  : getInitial(profile.name)}
+              </div>
+            </div>
+            <div className="profile-name-role-container">
+              <h2 className="profile-name">{profile.name}</h2>
+            </div>
+          </div>
+          <div className="mx-auto mt-6 max-w-md rounded-2xl border border-white/10 bg-[#101015] p-5 text-center">
+            <p className="m-0 text-sm font-medium text-white">{t('safety.blockedBanner', { name: profile.name })}</p>
+            <ul className="mx-auto mt-3 mb-4 max-w-sm list-none p-0 text-left text-[13px] leading-relaxed text-white/55">
+              {BLOCK_EFFECT_KEYS.map((k) => <li key={k} className="mb-1">· {t(`safety.${k}`)}</li>)}
+            </ul>
+            <SafetyMenu
+              variant="footer"
+              blocked
+              profile={profile}
+              onUnblocked={() => setReloadKey((n) => n + 1)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Official TORA account: an out-of-scope admin profile. No geography, no
   // role, no like/connect/message surface, no counters — just identity + bio.
   if (profile.isOfficial) {
@@ -494,10 +545,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
       </button>
-      {/* Report + block (App Review 1.2). Blocking closes the screen: the
-          person is gone from this member's app from that moment. */}
-      <SafetyMenu profile={profile} className="absolute top-3 right-3 z-20" onBlocked={onClose} />
-
       <div className="view-profile-content relative isolate">
         {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
         <div
@@ -941,6 +988,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             </button>
           </div>
         )}
+
+        {/* Report + block (App Review 1.2) at the end of the page, where rare
+            and deliberate actions belong. Blocking closes the screen: the
+            person is gone from this member's app from that moment. */}
+        <SafetyMenu variant="footer" profile={profile} onBlocked={onClose} />
       </div>
         
 
