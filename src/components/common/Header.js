@@ -3,6 +3,7 @@ import NotificationDropdown from './NotificationDropdown';
 import { BellIcon, GearIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { isDesktopV2 } from '../../utils/desktopV2';
 
 const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   const { notifications } = useAppContext();
@@ -47,6 +48,14 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
       <div className="logo flex items-center">
         <img src="/tora_logo.png" alt="TORA" className="h-6 w-auto block" />
       </div>
+      {/* Desktop v2: the brand lives in the sidebar, so the bar carries the
+          page instead of a hidden logo. Reuses the existing nav.* keys, so no
+          new copy enters the 8 catalogs. .desktop-only is already hidden
+          below 1024px, and .d2-page-title is styled only inside the v2 media
+          block, so with the flag off this renders nothing visible. */}
+      {isDesktopV2() && (
+        <div className="d2-page-title desktop-only">{t(`nav.${activeTab}`)}</div>
+      )}
       <div className="header-icons relative flex gap-3">
         <button
           className={iconBtnClasses}

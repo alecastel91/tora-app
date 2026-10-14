@@ -1,0 +1,700 @@
+/* ============================================================================
+   DESKTOP V2 — a parallel, refined desktop layout, off by default.
+   ----------------------------------------------------------------------------
+   Turn on with ?desktop=v2 (off with ?desktop=v1); the choice is remembered.
+   Console flip for same-scroll A/B: toraDesktopV2()
+
+   EVERY rule in this file is nested under BOTH
+     @media (min-width: 1024px)   and   html.desktop-v2
+   which buys two guarantees structurally rather than by discipline:
+     - flag off  -> no selector can match, so the diff is exactly zero
+     - below 1024px -> nothing is in range, so the phone cannot be affected
+   Keep that invariant. A rule outside the media query or missing the class
+   prefix breaks the comparison this file exists for.
+
+   This file loads LAST (App.js, after responsive.css) and is unlayered, so it
+   beats both responsive.css (source order + specificity) and Tailwind's
+   @layer utilities (unlayered wins over layered regardless of specificity).
+   That is what lets this restyle the Tailwind-authored chrome — TabBar's
+   text-[8px] uppercase, NewsScreen's pb-24 — with no JSX changes.
+   `!important` is used in exactly two places, matching the two in
+   responsive.css (.chat-screen left, .md-drawer .modal-body max-height).
+
+   Dev note: Vite HMR can re-inject a mutated <style> out of cascade order. If
+   a rule here suddenly "stops winning" mid-session, hard-reload first.
+   ========================================================================= */
+
+@media (min-width: 1024px) {
+  html.desktop-v2 {
+    /* ---- geometry ------------------------------------------------------
+       responsive.css types 240/280/57/436/456 out ~40 times, which is why
+       its 1440 block is ~70 duplicated rules. Declared once here, the wide
+       breakpoint below is a short token flip instead. */
+    --d2-sidebar: 248px;
+    --d2-topbar: 64px;
+    --d2-gutter: 32px;
+    --d2-gap: 24px;
+    --d2-measure: 720px; /* reading column */
+    --d2-master: 380px; /* master-detail list pane */
+    --d2-rail: 320px; /* feed right rail (phase 3) */
+    --d2-detail-max: 860px;
+    --d2-calendar-max: 1180px;
+
+    /* derived — the ONLY place these sums exist. --beta-banner-h is set by
+       body.beta-env (App.css) and defaults to 0, so folding it in here also
+       fixes the hand-patched beta drift on the body-portaled overlays. */
+    --d2-top: calc(var(--d2-topbar) + var(--beta-banner-h, 0px));
+    --d2-detail-left: calc(var(--d2-sidebar) + var(--d2-master) + var(--d2-gutter) + var(--d2-gap));
+
+    /* ---- surfaces ---- */
+    --d2-surface: #0b0b0e;
+    --d2-surface-2: #101014;
+    --d2-sidebar-bg: #07070a;
+    --d2-line: rgba(255, 255, 255, 0.07);
+    --d2-line-strong: rgba(255, 255, 255, 0.13);
+    --d2-accent: #ff3366;
+    --d2-accent-wash: rgba(255, 51, 102, 0.1);
+
+    /* ---- density: desktop radii are tighter than the phone's 20px/11px ---- */
+    --d2-r-card: 12px;
+    --d2-r-ctl: 8px;
+  }
+
+  /* =========================================================================
+     1. SIDEBAR  (.tab-bar — the mobile bottom nav, reposed by responsive.css)
+     The headline fix: 8px uppercase thumb labels become 13px sentence case.
+     ====================================================================== */
+  html.desktop-v2 .tab-bar {
+    width: var(--d2-sidebar);
+    padding: 22px 12px 16px;
+    gap: 2px;
+    /* opaque: the .app-container::before pink grid crawls behind nav labels */
+    background: var(--d2-sidebar-bg);
+    border-right: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 .sidebar-brand {
+    padding: 2px 10px 18px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 .sidebar-brand img {
+    height: 20px;
+  }
+
+  html.desktop-v2 .tab-item {
+    position: relative; /* anchors the badge, which moves to the row's end */
+    height: 40px;
+    padding: 0 12px;
+    gap: 12px;
+    border-radius: var(--d2-r-ctl);
+    color: rgba(255, 255, 255, 0.62);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.14s, color 0.14s;
+  }
+
+  html.desktop-v2 .tab-item > span {
+    font-size: 13px;
+  }
+
+  html.desktop-v2 .tab-item [class*='w-5'] svg,
+  html.desktop-v2 .tab-item svg {
+    width: 18px;
+    height: 18px;
+    /* quiet premium: the active tab is marked by a bar, not a glowing icon */
+    filter: none;
+  }
+
+  html.desktop-v2 .tab-item:hover {
+    background: rgba(255, 255, 255, 0.045);
+    color: #fff;
+  }
+
+  html.desktop-v2 .tab-item.active {
+    background: var(--d2-accent-wash);
+    color: #fff;
+  }
+
+  html.desktop-v2 .tab-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 3px;
+    height: 18px;
+    margin-top: -9px;
+    border-radius: 2px;
+    background: var(--d2-accent);
+  }
+
+  /* Unread badges/dots are absolutely positioned inside the icon wrapper
+     (fine stacked on a phone). In a row they belong at the row's end:
+     neutralise the wrapper's `relative` so they resolve against .tab-item. */
+  html.desktop-v2 .tab-item > div {
+    position: static;
+  }
+
+  html.desktop-v2 .tab-item > div > span {
+    top: 50%;
+    right: 12px;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  /* Grouping without words: a hairline before the three work tabs. Child 1 is
+     .sidebar-brand, so the buttons are children 2-7 (tour is 4). Eyebrow
+     labels ("DISCOVER"/"WORK") would be untranslated copy in 8 catalogs. */
+  html.desktop-v2 .tab-item:nth-child(4) {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--d2-line);
+  }
+
+  /* Profile reads as the sidebar footer */
+  html.desktop-v2 .tab-item:last-child {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--d2-line);
+  }
+
+  /* =========================================================================
+     2. TOP BAR  (.app-header)
+     57px with a hidden logo becomes a real 64px bar. Safe to change only
+     because every dependent offset below is restated as var(--d2-top).
+     ====================================================================== */
+  html.desktop-v2 .app-header {
+    margin-left: var(--d2-sidebar);
+    min-height: var(--d2-topbar);
+    padding: 0 var(--d2-gutter);
+    background: rgba(8, 8, 10, 0.72);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 .app-header .header-icons {
+    gap: 10px;
+  }
+
+  html.desktop-v2 .app-header .header-icons > button {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--d2-r-ctl);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--d2-line-strong);
+  }
+
+  html.desktop-v2 .app-header .header-icons > button:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 51, 102, 0.35);
+  }
+
+  /* responsive.css hides the logo with visibility:hidden, which keeps its box
+     and pushes the title off the left edge. Remove it from flow instead, so
+     the title becomes the bar's leading item. */
+  html.desktop-v2 .app-header .logo {
+    display: none;
+  }
+
+  /* Page title (Header.js, flag-gated). Styled only here, so the off path
+     renders an invisible empty node. */
+  html.desktop-v2 .d2-page-title {
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #fff;
+    margin-left: 2px;
+  }
+
+  /* =========================================================================
+     3. CANVAS
+     responsive.css caps every screen at 680px and welds it to the left edge,
+     leaving ~980 dead px at 1920. Centre the measure instead — safe here
+     because the master-detail screens get a fixed grid below, which is the
+     reason the left-dock existed (panes used to shift the master).
+     ====================================================================== */
+  html.desktop-v2 .app-content {
+    margin-left: var(--d2-sidebar);
+    width: calc(100% - var(--d2-sidebar));
+    padding: var(--d2-gutter);
+    padding-bottom: var(--d2-gutter);
+  }
+
+  html.desktop-v2 .app-content > .tab-panel > .screen:not(.view-profile-screen):not(.search-screen) {
+    max-width: var(--d2-measure);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Search is the exception: the globe is a full-bleed map, so the screen
+     keeps the whole canvas and the LIST view centres its own column below. */
+  html.desktop-v2 .app-content > .tab-panel > .screen.search-screen {
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Drop the phone's bottom-nav clearance (pb-24 / padding-bottom:70px) —
+     there is no bottom bar on desktop, it is just dead space. */
+  html.desktop-v2 .app-content > .tab-panel > .screen,
+  html.desktop-v2 .app-content > .tab-panel > .md-split .screen {
+    padding-bottom: 0;
+  }
+
+  html.desktop-v2 .app-content > .tab-panel > .screen.news-screen {
+    padding: 0 0 48px;
+  }
+
+  /* Quiet the ambient: the 40px infrared grid + two crimson washes are tuned
+     for a 428px frame and read as toy chrome across a 27" display. */
+  html.desktop-v2 .app-container {
+    background-image: radial-gradient(
+      70% 45% at calc(var(--d2-sidebar) + 24%) -12%,
+      rgba(255, 51, 102, 0.07),
+      transparent 70%
+    );
+  }
+
+  html.desktop-v2 .app-container::before {
+    opacity: 0.4;
+    -webkit-mask-image: radial-gradient(110% 55% at 55% 0%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(110% 55% at 55% 0%, #000 0%, transparent 72%);
+  }
+
+  /* ---- master-detail: a fixed grid, so the list never resizes when a detail
+     pane opens (responsive.css uses flex + per-screen width swaps) ---- */
+  html.desktop-v2 .md-split {
+    display: grid;
+    /* minmax(0, X) rather than a fixed X: the master takes its full width when
+       there is room and yields when there isn't, so the detail pane can never
+       be squeezed narrower than its own content (which overflowed at 1440). */
+    grid-template-columns: minmax(0, var(--d2-master)) minmax(0, 1fr);
+    align-items: stretch;
+    height: calc(100dvh - var(--d2-top) - var(--d2-gutter));
+  }
+
+  html.desktop-v2 .md-split > .md-master {
+    flex: none;
+    width: auto;
+    border-right: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 .md-split.md-split-wide {
+    grid-template-columns: minmax(0, calc(var(--d2-master) + 120px)) minmax(0, 1fr);
+  }
+
+  html.desktop-v2 .md-split > .md-detail > .screen {
+    max-width: min(var(--d2-detail-max), 100%);
+    margin: 0 auto;
+    padding-left: var(--d2-gutter);
+    padding-right: var(--d2-gutter);
+  }
+
+  /* inside a detail pane the content follows the pane, not the page measure */
+  html.desktop-v2 .md-split > .md-detail .view-profile-content {
+    max-width: 100%;
+  }
+
+  /* ---- Search: the globe stays full bleed (SearchGlobe sizes itself off its
+     own matchMedia — left alone); the list is a plain column ---- */
+  html.desktop-v2 .search-screen .search-board,
+  html.desktop-v2 .search-screen .search-header {
+    max-width: var(--d2-measure);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ...but when the list is the master pane of an open profile, it fills it */
+  html.desktop-v2 .md-split > .md-master .search-board,
+  html.desktop-v2 .md-split > .md-master .search-header {
+    max-width: none;
+  }
+
+  html.desktop-v2 .search-results {
+    gap: 10px;
+  }
+
+  /* ---- Tour calendar: the Outlook-style month grid is the app's strongest
+     desktop artefact and is currently choked at 1000px, left-docked ---- */
+  html.desktop-v2 .app-content > .tab-panel > .screen.tour-screen {
+    max-width: var(--d2-measure);
+  }
+
+  html.desktop-v2 .app-content > .tab-panel > .screen.tour-screen.tour-screen--calendar {
+    max-width: var(--d2-calendar-max);
+  }
+
+  html.desktop-v2 .tour-tabs {
+    background: rgba(8, 8, 10, 0.92);
+    backdrop-filter: blur(12px);
+  }
+
+  /* ---- Bookings: list + detail pane. .bookings-screen carries no .screen
+     class, so it needs its own selectors (as responsive.css also does). ---- */
+  html.desktop-v2 .app-content > .tab-panel > .bookings-screen {
+    max-width: var(--d2-measure);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  html.desktop-v2 .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
+    max-width: var(--d2-master);
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  html.desktop-v2 .bookings-screen .booking-card.expanded {
+    top: var(--d2-top);
+    bottom: 0;
+    width: min(var(--d2-detail-max), calc(100vw - var(--d2-detail-left)));
+    padding: var(--d2-gutter);
+    border-radius: 0;
+    border-left: 1px solid var(--d2-line);
+  }
+
+  /* ---- Messages: the list docks, the chat fills the pane beside it ---- */
+  html.desktop-v2 .app-content > .tab-panel > .screen.messages-screen {
+    max-width: var(--d2-measure);
+  }
+
+  html.desktop-v2 .app-container:has(> .chat-screen) .app-content > .tab-panel > .messages-screen {
+    max-width: var(--d2-master);
+    margin-left: 0;
+  }
+
+  /* ---- Feed rail (App.js, flag-gated). Below 1280 there isn't room for
+     sidebar + measure + rail, so the feed stays a single centred column. ---- */
+  html.desktop-v2 .d2-rail {
+    display: none;
+  }
+
+  /* =========================================================================
+     4. OVERLAY OFFSETS — every hardcoded top:57px / left:240px, once each
+     ====================================================================== */
+  html.desktop-v2 .chat-screen,
+  html.desktop-v2 .filter-screen,
+  html.desktop-v2 .view-profile-screen,
+  html.desktop-v2 .search-agents-screen,
+  html.desktop-v2 .search-artists-screen,
+  html.desktop-v2 .settings-screen,
+  html.desktop-v2 .premium-screen {
+    top: var(--d2-top);
+    left: var(--d2-sidebar);
+  }
+
+  /* Portaled to <body>, so they sit outside #root's beta shift and App.css
+     adds --beta-banner-h by hand. --d2-top already includes it, so these
+     selectors must be restated or the banner gets counted twice. */
+  html.desktop-v2 body > .filter-screen,
+  html.desktop-v2 body > .view-profile-screen {
+    top: var(--d2-top);
+  }
+
+  /* Docked to the right of the master column. The !important matches
+     responsive.css's own on .chat-screen — nothing else here needs one. */
+  html.desktop-v2 .chat-screen {
+    left: var(--d2-detail-left) !important;
+    border-left: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 .bookings-screen .booking-card.expanded,
+  html.desktop-v2 .make-offer-modal-overlay:not(.md-drawer) {
+    left: var(--d2-detail-left);
+  }
+
+  html.desktop-v2 .make-offer-modal-overlay:not(.md-drawer) {
+    top: var(--d2-top);
+    border-left: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 .md-drawer {
+    top: var(--d2-top);
+    left: calc(var(--d2-sidebar) + 480px + var(--d2-gutter) + var(--d2-gap));
+    border-left: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v2 body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {
+    max-width: 480px;
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  /* Settings/Premium read as pages, not modals: they start below the top bar
+     so the nav stays visible, and centre by measure rather than by the
+     viewport arithmetic responsive.css uses. */
+  html.desktop-v2 .settings-screen,
+  html.desktop-v2 .premium-screen {
+    padding-left: var(--d2-gutter);
+    padding-right: var(--d2-gutter);
+  }
+
+  html.desktop-v2 .settings-screen .settings-header,
+  html.desktop-v2 .settings-screen .settings-content {
+    width: 100%;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  html.desktop-v2 .premium-screen .premium-header,
+  html.desktop-v2 .premium-screen .premium-content {
+    width: 100%;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  html.desktop-v2 .view-profile-screen .view-profile-content {
+    max-width: min(var(--d2-measure), 100%);
+  }
+
+  /* =========================================================================
+     5. DENSITY + TYPE — descendant selectors only, so no screen file is
+     touched. Phone control sizes are thumb-tuned and read oversized here.
+     ====================================================================== */
+  html.desktop-v2 .app-content .btn,
+  html.desktop-v2 .md-drawer .btn,
+  html.desktop-v2 .settings-screen .btn,
+  html.desktop-v2 .premium-screen .btn,
+  html.desktop-v2 .chat-screen .btn,
+  html.desktop-v2 .view-profile-screen .btn {
+    font-size: 11px;
+    padding: 8px 14px;
+    border-radius: var(--d2-r-ctl);
+    letter-spacing: 0.1em;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  html.desktop-v2 .btn svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+  }
+
+  html.desktop-v2 .form-input {
+    font-size: 13.5px;
+    padding: 9px 12px;
+    border-radius: var(--d2-r-ctl);
+  }
+
+  html.desktop-v2 .app-content h1,
+  html.desktop-v2 .settings-screen h1,
+  html.desktop-v2 .premium-screen h1 {
+    font-size: 28px;
+    letter-spacing: -0.02em;
+  }
+
+  html.desktop-v2 .app-content h2 {
+    font-size: 22px;
+    letter-spacing: -0.015em;
+  }
+
+  html.desktop-v2 .app-content h3 {
+    font-size: 17px;
+  }
+
+  html.desktop-v2 .search-result-card,
+  html.desktop-v2 .artist-item,
+  html.desktop-v2 .booking-card {
+    border-radius: var(--d2-r-card);
+    border-color: var(--d2-line);
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  html.desktop-v2 .search-result-card,
+  html.desktop-v2 .booking-card {
+    padding: 14px 16px;
+  }
+
+  html.desktop-v2 .search-result-card:hover,
+  html.desktop-v2 .artist-item:hover,
+  html.desktop-v2 .booking-card:hover {
+    background: var(--d2-surface-2);
+    border-color: var(--d2-line-strong);
+    /* scale() would make the card a containing block for the position:fixed
+       expanded detail pane, which would then dock to the card, not the page */
+    transform: none;
+  }
+
+  html.desktop-v2 .modal-content {
+    max-width: 560px;
+    border-radius: 14px;
+    max-height: 78dvh;
+  }
+
+  /* Blunt instrument — these are Tailwind-generated utilities used by the
+     newer screens (News composer/cards, Messages rows, Profile). Keep the
+     list short and check any screen you add one for. */
+  html.desktop-v2 .app-content .rounded-3xl {
+    border-radius: 16px;
+  }
+
+  html.desktop-v2 .app-content .rounded-2xl {
+    border-radius: var(--d2-r-card);
+  }
+
+  /* =========================================================================
+     6. INTERACTION POLISH — the app has no global focus ring today
+     ====================================================================== */
+  html.desktop-v2 :is(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid rgba(255, 51, 102, 0.55);
+    outline-offset: 2px;
+  }
+
+  html.desktop-v2 ::selection {
+    background: rgba(255, 51, 102, 0.3);
+    color: #fff;
+  }
+
+  /* Out-specifies the global `*::-webkit-scrollbar*` block in App.css */
+  html.desktop-v2 *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  html.desktop-v2 *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+  }
+
+  html.desktop-v2 *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.22);
+    background-clip: padding-box;
+  }
+
+  /* =========================================================================
+     7. BOTTOM SHEETS -> DESKTOP SURFACES
+     ====================================================================== */
+  /* The Assistant has no desktop override at all today — it slides up from
+     the bottom edge of a 27" monitor with phone corner radii. */
+  html.desktop-v2 .assistant-overlay {
+    align-items: center;
+  }
+
+  html.desktop-v2 .assistant-sheet {
+    width: min(620px, 72vw);
+    height: min(680px, 78dvh);
+    border-radius: 14px;
+  }
+
+  /* Filters become a right-docked panel instead of a full-page takeover. */
+  html.desktop-v2 .filter-screen {
+    left: auto;
+    right: 0;
+    width: 420px;
+    border-left: 1px solid var(--d2-line);
+    padding-bottom: 0;
+  }
+
+  html.desktop-v2 .filter-screen-actions {
+    padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ===========================================================================
+   WIDE — a token flip, not a second layout. Contrast responsive.css's 1440
+   block, which restates ~70 rules to change 240 into 280.
+   ======================================================================== */
+@media (min-width: 1440px) {
+  html.desktop-v2 {
+    --d2-sidebar: 280px;
+    --d2-gutter: 40px;
+    --d2-measure: 760px;
+    --d2-master: 420px;
+    --d2-rail: 348px;
+  }
+}
+
+@media (min-width: 1800px) {
+  html.desktop-v2 {
+    --d2-measure: 780px;
+    --d2-rail: 380px;
+    --d2-detail-max: 920px;
+  }
+}
+
+/* ===========================================================================
+   FEED RAIL — only once the window can hold sidebar + measure + rail
+   ======================================================================== */
+@media (min-width: 1280px) {
+  html.desktop-v2 .app-content > .tab-panel:has(> .d2-rail) {
+    display: grid;
+    grid-template-columns: minmax(0, var(--d2-measure)) var(--d2-rail);
+    gap: var(--d2-gutter);
+    justify-content: center;
+    align-items: start;
+  }
+
+  /* inside the grid the screen fills its track instead of centring itself */
+  html.desktop-v2 .app-content > .tab-panel:has(> .d2-rail) > .screen {
+    max-width: none;
+    margin: 0;
+  }
+
+  html.desktop-v2 .d2-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+  }
+
+  html.desktop-v2 .d2-rail-card {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v2 .d2-rail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 10px;
+    border: none;
+    border-radius: var(--d2-r-ctl);
+    background: none;
+    color: rgba(255, 255, 255, 0.62);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  html.desktop-v2 .d2-rail-row:hover {
+    background: rgba(255, 255, 255, 0.045);
+    color: #fff;
+  }
+
+  html.desktop-v2 .d2-rail-count {
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  html.desktop-v2 .d2-rail-count.is-active {
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--d2-accent);
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* the invite block is a Settings-page section; in the rail it is a card */
+  html.desktop-v2 .d2-rail > *:not(.d2-rail-card) {
+    padding: 14px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+  }
+}

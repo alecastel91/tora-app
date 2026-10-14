@@ -28,9 +28,13 @@ import { StarIcon } from './utils/icons';
 import { CURRENCIES } from './utils/currencies';
 import './styles/App.css';
 import './styles/responsive.css';
+// Last stylesheet in the graph, deliberately: desktop v2 shadows responsive.css's
+// desktop rules. Inert without the desktop-v2 class on <html> (see utils/desktopV2).
+import './styles/desktop-v2.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import AchievementsScreen from './components/screens/AchievementsScreen';
 import InviteFriendsSection from './components/common/InviteFriendsSection';
+import { isDesktopV2 } from './utils/desktopV2';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
@@ -229,6 +233,20 @@ function App() {
   // actions are actually handled (the count drops to 0), so a still-unhandled
   // item keeps signalling instead of vanishing after one glance.
   const [bookingsActionCount, setBookingsActionCount] = useState(0);
+
+  // Desktop v2 feed rail: gated on the SAME 1280px breakpoint as its CSS, so on
+  // a phone the subtree never mounts at all (.desktop-only would only hide it —
+  // InviteFriendsSection would still mount and fetch).
+  const [showD2Rail, setShowD2Rail] = useState(
+    () => isDesktopV2() && window.matchMedia('(min-width: 1280px)').matches
+  );
+  useEffect(() => {
+    if (!isDesktopV2()) return undefined;
+    const mq = window.matchMedia('(min-width: 1280px)');
+    const onChange = () => setShowD2Rail(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
   // First-login "Getting started" carousel (reopenable from Settings).
   const [showGettingStarted, setShowGettingStarted] = useState(false);
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
@@ -811,6 +829,28 @@ function App() {
               style={{ display: activeTab === tab ? undefined : 'none' }}
             >
               {tabScreens[tab]}
+              {/* Desktop v2 feed rail. Added as a SIBLING of the screen so
+                  NewsScreen itself is untouched; the panel becomes a two-column
+                  grid in desktop-v2.css. Everything here reuses state already in
+                  this component and existing nav.* keys — no new copy, no new
+                  fetches. Not mounted below 1280px or when the flag is off. */}
+              {tab === 'news' && showD2Rail && (
+                <aside className="d2-rail desktop-only">
+                  <div className="d2-rail-card">
+                    {[
+                      { id: 'bookings', count: bookingsActionCount },
+                      { id: 'messages', count: unreadMessagesCount },
+                      { id: 'tour', count: unreadProposalsCount },
+                    ].map(({ id, count }) => (
+                      <button key={id} className="d2-rail-row" onClick={() => switchTab(id)}>
+                        <span>{t(`nav.${id}`)}</span>
+                        <span className={`d2-rail-count${count > 0 ? ' is-active' : ''}`}>{count}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <InviteFriendsSection />
+                </aside>
+              )}
             </div>
           ))}
         </main>
