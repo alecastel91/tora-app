@@ -1849,7 +1849,6 @@ const fr = {
   safety: {
     moreActions: 'Plus d\'actions',
     reportProfile: 'Signaler ce membre',
-    reportMessage: 'Signaler ce message',
     blockMember: 'Bloquer {{name}}',
     block: 'Bloquer',
     unblock: 'Débloquer',
@@ -2110,8 +2109,6 @@ const fr = {
     commentPlaceholder: "Écrire un commentaire...",
     commentCta: "Répondre",
     report: "Signaler",
-    reportConfirm: "Signaler cette publication à l'équipe TORA ?",
-    reportThanks: "Merci — notre équipe va l’examiner.",
     deleteConfirm: "Supprimer cette publication ?",
     deleteCommentConfirm: 'Supprimer ce commentaire ?',
     deleteCommentFailed: 'Impossible de supprimer le commentaire. Réessaie.',

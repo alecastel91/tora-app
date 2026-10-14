@@ -1861,7 +1861,6 @@ const en = {
   safety: {
     moreActions: 'More actions',
     reportProfile: 'Report this member',
-    reportMessage: 'Report this message',
     blockMember: 'Block {{name}}',
     block: 'Block',
     unblock: 'Unblock',
@@ -2122,8 +2121,6 @@ const en = {
     commentPlaceholder: "Write a comment...",
     commentCta: "Reply",
     report: "Report",
-    reportConfirm: "Report this post to the TORA team?",
-    reportThanks: "Thanks — our team will review this post.",
     deleteConfirm: "Delete this post?",
     deleteCommentConfirm: 'Delete this comment?',
     deleteCommentFailed: 'Could not delete the comment. Please try again.',

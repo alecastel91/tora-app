@@ -446,11 +446,11 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async reportPost(postId, { profileId, reason }) {
+  async reportPost(postId, { profileId, reason, note }) {
     const response = await fetch(`${API_URL}/posts/${postId}/report`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ profileId, reason }),
+      body: JSON.stringify({ profileId, reason, note }),
     });
     return this.handleResponse(response);
   }

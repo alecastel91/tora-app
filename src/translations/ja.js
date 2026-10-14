@@ -1849,7 +1849,6 @@ const ja = {
   safety: {
     moreActions: 'その他の操作',
     reportProfile: 'このメンバーを報告',
-    reportMessage: 'このメッセージを報告',
     blockMember: '{{name}}をブロック',
     block: 'ブロック',
     unblock: 'ブロック解除',
@@ -2110,8 +2109,6 @@ const ja = {
     commentPlaceholder: "コメントを書く...",
     commentCta: "返信",
     report: "報告",
-    reportConfirm: "この投稿をTORAチームに報告しますか？",
-    reportThanks: "ありがとうございます — チームが確認します。",
     deleteConfirm: "この投稿を削除しますか？",
     deleteCommentConfirm: 'このコメントを削除しますか？',
     deleteCommentFailed: 'コメントを削除できませんでした。もう一度お試しください。',

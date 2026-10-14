@@ -3,6 +3,7 @@ import { profileEmbeds } from '../../utils/mediaLinks';
 import RoomsTechCard from '../common/RoomsTechCard';
 import SafetyMenu from '../common/SafetyMenu';
 import { BLOCK_EFFECT_KEYS } from '../../utils/safety';
+import { confirmUnblock } from '../../utils/blockActions';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -54,6 +55,21 @@ const LockGlyph = () => (
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
+);
+
+/** The floating back arrow, identical on all three branches of this screen. */
+const BackButton = ({ onClose, label }) => (
+  <button
+    type="button"
+    onClick={onClose}
+    aria-label={label}
+    className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
+               flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </button>
 );
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
@@ -429,17 +445,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   if (profile.blockedByMe) {
     return (
       <div className="screen active view-profile-screen relative">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t('common.back')}
-          className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
-                     flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
+        <BackButton onClose={onClose} label={t('common.back')} />
         <div className="view-profile-content relative isolate">
           <div className="profile-header">
             <div className="profile-avatar-container">
@@ -458,12 +464,15 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <ul className="mx-auto mt-3 mb-4 max-w-sm list-none p-0 text-left text-[13px] leading-relaxed text-white/55">
               {BLOCK_EFFECT_KEYS.map((k) => <li key={k} className="mb-1">· {t(`safety.${k}`)}</li>)}
             </ul>
-            <SafetyMenu
-              variant="footer"
-              blocked
-              profile={profile}
-              onUnblocked={() => setReloadKey((n) => n + 1)}
-            />
+            <div className="safety-footer">
+              <button
+                type="button"
+                className="safety-footer-action"
+                onClick={async () => { if (await confirmUnblock(profile, t)) setReloadKey((n) => n + 1); }}
+              >
+                {t('safety.unblock')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -475,17 +484,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   if (profile.isOfficial) {
     return (
       <div className="screen active view-profile-screen relative">
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t('common.back')}
-          className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
-                     flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
+        <BackButton onClose={onClose} label={t('common.back')} />
         <div className="view-profile-content relative isolate">
           <div
             aria-hidden
@@ -534,17 +533,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   return (
     <div className="screen active view-profile-screen relative">
       {/* Floating back arrow — no header bar, the page starts at the avatar */}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={t('common.back')}
-        className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full border border-white/15 bg-black/50 backdrop-blur
-                   flex items-center justify-center text-white cursor-pointer hover:border-infrared/50 transition-colors"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-      </button>
+      <BackButton onClose={onClose} label={t('common.back')} />
       <div className="view-profile-content relative isolate">
         {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
         <div
