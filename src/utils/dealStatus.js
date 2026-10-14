@@ -3,3 +3,5 @@
 // deals (Bookings tabs, the calendar's gig markers).
 export const OFF_STATUSES = ['DECLINED', 'CANCELLED'];
 export const isOffDeal = (deal) => OFF_STATUSES.includes(deal?.status);
+/** A deal booked for this artist, directly or through an agent. */
+export const dealIsForArtist = (deal, artistId) => !!artistId && (deal?.artistId === artistId || deal?.bookedArtistId === artistId);

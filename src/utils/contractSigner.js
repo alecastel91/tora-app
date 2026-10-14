@@ -41,3 +41,16 @@ export function isArtistSideForDeal(deal, profile) {
   if (profile.id === deal.artistId || profile.id === deal.bookedArtistId) return true;
   return isDealAgent(deal, profile);
 }
+
+/**
+ * Which side a signature record belongs to. Records come in two shapes:
+ * sender records { signedBy, role } (send-and-sign) and recipient records
+ * { profileId, artistSide }. The flag wins, then the recorded role, then the
+ * id as a legacy fallback — an agent signs for the artist, so its id alone
+ * would land on the venue side.
+ */
+export function signatureIsArtistSide(sig, deal) {
+  if (typeof sig?.artistSide === 'boolean') return sig.artistSide;
+  if (sig?.role) return sig.role === 'ARTIST';
+  return (sig?.profileId || sig?.signedBy) === deal?.artistId;
+}

@@ -19,7 +19,7 @@ import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
-import { counterpartRoles, matchDatesFor, normalizeDate } from '../../utils/calendarMatch';
+import { counterpartRoles, matchDatesFor } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
@@ -213,20 +213,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [message, setMessage] = useState('');
-  // Multi-tick roles (none ticked = all). Agents excluded: they don't travel
-  // and aren't a booking counterpart in this view.
+  // Matches/feed filters: period, geography, genres (roles are fixed to the
+  // viewer's counterparts — see utils/calendarMatch).
   const [monthFilter, setMonthFilter] = useState('all');
   const [zoneFilter, setZoneFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
   const [genresFilter, setGenresFilter] = useState([]);
   const [showMatchFilters, setShowMatchFilters] = useState(false);
-  const [matchDropdown, setMatchDropdown] = useState(null);
   const matchFilterCount =
     (monthFilter !== 'all' ? 1 : 0) +
     (zoneFilter !== 'all' ? 1 : 0) + (countryFilter !== 'all' ? 1 : 0) +
     (genresFilter.length ? 1 : 0);
-  const toggleGenre = (g) => setGenresFilter((prev) =>
-    prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]);
   const clearMatchFilters = () => {
     setMonthFilter('all'); setZoneFilter('all');
     setCountryFilter('all'); setGenresFilter([]); setArtistFilter('all');
@@ -258,13 +255,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       feedHasMoreRef.current = true;
       setFeedHasMore(true);
     }
+    // An unknown role has no counterparts; an empty list would mean "all roles"
+    // to the API, so the feed stays empty instead of showing the viewer's own kind.
+    const roles = counterpartRoles(user.role);
+    if (roles.length === 0) { setTravelFeed([]); return; }
     feedLoadingRef.current = true;
     setFeedLoading(true);
     try {
       const page = feedPageRef.current;
       const range = monthFilter !== 'all' ? monthKeyToRange(monthFilter) : null;
       const res = await apiService.getTravelFeed(user.id, page, {
-        roles: counterpartRoles(user.role), // never the viewer's own role
+        roles,
         zone: zoneFilter !== 'all' ? zoneFilter : undefined,
         country: countryFilter !== 'all' ? countryFilter : undefined,
         genres: genresFilter,
@@ -541,8 +542,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const formatMatchDates = (dates) => {
     if (dates.length === 0) return '';
 
-    // Normalize and sort dates
-    const sortedDates = [...dates].map(normalizeDate).sort();
+    // matchDatesFor already returns normalized 'YYYY-MM-DD' strings.
+    const sortedDates = [...dates].sort();
 
     // Group consecutive dates
     const groups = [];

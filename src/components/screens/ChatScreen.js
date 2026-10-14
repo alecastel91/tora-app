@@ -17,7 +17,7 @@ import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
-import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
+import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatureIsArtistSide } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
 import { getAuthedBackendUrl, isPdfFile } from '../../utils/urls';
 import { PlaneIcon } from '../../utils/icons';
@@ -488,6 +488,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
           title: uploaded.originalName || file.name,
           url: uploaded.fileUrl,
           category: 'attachment',
+          contentType: uploaded.contentType,
         },
       });
       setShowDocumentPicker(false);
@@ -1795,9 +1796,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                       </div>
                       <button
                         type="button"
-                        // Only a payment proof can be a photo; press kits, riders and
-                        // contracts are PDFs even when the attachment carries no contentType.
-                        onClick={() => (msg.documentAttachment.category === 'paymentProof' && !isPdfFile(msg.documentAttachment)
+                        // Payment proofs and plain chat files can be photos; press kits,
+                        // riders and contracts are PDFs even without a contentType.
+                        onClick={() => (['paymentProof', 'attachment'].includes(msg.documentAttachment.category) && !isPdfFile(msg.documentAttachment)
                           ? setImageViewerUrl(getFullUrl(msg.documentAttachment.url))
                           : setPdfViewerUrl(getFullUrl(msg.documentAttachment.url)))}
                         className="btn btn-sm"
@@ -2382,7 +2383,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   // which side we are on (either party can send a contract).
                   const c = selectedOffer.contract || {};
                   const sigs = Array.isArray(c.signatures) ? c.signatures : [];
-                  const sigIsArtistSide = (sig) => (typeof sig.artistSide === 'boolean' ? sig.artistSide : sig.profileId === selectedOffer.artistId);
+                  const sigIsArtistSide = (sig) => signatureIsArtistSide(sig, selectedOffer);
                   const mySideSigned = sigs.some((sig) => sigIsArtistSide(sig) === onArtistSide)
                     || (sigs.length === 0 && c.status === 'SENT' && (c.sentBy ? c.sentBy === currentUser.id : onArtistSide));
                   return (

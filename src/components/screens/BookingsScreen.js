@@ -12,7 +12,7 @@ import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
-import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal } from '../../utils/contractSigner';
+import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatureIsArtistSide } from '../../utils/contractSigner';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
@@ -1165,12 +1165,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                     ? (deal.venue?.name || t('bookings.theVenue'))
                     : (deal.artist?.name || t('bookings.theArtist'));
                   const sigs = Array.isArray(deal.contract.signatures) ? deal.contract.signatures : [];
-                  // Side comes from the signature record itself: an agent signing for
-                  // their artist has signedBy = agentId, so ids alone would put that
-                  // signature on the venue side.
-                  const sigIsArtistSide = (sig) => (typeof sig.artistSide === 'boolean' ? sig.artistSide
-                    : sig.role ? sig.role === 'ARTIST'
-                    : (sig.profileId || sig.signedBy) === deal.artistId);
+                  const sigIsArtistSide = (sig) => signatureIsArtistSide(sig, deal);
                   const mySideSigned = sigs.some((sig) => sigIsArtistSide(sig) === onArtistSide)
                     // A SENT contract with no signature record was sent-and-signed by its sender.
                     || (sigs.length === 0 && deal.contract.status === 'SENT' && (deal.contract.sentBy ? deal.contract.sentBy === currentUser.id : onArtistSide));

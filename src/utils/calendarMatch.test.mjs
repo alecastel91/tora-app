@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { counterpartRoles, isValidRoleMatch, matchDatesFor } from './calendarMatch.js';
+import { counterpartRoles, isValidRoleMatch, matchDatesFor, artistInCountryOn } from './calendarMatch.js';
 
 const ROLES = ['ARTIST', 'AGENT', 'PROMOTER', 'VENUE'];
 
@@ -50,4 +50,13 @@ test('promoter↔venue: same country, every shared date; agents match as artists
   assert.deepEqual(matchDatesFor(promoter, berlinVenue), []);
   const rosterArtist = { ...artist, role: 'ARTIST' };
   assert.deepEqual(matchDatesFor({ ...rosterArtist, role: 'AGENT' }, berlinVenue), ['2026-12-05']);
+});
+
+test('artistInCountryOn: base country, travel window inclusive, unpadded dates', () => {
+  assert.equal(artistInCountryOn(artist, 'Japan', '2026-11-21'), true);
+  assert.equal(artistInCountryOn(artist, 'Germany', '2026-12-01'), true);
+  assert.equal(artistInCountryOn(artist, 'Germany', '2026-12-7'), true);
+  assert.equal(artistInCountryOn(artist, 'Germany', '2026-12-08'), false);
+  assert.equal(artistInCountryOn(artist, 'France', '2026-12-03'), false);
+  assert.equal(artistInCountryOn(artist, '', '2026-12-03'), false);
 });

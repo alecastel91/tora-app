@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
+import { dealIsForArtist } from '../../utils/dealStatus';
 import PrivacyNote from '../common/PrivacyNote';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
@@ -123,19 +124,19 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         // The agent's own deals (GET /deals is owner-only, so asking for the
         // artist's id was a 403), narrowed to this artist like CalendarPane does.
         const response = await apiService.getDeals({ profileId: user.id });
-        if (response?.deals) response.deals = response.deals.filter((d) => [d.artistId, d.bookedArtistId].includes(artistId));
+        const deals = (response?.deals || []).filter((d) => dealIsForArtist(d, artistId));
 
         console.log('ManageArtistScreen - API response:', response);
 
-        if (response && response.deals) {
+        if (response?.deals) {
           // Store all deals for events list
-          setDeals(response.deals || []);
+          setDeals(deals);
 
           const today = new Date();
           const yearStart = new Date(today.getFullYear(), 0, 1); // January 1st of current year
 
           // Count upcoming gigs with PENDING, NEGOTIATING, or ACCEPTED status
-          const upcoming = response.deals.filter(deal => {
+          const upcoming = deals.filter(deal => {
             const dealDate = new Date(deal.date);
             const hasUpcomingDate = dealDate >= today;
             const hasActiveStatus = ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status);
@@ -146,7 +147,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           setGigsError(false);
 
           // Calculate This Year Gigs: only completed or past accepted deals this year
-          const thisYearDeals = response.deals.filter(deal => {
+          const thisYearDeals = deals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isThisYear = dealDate >= yearStart && dealDate <= today;
             const isCompleted = deal.status === 'COMPLETED';
@@ -156,7 +157,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           setThisYearGigs(thisYearDeals.length);
 
           // Calculate YTD Revenue: sum all COMPLETED or past ACCEPTED deals from current year
-          const ytdDeals = response.deals.filter(deal => {
+          const ytdDeals = deals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isThisYear = dealDate >= yearStart && dealDate <= today;
             const isCompleted = deal.status === 'COMPLETED';
@@ -235,7 +236,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
           // Revenue events for the chart (converted once to the preferred currency)
           const startDate = new Date('2024-01-01');
-          const historicalDeals = response.deals.filter(deal => {
+          const historicalDeals = deals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isFrom2024 = dealDate >= startDate;
             const isCompleted = deal.status === 'COMPLETED';
@@ -278,7 +279,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     };
 
     fetchUpcomingGigs();
-  }, [artist, preferredCurrency]); // Re-run when currency changes
+  }, [artist, preferredCurrency, user?.id]); // Re-run when currency or the active profile changes
 
   // Fetch fresh artist profile data (including availableDates) when component mounts
   useEffect(() => {

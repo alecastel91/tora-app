@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isArtistSideForDeal } from '../../utils/contractSigner';
-import { OFF_STATUSES } from '../../utils/dealStatus';
+import { OFF_STATUSES, dealIsForArtist } from '../../utils/dealStatus';
 import { useAppContext } from '../../contexts/AppContext';
 import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { CloseIcon, CalendarIcon, ListIcon } from '../../utils/icons';
@@ -144,7 +144,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
 
         if (response && response.deals) {
           if (targetProfile) {
-            response.deals = response.deals.filter((d) => [d.artistId, d.bookedArtistId].includes(profile.id));
+            response.deals = response.deals.filter((d) => dealIsForArtist(d, profile.id));
           }
           setDeals(response.deals.filter((d) => !OFF_STATUSES.includes(d.status)));
         }

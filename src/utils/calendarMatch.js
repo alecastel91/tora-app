@@ -15,17 +15,15 @@ export const COUNTERPARTS = {
   PROMOTER: ['ARTIST', 'VENUE'],
 };
 
-export const counterpartRoles = (role) => COUNTERPARTS[String(role || '').toUpperCase()] || [];
+const up = (role) => String(role || '').toUpperCase();
+const arr = (v) => (Array.isArray(v) ? v : []);
+const isArtistLike = (p) => up(p?.role) === 'ARTIST' || up(p?.role) === 'AGENT';
 
-const asArtist = (role) => (role === 'AGENT' ? 'ARTIST' : role);
+export const counterpartRoles = (role) => COUNTERPARTS[up(role)] || [];
 
 /** ARTIST↔VENUE, ARTIST↔PROMOTER, PROMOTER↔VENUE; AGENT counts as ARTIST. Never same role. */
-export function isValidRoleMatch(roleA, roleB) {
-  const a = asArtist(String(roleA || '').toUpperCase());
-  const b = asArtist(String(roleB || '').toUpperCase());
-  if (!a || !b || a === b) return false;
-  return (COUNTERPARTS[a] || []).includes(b);
-}
+// An agent on either side stands in for an artist, so AGENT normalises to ARTIST before the lookup.
+export const isValidRoleMatch = (roleA, roleB) => counterpartRoles(roleA).includes(up(roleB) === 'AGENT' ? 'ARTIST' : up(roleB));
 
 /** 'YYYY-M-D' → 'YYYY-MM-DD' (dates are compared as strings, never as Date objects). */
 export const normalizeDate = (s) => {
@@ -39,7 +37,7 @@ export function artistInCountryOn(artist, country, date) {
   if (!artist || !country) return false;
   if (artist.country === country) return true;
   const d = normalizeDate(date);
-  return (Array.isArray(artist.travelSchedule) ? artist.travelSchedule : []).some((e) => (
+  return arr(artist.travelSchedule).some((e) => (
     e && e.country === country && e.startDate && e.endDate
     && normalizeDate(e.startDate) <= d && d <= normalizeDate(e.endDate)
   ));
@@ -54,19 +52,13 @@ export function artistInCountryOn(artist, country, date) {
 export function matchDatesFor(source, candidate) {
   if (!source || !candidate || !isValidRoleMatch(source.role, candidate.role)) return [];
   if (!source.country || !candidate.country) return [];
-  const sg = Array.isArray(source.genres) ? source.genres : [];
-  const cg = Array.isArray(candidate.genres) ? candidate.genres : [];
+  const sg = arr(source.genres); const cg = arr(candidate.genres);
   if (sg.length === 0 || cg.length === 0 || !sg.some((g) => cg.includes(g))) return [];
-  const cand = new Set((Array.isArray(candidate.availableDates) ? candidate.availableDates : []).map(normalizeDate));
-  const shared = (Array.isArray(source.availableDates) ? source.availableDates : []).map(normalizeDate).filter((d) => cand.has(d));
+  const cand = new Set(arr(candidate.availableDates).map(normalizeDate));
+  const shared = arr(source.availableDates).map(normalizeDate).filter((d) => cand.has(d));
   if (shared.length === 0) return [];
-  const sRole = asArtist(String(source.role).toUpperCase());
-  const cRole = asArtist(String(candidate.role).toUpperCase());
-  if (sRole !== 'ARTIST' && cRole !== 'ARTIST') {
-    // PROMOTER↔VENUE: no travelling party — same country, every shared date.
-    return source.country === candidate.country ? shared : [];
-  }
-  const artist = sRole === 'ARTIST' ? source : candidate;
-  const other = sRole === 'ARTIST' ? candidate : source;
+  const artist = isArtistLike(source) ? source : isArtistLike(candidate) ? candidate : null;
+  if (!artist) return source.country === candidate.country ? shared : []; // PROMOTER↔VENUE: nobody travels
+  const other = artist === source ? candidate : source;
   return shared.filter((d) => artistInCountryOn(artist, other.country, d));
 }
