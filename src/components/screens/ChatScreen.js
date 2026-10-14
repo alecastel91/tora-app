@@ -16,6 +16,7 @@ import AddContractModal from '../common/AddContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
+import SafetyMenu from '../common/SafetyMenu';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatureIsArtistSide } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, DOC_CATEGORY_KEYS, BROADCAST_DOC_CATEGORY_KEYS, labelForCategory } from '../../utils/documentCategories';
@@ -1099,6 +1100,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
             <span className="chat-location">{user.location}</span>
           </div>
         </div>
+        {/* Report + block (App Review 1.2); blocking closes the thread. */}
+        <SafetyMenu profile={user} className="chat-header-menu" onBlocked={onClose} />
       </div>
 
       {/* Banner for deleted profiles */}

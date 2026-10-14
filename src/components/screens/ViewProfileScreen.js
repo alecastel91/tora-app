@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import RoomsTechCard from '../common/RoomsTechCard';
+import SafetyMenu from '../common/SafetyMenu';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -493,7 +494,10 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
       </button>
-      
+      {/* Report + block (App Review 1.2). Blocking closes the screen: the
+          person is gone from this member's app from that moment. */}
+      <SafetyMenu profile={profile} className="absolute top-3 right-3 z-20" onBlocked={onClose} />
+
       <div className="view-profile-content relative isolate">
         {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
         <div

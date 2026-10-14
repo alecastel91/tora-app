@@ -420,6 +420,32 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // --- Safety: blocks + reports (App Review guideline 1.2) ---------------
+  async getBlocks() {
+    const response = await fetch(`${API_URL}/blocks`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
+  async blockMember(profileId) {
+    const response = await fetch(`${API_URL}/blocks`, {
+      method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId }),
+    });
+    return this.handleResponse(response);
+  }
+
+  async unblockMember(userId) {
+    const response = await fetch(`${API_URL}/blocks/${userId}`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
+  async sendReport({ targetType, targetId, reason, note, reporterProfileId }) {
+    const response = await fetch(`${API_URL}/reports`, {
+      method: 'POST', headers: this.getHeaders(),
+      body: JSON.stringify({ targetType, targetId, reason, note, reporterProfileId }),
+    });
+    return this.handleResponse(response);
+  }
+
   async reportPost(postId, { profileId, reason }) {
     const response = await fetch(`${API_URL}/posts/${postId}/report`, {
       method: 'POST',

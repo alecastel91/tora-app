@@ -34,6 +34,7 @@ import InviteFriendsSection from './components/common/InviteFriendsSection';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
+import BlockedMembers from './components/common/BlockedMembers';
 import StripeCheckout from './components/common/StripeCheckout';
 import BetaTools from './components/common/BetaTools';
 import AssistantChat from './components/common/AssistantChat';
@@ -1078,6 +1079,8 @@ function App() {
               </div>
               <button className="btn btn-outline btn-change-password" onClick={() => setShowPasswordChange(true)}>{t('settings.changePassword')}</button>
             </div>
+
+            <BlockedMembers />
 
             <div className="settings-section">
               <h3>{t('settings.language')}</h3>
