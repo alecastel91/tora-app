@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import apiService from '../../services/api';
+import { confirmUnblock } from '../../utils/blockActions';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { appAlert, appConfirm } from '../../utils/dialogs';
 import { getAvatarClass, roleLabel } from '../../utils/roles';
 
 /**
@@ -23,18 +23,12 @@ const BlockedMembers = () => {
   }, []);
 
   const unblock = async (entry) => {
-    const name = entry.profiles?.[0]?.name || t('safety.thisMember');
-    const ok = await appConfirm(t('safety.unblockConfirm', { name }), { confirmLabel: t('safety.unblock') });
-    if (!ok) return;
     setBusyId(entry.userId);
-    try {
-      await apiService.unblockMember(entry.userId);
+    const name = entry.profiles?.[0]?.name || t('safety.thisMember');
+    if (await confirmUnblock({ userId: entry.userId, name }, t)) {
       setBlocks((cur) => (cur || []).filter((b) => b.userId !== entry.userId));
-    } catch (err) {
-      appAlert(err.message || t('safety.unblockFailed'));
-    } finally {
-      setBusyId(null);
     }
+    setBusyId(null);
   };
 
   return (

@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import ReportDialog from '../common/ReportDialog';
+import { REPORT_TARGETS } from '../../utils/safety';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
@@ -302,17 +304,9 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     }
   };
 
-  const reportPost = async (post) => {
-    setMenuFor(null);
-    const ok = await appConfirm(t('news.reportConfirm'), { confirmLabel: t('news.report'), danger: true });
-    if (!ok) return;
-    try {
-      await apiService.reportPost(post.id, { profileId: user.id });
-      appAlert(t('news.reportThanks'));
-    } catch (e) {
-      appAlert(e.message || t('news.postFailed'));
-    }
-  };
+  // Reporting a post asks for a reason, same as reporting a person. A bare
+  // confirmation filed every post in the moderation queue as "other".
+  const [reportingPost, setReportingPost] = useState(null);
 
   const deleteComment = async (post, comment) => {
     const ok = await appConfirm(t('news.deleteCommentConfirm'), { confirmLabel: t('common.delete'), danger: true });
@@ -488,7 +482,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                     )}
                     {!isOwn && (
                       <button className="block w-full cursor-pointer border-0 bg-transparent px-4 py-2.5 text-left text-xs text-infrared hover:bg-white/5"
-                              onClick={() => reportPost(post)}>
+                              onClick={() => { setMenuFor(null); setReportingPost(post); }}>
                         {t('news.report')}
                       </button>
                     )}
@@ -594,6 +588,16 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
         <button className="btn btn-outline mx-auto mt-2 block" disabled={loadingMore} onClick={loadMore}>
           {loadingMore ? '...' : t('news.loadMore')}
         </button>
+      )}
+
+      {reportingPost && (
+        <ReportDialog
+          targetType={REPORT_TARGETS.POST}
+          targetId={reportingPost.id}
+          name={reportingPost.author?.name}
+          title={t('news.report')}
+          onClose={() => setReportingPost(null)}
+        />
       )}
     </div>
   );

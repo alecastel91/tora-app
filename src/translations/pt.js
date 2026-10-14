@@ -1849,7 +1849,6 @@ const pt = {
   safety: {
     moreActions: 'Mais ações',
     reportProfile: 'Denunciar este membro',
-    reportMessage: 'Denunciar esta mensagem',
     blockMember: 'Bloquear {{name}}',
     block: 'Bloquear',
     unblock: 'Desbloquear',
@@ -2110,8 +2109,6 @@ const pt = {
     commentPlaceholder: "Escreva um comentário...",
     commentCta: "Responder",
     report: "Denunciar",
-    reportConfirm: "Denunciar este post à equipe TORA?",
-    reportThanks: "Obrigado — nossa equipe vai analisar.",
     deleteConfirm: "Excluir este post?",
     deleteCommentConfirm: 'Excluir este comentário?',
     deleteCommentFailed: 'Não foi possível excluir o comentário. Tente novamente.',

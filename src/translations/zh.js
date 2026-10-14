@@ -1849,7 +1849,6 @@ const zh = {
   safety: {
     moreActions: '更多操作',
     reportProfile: '举报该成员',
-    reportMessage: '举报该消息',
     blockMember: '拉黑 {{name}}',
     block: '拉黑',
     unblock: '解除拉黑',
@@ -2110,8 +2109,6 @@ const zh = {
     commentPlaceholder: "写评论...",
     commentCta: "回复",
     report: "举报",
-    reportConfirm: "向TORA团队举报此帖？",
-    reportThanks: "感谢——我们的团队会进行审核。",
     deleteConfirm: "删除此帖？",
     deleteCommentConfirm: '删除这条评论？',
     deleteCommentFailed: '无法删除评论，请重试。',

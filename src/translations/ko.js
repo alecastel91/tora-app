@@ -1849,7 +1849,6 @@ const ko = {
   safety: {
     moreActions: '추가 작업',
     reportProfile: '이 멤버 신고',
-    reportMessage: '이 메시지 신고',
     blockMember: '{{name}} 차단',
     block: '차단',
     unblock: '차단 해제',
@@ -2110,8 +2109,6 @@ const ko = {
     commentPlaceholder: "댓글 쓰기...",
     commentCta: "답글",
     report: "신고",
-    reportConfirm: "이 게시물을 TORA 팀에 신고할까요?",
-    reportThanks: "감사합니다 — 팀에서 검토하겠습니다.",
     deleteConfirm: "이 게시물을 삭제할까요?",
     deleteCommentConfirm: '이 댓글을 삭제할까요?',
     deleteCommentFailed: '댓글을 삭제하지 못했습니다. 다시 시도해 주세요.',
