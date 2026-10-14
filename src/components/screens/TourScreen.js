@@ -19,6 +19,7 @@ import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
+import { counterpartRoles, matchDatesFor, normalizeDate } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
@@ -214,7 +215,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [message, setMessage] = useState('');
   // Multi-tick roles (none ticked = all). Agents excluded: they don't travel
   // and aren't a booking counterpart in this view.
-  const [rolesFilter, setRolesFilter] = useState([]);
   const [monthFilter, setMonthFilter] = useState('all');
   const [zoneFilter, setZoneFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
@@ -222,17 +222,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showMatchFilters, setShowMatchFilters] = useState(false);
   const [matchDropdown, setMatchDropdown] = useState(null);
   const matchFilterCount =
-    (rolesFilter.length ? 1 : 0) + (monthFilter !== 'all' ? 1 : 0) +
+    (monthFilter !== 'all' ? 1 : 0) +
     (zoneFilter !== 'all' ? 1 : 0) + (countryFilter !== 'all' ? 1 : 0) +
     (genresFilter.length ? 1 : 0);
   const toggleGenre = (g) => setGenresFilter((prev) =>
     prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]);
   const clearMatchFilters = () => {
-    setRolesFilter([]); setMonthFilter('all'); setZoneFilter('all');
+    setMonthFilter('all'); setZoneFilter('all');
     setCountryFilter('all'); setGenresFilter([]); setArtistFilter('all');
   };
-  const toggleRole = (r) => setRolesFilter((prev) =>
-    prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]);
   const [calendarMatches, setCalendarMatches] = useState([]);
 
   // Industry travel feed: every active schedule (connected > liked > others),
@@ -266,7 +264,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       const page = feedPageRef.current;
       const range = monthFilter !== 'all' ? monthKeyToRange(monthFilter) : null;
       const res = await apiService.getTravelFeed(user.id, page, {
-        roles: rolesFilter,
+        roles: counterpartRoles(user.role), // never the viewer's own role
         zone: zoneFilter !== 'all' ? zoneFilter : undefined,
         country: countryFilter !== 'all' ? countryFilter : undefined,
         genres: genresFilter,
@@ -293,7 +291,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       loadFeedPage(true); // owns the page/hasMore reset
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, activeTab, isActive, rolesFilter, monthFilter, zoneFilter, countryFilter, genresFilter]);
+  }, [user?.id, user?.role, activeTab, isActive, monthFilter, zoneFilter, countryFilter, genresFilter]);
 
   useEffect(() => {
     const el = feedSentinelRef.current;
@@ -467,18 +465,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
         const matches = [];
         for (const source of sources) {
-          const sourceDates = new Set(source.availableDates || []);
-          const sourceGenres = source.genres || [];
-
           for (const profile of allProfiles) {
             if (profile.id === source.id || profile.id === user.id) continue;
-            if (!isValidRoleMatch(source.role, profile.role)) continue;
-
-            const profileGenres = profile.genres || [];
-            if (sourceGenres.length === 0 || profileGenres.length === 0) continue;
-            if (!sourceGenres.some((genre) => profileGenres.includes(genre))) continue;
-
-            const overlappingDates = (profile.availableDates || []).filter((date) => sourceDates.has(date));
+            // Counterpart roles, shared genre, shared open dates on which the
+            // artist is actually in the counterpart's country (utils/calendarMatch).
+            const overlappingDates = matchDatesFor(source, profile);
             if (overlappingDates.length > 0) {
               matches.push({
                 profile,
@@ -543,32 +534,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, user?.role, activeTab, isActive, onUnreadProposalsChange]);
 
-  // Helper function to check role compatibility
-  const isValidRoleMatch = (role1, role2) => {
-    // Treat AGENT same as ARTIST (agents represent artists)
-    const normalizedRole1 = role1 === 'AGENT' ? 'ARTIST' : role1;
-    const normalizedRole2 = role2 === 'AGENT' ? 'ARTIST' : role2;
-
-    const validPairs = [
-      ['ARTIST', 'VENUE'],
-      ['ARTIST', 'PROMOTER'],
-      ['PROMOTER', 'VENUE']
-    ];
-
-    return validPairs.some(([r1, r2]) =>
-      (normalizedRole1 === r1 && normalizedRole2 === r2) ||
-      (normalizedRole1 === r2 && normalizedRole2 === r1)
-    );
-  };
-
-  // Helper function to normalize date format (YYYY-M-D to YYYY-MM-DD)
-  const normalizeDate = (dateStr) => {
-    const parts = dateStr.split('-');
-    if (parts.length !== 3) return dateStr;
-    const [year, month, day] = parts;
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-  };
-
   // Helper function to format overlapping dates for display
   // Tour span as one "d MMM – d MMM yyyy" string for drafts and cards.
   const tourDatesLabel = (tour) => `${formatEventDate(tour.startDate, t('dateFormat.locale'))} – ${formatEventDate(tour.endDate, t('dateFormat.locale'))}`;
@@ -628,11 +593,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const filteredMatches = allMatches.filter(match => {
     // Represented-artist filter (agents only)
     if (selectedArtistId !== 'all' && match.forArtist?.id !== selectedArtistId) {
-      return false;
-    }
-
-    // Role filter (multi-tick; empty = all)
-    if (rolesFilter.length > 0 && !rolesFilter.includes(match.profile.role)) {
       return false;
     }
 
@@ -769,6 +729,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           })}
 
           <div className="feature-preview">
+            <p className="form-hint" style={{ margin: '0 0 12px' }}>{t('tour.matchesGeoHint')}</p>
 
             {matches.length > 0 ? (
               <div className="matches-results">
@@ -940,22 +901,16 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             phone's fixed-height box) can sit on top of the sheet. */}
         {showMatchFilters && (
           <OverlayPortal><FilterSheet
-            values={{ roles: rolesFilter, period: monthFilter, zone: zoneFilter, country: countryFilter, genres: genresFilter }}
-            clearedValues={{ roles: [], period: 'all', zone: 'all', country: 'all', genres: [] }}
+            values={{ period: monthFilter, zone: zoneFilter, country: countryFilter, genres: genresFilter }}
+            clearedValues={{ period: 'all', zone: 'all', country: 'all', genres: [] }}
             onClose={() => setShowMatchFilters(false)}
             onApply={(v) => {
-              setRolesFilter(v.roles); setMonthFilter(v.period);
+              setMonthFilter(v.period);
               setZoneFilter(v.zone); setCountryFilter(v.country);
               setGenresFilter(v.genres);
               setShowMatchFilters(false);
             }}
             sections={[
-              { key: 'roles', label: t('search.roles'), multi: true,
-                options: () => [
-                  { value: 'ARTIST', label: t('editProfile.artist') },
-                  { value: 'PROMOTER', label: t('editProfile.promoter') },
-                  { value: 'VENUE', label: t('editProfile.venue') },
-                ] },
               { key: 'period', label: t('tour.period'), multi: false, allLabel: t('tour.allMonths'),
                 options: () => monthOptions.map((o) => ({ value: o.value, label: o.label })) },
               { key: 'zone', label: t('editProfile.zone'), multi: false, allLabel: t('manageArtist.allZones'), resets: ['country'],

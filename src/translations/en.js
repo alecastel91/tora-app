@@ -547,7 +547,7 @@ const en = {
       searchVisibility: 'Free members can only discover people in their own country. Premium unlocks global search — find and be found by artists, agents, promoters and venues anywhere in the world.',
       professionalDashboard: 'Your professional hub: bookings, contracts, shared documents and payment tracking in one place. Free members get a preview; premium unlocks the full workflow.',
       updateTravelSchedule: 'Publish where you\'ll be and when, so promoters and venues in those cities can book you while you\'re in town.',
-      calendarMatching: 'Automatically surfaces people whose availability overlaps with yours — less searching, more booking.',
+      calendarMatching: 'Automatically surfaces people whose availability overlaps with yours, in the countries where you are based or travelling — less searching, more booking.',
       tourKickstarter: 'Plan a multi-city tour and let venues and promoters along the route come to you with offers.',
       artistTravelAlerts: 'Every artist you like becomes an alert: when they announce travel or tour dates near your city, you\'re notified — so you can reach out before anyone else.',
       calendarPrivacy: 'Decide exactly who can see your availability and travel plans — everyone, only your connections, or no one.',
@@ -863,6 +863,7 @@ const en = {
     unavailable: 'The assistant isn\'t available right now — please try again later.',
   },
   tour: {
+    matchesGeoHint: 'Matches show venues and promoters in the countries where you are based or travelling on your open dates.',
     matchDraft: 'Hi {{name}}, we both have {{dates}} open. Would you be up for a date with us?',
     tourDraft: 'Hi {{name}}, I saw your {{where}} tour ({{dates}}). We could host you — which dates are still open?',
     imInterested: "I'm interested",
@@ -893,7 +894,7 @@ const en = {
     matchFound: '{{n}} match found',
     matchesFound: '{{n}} matches found',
     travelFeedTitle: 'Travel schedules & open dates',
-    travelFeedHint: 'Artists on the move, promoters and venues with open dates — the industry\'s live calendar, beyond your matches.',
+    travelFeedHint: 'Promoters and venues with open dates, and artists on the move — the live calendar beyond your matches, for the roles you work with.',
     travelFeedEmpty: 'No active schedules right now.',
     feedConnected: 'Connected',
     feedOpenDates: 'Open dates',
@@ -1641,6 +1642,7 @@ const en = {
   },
 
   manageArtist: {
+    feesScopeHint: 'Revenue counts only the bookings you manage. Gigs booked directly by the artist or by another agent show dates but not fees.',
     privateDashboard: 'Only you and the artist can see this. Nothing here appears on their public profile.',
     endDateBeforeStart: 'End date cannot be before start date. Please adjust your dates.',
     scheduleOverlap: 'This travel schedule overlaps with an existing schedule. Please choose different dates.',

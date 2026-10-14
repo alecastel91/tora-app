@@ -597,7 +597,7 @@ const es = {
       searchVisibility: 'Los miembros gratuitos solo pueden descubrir a personas de su propio país. Premium desbloquea la búsqueda global: encuentra y sé encontrado por artistas, agentes, promotores y salas en cualquier parte del mundo.',
       professionalDashboard: 'Tu centro profesional: reservas, contratos, documentos compartidos y seguimiento de pagos en un solo lugar. Los miembros gratuitos ven una vista previa; Premium desbloquea el flujo de trabajo completo.',
       updateTravelSchedule: 'Publica dónde estarás y cuándo, para que los promotores y salas de esas ciudades puedan contratarte mientras estés allí.',
-      calendarMatching: 'Muestra automáticamente a las personas cuya disponibilidad coincide con la tuya: menos búsqueda, más contrataciones.',
+      calendarMatching: 'Muestra automáticamente a quienes tienen disponibilidad coincidente con la tuya en los países donde resides o viajas: menos buscar, más reservar.',
       tourKickstarter: 'Planifica una gira por varias ciudades y deja que las salas y promotores de la ruta vengan a ti con ofertas.',
       artistTravelAlerts: 'Cada artista que te gusta se convierte en un aviso: cuando anuncie fechas de viaje o gira cerca de tu ciudad, recibirás una notificación para contactarlo antes que nadie.',
       calendarPrivacy: 'Decide exactamente quién puede ver tu disponibilidad y tus planes de viaje: todos, solo tus contactos o nadie.',
@@ -863,6 +863,7 @@ const es = {
     unavailable: 'El asistente no está disponible ahora mismo; inténtalo más tarde.',
   },
   tour: {
+    matchesGeoHint: 'Las coincidencias muestran locales y promotores en los países donde resides o viajas en tus fechas libres.',
     matchDraft: 'Hola {{name}}, los dos tenemos libre {{dates}}. ¿Te apetece una fecha con nosotros?',
     tourDraft: 'Hola {{name}}, vi tu gira por {{where}} ({{dates}}). Podríamos acogerte, ¿qué fechas siguen libres?',
     imInterested: 'Me interesa',
@@ -893,7 +894,7 @@ const es = {
     matchFound: '{{n}} match encontrado',
     matchesFound: '{{n}} matches encontrados',
     travelFeedTitle: 'Agendas de viaje y fechas libres',
-    travelFeedHint: 'Artistas en movimiento, promotores y venues con fechas libres — el calendario vivo de la industria, más allá de tus coincidencias.',
+    travelFeedHint: 'Promotores y locales con fechas libres, y artistas en gira: el calendario en vivo más allá de tus coincidencias, solo para los roles con los que trabajas.',
     travelFeedEmpty: 'No hay agendas activas ahora mismo.',
     feedConnected: 'Conectado',
     feedOpenDates: 'Fechas libres',
@@ -1629,6 +1630,7 @@ const es = {
   },
 
   manageArtist: {
+    feesScopeHint: 'Los ingresos cuentan solo las reservas que gestionas. Los bolos reservados directamente por el artista o por otro agente muestran fechas pero no cachés.',
     privateDashboard: 'Solo tú y el artista podéis ver esto. Nada de aquí aparece en su perfil público.',
     endDateBeforeStart: 'La fecha de fin no puede ser anterior a la de inicio. Ajusta las fechas.',
     scheduleOverlap: 'Este viaje se solapa con uno existente. Elige otras fechas.',

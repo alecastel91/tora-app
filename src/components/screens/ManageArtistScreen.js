@@ -120,8 +120,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
         console.log('ManageArtistScreen - Fetching deals for artist:', artistId);
 
-        // Fetch deals for this artist
-        const response = await apiService.getDeals({ profileId: artistId });
+        // The agent's own deals (GET /deals is owner-only, so asking for the
+        // artist's id was a 403), narrowed to this artist like CalendarPane does.
+        const response = await apiService.getDeals({ profileId: user.id });
+        if (response?.deals) response.deals = response.deals.filter((d) => [d.artistId, d.bookedArtistId].includes(artistId));
 
         console.log('ManageArtistScreen - API response:', response);
 
@@ -512,6 +514,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           <div className="metric-label">{t('manageArtist.expectedRevenue')}</div>
         </div>
       </div>
+      {/* Fees are redacted on roster deals this agent did not book, so the
+          tiles legitimately read 0 for those gigs. */}
+      <p className="form-hint" style={{ margin: '-8px 0 16px' }}>{t('manageArtist.feesScopeHint')}</p>
 
       {/* Action Items */}
       <div className="dashboard-section">

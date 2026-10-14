@@ -597,7 +597,7 @@ const zh = {
       searchVisibility: '免费会员只能发现同国家的人。高级会员解锁全球搜索——在世界任何地方找到艺人、经纪人、主办方和场地，也被他们找到。',
       professionalDashboard: '你的专业中心：预订、合同、共享文件和付款跟踪，尽在一处。免费会员可预览；高级会员解锁完整流程。',
       updateTravelSchedule: '发布你将在何时何地，让这些城市的主办方和场地在你在城时预订你。',
-      calendarMatching: '自动呈现与你档期重叠的人——少搜索，多成交。',
+      calendarMatching: '自动显示在你所在或出行的国家中与你档期重叠的人——少搜索，多成交。',
       tourKickstarter: '规划多城市巡演，让沿途的场地和主办方主动带着报价找你。',
       artistTravelAlerts: '你点赞的每位艺人都会成为提醒：当他们公布你所在城市附近的出行或巡演日期时，你会收到通知，抢先联系。',
       calendarPrivacy: '精确决定谁能看到你的档期和行程——所有人、仅限你的人脉，或无人可见。',
@@ -863,6 +863,7 @@ const zh = {
     unavailable: '助手当前不可用，请稍后再试。',
   },
   tour: {
+    matchesGeoHint: '匹配显示你所在国家或在开放日期出行所在国家的场馆和主办方。',
     matchDraft: '{{name}}你好，我们在{{dates}}都有空。有兴趣和我们合作一场吗？',
     tourDraft: '{{name}}你好，看到你的{{where}}巡演（{{dates}}）。我们可以接待你，还有哪些日期有空？',
     imInterested: '我感兴趣',
@@ -893,7 +894,7 @@ const zh = {
     matchFound: '找到{{n}}个匹配',
     matchesFound: '找到{{n}}个匹配',
     travelFeedTitle: '行程安排与空档日期',
-    travelFeedHint: '巡演中的艺人、有空档的主办方与场地 — 超越匹配的行业实时日历。',
+    travelFeedHint: '有空档的主办方和场馆，以及在路上的艺人——超越匹配的实时日程，只显示与你合作的角色。',
     travelFeedEmpty: '目前没有活跃的行程。',
     feedConnected: '已联络',
     feedOpenDates: '空档日期',
@@ -1629,6 +1630,7 @@ const zh = {
   },
 
   manageArtist: {
+    feesScopeHint: '收入仅统计你管理的预订。由艺人本人或其他经纪人直接预订的演出只显示日期，不显示费用。',
     privateDashboard: '只有你和艺人能看到此内容，不会显示在其公开资料中。',
     endDateBeforeStart: '结束日期不能早于开始日期。请调整日期。',
     scheduleOverlap: '此行程与现有行程重叠。请选择其他日期。',
