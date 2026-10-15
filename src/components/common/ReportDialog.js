@@ -83,7 +83,7 @@ const ReportDialog = ({ targetType = REPORT_TARGETS.PROFILE, targetId, name, tit
             </div>
             <p className="form-hint">{t('safety.reportPrivacy')}</p>
           </div>
-          <div className="form-actions">
+          <div className="modal-footer">
             <button className="btn btn-outline" onClick={onClose} disabled={busy}>{t('common.cancel')}</button>
             <button className="btn btn-primary" onClick={submit} disabled={busy}>
               {busy ? t('safety.sending') : t('safety.sendReport')}
