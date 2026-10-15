@@ -2173,7 +2173,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <TargetIcon /><span>{t('tour.calendarMatches')}</span>
             </button>
             <button type="button" className={d3Mode === 'tours' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('tours'); }}>
-              <PlaneIcon /><span>{td('tours')}</span>
+              <PlaneIcon /><span>{t('tour.tourKickstart')}</span>
             </button>
           </div>
         );

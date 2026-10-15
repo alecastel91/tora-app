@@ -4,7 +4,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import { subscribeToDeals } from '../../services/realtime';
-import NewsScreen from '../screens/NewsScreen';
 import { getDealDisplayStatus } from '../screens/BookingsScreen';
 import { isOffDeal } from '../../utils/dealStatus';
 import { formatEventDate, formatTimestamp } from '../../utils/dates';
@@ -303,14 +302,6 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
           </Panel>
         </div>
 
-        {/* ---- the feed, as one panel of the cockpit ---- */}
-        <div className="d3-dash-span">
-          <Panel title={td('feed')} action={{ label: td('viewAll'), onClick: () => onSwitchTab('news') }}>
-            <div className="d3-feed-embed max-h-[760px] overflow-y-auto px-2 pb-2">
-              <NewsScreen onOpenProfile={onOpenProfile} onOpenPremium={onOpenPremium} />
-            </div>
-          </Panel>
-        </div>
       </div>
     </div>
   );
