@@ -21,6 +21,7 @@ import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
 import { counterpartRoles, matchDatesFor } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
+import { useNativeDesktop } from '../../utils/desktopV2';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -75,6 +76,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // 'kickstart'. Opens on Calendar — your data first, the matches it drives
   // next — unless the viewer would only meet the Premium teaser there.
   const [activeTab, setActiveTab] = useState(isPremiumViewer(user) ? 'calendar' : 'matches');
+  // Desktop v3 is a workspace: the calendar is always on the left, and
+  // Matches / Tour Kickstart are a side panel whose tab IS activeTab — so
+  // every fetch below keeps its gating. 'calendar' has no meaning as a side
+  // tab there, so it resolves to Matches.
+  const nativeDesktop = useNativeDesktop();
+  useEffect(() => {
+    if (nativeDesktop && activeTab === 'calendar') setActiveTab('matches');
+  }, [nativeDesktop, activeTab]);
   // Deep-links: ViewProfile's tour block asks for Kickstart; the onboarding
   // checklist and the Matches "Edit" link ask for Calendar. The sessionStorage
   // flags cover the case where TourScreen wasn't mounted yet when the event
@@ -2126,9 +2135,25 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   function renderMain() {
   return (
-    <div ref={screenRef} className={`screen active matches-screen tour-screen${activeTab === 'calendar' ? ' tour-screen--calendar' : ''}`}>
-      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
-          overlays (modals) live outside it. */}
+    <div ref={screenRef} className={`screen active matches-screen tour-screen${nativeDesktop ? ' d3-tour' : (activeTab === 'calendar' ? ' tour-screen--calendar' : '')}`}>
+      {nativeDesktop ? (
+        <div className="d3-tour-grid">
+          <section className="d3-tour-main">{renderMyDates()}</section>
+          <aside className="d3-tour-side d3-panel">
+            <div className="d3-tour-side-tabs">
+              <button type="button" className={activeTab !== 'kickstart' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setActiveTab('matches'); }}>
+                <TargetIcon /><span>{t('tour.calendarMatches')}</span>
+              </button>
+              <button type="button" className={activeTab === 'kickstart' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setActiveTab('kickstart'); }}>
+                <PlaneIcon /><span>{t('tour.tourKickstart')}</span>
+              </button>
+            </div>
+            <div className="d3-tour-side-body">
+              {activeTab === 'kickstart' ? renderTourKickstart() : renderCalendarMatches()}
+            </div>
+          </aside>
+        </div>
+      ) : (
       <div className="relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
@@ -2170,6 +2195,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         {activeTab === 'kickstart' && renderTourKickstart()}
       </div>
       </div>
+      )}
 
       {/* Message Modal */}
       {showMessageModal && selectedProfile && (

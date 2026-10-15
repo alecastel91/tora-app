@@ -320,8 +320,111 @@
     color: rgba(255, 255, 255, 0.5);
   }
 
-  /* ---- Tour: the whole canvas, and sub-tabs as a segmented control like
-     the pipeline's (the phone's underlined tabs read as a browser's). ---- */
+  /* ---- Tour workspace (desktop v3): the calendar always on the left, the
+     Matches / Tour Kickstart panel on the right. Drawers (create / edit tour,
+     offers) dock over the side panel instead of shrinking the workspace. ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.tour-screen.d3-tour,
+  html.desktop-v2.desktop-v3 body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen.d3-tour {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0;
+    min-height: 0;
+    container-type: inline-size;
+  }
+
+  html.desktop-v3 .d3-tour-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    gap: var(--d2-gap);
+    align-items: start;
+  }
+
+  html.desktop-v3 .d3-tour .tour-kickstart-content,
+  html.desktop-v3 .d3-tour .coming-soon-placeholder {
+    padding: 0;
+    text-align: left;
+  }
+
+  html.desktop-v3 .d3-tour-side {
+    position: sticky;
+    top: 0;
+    max-height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2);
+    overflow-y: auto;
+  }
+
+  html.desktop-v3 .d3-tour-side-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    gap: 2px;
+    margin: 0;
+    padding: 10px 10px 8px;
+    background: var(--d2-surface);
+    border-bottom: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v3 .d3-tour-side-tabs button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: none;
+    color: rgba(255, 255, 255, 0.5);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  html.desktop-v3 .d3-tour-side-tabs button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  html.desktop-v3 .d3-tour-side-tabs button:hover {
+    color: #fff;
+  }
+
+  html.desktop-v3 .d3-tour-side-tabs button.is-on {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  html.desktop-v3 .d3-tour-side-body {
+    padding: 12px 14px 16px;
+  }
+
+  html.desktop-v3 .d3-tour-side .matches-results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @container (max-width: 980px) {
+    html.desktop-v3 .d3-tour-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    html.desktop-v3 .d3-tour-side {
+      position: static;
+      max-height: none;
+    }
+  }
+
+  /* drawers dock at the right edge over the side panel */
+  html.desktop-v3 .md-drawer {
+    left: auto;
+    right: 0;
+    width: min(680px, 56vw);
+    justify-content: flex-end;
+  }
+
+  /* ---- Tour (phone sub-tabs, v2 frame only): sub-tabs as a segmented
+     control like the pipeline's. ---- */
   html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.tour-screen,
   html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.tour-screen.tour-screen--calendar {
     max-width: 1280px;
