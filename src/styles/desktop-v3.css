@@ -856,13 +856,13 @@
   }
 
   /* the Actions tab is one wide list; the actions section loses its stretch rules */
-  html.desktop-v3 .d3-manage .dashboard-tab.is-actions { grid-template-columns: minmax(0, 1fr); }
-  html.desktop-v3 .d3-manage .dashboard-tab.is-actions > .actions-required-section { grid-row: auto; display: block; }
-  html.desktop-v3 .d3-manage .dashboard-tab.is-actions .action-items { overflow: visible; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  html.desktop-v3 .d3-manage .dashboard-tab.is-actions .action-item { margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) > .actions-required-section { grid-row: auto; display: block; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-items { overflow: visible; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item { margin: 0; }
 
   /* Insights: metrics across, then revenue left / reach + cities right */
-  html.desktop-v3 .d3-manage .dashboard-tab.is-insights > .dashboard-section.revenue-overview-section { grid-column: 1; grid-row: 2 / span 3; align-self: stretch; }
+  html.desktop-v3 .d3-manage .dashboard-tab:not(:has(> .actions-required-section)) > .dashboard-section.revenue-overview-section { grid-column: 1; grid-row: 2 / span 3; align-self: stretch; }
 
   /* dashboard: metrics across the top, then two columns of panels */
   html.desktop-v3 .d3-manage .dashboard-tab {
