@@ -550,6 +550,8 @@ const ko = {
     onYearlyAlready: 'Yearly 이용 중',
     currentPlan: '현재 플랜',
     cancelAnytime: '언제든지 해지할 수 있습니다. 가격은 결제 통화로 표시됩니다.',
+    changeTiming: '차액은 등록된 카드로 청구되거나 환급됩니다. 결제가 필요한 경우 다음 화면에서 확인합니다.',
+    confirmChange: '변경 확인',
     paymentTiming: '첫 결제는 오늘, 이후 각 갱신일에 자동으로 청구됩니다.',
     cancelTerms: '설정에서 언제든지 해지할 수 있습니다. 결제한 기간이 끝날 때까지 이용할 수 있으며, 멤버십 시작 후에는 법률이 정한 경우를 제외하고 환불되지 않습니다.',
     legalDisclosure: '법적 고지',

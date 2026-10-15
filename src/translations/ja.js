@@ -550,6 +550,8 @@ const ja = {
     onYearlyAlready: 'Yearlyプランご利用中',
     currentPlan: '現在のプラン',
     cancelAnytime: 'いつでもキャンセル可能。価格はお客様の請求通貨で表示されます。',
+    changeTiming: '差額は登録済みのカードに請求または返金されます。お支払いが必要な場合は次の画面でご確認いただきます。',
+    confirmChange: '変更を確定',
     paymentTiming: '初回のお支払いは本日、以降は各更新日に自動的に課金されます。',
     cancelTerms: '解約は設定からいつでも可能です。お支払い済みの期間が終了するまでご利用いただけ、提供開始後の返金は法令に定めがある場合を除き承っておりません。',
     legalDisclosure: '特定商取引法に基づく表記',

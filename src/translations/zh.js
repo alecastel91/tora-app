@@ -550,6 +550,8 @@ const zh = {
     onYearlyAlready: '您已订阅 Yearly',
     currentPlan: '当前方案',
     cancelAnytime: '随时可取消。价格以您的结算货币显示。',
+    changeTiming: '差额将从已绑定的卡扣款或退回。如需付款，您将在下一屏确认。',
+    confirmChange: '确认更改',
     paymentTiming: '今日完成首次付款，之后在每个续订日自动扣款。',
     cancelTerms: '可随时在设置中取消。已付费期间内可继续使用；会员开始后不予退款，法律另有规定的除外。',
     legalDisclosure: '法律信息',

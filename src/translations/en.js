@@ -579,6 +579,8 @@ const en = {
     onYearlyAlready: 'You\'re on Yearly',
     currentPlan: 'Current plan',
     cancelAnytime: 'Cancel anytime. Prices shown in your billing currency.',
+    changeTiming: 'Any difference is charged or credited to your card on file. If a payment is needed, you confirm it on the next screen.',
+    confirmChange: 'Confirm change',
     paymentTiming: 'First payment today, then automatically on each renewal date.',
     cancelTerms: 'Cancel anytime in Settings. Access continues until the end of the paid period; no refunds once the membership has started, except where the law requires.',
     legalDisclosure: 'Legal disclosure',

@@ -550,6 +550,8 @@ const fr = {
     onYearlyAlready: 'Vous êtes sur Yearly',
     currentPlan: 'Offre actuelle',
     cancelAnytime: 'Annulez à tout moment. Prix affichés dans votre devise de facturation.',
+    changeTiming: 'Toute différence est débitée ou créditée sur votre carte enregistrée. Si un paiement est nécessaire, vous le confirmez à l\'écran suivant.',
+    confirmChange: 'Confirmer le changement',
     paymentTiming: 'Premier paiement aujourd\'hui, puis automatiquement à chaque date de renouvellement.',
     cancelTerms: 'Résiliez à tout moment dans les Réglages. L\'accès se poursuit jusqu\'à la fin de la période payée ; aucun remboursement une fois l\'abonnement commencé, sauf si la loi l\'exige.',
     legalDisclosure: 'Mentions légales',

@@ -550,6 +550,8 @@ const it = {
     onYearlyAlready: 'Sei già su Yearly',
     currentPlan: 'Piano attuale',
     cancelAnytime: 'Disdici quando vuoi. Prezzi nella tua valuta di fatturazione.',
+    changeTiming: 'L\'eventuale differenza viene addebitata o accreditata sulla carta registrata. Se serve un pagamento, lo confermi nella schermata successiva.',
+    confirmChange: 'Conferma modifica',
     paymentTiming: 'Primo pagamento oggi, poi automaticamente a ogni data di rinnovo.',
     cancelTerms: 'Disdici quando vuoi dalle Impostazioni. L\'accesso continua fino alla fine del periodo pagato; nessun rimborso una volta avviato l\'abbonamento, salvo quanto previsto dalla legge.',
     legalDisclosure: 'Note legali',

@@ -1569,6 +1569,9 @@ function App() {
               // Agents subscribe on the per-seat scale (planDetail carries the
               // configured roster price); everyone else on the personal tier.
               const isYearly = selectedPlan === 'yearly';
+              // Already paying → this is a modification of a running
+              // subscription: prorated, and it must wait for a click.
+              const isPlanChange = ['MONTHLY', 'YEARLY'].includes(billingTier(user));
               const cycleWord = isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth');
               const priceLabel = planDetail?.priceLabel || money(isYearly ? memberPrice.yearly : memberPrice.monthly);
               const perMonthEq = planDetail ? planDetail.perMonthLabel : money(yearlyPerMonth(memberPrice.yearly));
@@ -1641,7 +1644,7 @@ function App() {
                       the price and period (above), when payment is taken, and how
                       to cancel — in the same words as the tokushōhō page. */}
                   <ul className="summary-terms">
-                    {!checkoutQuote?.change && <li>{t('premium.paymentTiming')}</li>}
+                    <li>{t(isPlanChange ? 'premium.changeTiming' : 'premium.paymentTiming')}</li>
                     <li>{t('premium.cancelTerms')}</li>
                     <li className="summary-terms-legal">
                       <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">
@@ -1661,6 +1664,7 @@ function App() {
                     profileId={user?.id}
                     interval={isYearly ? 'year' : 'month'}
                     seats={planDetail?.seats}
+                    confirmFirst={isPlanChange}
                     onQuote={setCheckoutQuote}
                     onSuccess={async () => {
                       setSubscriptionStep('success');

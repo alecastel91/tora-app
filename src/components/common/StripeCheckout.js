@@ -147,9 +147,13 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
  * Embedded subscription checkout. On mount it creates the subscription and
  * mounts the Payment Element with the returned client secret.
  */
-const StripeCheckout = ({ profileId, interval, seats, extraItem, onSuccess, onQuote }) => {
+const StripeCheckout = ({ profileId, interval, seats, extraItem, confirmFirst = false, onSuccess, onQuote }) => {
   const { t } = useLanguage();
-  const [state, setState] = useState({ loading: true });
+  // A plan CHANGE must not run on mount: when nothing is due, the backend
+  // applies it in the same call that quotes it, so the member would have
+  // switched before reading the summary and without pressing anything.
+  // With confirmFirst the screen waits for an explicit click.
+  const [state, setState] = useState(confirmFirst ? { awaitingConfirm: true } : { loading: true });
   const successFired = useRef(false);
   // Each start call creates a REAL Stripe object (subscription or
   // PaymentIntent). Guard by parameter tuple so re-renders, StrictMode's
@@ -164,6 +168,7 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, onSuccess, onQu
     // run's response must be allowed to land or the checkout hangs on Loading.
     // setState after a real unmount is a safe no-op in React 18.
     if (startedKeyRef.current === startKey) return undefined;
+    if (confirmFirst) return undefined; // begin() runs from the Confirm button
     startedKeyRef.current = startKey;
     begin();
     return undefined;
@@ -209,6 +214,17 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, onSuccess, onQu
     [state.clientSecret]
   );
 
+  if (state.awaitingConfirm) {
+    return (
+      <button
+        type="button"
+        className="btn btn-primary btn-full"
+        onClick={() => { startedKeyRef.current = startKey; setState({ loading: true }); begin(); }}
+      >
+        {t('premium.confirmChange')}
+      </button>
+    );
+  }
   if (state.loading) return <p className="py-6 text-center text-sm text-white/50">{t('common.loading')}</p>;
   if (state.error) return <p className="py-6 text-center text-sm text-infrared">{state.error}</p>;
   if (state.addressRequired) {

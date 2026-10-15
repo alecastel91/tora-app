@@ -550,6 +550,8 @@ const pt = {
     onYearlyAlready: 'Você já está no Yearly',
     currentPlan: 'Plano atual',
     cancelAnytime: 'Cancele quando quiser. Preços na sua moeda de cobrança.',
+    changeTiming: 'Qualquer diferença é cobrada ou creditada no cartão cadastrado. Se for preciso pagar, você confirma na próxima tela.',
+    confirmChange: 'Confirmar alteração',
     paymentTiming: 'Primeiro pagamento hoje; depois, automaticamente em cada data de renovação.',
     cancelTerms: 'Cancele quando quiser em Configurações. O acesso continua até o fim do período pago; sem reembolso depois de iniciada a assinatura, salvo quando a lei exigir.',
     legalDisclosure: 'Informações legais',
