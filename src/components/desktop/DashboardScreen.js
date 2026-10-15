@@ -65,6 +65,11 @@ const Avatar = ({ profile, size = 'h-9 w-9' }) => (
   </span>
 );
 
+// The sidebar dot counts booking-workflow actions only (representation
+// requests route to Messages); the tile says the same number as the dot.
+const BOOKING_ACTIONS = new Set(['offer_received', 'counter_offer_pending', 'contract_to_send', 'contract_to_sign', 'payment_to_mark_sent', 'payment_to_confirm_received', 'payment_to_resolve']);
+const ACTION_ROWS = 8;
+
 const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium, isActive = true }) => {
   const { user } = useAppContext();
   const { t } = useLanguage();
@@ -104,6 +109,7 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
     .filter((d) => !isOffDeal(d) && d.status === 'ACCEPTED' && new Date(d.date) >= today)
     .sort((a, b) => new Date(a.date) - new Date(b.date)), [deals, today]);
   const unread = useMemo(() => data.conversations.reduce((n, c) => n + (c.unreadCount || 0), 0), [data.conversations]);
+  const yourMove = useMemo(() => data.actions.filter((a) => BOOKING_ACTIONS.has(a.type)).length, [data.actions]);
   const threads = useMemo(() => [...data.conversations]
     .sort((a, b) => (b.unreadCount > 0) - (a.unreadCount > 0) || new Date(b.lastMessage?.createdAt || 0) - new Date(a.lastMessage?.createdAt || 0))
     .slice(0, 6), [data.conversations]);
@@ -156,7 +162,7 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <StatTile icon={<HandshakeIcon />} label={td('yourMove')} value={data.actions.length} accent onClick={() => onSwitchTab('bookings')} />
+            <StatTile icon={<HandshakeIcon />} label={td('yourMove')} value={yourMove} accent onClick={() => onSwitchTab('bookings')} />
             <StatTile icon={<BookingsIcon />} label={td('openOffers')} value={openOffers} onClick={() => onSwitchTab('bookings')} />
             <StatTile icon={<CalendarCheckIcon />} label={td('confirmedAhead')} value={upcoming.length} onClick={() => onSwitchTab('tour')} />
             <StatTile icon={<MessageIcon />} label={td('unread')} value={unread} accent onClick={() => onSwitchTab('messages')} />
@@ -165,10 +171,13 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
 
         {/* ---- left: the work ---- */}
         <div className="flex min-w-0 flex-col gap-5">
-          <Panel title={td('needsAction')} action={{ label: td('viewAll'), onClick: () => onSwitchTab('bookings') }}>
+          <Panel
+            title={td('needsAction')}
+            action={{ label: data.actions.length > ACTION_ROWS ? `${td('viewAll')} · ${data.actions.length}` : td('viewAll'), onClick: () => onSwitchTab('bookings') }}
+          >
             {data.actions.length === 0 ? <Empty text={td('allClear')} /> : (
               <ul className="flex flex-col">
-                {data.actions.slice(0, 8).map((item) => {
+                {data.actions.slice(0, ACTION_ROWS).map((item) => {
                   const { title, actionLabel } = localizeActionItem(item, t);
                   const Icon = getActionIcon(item.type);
                   return (

@@ -535,6 +535,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       {/* Floating back arrow — no header bar, the page starts at the avatar */}
       <BackButton onClose={onClose} label={t('common.back')} />
       <div className="view-profile-content relative isolate">
+        <div className="vp-identity">
         {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
         <div
           aria-hidden
@@ -675,6 +676,10 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           );
         })()}
 
+        </div>
+        {/* Desktop v3 lays identity and body side by side (desktop-v3.css);
+            on the phone both wrappers are plain blocks. */}
+        <div className="vp-body">
         {/* Bio — clamped with see-more; authored line breaks preserved */}
         {profile.bio && (
           <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 mb-5 text-left">
@@ -982,6 +987,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             and deliberate actions belong. Blocking closes the screen: the
             person is gone from this member's app from that moment. */}
         <SafetyMenu variant="footer" profile={profile} onBlocked={onClose} />
+        </div>
       </div>
         
 

@@ -28,6 +28,14 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
     setShowNotifications(false);
   }, [activeTab]);
 
+  // Esc closes the notifications panel (on desktop v3 it is a side panel).
+  useEffect(() => {
+    if (!showNotifications) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setShowNotifications(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showNotifications]);
+
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
     // Remove the dot when notifications are opened

@@ -35,6 +35,8 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
+  const [mineOnly, setMineOnly] = useState(false);
+  const [sort, setSort] = useState({ key: 'date', dir: 1 }); // date asc by default; past flips below
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -71,14 +73,27 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
     const q = query.trim().toLowerCase();
     const list = byTab[tab].filter((d) => {
       if (status !== 'all' && getDealDisplayStatus(d) !== status) return false;
+      if (mineOnly && !statusLineFor(d, user, t)?.mine) return false;
       if (!q) return true;
       const other = counterpartFor(d, user);
       return [other?.name, d.eventName, d.city, d.country, bookedArtistName(d, user)]
         .some((s) => s && String(s).toLowerCase().includes(q));
     });
-    const dir = tab === 'past' ? -1 : 1;
-    return list.sort((a, b) => dir * (new Date(a.date) - new Date(b.date)));
-  }, [byTab, tab, status, query, user]);
+    // Past reads newest-first by default; an explicit header click wins.
+    const dir = sort.key === 'date' && tab === 'past' ? -sort.dir : sort.dir;
+    const val = (d) => (sort.key === 'fee' ? Number(d.currentFee) || 0 : new Date(d.date).getTime());
+    return list.sort((a, b) => dir * (val(a) - val(b)));
+  }, [byTab, tab, status, query, user, mineOnly, sort, t]);
+
+  const toggleSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: 1 }));
+  const SortHead = ({ k, children }) => (
+    <button
+      onClick={() => toggleSort(k)}
+      className={`flex cursor-pointer items-center gap-1 truncate text-left uppercase tracking-[0.12em] hover:text-white ${sort.key === k ? 'text-white/70' : ''}`}
+    >
+      {children}{sort.key === k && <span className="text-[9px]">{sort.dir === 1 ? '▲' : '▼'}</span>}
+    </button>
+  );
 
   const statuses = DEAL_DISPLAY_STATUSES.filter((s) => OFF_STATUSES.includes(s) === (tab === 'declined'));
   const myMoveCount = (list) => list.filter((d) => statusLineFor(d, user, t)?.mine).length;
@@ -114,6 +129,14 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
                 className="h-8 w-full rounded-lg border border-white/10 bg-white/[0.02] pl-8 pr-3 text-[12.5px] text-white placeholder-white/35 outline-none focus:border-white/25"
               />
             </label>
+            <button
+              onClick={() => setMineOnly((v) => !v)}
+              className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 text-[12px] font-medium transition-colors
+                          ${mineOnly ? 'border-infrared/50 bg-infrared/10 text-white' : 'border-white/10 bg-white/[0.02] text-white/55 hover:text-white'}`}
+            >
+              {td('yourMove')}
+              {myMoveCount(byTab[tab]) > 0 && <span className="rounded-full bg-infrared px-1.5 text-[10px] font-semibold text-white">{myMoveCount(byTab[tab])}</span>}
+            </button>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
@@ -125,8 +148,8 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
           </div>
 
           <div className="d3-row px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
-            <span className="truncate">{td('colDate')}</span><span className="truncate">{td('colCounterpart')}</span>
-            <span className="truncate">{td('colEvent')}</span><span className="truncate">{td('colFee')}</span>
+            <SortHead k="date">{td('colDate')}</SortHead><span className="truncate">{td('colCounterpart')}</span>
+            <span className="truncate">{td('colEvent')}</span><SortHead k="fee">{td('colFee')}</SortHead>
             <span className="truncate">{td('colStatus')} · {td('colNext')}</span>
           </div>
 

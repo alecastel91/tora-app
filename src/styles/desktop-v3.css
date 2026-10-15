@@ -317,27 +317,183 @@
     color: #fff;
   }
 
-  /* ---- Settings / Premium: sections as panels ---- */
+  /* =========================================================================
+     CENTRED SCREENS -> DESKTOP COMPOSITIONS. A phone stacks every section in
+     one column; a desk lays them out. These are grids over the existing
+     section blocks, so the screens' JSX is untouched.
+     ====================================================================== */
+
+  /* ---- Settings: a control panel. Page header left-aligned; sections in two
+     columns; the subscription card and the actions row span both. ---- */
   html.desktop-v3 .settings-screen .settings-header,
   html.desktop-v3 .settings-screen .settings-content {
-    max-width: 880px;
+    max-width: 1120px;
+  }
+
+  html.desktop-v3 .settings-screen .settings-header {
+    justify-content: flex-start;
+    gap: 14px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  html.desktop-v3 .settings-screen .settings-header h1 {
+    flex: 0 0 auto;
+    text-align: left;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  html.desktop-v3 .settings-screen .settings-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
   }
 
   html.desktop-v3 .settings-screen .settings-section {
-    margin-bottom: 16px;
-    padding: 18px 20px 8px;
+    margin: 0;
+    padding: 18px 20px 10px;
     border: 1px solid var(--d2-line);
     border-radius: var(--d2-r-card);
     background: var(--d2-surface);
   }
 
-  html.desktop-v3 .settings-screen .settings-section:last-child {
-    border: 1px solid var(--d2-line);
+  html.desktop-v3 .settings-screen .subscription-section,
+  html.desktop-v3 .settings-screen .settings-actions,
+  html.desktop-v3 .settings-screen .settings-content > :not(.settings-section):not(.settings-actions) {
+    grid-column: 1 / -1;
   }
 
+  /* Achievements borrows the settings chrome but is one gallery */
+  html.desktop-v3 .achievements-screen .settings-content {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 960px;
+  }
+
+  /* ---- Premium: the pitch and the plans on the left, the feature table on
+     the right, instead of one long scroll. ---- */
   html.desktop-v3 .premium-screen .premium-header,
   html.desktop-v3 .premium-screen .premium-content {
-    max-width: 960px;
+    max-width: 1200px;
+  }
+
+  html.desktop-v3 .premium-screen .premium-header {
+    justify-content: flex-start;
+    gap: 14px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  html.desktop-v3 .premium-screen .premium-header h1 {
+    flex: 0 0 auto;
+    text-align: left;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  html.desktop-v3 .premium-screen .premium-content {
+    display: grid;
+    grid-template-columns: 420px minmax(0, 1fr);
+    grid-auto-flow: row dense;
+    gap: 24px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .premium-screen .premium-content > * {
+    grid-column: 1;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  html.desktop-v3 .premium-screen .premium-features {
+    grid-column: 2;
+    grid-row: 1 / span 12;
+    position: sticky;
+    top: 0;
+  }
+
+  /* ---- Edit profile: a two-column form. Basic info is the tall section, so
+     it holds the first column while the rest stack beside it. ---- */
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen {
+    max-width: 1120px;
+  }
+
+  html.desktop-v3 .edit-profile-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    gap: 16px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .edit-profile-content > .edit-section {
+    margin: 0;
+  }
+
+  html.desktop-v3 .edit-profile-content > .edit-section:first-of-type {
+    grid-row: span 3;
+  }
+
+  html.desktop-v3 .edit-profile-content > :not(.edit-section) {
+    grid-column: 1 / -1;
+  }
+
+  /* ---- Manage / roster: room to breathe ---- */
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .manage-artist-screen,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen {
+    max-width: 1040px;
+  }
+
+  /* ---- View profile (the overlay, not the search pane): identity on the
+     left, the work on the right. Needs the vp-identity / vp-body wrappers in
+     ViewProfileScreen (plain blocks on the phone). ---- */
+  html.desktop-v3 .view-profile-screen .view-profile-content:has(> .vp-identity) {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .md-split > .md-detail .view-profile-content:has(> .vp-identity) {
+    grid-template-columns: minmax(0, 1fr); /* the search pane is too narrow for two */
+  }
+
+  html.desktop-v3 .view-profile-content > .vp-identity {
+    position: sticky;
+    top: 0;
+  }
+
+  /* ---- Tour: matches as a two-column card grid ---- */
+  html.desktop-v3 .matches-results {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .matches-results > .matches-count {
+    grid-column: 1 / -1;
+  }
+
+  /* ---- Notifications: a side panel, not a dropdown. backdrop-filter on the
+     header makes it the containing block for fixed descendants, so the
+     offsets are taken from the header's own box. ---- */
+  html.desktop-v3 .notifications-dropdown {
+    position: fixed;
+    top: 100%;
+    right: 0;
+    margin: 0;
+    width: 380px;
+    height: calc(100dvh - var(--d2-top));
+    max-height: none;
+    border: 0;
+    border-left: 1px solid var(--d2-line);
+    border-radius: 0;
+    background: var(--d2-surface);
   }
 }
 
