@@ -1201,7 +1201,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           className={`tab-button ${activeTab === 'actions' ? 'active' : ''}`}
           onClick={() => setActiveTab('actions')}
         >
-          {t('manage.actionsRequired')}{actionItems.length > 0 ? ` (${actionItems.length})` : ''}
+          {t('manage.actionsRequired')}
+          {actionItems.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
         </button>
         <button
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}

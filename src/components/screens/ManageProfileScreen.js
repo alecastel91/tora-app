@@ -579,6 +579,27 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />
       </div>}
 
+      {/* Top cities played */}
+      {showInsights && topCities.length > 0 && (
+        <div className="dashboard-section">
+          <h3><LocationIcon /> {t('manage.topCities')}</h3>
+          <div className="mt-3 flex flex-col gap-2.5">
+            {topCities.map((c) => {
+              const max = topCities[0].count;
+              return (
+                <div key={c.city} className="flex items-center gap-3">
+                  <span className="w-20 shrink-0 truncate text-xs text-white/70">{c.city}</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div className="h-full rounded-full" style={{ width: `${(c.count / max) * 100}%`, background: 'linear-gradient(to right, rgba(255,51,102,0.35), rgba(255,51,102,0.8))' }} />
+                  </div>
+                  <span className="w-14 shrink-0 text-right text-[11px] text-white/45">×{c.count} · {getCurrencySymbol(preferredCurrency)}{Math.round(c.revenue / 1000 * 10) / 10}K</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Profile reach — internal view/like/connection tracking */}
       {showInsights && reach && (
         <div className="dashboard-section">
@@ -676,26 +697,6 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         );
       })()}
 
-      {/* Top cities played */}
-      {showInsights && topCities.length > 0 && (
-        <div className="dashboard-section">
-          <h3><LocationIcon /> {t('manage.topCities')}</h3>
-          <div className="mt-3 flex flex-col gap-2.5">
-            {topCities.map((c) => {
-              const max = topCities[0].count;
-              return (
-                <div key={c.city} className="flex items-center gap-3">
-                  <span className="w-20 shrink-0 truncate text-xs text-white/70">{c.city}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div className="h-full rounded-full" style={{ width: `${(c.count / max) * 100}%`, background: 'linear-gradient(to right, rgba(255,51,102,0.35), rgba(255,51,102,0.8))' }} />
-                  </div>
-                  <span className="w-14 shrink-0 text-right text-[11px] text-white/45">×{c.count} · {getCurrencySymbol(preferredCurrency)}{Math.round(c.revenue / 1000 * 10) / 10}K</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
     );
   };
@@ -944,7 +945,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           className={`tab-button ${activeTab === 'actions' ? 'active' : ''}`}
           onClick={() => handleTabChange('actions')}
         >
-          {t('manage.actionsRequired')}{actionItems.length > 0 ? ` (${actionItems.length})` : ''}
+          {t('manage.actionsRequired')}
+          {actionItems.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
         </button>
         <button
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}

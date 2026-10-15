@@ -10410,6 +10410,25 @@ textarea.form-textarea:focus {
   margin-top: 32px;
   margin-bottom: 16px;
 }
+/* Consecutive sections read as one block without this: more air and a
+   hairline between them. The first section keeps its place under the tiles. */
+.dashboard-tab > .dashboard-section + .dashboard-section {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+/* The Actions Required tab's "something pending" mark — a dot, not a count:
+   the list with the number is right below the tab. */
+.tab-button { position: relative; }
+.tab-attention-dot {
+  position: absolute;
+  top: 10px;
+  margin-left: 4px;
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: #ff3366;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
+}
 
 .dashboard-section:first-child {
   margin-top: 0;
