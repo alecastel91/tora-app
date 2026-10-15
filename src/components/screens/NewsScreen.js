@@ -595,7 +595,8 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
           targetType={REPORT_TARGETS.POST}
           targetId={reportingPost.id}
           name={reportingPost.author?.name}
-          title={t('news.report')}
+          title={t('safety.reportPost')}
+          intro={t('safety.reportPostIntro')}
           onClose={() => setReportingPost(null)}
         />
       )}

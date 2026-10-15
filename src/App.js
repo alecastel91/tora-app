@@ -1643,13 +1643,13 @@ function App() {
                   <ul className="summary-terms">
                     <li>{t('premium.paymentTiming')}</li>
                     <li>{t('premium.cancelTerms')}</li>
-                    <li>
-                      <a href="https://torahub.io/tokushoho" target="_blank" rel="noopener noreferrer nofollow">
-                        {t('premium.legalDisclosure')}
-                      </a>
-                      {' · '}
+                    <li className="summary-terms-legal">
                       <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">
                         {t('premium.termsLink')}
+                      </a>
+                      {' · '}
+                      <a href="https://torahub.io/tokushoho" target="_blank" rel="noopener noreferrer nofollow">
+                        {t('premium.legalDisclosure')}
                       </a>
                     </li>
                   </ul>
