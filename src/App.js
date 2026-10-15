@@ -31,10 +31,14 @@ import './styles/responsive.css';
 // Last stylesheet in the graph, deliberately: desktop v2 shadows responsive.css's
 // desktop rules. Inert without the desktop-v2 class on <html> (see utils/desktopV2).
 import './styles/desktop-v2.css';
+import './styles/desktop-v3.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import AchievementsScreen from './components/screens/AchievementsScreen';
 import InviteFriendsSection from './components/common/InviteFriendsSection';
-import { isDesktopV2 } from './utils/desktopV2';
+import { isDesktopV2, useNativeDesktop } from './utils/desktopV2';
+import DashboardScreen from './components/desktop/DashboardScreen';
+import BookingsBoard from './components/desktop/BookingsBoard';
+import SearchWorkspace from './components/desktop/SearchWorkspace';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
@@ -68,7 +72,10 @@ function App() {
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : (inviteCodeFromUrl ? 'signup' : 'login'));
   const [loading, setLoading] = useState(true);
   // News is home: first tab in the bar, and where every session starts.
-  const HOME_TAB = 'news';
+  // Desktop v3 (flag + >= 1024px) lands on the dashboard instead and swaps
+  // three tabs for desktop-native screens; the phone never takes this branch.
+  const nativeDesktop = useNativeDesktop();
+  const HOME_TAB = nativeDesktop ? 'home' : 'news';
   const [activeTab, setActiveTab] = useState(HOME_TAB);
 
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
@@ -639,11 +646,16 @@ function App() {
   };
 
   const tabScreens = {
+    ...(nativeDesktop && {
+      home: <DashboardScreen onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onSwitchTab={switchTab} onOpenPremium={() => setShowPremium(true)} isActive={activeTab === 'home'} />,
+      search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
+      bookings: <BookingsBoard onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
+    }),
     profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
-    search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
+    ...(!nativeDesktop && { search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} /> }),
     news: <NewsScreen onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
     tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,
-    bookings: <BookingsScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
+    ...(!nativeDesktop && { bookings: <BookingsScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} /> }),
     // chatOpen (not a key remount): MessagesScreen refetches once when a
     // chat closes, to pick up read-state changes. A key here remounted the
     // permanently-mounted screen twice per chat session.
@@ -878,7 +890,7 @@ function App() {
             onOpenChat={openChatInMessages}
           />
         )}
-        <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} bookingsHasDot={bookingsActionCount > 0 && activeTab !== 'bookings'} />
+        <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} bookingsHasDot={bookingsActionCount > 0 && activeTab !== 'bookings'} homeTab={nativeDesktop} />
         
         {/* Achievements Screen */}
         {showAchievements && (

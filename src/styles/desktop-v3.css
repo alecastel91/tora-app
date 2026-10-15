@@ -1,0 +1,162 @@
+/* ============================================================================
+   DESKTOP V3 — the desktop-NATIVE product, on top of the v2 frame.
+   ----------------------------------------------------------------------------
+   ?desktop=v3 (console: toraDesktop('v3')). <html> carries BOTH desktop-v2
+   (the frame) and desktop-v3 (these screens). Same invariant as desktop-v2.css:
+   every rule sits under @media (min-width: 1024px) AND html.desktop-v3, so the
+   flag off matches nothing and the phone is out of range by construction. The
+   v3 screens themselves only mount through useNativeDesktop() (>= 1024px).
+
+   Loads after desktop-v2.css. Where a v2 rule must be beaten on specificity
+   (the tab-panel measure cap), the selector carries both classes.
+   ========================================================================= */
+
+@media (min-width: 1024px) {
+  /* ---- v3 screens own their canvas: no reading-measure cap, no auto margins.
+     Beats v2's cap (0,6,1) on equal specificity by loading later. ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.d3-screen {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+  }
+
+  /* Sidebar: the dashboard sits first, so the hairline that separates
+     Discover from Work moves down one row (v2 draws it before child 4). */
+  html.desktop-v3 .tab-item:nth-child(4) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  html.desktop-v3 .tab-item:nth-child(5) {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--d2-line);
+  }
+
+  /* ---- shared surfaces ---- */
+  html.desktop-v3 .d3-panel {
+    background: var(--d2-surface);
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+  }
+
+  /* Fixed-height workspaces: the page scroller holds still and the panes
+     scroll inside. Height = viewport minus the top bar and the gutters. */
+  html.desktop-v3 .d3-fill {
+    height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2);
+    min-height: 480px;
+  }
+
+  /* ---- Dashboard ---- */
+  html.desktop-v3 .d3-dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--d2-rail);
+    gap: var(--d2-gap);
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  html.desktop-v3 .d3-dash-span {
+    grid-column: 1 / -1;
+  }
+
+  /* NewsScreen embedded as a panel: strip its phone gutters and the
+     tab-bar clearance. Deeper than .tab-panel > .screen, so v2's news rule
+     does not reach it; unlayered, so Tailwind's px-5/pt-6/pb-24 lose. */
+  html.desktop-v3 .d3-feed-embed .news-screen {
+    padding: 0;
+    min-height: 0;
+  }
+
+  html.desktop-v3 .d3-feed-embed .news-screen > .mb-5 {
+    margin-bottom: 16px;
+  }
+
+  /* ---- Bookings pipeline: table left, inspector right ---- */
+  html.desktop-v3 .d3-board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(400px, 40%);
+    gap: var(--d2-gap);
+  }
+
+  html.desktop-v3 .d3-board > * {
+    min-height: 0;
+    overflow: auto;
+  }
+
+  /* The existing BookingsScreen, in focus mode, is the inspector's body: its
+     expanded card must be a static block inside the pane — not the
+     position:fixed right-hand pane that v2/responsive.css make of it. */
+  html.desktop-v3 .bookings-screen--focus .booking-card,
+  html.desktop-v3 .bookings-screen--focus .booking-card.expanded {
+    position: relative; /* not fixed — but still the anchor for the date badge */
+    width: auto;
+    left: auto;
+    top: auto;
+    bottom: auto;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    box-shadow: none;
+    z-index: auto;
+    overflow: visible;
+  }
+
+  html.desktop-v3 .bookings-screen--focus .booking-card:hover {
+    background: #0a0a0e;
+    border-color: var(--d2-line);
+  }
+
+  html.desktop-v3 .bookings-screen--focus .booking-card .booking-header {
+    cursor: default;
+  }
+
+  /* date · counterpart · event · fee · status (chip + the status sentence) */
+  html.desktop-v3 .d3-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1.25fr) minmax(0, 1fr) 96px minmax(0, 1.4fr);
+    gap: 12px;
+    align-items: center;
+  }
+
+  /* ---- Search workspace: list left, map right ---- */
+  html.desktop-v3 .d3-ws {
+    display: grid;
+    grid-template-columns: 440px minmax(0, 1fr);
+    gap: var(--d2-gap);
+  }
+
+  html.desktop-v3 .d3-ws > * {
+    min-height: 0;
+  }
+
+  html.desktop-v3 .d3-ws-globe {
+    position: relative; /* SearchGlobe is absolute inset-0 inside its stage */
+    overflow: hidden;
+    border-radius: var(--d2-r-card);
+    border: 1px solid var(--d2-line);
+    background: #040407;
+  }
+
+  html.desktop-v3 .d3-ws .search-result-card {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  html.desktop-v3 .d3-ws .search-result-card .result-actions .btn {
+    padding: 6px 10px;
+  }
+}
+
+@media (min-width: 1600px) {
+  html.desktop-v3 .d3-ws {
+    grid-template-columns: 480px minmax(0, 1fr);
+  }
+
+  html.desktop-v3 .d3-board {
+    grid-template-columns: minmax(0, 1fr) minmax(440px, 38%);
+  }
+}

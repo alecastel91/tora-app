@@ -2,11 +2,27 @@ import React from 'react';
 import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon, NewsIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 import CountBadge from './CountBadge';
+import { useDesktopStrings } from '../desktop/strings';
 
-const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0, bookingsHasDot = false }) => {
+// Desktop v3 dashboard glyph — lives here rather than in utils/icons because
+// no other surface has a home tab.
+const DashboardIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="3" width="8" height="10" rx="1.5" />
+    <rect x="13" y="3" width="8" height="6" rx="1.5" />
+    <rect x="13" y="11" width="8" height="10" rx="1.5" />
+    <rect x="3" y="15" width="8" height="6" rx="1.5" />
+  </svg>
+);
+
+// homeTab — desktop v3 only (App.js passes useNativeDesktop()): a Dashboard
+// entry leads the list. Never true on the phone.
+const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0, bookingsHasDot = false, homeTab = false }) => {
   const { t } = useLanguage();
+  const td = useDesktopStrings();
 
   const tabs = [
+    ...(homeTab ? [{ id: 'home', icon: DashboardIcon, label: td('home') }] : []),
     // Feed first, profile last — the order thumbs already know from
     // Instagram/LinkedIn/X; the two work tabs sit under the right thumb.
     { id: 'news', icon: NewsIcon, label: t('nav.news') },

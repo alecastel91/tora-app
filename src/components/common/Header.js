@@ -4,10 +4,12 @@ import { BellIcon, GearIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isDesktopV2 } from '../../utils/desktopV2';
+import { useDesktopStrings } from '../desktop/strings';
 
 const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   const { notifications } = useAppContext();
   const { t } = useLanguage();
+  const td = useDesktopStrings();
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotificationDot, setHasNotificationDot] = useState(true);
 
@@ -54,7 +56,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
           below 1024px, and .d2-page-title is styled only inside the v2 media
           block, so with the flag off this renders nothing visible. */}
       {isDesktopV2() && (
-        <div className="d2-page-title desktop-only">{t(`nav.${activeTab}`)}</div>
+        <div className="d2-page-title desktop-only">{activeTab === 'home' ? td('home') : t(`nav.${activeTab}`)}</div>
       )}
       <div className="header-icons relative flex gap-3">
         <button

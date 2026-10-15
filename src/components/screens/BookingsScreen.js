@@ -70,7 +70,12 @@ const getDealDisplayStatus = (deal) => {
   return 'ACCEPTED';
 };
 
-const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onActionCountChange }) => {
+// focusDealId — desktop v3 inspector mode (components/desktop/BookingsBoard):
+// `undefined` (the default) is the full screen as always; null/an id renders
+// ONLY that deal's expanded card, with every action and modal intact, inside
+// the board's right-hand pane. The phone never passes it.
+const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onActionCountChange, focusDealId }) => {
+  const focusMode = focusDealId !== undefined;
   const { t } = useLanguage();
   const { user: currentUser, reloadProfileData } = useAppContext();
   const getFullUrl = (url, dealId) => getAuthedBackendUrl(url, currentUser?.id, dealId);
@@ -740,7 +745,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     const otherParty = isOutgoing
       ? (deal.venue.id === currentUser.id ? deal.artist : deal.venue)
       : deal.initiator;
-    const isExpanded = expandedDealId === deal.id;
+    const isExpanded = expandedDealId === deal.id || focusDealId === deal.id;
 
     // Visibility + write-access flags for the deal card.
     //   isViaAgent — show the "via agent" sub-line (artist viewer + booker viewer when relevant).
@@ -1766,9 +1771,15 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   };
 
   return (
-    <div className="bookings-screen">
+    <div className={`bookings-screen${focusMode ? ' bookings-screen--focus' : ''}`}>
+      {focusMode && focusDealId && (() => {
+        const deal = deals.find((d) => d.id === focusDealId);
+        if (deal) return renderDealCard(deal);
+        return loading || !hasLoadedRef.current ? <LoadingGlobe label={t('bookings.loadingBookings')} /> : null;
+      })()}
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           overlays (delete modal, etc.) live outside it. */}
+      {!focusMode && (
       <div className="relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
@@ -1912,6 +1923,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         )}
       </div>
       </div>
+      )}
 
       {/* Custom Delete Confirmation Modal */}
       {dealToDelete && (
@@ -2676,4 +2688,5 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
 // Keep-mounted tabs re-render on every App state change; memo keeps
 // hidden tabs cheap when their props are unchanged.
+export { getDealDisplayStatus, DEAL_DISPLAY_STATUSES };
 export default React.memo(BookingsScreen);

@@ -1,11 +1,17 @@
-/* Desktop v2 — a parallel, refined desktop layout kept behind a flag so the
- * shipped desktop stays the default while the new one is evaluated.
+/* Desktop layouts kept behind a flag so the shipped desktop stays the default
+ * while the alternatives are evaluated.
  *
- * The flag is a single `desktop-v2` class on <html>. Every rule in
- * styles/desktop-v2.css is nested under BOTH that class and
- * @media (min-width: 1024px), which buys two guarantees without relying on
- * discipline: flag off, no selector can match (zero diff); below 1024px,
- * nothing is in range (the phone cannot be affected).
+ *   v1 — the shipped desktop (responsive.css). No class on <html>.
+ *   v2 — the refined FRAME: sidebar, top bar, canvases, density. Same screens.
+ *        <html class="desktop-v2">, rules in styles/desktop-v2.css.
+ *   v3 — the desktop-NATIVE product: the v2 frame plus desktop-only screens
+ *        (dashboard home, bookings pipeline, search workspace) mounted in
+ *        place of the phone screens. <html class="desktop-v2 desktop-v3">.
+ *
+ * Every rule in the v2/v3 stylesheets is nested under BOTH its class and
+ * @media (min-width: 1024px), and the v3 screens only mount through
+ * useNativeDesktop(), which also requires >= 1024px. So: flag off, nothing
+ * matches and nothing mounts; below 1024px the phone cannot be affected.
  *
  * Applied on import rather than from a call: `import` statements are hoisted,
  * so a function call sitting above the stylesheet imports would still run after
@@ -13,27 +19,59 @@
  * above ./styles/index.css is what actually lands the class first — same
  * pattern as ./services/install in index.js.
  */
-const KEY = 'tora-desktop-v2';
+import { useEffect, useState } from 'react';
+
+const KEY = 'tora-desktop-layout'; // 'v2' | 'v3'; absent = v1
+const LEGACY_KEY = 'tora-desktop-v2'; // first iteration stored '1' here
+const LEVELS = ['v2', 'v3'];
+const DESKTOP_MQ = '(min-width: 1024px)';
 
 export const isDesktopV2 = () => document.documentElement.classList.contains('desktop-v2');
+export const isDesktopV3 = () => document.documentElement.classList.contains('desktop-v3');
 
-function apply(on) {
-  document.documentElement.classList.toggle('desktop-v2', !!on);
+function apply(level) {
+  const cl = document.documentElement.classList;
+  cl.toggle('desktop-v2', level === 'v2' || level === 'v3');
+  cl.toggle('desktop-v3', level === 'v3');
 }
 
-// ?desktop=v2 turns it on, ?desktop=v1 (or =off) turns it off, and either one
-// updates the stored preference so the next plain load keeps it.
-const param = new URLSearchParams(window.location.search).get('desktop');
-if (param === 'v2') localStorage.setItem(KEY, '1');
-else if (param === 'v1' || param === 'off') localStorage.removeItem(KEY);
-
-apply(localStorage.getItem(KEY) === '1');
-
-// Console flip for same-scroll A/B: toraDesktopV2() toggles, or pass a bool.
-window.toraDesktopV2 = (next) => {
-  const value = next === undefined ? !isDesktopV2() : !!next;
-  if (value) localStorage.setItem(KEY, '1');
+function store(level) {
+  localStorage.removeItem(LEGACY_KEY);
+  if (level) localStorage.setItem(KEY, level);
   else localStorage.removeItem(KEY);
-  apply(value);
-  return value;
+}
+
+// ?desktop=v2 / v3 turns a layout on, ?desktop=v1 (or =off) turns it off, and
+// any of them updates the stored preference so the next plain load keeps it.
+const param = new URLSearchParams(window.location.search).get('desktop');
+if (LEVELS.includes(param)) store(param);
+else if (param === 'v1' || param === 'off') store(null);
+else if (localStorage.getItem(LEGACY_KEY) === '1') store('v2');
+
+apply(localStorage.getItem(KEY));
+
+// Console flip for same-scroll A/B: toraDesktop('v3'), toraDesktop('v1').
+window.toraDesktop = (level) => {
+  const next = LEVELS.includes(level) ? level : null;
+  store(next);
+  apply(next);
+  return next || 'v1';
 };
+window.toraDesktopV2 = (on) => window.toraDesktop(on === false ? 'v1' : 'v2'); // first-iteration name
+
+/**
+ * True only when the v3 flag is on AND the window is desktop-sized. This is
+ * the single gate for mounting desktop-native screens, so the phone never
+ * renders one — not hidden, not mounted (hidden subtrees would still fetch).
+ */
+export function useNativeDesktop() {
+  const [on, setOn] = useState(() => isDesktopV3() && window.matchMedia(DESKTOP_MQ).matches);
+  useEffect(() => {
+    if (!isDesktopV3()) return undefined;
+    const mq = window.matchMedia(DESKTOP_MQ);
+    const onChange = () => setOn(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return on;
+}
