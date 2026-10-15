@@ -6797,6 +6797,38 @@
 }
 .summary-renewal svg { flex-shrink: 0; opacity: 0.75; }
 
+/* The legally required lines under the order summary (改正特商法 12条の6):
+   same tone as .summary-renewal, a list so each item reads on its own. */
+.summary-terms {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+/* The legal links: present because the law needs them reachable from here,
+   quiet because nobody is meant to read them before paying. */
+.summary-terms-legal { margin-top: 4px; font-size: 10px; letter-spacing: 0.02em; }
+.summary-terms-legal a { color: rgba(255, 255, 255, 0.35); text-decoration: none; }
+.summary-terms-legal a:hover { color: rgba(255, 255, 255, 0.7); text-decoration: underline; }
+
+/* EU withdrawal acknowledgement — gates the Subscribe button for EUR */
+.checkout-waiver {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12.5px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.checkout-waiver input { margin-top: 2px; flex-shrink: 0; accent-color: #ff3366; }
+
 /* Launch-promo banner inside checkout (coupon applied) */
 .checkout-promo {
   display: flex;
@@ -10377,6 +10409,25 @@ textarea.form-textarea:focus {
 .dashboard-section {
   margin-top: 32px;
   margin-bottom: 16px;
+}
+/* Consecutive sections read as one block without this: more air and a
+   hairline between them. The first section keeps its place under the tiles. */
+.dashboard-tab > .dashboard-section + .dashboard-section {
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+/* The Actions Required tab's "something pending" mark — a dot, not a count:
+   the list with the number is right below the tab. */
+.tab-button { position: relative; }
+.tab-attention-dot {
+  position: absolute;
+  top: 10px;
+  margin-left: 4px;
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: #ff3366;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
 }
 
 .dashboard-section:first-child {

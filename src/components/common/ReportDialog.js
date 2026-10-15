@@ -14,7 +14,7 @@ import { REPORT_REASONS, REPORT_TARGETS } from '../../utils/safety';
  * report nobody can triage: the News feed used to send a bare confirmation,
  * so every post arrived in the moderation queue filed as "other".
  */
-const ReportDialog = ({ targetType = REPORT_TARGETS.PROFILE, targetId, name, title, onClose }) => {
+const ReportDialog = ({ targetType = REPORT_TARGETS.PROFILE, targetId, name, title, intro, onClose }) => {
   const { t } = useLanguage();
   const { user } = useAppContext();
   const [reason, setReason] = useState('spam');
@@ -62,7 +62,7 @@ const ReportDialog = ({ targetType = REPORT_TARGETS.PROFILE, targetId, name, tit
             </button>
           </div>
           <div className="modal-body">
-            <p className="form-hint" style={{ marginTop: 0 }}>{t('safety.reportIntro', { name: name || t('safety.thisMember') })}</p>
+            <p className="form-hint" style={{ marginTop: 0 }}>{intro || t('safety.reportIntro', { name: name || t('safety.thisMember') })}</p>
             <div className="safety-reasons" role="radiogroup" aria-label={t('safety.reasonLabel')}>
               {REPORT_REASONS.map((r) => (
                 <label key={r} className="checkbox-label">
@@ -83,7 +83,7 @@ const ReportDialog = ({ targetType = REPORT_TARGETS.PROFILE, targetId, name, tit
             </div>
             <p className="form-hint">{t('safety.reportPrivacy')}</p>
           </div>
-          <div className="form-actions">
+          <div className="modal-footer">
             <button className="btn btn-outline" onClick={onClose} disabled={busy}>{t('common.cancel')}</button>
             <button className="btn btn-primary" onClick={submit} disabled={busy}>
               {busy ? t('safety.sending') : t('safety.sendReport')}

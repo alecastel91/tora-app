@@ -18,7 +18,7 @@ import FilterList from './FilterList';
  *   options(draft),     // [{ value, label }] — function of draft for dependent sections
  *   visible?(draft),    // hide section (e.g. Country until a Zone is chosen)
  *   allLabel?,          // summary label when single-select value is 'all'
- *   emptyLabel?,        // summary label when a multi-select has nothing ticked (default: 'Select genres')
+ *   emptyLabel?,        // summary label for an empty multi-select (default: search.selectGenres)
  *   resets?,            // keys reset to 'all' when this section changes
  * }
  */

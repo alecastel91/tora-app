@@ -28,11 +28,6 @@ export const AppProvider = ({ children }) => {
   // superseded it — otherwise an in-flight fetch for the old profile lands on
   // the new one's cards. Cleared-and-reset by switchProfile.
   const activeProfileIdRef = useRef(null);
-  // Reloads can overlap: a poll that started BEFORE a like resolves after
-  // the optimistic update and writes the old graph back (the heart flicks
-  // off, then on again when the post-like reload lands). Only the newest
-  // reload may publish.
-  const reloadSeqRef = useRef(0);
   // Clear every per-profile graph Set/array in one place.
   const clearProfileGraph = () => {
     setLikedProfiles(new Set());
@@ -231,12 +226,17 @@ export const AppProvider = ({ children }) => {
 
   // Helper function to reload profile data (call after likes/connections change)
   const lastReloadSignatureRef = useRef('');
+  // Reloads can overlap: the 60s poll that started BEFORE a like resolves
+  // AFTER the optimistic update and writes the old likedProfiles back, then
+  // the post-like reload lands — heart on, off, on. Only the newest reload
+  // may publish.
+  const reloadSeqRef = useRef(0);
   const reloadProfileData = async () => {
     const userId = user?.id;
     if (!user || !userId) return;
     if (isLoadingProfileData) return; // Prevent duplicate fetches
-
     const seq = ++reloadSeqRef.current;
+
     try {
       setIsLoadingProfileData(true);
 
@@ -245,7 +245,7 @@ export const AppProvider = ({ children }) => {
         apiService.getProfileData(userId),
         apiService.getCurrentUser()
       ]);
-      if (seq !== reloadSeqRef.current) return; // a newer reload supersedes this one
+      if (seq !== reloadSeqRef.current) return; // a newer reload superseded this one
 
       // A profile switch during this poll/reload supersedes it — discard rather
       // than clobber the new profile's graph with the old profile's data (F6-02).
