@@ -304,7 +304,7 @@ const ProfilePage = ({
 
             {networkStrips.map(([key, items, titleKey]) => (
               <Section key={key} title={t(titleKey)}>
-                <ProfileMiniGrid profiles={items} onOpenProfile={onOpenNested} />
+                <ProfileMiniGrid profiles={items} onOpenProfile={onOpenNested} cols={4} />
               </Section>
             ))}
           </main>
@@ -329,7 +329,7 @@ const ProfilePage = ({
             )}
             {similarProfiles.length >= 2 && (
               <Panel title={t('viewProfile.similarProfiles')}>
-                <ProfileMiniGrid profiles={similarProfiles.slice(0, 6)} onOpenProfile={onOpenNested} />
+                <ProfileMiniGrid profiles={similarProfiles.slice(0, 6)} onOpenProfile={onOpenNested} cols={3} />
               </Panel>
             )}
             {!isOwn && (

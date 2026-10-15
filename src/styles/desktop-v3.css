@@ -260,10 +260,8 @@
     letter-spacing: -0.015em;
   }
 
-  html.desktop-v3 .d3-op main .grid-cols-2,
-  html.desktop-v3 .d3-op main .grid-cols-3,
-  html.desktop-v3 .d3-vp main .grid-cols-3 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  html.desktop-v3 .d3-op main .grid-cols-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* the roster grid */
   }
 
   html.desktop-v3 .d3-op-body .mb-5,

@@ -254,7 +254,7 @@ const OwnProfilePage = ({
           <RepresentationSection profiles={representedByProfiles} fallbackEntries={user?.representedBy} onOpenProfile={onOpenProfile} />
 
           {networkSections.map(([key, items, titleKey]) => items.length > 0 && (
-            <Section key={key} title={t(titleKey)}><ProfileMiniGrid profiles={items} onOpenProfile={onOpenProfile} /></Section>
+            <Section key={key} title={t(titleKey)}><ProfileMiniGrid profiles={items} onOpenProfile={onOpenProfile} cols={4} /></Section>
           ))}
         </main>
 
