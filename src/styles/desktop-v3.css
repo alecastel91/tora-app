@@ -523,29 +523,104 @@
     margin: 0;
   }
 
-  /* ---- Edit profile: a two-column form ---- */
-  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen {
-    max-width: 1120px;
+  /* ---- Edit profile: an editor (EditShell.js around the existing form).
+     Sticky header with the actions; section index left; live preview right;
+     the form in one calm column between them. The phone-sized master pane
+     steps aside — an editor takes the whole canvas. ---- */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-edit) {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  html.desktop-v3 .edit-profile-content {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-flow: row dense;
-    gap: 16px;
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-edit) > .md-master {
+    display: none;
+  }
+
+  /* the pane is the size container — an element cannot query its own size */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-edit) > .md-detail {
+    container-type: inline-size;
+  }
+
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+    max-width: 1280px;
+    padding: 0 var(--d2-gutter) 48px;
+    /* App.css forces .edit-profile-screen.screen.active { display: flex !important } */
+    display: grid !important;
+    grid-template-columns: 176px minmax(0, 1fr) 264px;
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
     align-items: start;
   }
 
-  html.desktop-v3 .edit-profile-content > .edit-section {
-    margin: 0;
-  }
-
-  html.desktop-v3 .edit-profile-content > .edit-section:first-of-type {
-    grid-row: span 3;
-  }
-
-  html.desktop-v3 .edit-profile-content > :not(.edit-section) {
+  html.desktop-v3 .d3-edit-head {
     grid-column: 1 / -1;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 calc(-1 * var(--d2-gutter)) 20px;
+    padding: 14px var(--d2-gutter);
+    background: rgba(8, 8, 10, 0.86);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v3 .d3-edit-nav {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+  }
+
+  html.desktop-v3 .d3-edit > .edit-profile-content {
+    max-width: none;
+    padding: 0;
+  }
+
+  html.desktop-v3 .d3-edit .edit-section {
+    margin: 0 0 16px;
+    padding: 18px 20px 14px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+    scroll-margin-top: 84px;
+  }
+
+  /* the actions live in the sticky header on desktop */
+  html.desktop-v3 .d3-edit .edit-actions {
+    display: none;
+  }
+
+  html.desktop-v3 .d3-edit-preview {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+  }
+
+  html.desktop-v3 .d3-edit .font-futuristic {
+    letter-spacing: -0.015em;
+  }
+
+  /* the pane's width: ~1040px in a 1440 window, ~710px in a 1024 window */
+  @container (max-width: 840px) {
+    html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+      grid-template-columns: 160px minmax(0, 1fr);
+    }
+
+    html.desktop-v3 .d3-edit-preview {
+      display: none;
+    }
+  }
+
+  @container (max-width: 560px) {
+    html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    html.desktop-v3 .d3-edit-nav {
+      display: none;
+    }
   }
 
   /* ---- Manage / roster: room to breathe ---- */

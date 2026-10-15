@@ -53,6 +53,7 @@ const EN = {
   exitFullscreen: 'Exit full screen',
   allCities: 'All cities',
   allRoles: 'All roles',
+  preview: 'Preview',
 };
 
 const CATALOG = {
@@ -104,6 +105,7 @@ const CATALOG = {
     exitFullscreen: '全画面を終了',
     allCities: 'すべての都市',
     allRoles: 'すべての役割',
+    preview: 'プレビュー',
   },
   zh: {
     home: '仪表盘',
@@ -152,6 +154,7 @@ const CATALOG = {
     exitFullscreen: '退出全屏',
     allCities: '所有城市',
     allRoles: '所有角色',
+    preview: '预览',
   },
   ko: {
     home: '대시보드',
@@ -200,6 +203,7 @@ const CATALOG = {
     exitFullscreen: '전체 화면 종료',
     allCities: '모든 도시',
     allRoles: '모든 역할',
+    preview: '미리보기',
   },
   es: {
     home: 'Panel',
@@ -248,6 +252,7 @@ const CATALOG = {
     exitFullscreen: 'Salir de pantalla completa',
     allCities: 'Todas las ciudades',
     allRoles: 'Todos los roles',
+    preview: 'Vista previa',
   },
   fr: {
     home: 'Tableau de bord',
@@ -296,6 +301,7 @@ const CATALOG = {
     exitFullscreen: 'Quitter le plein écran',
     allCities: 'Toutes les villes',
     allRoles: 'Tous les rôles',
+    preview: 'Aperçu',
   },
   it: {
     home: 'Dashboard',
@@ -344,6 +350,7 @@ const CATALOG = {
     exitFullscreen: 'Esci da schermo intero',
     allCities: 'Tutte le città',
     allRoles: 'Tutti i ruoli',
+    preview: 'Anteprima',
   },
   pt: {
     home: 'Painel',
@@ -392,6 +399,7 @@ const CATALOG = {
     exitFullscreen: 'Sair da tela cheia',
     allCities: 'Todas as cidades',
     allRoles: 'Todas as funções',
+    preview: 'Pré-visualização',
   },
 };
 

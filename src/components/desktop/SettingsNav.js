@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from 'react';
 
-/* Desktop v3 Settings: a section index on the left, the way desktop settings
-   pages are built. Reads the existing section headings from the DOM so the
-   settings markup in App.js stays exactly as it is; clicking scrolls, and the
-   section in view is highlighted. */
+/* Desktop v3: a section index beside long content, the way desktop settings
+   and editor pages are built. Reads the existing section headings from the
+   DOM so the screen's markup stays exactly as it is; clicking scrolls, and
+   the section in view is highlighted.
 
-const SettingsNav = ({ root = '.settings-screen' }) => {
+   root      — the screen container (where the sections live)
+   sections  — selector for the section blocks, relative to root
+   observeIn — the element that scrolls (IntersectionObserver root); omit
+               to measure against the viewport, which clips through nested
+               scrollers correctly */
+
+const SettingsNav = ({
+  root = '.settings-screen',
+  sections = '.settings-content > .settings-section',
+  observeIn = root,
+  className = 'd3-settings-nav',
+}) => {
   const [items, setItems] = useState([]);
   const [active, setActive] = useState(null);
 
   useEffect(() => {
     const screen = document.querySelector(root);
     if (!screen) return undefined;
-    const sections = Array.from(screen.querySelectorAll('.settings-content > .settings-section'));
-    const found = sections.map((el, i) => {
-      if (!el.id) el.id = `settings-sec-${i}`;
+    const blocks = Array.from(screen.querySelectorAll(sections));
+    const found = blocks.map((el, i) => {
+      if (!el.id) el.id = `${className}-sec-${i}`;
       return { id: el.id, label: el.querySelector('h3')?.textContent?.trim() || '', el };
     }).filter((s) => s.label);
     setItems(found.map(({ id, label }) => ({ id, label })));
@@ -23,15 +34,15 @@ const SettingsNav = ({ root = '.settings-screen' }) => {
     const io = new IntersectionObserver((entries) => {
       const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
       if (visible[0]) setActive(visible[0].target.id);
-    }, { root: screen, rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+    }, { root: observeIn ? document.querySelector(observeIn) : null, rootMargin: '-10% 0px -70% 0px', threshold: 0 });
     found.forEach((s) => io.observe(s.el));
     return () => io.disconnect();
-  }, [root]);
+  }, [root, sections, observeIn, className]);
 
   if (items.length === 0) return null;
 
   return (
-    <nav className="d3-settings-nav" aria-label="Sections">
+    <nav className={className} aria-label="Sections">
       <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
         {items.map((s) => (
           <li key={s.id}>

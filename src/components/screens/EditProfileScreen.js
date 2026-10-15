@@ -10,6 +10,8 @@ import CitySearch from '../common/CitySearch';
 import { downscaleImageToDataUrl } from '../../utils/image';
 import { appAlert } from '../../utils/dialogs';
 import { RA_URL_RE } from '../common/HighlightsList';
+import { useNativeDesktop } from '../../utils/desktopV2';
+import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
 
 const MAX_PROFILE_PHOTOS = 8;
 // Plausible highlight years — upper bound derived from today. The three core
@@ -44,6 +46,10 @@ const highlightRowIssue = (h, role) => {
 const EditProfileScreen = ({ onClose }) => {
   const { user, updateUser } = useAppContext();
   const { t } = useLanguage();
+  // Desktop v3 wraps the SAME form in editor chrome (components/desktop/
+  // EditShell): sticky header with the actions, a section index, a live
+  // preview. The fields below are untouched; the phone renders as before.
+  const nativeDesktop = useNativeDesktop();
 
   // Parse existing location
   const parseLocation = (location) => {
@@ -296,7 +302,10 @@ const EditProfileScreen = ({ onClose }) => {
     : genresList.filter((g, i) => i < 12 || selectedGenres.has(g));
 
   return (
-    <div className="screen active edit-profile-screen">
+    <div className={`screen active edit-profile-screen${nativeDesktop ? ' d3-edit' : ''}`}>
+      {nativeDesktop ? (
+        <EditHeader title={t('profile.editProfile')} onCancel={onClose} onSave={handleSave} saving={saving} blocked={highlightsBlocked} />
+      ) : (
       <div className="edit-profile-header">
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />
@@ -304,6 +313,8 @@ const EditProfileScreen = ({ onClose }) => {
         <h1>{t('profile.editProfile')}</h1>
         <div style={{ width: '24px' }}></div>
       </div>
+      )}
+      {nativeDesktop && <EditIndex />}
 
       <div className="edit-profile-content relative isolate">
         {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
@@ -734,6 +745,7 @@ const EditProfileScreen = ({ onClose }) => {
           </button>
         </div>
       </div>
+      {nativeDesktop && <EditPreview draft={editedUser} genres={Array.from(selectedGenres)} photos={hasPhotoGallery ? photos : []} />}
     </div>
   );
 };
