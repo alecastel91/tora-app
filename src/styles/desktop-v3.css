@@ -352,6 +352,54 @@
     overflow-y: auto;
   }
 
+  /* mode switch: Calendar | Tours */
+  html.desktop-v3 .d3-tour-modes {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: 16px;
+    border: 1px solid var(--d2-line);
+    border-radius: 10px;
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v3 .d3-tour-modes button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: rgba(255, 255, 255, 0.5);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  html.desktop-v3 .d3-tour-modes button svg { width: 14px; height: 14px; }
+  html.desktop-v3 .d3-tour-modes button:hover { color: #fff; }
+  html.desktop-v3 .d3-tour-modes button.is-on { background: rgba(255, 255, 255, 0.08); color: #fff; }
+
+  /* tours pipeline rows: tour · dates · gigs · interest · revenue/fee · status */
+  html.desktop-v3 .d3-tour-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) 92px 100px minmax(0, 1.2fr) minmax(0, 0.9fr);
+    gap: 12px;
+    align-items: center;
+  }
+
+  html.desktop-v3 .d3-tours { height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2 - 62px); }
+
+  /* the detail pane shows one tour card: no list chrome, no gutters */
+  html.desktop-v3 .d3-tours .tour-kickstart-content,
+  html.desktop-v3 .d3-tours .tour-kickstart-section { padding: 0; margin: 0; }
+  html.desktop-v3 .d3-tours .tour-cards-list { display: block; }
+  html.desktop-v3 .d3-tours .tour-card,
+  html.desktop-v3 .d3-tours .tour-cards-list > div { margin: 0; }
+
   html.desktop-v3 .d3-tour-side-tabs {
     position: sticky;
     top: 0;

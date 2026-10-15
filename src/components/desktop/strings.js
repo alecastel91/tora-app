@@ -54,6 +54,10 @@ const EN = {
   allCities: 'All cities',
   allRoles: 'All roles',
   preview: 'Preview',
+  selectTour: 'Select a tour to see everything about it',
+  dates: 'Dates',
+  tours: 'Tours',
+  calendar: 'Calendar',
 };
 
 const CATALOG = {
@@ -106,6 +110,10 @@ const CATALOG = {
     allCities: 'すべての都市',
     allRoles: 'すべての役割',
     preview: 'プレビュー',
+    selectTour: 'ツアーを選択すると詳細が表示されます',
+    dates: '日程',
+    tours: 'ツアー',
+    calendar: 'カレンダー',
   },
   zh: {
     home: '仪表盘',
@@ -155,6 +163,10 @@ const CATALOG = {
     allCities: '所有城市',
     allRoles: '所有角色',
     preview: '预览',
+    selectTour: '选择一个巡演以查看全部详情',
+    dates: '日期',
+    tours: '巡演',
+    calendar: '日历',
   },
   ko: {
     home: '대시보드',
@@ -204,6 +216,10 @@ const CATALOG = {
     allCities: '모든 도시',
     allRoles: '모든 역할',
     preview: '미리보기',
+    selectTour: '투어를 선택하면 상세 정보가 표시됩니다',
+    dates: '일정',
+    tours: '투어',
+    calendar: '캘린더',
   },
   es: {
     home: 'Panel',
@@ -253,6 +269,10 @@ const CATALOG = {
     allCities: 'Todas las ciudades',
     allRoles: 'Todos los roles',
     preview: 'Vista previa',
+    selectTour: 'Elige una gira para ver todos sus detalles',
+    dates: 'Fechas',
+    tours: 'Giras',
+    calendar: 'Calendario',
   },
   fr: {
     home: 'Tableau de bord',
@@ -302,6 +322,10 @@ const CATALOG = {
     allCities: 'Toutes les villes',
     allRoles: 'Tous les rôles',
     preview: 'Aperçu',
+    selectTour: 'Sélectionnez une tournée pour en voir tous les détails',
+    dates: 'Dates',
+    tours: 'Tournées',
+    calendar: 'Calendrier',
   },
   it: {
     home: 'Dashboard',
@@ -351,6 +375,10 @@ const CATALOG = {
     allCities: 'Tutte le città',
     allRoles: 'Tutti i ruoli',
     preview: 'Anteprima',
+    selectTour: 'Seleziona un tour per vederne tutti i dettagli',
+    dates: 'Date',
+    tours: 'Tour',
+    calendar: 'Calendario',
   },
   pt: {
     home: 'Painel',
@@ -400,6 +428,10 @@ const CATALOG = {
     allCities: 'Todas as cidades',
     allRoles: 'Todas as funções',
     preview: 'Pré-visualização',
+    selectTour: 'Selecione uma turnê para ver todos os detalhes',
+    dates: 'Datas',
+    tours: 'Turnês',
+    calendar: 'Calendário',
   },
 };
 

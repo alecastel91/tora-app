@@ -22,6 +22,8 @@ import { rosterEntryId } from '../../utils/representation';
 import { counterpartRoles, matchDatesFor } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 import { useNativeDesktop } from '../../utils/desktopV2';
+import TourBoard from '../desktop/TourBoard';
+import { useDesktopStrings } from '../desktop/strings';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -81,9 +83,24 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // every fetch below keeps its gating. 'calendar' has no meaning as a side
   // tab there, so it resolves to Matches.
   const nativeDesktop = useNativeDesktop();
+  const td = useDesktopStrings();
+  // Desktop v3 has two modes under Tour: 'calendar' (the grid with Matches
+  // beside it) and 'tours' (a full-width pipeline of tours). The mode drives
+  // activeTab so every fetch keeps its gating: calendar mode = 'matches',
+  // tours mode = 'kickstart'. Deep links that set activeTab pick the mode.
+  const [d3Mode, setD3Mode] = useState(activeTab === 'kickstart' ? 'tours' : 'calendar');
+  const [d3TourId, setD3TourId] = useState(null);
   useEffect(() => {
-    if (nativeDesktop && activeTab === 'calendar') setActiveTab('matches');
+    if (!nativeDesktop) return;
+    if (activeTab === 'kickstart') setD3Mode('tours');
+    else if (activeTab === 'calendar' || activeTab === 'matches') setD3Mode('calendar');
   }, [nativeDesktop, activeTab]);
+  useEffect(() => {
+    if (!nativeDesktop) return;
+    const want = d3Mode === 'tours' ? 'kickstart' : 'matches';
+    if (activeTab !== want) setActiveTab(want);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativeDesktop, d3Mode]);
   // Deep-links: ViewProfile's tour block asks for Kickstart; the onboarding
   // checklist and the Matches "Edit" link ask for Calendar. The sessionStorage
   // flags cover the case where TourScreen wasn't mounted yet when the event
@@ -1638,7 +1655,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   };
 
   // Tour Kickstart Tab Content
-  const renderTourKickstart = () => {
+  const renderTourKickstart = ({ only = null } = {}) => {
     // Show upgrade prompt for basic users
     if (!isPremiumUser()) {
       return (
@@ -1694,10 +1711,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
     // ARTISTS + AGENTS: Create and manage tours
     if (isArtist) {
-      const visibleTours = isAgent && selectedArtistId !== 'all' ? myTours.filter((tour) => tour.artist?.id === selectedArtistId) : myTours;
+      const allVisible = isAgent && selectedArtistId !== 'all' ? myTours.filter((tour) => tour.artist?.id === selectedArtistId) : myTours;
+      const visibleTours = only ? allVisible.filter((tour) => tour.id === only) : allVisible;
       return (
         <div className="tour-kickstart-content">
-          <div className="coming-soon-placeholder">
+          {!only && <div className="coming-soon-placeholder">
             {renderSubTabHeader({
               intro: t('tour.kickstartIntro'),
               action: (
@@ -1706,11 +1724,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 </button>
               ),
             })}
-          </div>
+          </div>}
           <div className="tour-kickstart-section">
-            <div className="section-header">
+            {!only && <div className="section-header">
               <h3>{t('tour.myTours')}</h3>
-            </div>
+            </div>}
 
             {/* Tour cards or empty state */}
             {toursLoading ? (
@@ -1875,13 +1893,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             monthMatch = ts <= range.toDate && te >= range.fromDate;
           }
         }
-        return zoneMatch && countryMatch && genreMatch && monthMatch;
+        return (!only || tour.id === only) && zoneMatch && countryMatch && genreMatch && monthMatch;
       });
 
       return (
         <div className="tour-kickstart-content">
           <div className="tour-kickstart-section">
-            {renderSubTabHeader({
+            {!only && renderSubTabHeader({
               intro: t('tour.tourOpportunitiesDesc'),
               action: <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />,
             })}
@@ -2136,24 +2154,72 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   function renderMain() {
   return (
     <div ref={screenRef} className={`screen active matches-screen tour-screen${nativeDesktop ? ' d3-tour' : (activeTab === 'calendar' ? ' tour-screen--calendar' : '')}`}>
-      {nativeDesktop ? (
-        <div className="d3-tour-grid">
-          <section className="d3-tour-main">{renderMyDates()}</section>
-          <aside className="d3-tour-side d3-panel">
-            <div className="d3-tour-side-tabs">
-              <button type="button" className={activeTab !== 'kickstart' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setActiveTab('matches'); }}>
-                <TargetIcon /><span>{t('tour.calendarMatches')}</span>
-              </button>
-              <button type="button" className={activeTab === 'kickstart' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setActiveTab('kickstart'); }}>
-                <PlaneIcon /><span>{t('tour.tourKickstart')}</span>
-              </button>
-            </div>
-            <div className="d3-tour-side-body">
-              {activeTab === 'kickstart' ? renderTourKickstart() : renderCalendarMatches()}
-            </div>
-          </aside>
-        </div>
-      ) : (
+      {nativeDesktop ? (() => {
+        const premium = isPremiumUser();
+        const owner = user?.role === 'ARTIST' || user?.role === 'AGENT';
+        const boardTours = owner
+          ? (isAgent && selectedArtistId !== 'all' ? myTours.filter((tour) => tour.artist?.id === selectedArtistId) : myTours)
+          : allTours.filter((tour) => {
+              const zoneMatch = tourZoneFilter === 'all' || tour.zone === tourZoneFilter;
+              const countryMatch = tourCountryFilter === 'all' || tour.country === tourCountryFilter;
+              const genreMatch = tourGenreFilter.length === 0 || (tour.artist?.genres || []).some((g) => tourGenreFilter.includes(g));
+              let monthMatch = true;
+              if (tourMonthFilter !== 'all') {
+                const range = monthKeyToRange(tourMonthFilter);
+                if (range) { const ts = new Date(tour.startDate); const te = new Date(tour.endDate); monthMatch = ts <= range.toDate && te >= range.fromDate; }
+              }
+              return zoneMatch && countryMatch && genreMatch && monthMatch;
+            });
+        const modeTabs = (
+          <div className="d3-tour-modes">
+            <button type="button" className={d3Mode === 'calendar' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('calendar'); }}>
+              <CalendarIcon /><span>{td('calendar')}</span>
+            </button>
+            <button type="button" className={d3Mode === 'tours' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('tours'); }}>
+              <PlaneIcon /><span>{td('tours')}</span>
+            </button>
+          </div>
+        );
+        return (
+          <>
+            {modeTabs}
+            {d3Mode === 'calendar' ? (
+              <div className="d3-tour-grid">
+                <section className="d3-tour-main">{renderMyDates()}</section>
+                <aside className="d3-tour-side d3-panel">
+                  <div className="d3-tour-side-body">{renderCalendarMatches()}</div>
+                </aside>
+              </div>
+            ) : !premium ? (
+              renderTourKickstart()
+            ) : (
+              <TourBoard
+                tours={boardTours}
+                loading={owner && toursLoading}
+                owner={owner}
+                selectedId={d3TourId}
+                onSelect={setD3TourId}
+                statusLabel={tourStatusLabel}
+                toolbar={(
+                  <>
+                    <span className="min-w-0 flex-1 text-[12px] text-white/45">{owner ? t('tour.kickstartIntro') : t('tour.tourOpportunitiesDesc')}</span>
+                    {isAgent && roster.length > 0 && (
+                      <select className="h-8 cursor-pointer rounded-lg border border-white/10 bg-[#0b0b0e] px-2.5 text-[12px] text-white/80 outline-none" value={selectedArtistId} onChange={(e) => setArtistFilter(e.target.value)}>
+                        <option value="all">{t('tour.allArtists')}</option>
+                        {roster.map((a) => <option key={rosterEntryId(a)} value={rosterEntryId(a)}>{a.name}</option>)}
+                      </select>
+                    )}
+                    {owner
+                      ? <button className="btn btn-primary btn-small shrink-0" onClick={() => { closeTourPanes(); setShowCreateTourModal(true); }}>+ {t('tour.createTour')}</button>
+                      : <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />}
+                  </>
+                )}
+                detail={renderTourKickstart({ only: d3TourId })}
+              />
+            )}
+          </>
+        );
+      })() : (
       <div className="relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
