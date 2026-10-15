@@ -1009,3 +1009,27 @@
     grid-template-columns: minmax(0, 1fr) minmax(440px, 38%);
   }
 }
+
+/* ===========================================================================
+   SEGMENTED STRIPS — every tab the width of the longest label, so a strip
+   reads as one control rather than a row of differently sized buttons.
+   ======================================================================== */
+@media (min-width: 1024px) {
+  html.desktop-v3 .d3-tour-modes,
+  html.desktop-v3 .d3-manage .tab-navigation,
+  html.desktop-v3 .tour-tabs,
+  html.desktop-v3 .d3-seg {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+
+  html.desktop-v3 .d3-tour-modes > button,
+  html.desktop-v3 .d3-manage .tab-navigation > .tab-button,
+  html.desktop-v3 .tour-tabs > .tour-tab,
+  html.desktop-v3 .d3-seg > button {
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+}

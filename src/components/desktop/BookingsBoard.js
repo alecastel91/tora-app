@@ -104,7 +104,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
         {/* ---------------- pipeline ---------------- */}
         <div className="d3-panel flex min-w-0 flex-col">
           <div className="flex flex-wrap items-center gap-3 border-b border-white/[0.07] px-3 py-2.5">
-            <div className="flex rounded-lg border border-white/10 bg-white/[0.02] p-0.5">
+            <div className="d3-seg flex rounded-lg border border-white/10 bg-white/[0.02] p-0.5">
               {TABS.map((k) => {
                 const n = myMoveCount(byTab[k]);
                 return (
