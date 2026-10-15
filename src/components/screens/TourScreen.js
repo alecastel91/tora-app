@@ -88,19 +88,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // beside it) and 'tours' (a full-width pipeline of tours). The mode drives
   // activeTab so every fetch keeps its gating: calendar mode = 'matches',
   // tours mode = 'kickstart'. Deep links that set activeTab pick the mode.
-  const [d3Mode, setD3Mode] = useState(activeTab === 'kickstart' ? 'tours' : 'calendar');
+  // Three modes, one per job: 'calendar' | 'matches' | 'tours'. Each takes
+  // the whole canvas; the mode is activeTab under another name, so every
+  // fetch keeps its gating and deep links land.
+  const D3_TAB = { calendar: 'calendar', matches: 'matches', tours: 'kickstart' };
+  const d3Mode = activeTab === 'kickstart' ? 'tours' : activeTab;
+  const setD3Mode = (m) => setActiveTab(D3_TAB[m] || 'calendar');
   const [d3TourId, setD3TourId] = useState(null);
-  useEffect(() => {
-    if (!nativeDesktop) return;
-    if (activeTab === 'kickstart') setD3Mode('tours');
-    else if (activeTab === 'calendar' || activeTab === 'matches') setD3Mode('calendar');
-  }, [nativeDesktop, activeTab]);
-  useEffect(() => {
-    if (!nativeDesktop) return;
-    const want = d3Mode === 'tours' ? 'kickstart' : 'matches';
-    if (activeTab !== want) setActiveTab(want);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nativeDesktop, d3Mode]);
   // Deep-links: ViewProfile's tour block asks for Kickstart; the onboarding
   // checklist and the Matches "Edit" link ask for Calendar. The sessionStorage
   // flags cover the case where TourScreen wasn't mounted yet when the event
@@ -2175,6 +2169,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             <button type="button" className={d3Mode === 'calendar' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('calendar'); }}>
               <CalendarIcon /><span>{td('calendar')}</span>
             </button>
+            <button type="button" className={d3Mode === 'matches' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('matches'); }}>
+              <TargetIcon /><span>{t('tour.calendarMatches')}</span>
+            </button>
             <button type="button" className={d3Mode === 'tours' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('tours'); }}>
               <PlaneIcon /><span>{td('tours')}</span>
             </button>
@@ -2184,12 +2181,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           <>
             {modeTabs}
             {d3Mode === 'calendar' ? (
-              <div className="d3-tour-grid">
-                <section className="d3-tour-main">{renderMyDates()}</section>
-                <aside className="d3-tour-side d3-panel">
-                  <div className="d3-tour-side-body">{renderCalendarMatches()}</div>
-                </aside>
-              </div>
+              <section className="d3-tour-main d3-tour-calendar">{renderMyDates()}</section>
+            ) : d3Mode === 'matches' ? (
+              <section className="d3-tour-main d3-tour-matches">{renderCalendarMatches()}</section>
             ) : !premium ? (
               renderTourKickstart()
             ) : (

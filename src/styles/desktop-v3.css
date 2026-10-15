@@ -332,12 +332,11 @@
     container-type: inline-size;
   }
 
-  html.desktop-v3 .d3-tour-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 440px;
-    gap: var(--d2-gap);
-    align-items: start;
-  }
+  /* each mode takes the canvas; the calendar and the matches grid read best
+     a little narrower than the tours pipeline */
+  html.desktop-v3 .d3-tour-calendar { max-width: 1120px; margin: 0 auto; }
+  html.desktop-v3 .d3-tour-matches { max-width: 1120px; margin: 0 auto; }
+  html.desktop-v3 .d3-tour-matches .feature-preview { max-width: none; }
 
   html.desktop-v3 .d3-tour .tour-kickstart-content,
   html.desktop-v3 .d3-tour .coming-soon-placeholder {
