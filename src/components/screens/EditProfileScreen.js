@@ -20,6 +20,10 @@ const MAX_PROFILE_PHOTOS = 8;
 // Save button. Blank rows the user never filled are dropped, not blocking.
 const HIGHLIGHT_YEAR_MIN = 1980;
 const HIGHLIGHT_YEAR_MAX = new Date().getFullYear();
+// Ten is the cap (beta feedback: long lists read as padding). The profile
+// shows three and tucks the rest in a drawer; the server grandfathers anyone
+// already above ten so nothing is deleted behind their back.
+const HIGHLIGHT_MAX = 10;
 const highlightMidField = (role) => (role === 'ARTIST' ? 'city' : 'artist');
 const highlightRowBlank = (h) =>
   !String(h?.venue || '').trim() && !String(h?.city || '').trim()
@@ -699,7 +703,7 @@ const EditProfileScreen = ({ onClose }) => {
                 })()}
                 </div>
               ))}
-              {(editedUser.pastHighlights || []).length < 20 && (
+              {(editedUser.pastHighlights || []).length < HIGHLIGHT_MAX ? (
                 <button
                   type="button"
                   className="btn btn-outline"
@@ -708,8 +712,10 @@ const EditProfileScreen = ({ onClose }) => {
                     pastHighlights: [...(editedUser.pastHighlights || []), { venue: '', city: '', artist: '', year: '' }],
                   })}
                 >
-                  + {t('editProfile.addHighlight')}
+                  + {t('editProfile.addHighlight')} ({(editedUser.pastHighlights || []).length}/{HIGHLIGHT_MAX})
                 </button>
+              ) : (
+                <p className="m-0 text-xs text-white/40">{t('editProfile.highlightsFull', { max: HIGHLIGHT_MAX })}</p>
               )}
             </div>
           </div>

@@ -1220,6 +1220,7 @@ const it = {
     raLinkInvalid: 'Inserisci un link Resident Advisor (ra.co).',
     yearOutOfRange: 'L\'anno deve essere compreso tra {{min}} e {{max}}.',
     highlightIncomplete: 'Compila tutti i campi — solo il link RA è facoltativo.',
+    highlightsFull: 'Hai raggiunto il massimo di {{max}} highlight. Rimuovine uno per aggiungerne un altro.',
     addHighlight: 'Aggiungi highlight',
     venuePhotos: 'Foto del locale',
     venuePhotosHint: 'Aggiungi fino a 8 foto del tuo locale. Visibili sul tuo profilo pubblico.',

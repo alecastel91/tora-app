@@ -1220,6 +1220,7 @@ const ko = {
     raLinkInvalid: 'Resident Advisor 링크(ra.co)를 입력하세요.',
     yearOutOfRange: '연도는 {{min}}~{{max}} 사이여야 합니다.',
     highlightIncomplete: '모든 항목을 입력하세요 — RA 링크만 선택 사항입니다.',
+    highlightsFull: '하이라이트는 최대 {{max}}개입니다. 추가하려면 하나를 삭제하세요.',
     addHighlight: '하이라이트 추가',
     venuePhotos: '베뉴 사진',
     venuePhotosHint: '베뉴 사진을 최대 8장 추가할 수 있습니다. 공개 프로필에 표시됩니다.',

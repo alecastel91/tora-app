@@ -1220,6 +1220,7 @@ const zh = {
     raLinkInvalid: '请输入Resident Advisor链接（ra.co）。',
     yearOutOfRange: '年份须在{{min}}至{{max}}之间。',
     highlightIncomplete: '请填写所有字段 — 仅RA链接为可选项。',
+    highlightsFull: '最多可添加 {{max}} 条亮点。请删除一条后再添加。',
     addHighlight: '添加亮点',
     venuePhotos: '场地照片',
     venuePhotosHint: '最多可添加8张场地照片，将显示在你的公开资料中。',

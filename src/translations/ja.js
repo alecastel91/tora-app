@@ -1220,6 +1220,7 @@ const ja = {
     raLinkInvalid: 'Resident Advisorのリンク（ra.co）を入力してください。',
     yearOutOfRange: '年は{{min}}〜{{max}}の間で入力してください。',
     highlightIncomplete: 'すべての項目を入力してください — RAリンクのみ任意です。',
+    highlightsFull: 'ハイライトは最大{{max}}件です。追加するには1件削除してください。',
     addHighlight: 'ハイライトを追加',
     venuePhotos: '会場の写真',
     venuePhotosHint: '会場の写真を最大8枚追加できます。公開プロフィールに表示されます。',

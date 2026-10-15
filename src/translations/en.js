@@ -1223,6 +1223,7 @@ const en = {
     raLinkInvalid: 'Enter a Resident Advisor link (ra.co).',
     yearOutOfRange: 'Year must be between {{min}} and {{max}}.',
     highlightIncomplete: 'Fill in all fields — only the RA link is optional.',
+    highlightsFull: 'That\'s the maximum of {{max}} highlights. Remove one to add another.',
     addHighlight: 'Add highlight',
     venuePhotos: 'Venue Photos',
     venuePhotosHint: 'Add up to 8 photos of your venue. Shown on your public profile.',
