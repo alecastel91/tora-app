@@ -39,7 +39,6 @@ import { isDesktopV2, useNativeDesktop } from './utils/desktopV2';
 import DashboardScreen from './components/desktop/DashboardScreen';
 import BookingsBoard from './components/desktop/BookingsBoard';
 import SearchWorkspace from './components/desktop/SearchWorkspace';
-import ProfileWorkspace from './components/desktop/ProfileWorkspace';
 import ChatContextPanel from './components/desktop/ChatContextPanel';
 import CommandPalette from './components/desktop/CommandPalette';
 import SettingsNav from './components/desktop/SettingsNav';
@@ -657,9 +656,8 @@ function App() {
       home: <DashboardScreen onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onSwitchTab={switchTab} onOpenPremium={() => setShowPremium(true)} isActive={activeTab === 'home'} />,
       search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
       bookings: <BookingsBoard onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
-      profile: <ProfileWorkspace onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
     }),
-    ...(!nativeDesktop && { profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} /> }),
+    profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
     ...(!nativeDesktop && { search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} /> }),
     news: <NewsScreen onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
     tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,

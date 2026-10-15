@@ -209,26 +209,70 @@
     font-size: 13px;
   }
 
-  /* ---- Profile: reading column + network rail ---- */
-  html.desktop-v3 .d3-profile {
+  /* ---- Own profile page (OwnProfilePage.js) — same bones as ProfilePage ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.profile-screen:has(> .d3-op) {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  html.desktop-v3 .d3-op {
+    text-align: left; /* the phone profile centres everything */
+    container-type: inline-size;
+  }
+
+  html.desktop-v3 .d3-op-head {
+    position: relative;
+    overflow: hidden;
+    padding: 22px 24px 14px;
+  }
+
+  /* A narrow band (1024px window, or a pane) puts the actions under the
+     identity instead of squeezing the name out. */
+  @container (max-width: 1000px) {
+    html.desktop-v3 .d3-op-head > .flex {
+      flex-wrap: wrap;
+    }
+
+    html.desktop-v3 .d3-op-actions {
+      width: 100%;
+      justify-content: flex-start;
+      padding-top: 4px;
+    }
+  }
+
+  @container (max-width: 900px) {
+    html.desktop-v3 .d3-op-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  html.desktop-v3 .d3-op-body {
     display: grid;
-    grid-template-columns: minmax(0, 760px) var(--d2-rail);
-    gap: var(--d2-gap);
-    justify-content: center;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 28px;
     align-items: start;
+    margin-top: 24px;
   }
 
-  html.desktop-v3 .d3-profile .profile-screen {
-    padding-bottom: 0;
+  html.desktop-v3 .d3-op h1,
+  html.desktop-v3 .d3-op .font-futuristic {
+    letter-spacing: -0.015em;
   }
 
-  /* ProfileScreen's own split panes (manage, roster…) take the whole canvas */
-  html.desktop-v3 .d3-profile:has(.md-split) {
-    grid-template-columns: minmax(0, 1fr);
+  html.desktop-v3 .d3-op main .grid-cols-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  html.desktop-v3 .d3-profile:has(.md-split) > .d3-rail-net {
-    display: none;
+  html.desktop-v3 .d3-op-body .mb-5,
+  html.desktop-v3 .d3-op-body .mb-6,
+  html.desktop-v3 .d3-op-body .mb-8 {
+    margin-bottom: 0;
+  }
+
+  /* the checklist card keeps its own margins on the phone */
+  html.desktop-v3 .d3-op main > .onboarding-checklist {
+    margin: 0;
   }
 
   /* ---- Sidebar: the profile chip ---- */
