@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNativeDesktop } from '../../utils/desktopV2';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import { dealIsForArtist } from '../../utils/dealStatus';
 import PrivacyNote from '../common/PrivacyNote';
@@ -21,6 +22,8 @@ import { raProfileUrl } from '../../utils/urls';
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const { t } = useLanguage();
+  // Desktop v3 lays this screen out as a panel grid (desktop-v3.css .d3-manage).
+  const nativeDesktop = useNativeDesktop();
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, info, documents (calendar: Tour > Calendar > artist)
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
   const [actionItems, setActionItems] = useState([]);
@@ -1170,7 +1173,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   }
 
   return (
-    <div className="screen active manage-artist-screen">
+    <div className={`screen active manage-artist-screen${nativeDesktop ? ' d3-manage' : ''}`}>
       <div className="manage-artist-header">
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />

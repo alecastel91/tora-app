@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNativeDesktop } from '../../utils/desktopV2';
 import { getCurrencySymbol } from '../../utils/currencies';
 import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
 import RevenueChart from '../common/RevenueChart';
@@ -18,6 +19,8 @@ import { isPremiumViewer } from '../../utils/subscription';
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = () => {}, initialTab = null }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const { t } = useLanguage();
+  // Desktop v3 lays this screen out as a panel grid (desktop-v3.css .d3-manage).
+  const nativeDesktop = useNativeDesktop();
   // Free tier sees the Dashboard as a blurred teaser that opens Premium.
   // Documents stays open — riders/press kits feed accepted deals and gating
   // them would break bookings already in motion. (Availability + travel
@@ -870,7 +873,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   };
 
   return (
-    <div className="screen active manage-artist-screen">
+    <div className={`screen active manage-artist-screen${nativeDesktop ? ' d3-manage' : ''}`}>
       <div className="manage-artist-header">
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />

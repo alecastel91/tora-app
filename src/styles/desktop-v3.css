@@ -773,11 +773,109 @@
     }
   }
 
-  /* ---- Manage / roster: room to breathe ---- */
-  html.desktop-v2.desktop-v3 .md-split > .md-detail > .manage-artist-screen,
-  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen {
-    max-width: 1040px;
+  /* ---- Manage (own profile + agent-per-artist): a panel grid. Takes the
+     whole canvas; the phone-sized master steps aside. ---- */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-manage) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-manage) > .md-master { display: none; }
+
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-manage {
+    max-width: 1280px;
+    padding: 0 var(--d2-gutter) 48px;
   }
+
+  /* header: back + title left, identity and the tab strip on one row */
+  html.desktop-v3 .d3-manage .manage-artist-header {
+    position: static;
+    padding: 18px 0 12px;
+    border-bottom: 0;
+    gap: 12px;
+  }
+
+  html.desktop-v3 .d3-manage .manage-artist-header h1 {
+    flex: 1;
+    text-align: left;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  html.desktop-v3 .d3-manage .artist-info-bar {
+    display: none; /* the title already names the profile */
+  }
+
+  html.desktop-v3 .d3-manage .tab-navigation {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    margin: 0 0 20px;
+    border: 1px solid var(--d2-line);
+    border-radius: 10px;
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v3 .d3-manage .tab-button {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  html.desktop-v3 .d3-manage .tab-button.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  html.desktop-v3 .d3-manage .manage-artist-content { padding: 0; }
+
+  /* dashboard: metrics across the top, then two columns of panels */
+  html.desktop-v3 .d3-manage .dashboard-tab {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .d3-manage .hero-metrics {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: none;
+    margin: 0;
+  }
+
+  html.desktop-v3 .d3-manage .dashboard-section {
+    margin: 0;
+    padding: 16px 18px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+  }
+
+  /* actions fill the left column top to bottom; revenue, reach and cities
+     stack on the right */
+  html.desktop-v3 .d3-manage .dashboard-tab > .actions-required-section { grid-column: 1; grid-row: 2 / span 4; }
+  html.desktop-v3 .d3-manage .dashboard-tab > .dashboard-section:not(.actions-required-section) { grid-column: 2; }
+  html.desktop-v3 .d3-manage .actions-required-section .action-items { max-height: calc(100dvh - 420px); overflow-y: auto; }
+
+  /* documents: categories two across */
+  html.desktop-v3 .d3-manage .artist-info-tab {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .d3-manage .artist-info-tab > .dashboard-section { margin: 0; }
+
+  /* the privacy note sits above the grid */
+  html.desktop-v3 .d3-manage .manage-artist-content > .privacy-note { margin-bottom: 14px; }
+
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen { max-width: 1040px; }
 
   /* ---- Profile page (ProfilePage.js). The screen is a fixed overlay with
      overflow hidden; .d3-vp is its scroller. Container queries keep the
