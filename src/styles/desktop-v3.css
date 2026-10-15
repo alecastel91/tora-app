@@ -858,8 +858,29 @@
   /* the Actions tab is one wide list; the actions section loses its stretch rules */
   html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) { grid-template-columns: minmax(0, 1fr); }
   html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) > .actions-required-section { grid-row: auto; display: block; }
-  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-items { overflow: visible; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item { margin: 0; }
+  /* one thin row per action, like the pipelines: icon · what · detail · do */
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-items { overflow: visible; display: block; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 10px 6px;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--d2-line);
+    border-radius: 0;
+    transition: background 0.15s;
+  }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item:last-child { border-bottom: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item:hover { background: rgba(255, 255, 255, 0.03); }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-icon { width: 28px; height: 28px; margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-icon svg { width: 16px; height: 16px; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-content { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-title { font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item .btn { padding: 6px 12px; }
 
   /* Insights: metrics across, then revenue left / reach + cities right */
   html.desktop-v3 .d3-manage .dashboard-tab:not(:has(> .actions-required-section)) > .dashboard-section.revenue-overview-section { grid-column: 1; grid-row: 2 / span 3; align-self: stretch; }
