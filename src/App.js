@@ -39,6 +39,10 @@ import { isDesktopV2, useNativeDesktop } from './utils/desktopV2';
 import DashboardScreen from './components/desktop/DashboardScreen';
 import BookingsBoard from './components/desktop/BookingsBoard';
 import SearchWorkspace from './components/desktop/SearchWorkspace';
+import ProfileWorkspace from './components/desktop/ProfileWorkspace';
+import ChatContextPanel from './components/desktop/ChatContextPanel';
+import CommandPalette from './components/desktop/CommandPalette';
+import { useDesktopStrings } from './components/desktop/strings';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
@@ -75,6 +79,7 @@ function App() {
   // Desktop v3 (flag + >= 1024px) lands on the dashboard instead and swaps
   // three tabs for desktop-native screens; the phone never takes this branch.
   const nativeDesktop = useNativeDesktop();
+  const td = useDesktopStrings();
   const HOME_TAB = nativeDesktop ? 'home' : 'news';
   const [activeTab, setActiveTab] = useState(HOME_TAB);
 
@@ -650,8 +655,9 @@ function App() {
       home: <DashboardScreen onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onSwitchTab={switchTab} onOpenPremium={() => setShowPremium(true)} isActive={activeTab === 'home'} />,
       search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
       bookings: <BookingsBoard onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
+      profile: <ProfileWorkspace onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
     }),
-    profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
+    ...(!nativeDesktop && { profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} /> }),
     ...(!nativeDesktop && { search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} /> }),
     news: <NewsScreen onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
     tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,
@@ -846,6 +852,11 @@ function App() {
                   grid in desktop-v2.css. Everything here reuses state already in
                   this component and existing nav.* keys — no new copy, no new
                   fetches. Not mounted below 1280px or when the flag is off. */}
+              {/* Desktop v3 Messages: the list keeps its column and the
+                  thread area says so until a conversation is open. */}
+              {tab === 'messages' && nativeDesktop && !activeChatUser && (
+                <div className="d3-msg-empty desktop-only"><p>{td('selectThread')}</p></div>
+              )}
               {tab === 'news' && showD2Rail && (
                 <aside className="d2-rail desktop-only">
                   <div className="d2-rail-card">
@@ -883,11 +894,26 @@ function App() {
             onOpenProfile={(profile) => setViewingProfile(profile)}
           />
         )}
+        {/* Desktop v3: the deal beside the thread (desktop-v3.css shrinks the chat) */}
+        {nativeDesktop && activeChatUser && !viewingProfile && (
+          <ChatContextPanel profile={activeChatUser} onOpenProfile={(profile) => setViewingProfile(profile)} onSwitchTab={switchTab} />
+        )}
         {viewingProfile && (
           <ViewProfileScreen
             profile={viewingProfile}
             onClose={() => setViewingProfile(null)}
             onOpenChat={openChatInMessages}
+          />
+        )}
+        {nativeDesktop && (
+          <CommandPalette
+            pages={[
+              { id: 'home', label: td('home') },
+              ...['news', 'search', 'tour', 'bookings', 'messages', 'profile'].map((id) => ({ id, label: t(`nav.${id}`) })),
+              { id: 'settings', label: t('settings.title') },
+            ]}
+            onGo={(id) => (id === 'settings' ? setShowSettings(true) : switchTab(id))}
+            onOpenProfile={(profile) => setViewingProfile(profile)}
           />
         )}
         <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} bookingsHasDot={bookingsActionCount > 0 && activeTab !== 'bookings'} homeTab={nativeDesktop} />

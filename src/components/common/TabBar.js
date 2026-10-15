@@ -3,6 +3,8 @@ import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon, NewsIcon
 import { useLanguage } from '../../contexts/LanguageContext';
 import CountBadge from './CountBadge';
 import { useDesktopStrings } from '../desktop/strings';
+import { useAppContext } from '../../contexts/AppContext';
+import { getAvatarClass, roleLabel } from '../../utils/roles';
 
 // Desktop v3 dashboard glyph — lives here rather than in utils/icons because
 // no other surface has a home tab.
@@ -20,6 +22,7 @@ const DashboardIcon = () => (
 const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0, bookingsHasDot = false, homeTab = false }) => {
   const { t } = useLanguage();
   const td = useDesktopStrings();
+  const { user } = useAppContext();
 
   const tabs = [
     ...(homeTab ? [{ id: 'home', icon: DashboardIcon, label: td('home') }] : []),
@@ -61,6 +64,19 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
                           : 'text-white/40 hover:text-white/70'}`}
             onClick={() => onTabChange(tab.id)}
           >
+            {/* Desktop v3: the Profile entry is a chip — who you are, at the
+                foot of the sidebar. Everything else renders as before. */}
+            {homeTab && tab.id === 'profile' && user ? (
+              <span className="d3-chip flex w-full items-center gap-2.5 text-left">
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full text-[12px] font-semibold text-white ${getAvatarClass(user.role)}`}>
+                  {user.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : (user.name || '?').charAt(0).toUpperCase()}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-[13px] font-medium">{user.name}</span>
+                  <span className="block truncate text-[11px] text-white/45">{roleLabel(user.role, t)}</span>
+                </span>
+              </span>
+            ) : (
             <div className="relative flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5">
               <Icon />
               {(showMessagesBadge || showTourBadge) && (
@@ -71,7 +87,8 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
                                  shadow-[0_0_6px_rgba(255,51,102,0.7)]" />
               )}
             </div>
-            <span>{tab.label}</span>
+            )}
+            {!(homeTab && tab.id === 'profile' && user) && <span>{tab.label}</span>}
           </button>
         );
       })}
