@@ -402,6 +402,33 @@
 
   html.desktop-v3 .premium-screen .premium-content > * {
     margin: 0;
+    order: 5; /* anything unnamed (the extras shop) goes last */
+  }
+
+  /* ---- the three plan columns (PremiumPlans.js) ---- */
+  html.desktop-v3 .premium-screen .premium-content > .d3-plans {
+    order: 1;
+  }
+
+  html.desktop-v3 .d3-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+    margin-top: 14px;
+  }
+
+  /* the phone's premium rules track display numerals out; a price is tight */
+  html.desktop-v3 .d3-plan-price,
+  html.desktop-v3 .d3-plan-price * {
+    letter-spacing: -0.015em;
+  }
+
+  html.desktop-v3 .d3-plans-note {
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.5);
   }
 
   html.desktop-v3 .premium-screen .premium-hero {

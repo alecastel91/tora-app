@@ -43,6 +43,7 @@ import ProfileWorkspace from './components/desktop/ProfileWorkspace';
 import ChatContextPanel from './components/desktop/ChatContextPanel';
 import CommandPalette from './components/desktop/CommandPalette';
 import SettingsNav from './components/desktop/SettingsNav';
+import PremiumPlans from './components/desktop/PremiumPlans';
 import { useDesktopStrings } from './components/desktop/strings';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
@@ -1401,6 +1402,25 @@ function App() {
               </p>
             </div>
             
+            {/* Desktop v3: three plan columns (free / monthly / yearly), the
+                price on top and what each includes beneath. Agents keep the
+                per-seat pricing below. Same prices and handlers either way. */}
+            {nativeDesktop && user?.role !== 'AGENT' ? (
+              <PremiumPlans
+                user={user}
+                money={money}
+                memberPrice={memberPrice}
+                currency={cur}
+                hasMonthly={billingTier(user) === 'MONTHLY'}
+                hasYearly={billingTier(user) === 'YEARLY'}
+                onAgencyPlan={onAgencyPlan}
+                canLeaveAgency={agencyRoster <= 1}
+                onMembership={onMembership}
+                onSelectPlan={handleSelectPlan}
+                onExplain={setInfoFeature}
+              />
+            ) : (
+            <>
             <div className="premium-features">
               <h3>{t('premium.comparePlans')}</h3>
               <div className="features-table">
@@ -1615,6 +1635,8 @@ function App() {
               </>
               );
             })()}
+            </>
+            )}
 
             <ExtrasShop user={user} />
           </div>
