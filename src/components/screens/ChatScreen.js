@@ -128,7 +128,11 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   const [hasOlder, setHasOlder] = useState(false);
   // A thread over an agreed booking survives a block, frozen: readable, no
   // new messages. { blockedByMe } decides which line replaces the composer.
-  const [frozen, setFrozen] = useState(null);
+  const [frozen, setFrozen] = useState(false);
+  // The server marks the partner inactive when THIS member was blocked over
+  // an agreed booking — rendered exactly like a deactivated account.
+  const [partnerInactive, setPartnerInactive] = useState(false);
+  const partnerGone = user?.isDeleted || user?.deleted || partnerInactive;
   const [loadingOlder, setLoadingOlder] = useState(false);
   const inputRef = useRef(null);
   const otherFileInputRef = useRef(null);
@@ -284,7 +288,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
       // Transform backend messages to match the format expected by the UI
       const transformedMessages = (response.messages || []).map(transformThreadMessage);
       setHasOlder(!!response.hasMore);
-      setFrozen(response.frozen ? { blockedByMe: !!response.blockedByMe } : null);
+      setFrozen(!!response.frozen);
+      setPartnerInactive(!!response.partnerInactive);
 
       // Backend now embeds the linked deal on each message, so we can
       // build dealStatuses from the same response — no second round-trip.
@@ -1085,13 +1090,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
         <div
           className="chat-user-info"
           onClick={() => {
-            if (!(user.isDeleted || user.deleted) && onOpenProfile) {
+            if (!partnerGone && onOpenProfile) {
               onOpenProfile(user);
             }
           }}
-          style={{ cursor: user.isDeleted || user.deleted ? 'default' : 'pointer' }}
+          style={{ cursor: partnerGone ? 'default' : 'pointer' }}
         >
-          <div className={`chat-avatar ${user.isDeleted || user.deleted ? 'avatar-deleted' : getAvatarClass(user.role)}`}>
+          <div className={`chat-avatar ${partnerGone ? 'avatar-deleted' : getAvatarClass(user.role)}`}>
             {user.avatar ? (
               <img src={user.avatar} alt={user.name} />
             ) : (
@@ -1099,17 +1104,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
             )}
           </div>
           <div className="chat-user-details">
-            <h3 style={{ color: user.isDeleted || user.deleted ? '#888' : 'inherit' }}>{user.name}</h3>
-            <span className="chat-role" style={{ color: user.isDeleted || user.deleted ? '#888' : 'inherit' }}>{roleLabel(user.role, t)}</span>
+            <h3 style={{ color: partnerGone ? '#888' : 'inherit' }}>{user.name}</h3>
+            <span className="chat-role" style={{ color: partnerGone ? '#888' : 'inherit' }}>{roleLabel(user.role, t)}</span>
             <span className="chat-location">{user.location}</span>
           </div>
         </div>
         {/* Report + block (App Review 1.2); blocking closes the thread. */}
-        {!frozen && <SafetyMenu profile={user} className="chat-header-menu" onBlocked={onClose} />}
+        {!frozen && !partnerGone && <SafetyMenu profile={user} className="chat-header-menu" onBlocked={onClose} />}
       </div>
 
       {/* Banner for deleted profiles */}
-      {(user.isDeleted || user.deleted) && (
+      {partnerGone && (
         <div className="chat-deleted-banner">
           <span>{t('chat.profileNoLongerActive')}</span>
         </div>
@@ -2033,13 +2038,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
         if (frozen) {
           return (
             <div className="chat-input-disabled">
-              <p>{frozen.blockedByMe ? t('chat.frozenByMe', { name: user.name }) : t('chat.frozenNotice')}</p>
+              <p>{t('chat.frozenByMe', { name: user.name })}</p>
             </div>
           );
         }
 
-        // User is deleted
-        if (user.isDeleted || user.deleted) {
+        // User is deleted — or, to this member, as good as
+        if (partnerGone) {
           return (
             <div className="chat-input-disabled">
               <p>{t('chat.cannotMessageInactive')}</p>

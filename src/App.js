@@ -1641,7 +1641,7 @@ function App() {
                       the price and period (above), when payment is taken, and how
                       to cancel — in the same words as the tokushōhō page. */}
                   <ul className="summary-terms">
-                    <li>{t('premium.paymentTiming')}</li>
+                    {!checkoutQuote?.change && <li>{t('premium.paymentTiming')}</li>}
                     <li>{t('premium.cancelTerms')}</li>
                     <li className="summary-terms-legal">
                       <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">

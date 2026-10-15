@@ -6810,8 +6810,6 @@
   font-size: 11.5px;
   line-height: 1.45;
 }
-.summary-terms a { color: rgba(255, 255, 255, 0.7); text-decoration: underline; text-underline-offset: 2px; }
-.summary-terms a:hover { color: #fff; }
 /* The legal links: present because the law needs them reachable from here,
    quiet because nobody is meant to read them before paying. */
 .summary-terms-legal { margin-top: 4px; font-size: 10px; letter-spacing: 0.02em; }

@@ -72,7 +72,7 @@ const AddressStep = ({ onContinue, t }) => {
 };
 
 // Inner form — needs the <Elements> context around it.
-const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon, amountDue, currency, cta, onSuccess }) => {
+const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon, amountDue, currency, cta, isExtra, onSuccess }) => {
   const { t } = useLanguage();
   const stripe = useStripe();
   const elements = useElements();
@@ -86,7 +86,7 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements || busy || (needsWaiver && !waived)) return;
+    if (!stripe || !elements || busy) return;
     setBusy(true);
     setError('');
 
@@ -133,7 +133,7 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
       {needsWaiver && (
         <label className="checkout-waiver">
           <input type="checkbox" checked={waived} onChange={(e) => setWaived(e.target.checked)} />
-          <span>{t('premium.euWithdrawal')}</span>
+          <span>{t(isExtra ? 'premium.euWithdrawalExtra' : 'premium.euWithdrawal')}</span>
         </label>
       )}
       <button type="submit" className="btn btn-primary btn-full mt-5" disabled={!stripe || busy || (needsWaiver && !waived)}>
@@ -235,6 +235,7 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, onSuccess, onQu
         amountDue={state.amountDue}
         currency={state.currency}
         cta={extraItem && state.amountDue != null ? t('premium.payNow', { price: formatMoney(state.amountDue, state.currency) }) : undefined}
+        isExtra={!!extraItem}
         onSuccess={onSuccess}
       />
     </Elements>
