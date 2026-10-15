@@ -260,7 +260,9 @@
     letter-spacing: -0.015em;
   }
 
-  html.desktop-v3 .d3-op main .grid-cols-2 {
+  html.desktop-v3 .d3-op main .grid-cols-2,
+  html.desktop-v3 .d3-op main .grid-cols-3,
+  html.desktop-v3 .d3-vp main .grid-cols-3 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
@@ -510,6 +512,14 @@
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
   }
+
+  /* The app sets `* { overscroll-behavior: none }` for the phone's rubber
+     band. On a desk it has a side effect: a wheel over ANY inner scroll
+     container that does not overflow is swallowed instead of chained to the
+     page, so the page only scrolls with the cursor outside the panel. Chain
+     everywhere; only the page itself keeps the rubber band off. */
+  html.desktop-v3 .app-container * { overscroll-behavior: auto; }
+  html.desktop-v3 .app-content { overscroll-behavior: contain; }
 
   /* =========================================================================
      SCREENS DESIGNED FOR THE DESK (round 4). Not the phone blocks split into
@@ -858,9 +868,16 @@
 
   /* actions fill the left column top to bottom; revenue, reach and cities
      stack on the right */
-  html.desktop-v3 .d3-manage .dashboard-tab > .actions-required-section { grid-column: 1; grid-row: 2 / span 4; }
+  html.desktop-v3 .d3-manage .dashboard-tab > .actions-required-section {
+    grid-column: 1;
+    grid-row: 2 / span 4;
+    align-self: stretch; /* as tall as the right column, however long it is */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
   html.desktop-v3 .d3-manage .dashboard-tab > .dashboard-section:not(.actions-required-section) { grid-column: 2; }
-  html.desktop-v3 .d3-manage .actions-required-section .action-items { max-height: calc(100dvh - 420px); overflow-y: auto; }
+  html.desktop-v3 .d3-manage .actions-required-section .action-items { flex: 1; min-height: 0; overflow-y: auto; }
 
   /* documents: categories two across */
   html.desktop-v3 .d3-manage .artist-info-tab {

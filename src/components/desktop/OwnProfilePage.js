@@ -78,31 +78,6 @@ const Stat = ({ value, label, onClick }) => (
   </button>
 );
 
-const People = ({ title, people, onOpen, onAll, t }) => (
-  <Panel
-    title={`${title} · ${people.length}`}
-    action={people.length > 5 && <button onClick={onAll} className="cursor-pointer text-[11px] text-white/40 hover:text-white">›</button>}
-  >
-    {people.length === 0 ? <p className="m-0 py-2 text-[12px] text-white/30">—</p> : (
-      <ul className="m-0 flex list-none flex-col p-0">
-        {people.slice(0, 5).map((p) => (
-          <li key={p.id}>
-            <button onClick={() => onOpen(p)} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-left transition-colors hover:bg-white/[0.04]">
-              <span className={`flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-semibold text-white ${getAvatarClass(p.role)}`}>
-                {p.avatar ? <img src={p.avatar} alt="" className="h-full w-full object-cover" /> : (p.name || '?').charAt(0).toUpperCase()}
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate text-[12.5px] text-white/90">{p.name}</span>
-                <span className="block truncate text-[10.5px] text-white/40">{roleLabel(p.role, t)}{p.city ? ` · ${p.city}` : ''}</span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    )}
-  </Panel>
-);
-
 const OwnProfilePage = ({
   user, userProfiles, defaultProfileId, embeds, ownBadges, rosterArtists, artistActionsMap, ownHasActions,
   representedByProfiles, networkSections, likedProfilesList, likerProfilesList, connectionsList, trialInfo,
@@ -321,10 +296,6 @@ const OwnProfilePage = ({
               )}
             </ul>
           </Panel>
-
-          <People title={t('profile.connections')} people={connectionsList} onOpen={onOpenProfile} onAll={onOpenConnections} t={t} />
-          <People title={t('profile.likedByLabel')} people={likerProfilesList} onOpen={onOpenProfile} onAll={onOpenLikers} t={t} />
-          <People title={t('profile.likesGiven')} people={likedProfilesList} onOpen={onOpenProfile} onAll={onOpenLikes} t={t} />
 
           <Panel title={t('profile.links')} action={<button onClick={onEdit} className="cursor-pointer text-[11px] text-white/40 hover:text-white">{t('common.edit')}</button>}>
             {links.length === 0 ? <p className="m-0 py-2 text-[12px] text-white/30">—</p> : (
