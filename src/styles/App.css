@@ -6797,6 +6797,35 @@
 }
 .summary-renewal svg { flex-shrink: 0; opacity: 0.75; }
 
+/* The legally required lines under the order summary (改正特商法 12条の6):
+   same tone as .summary-renewal, a list so each item reads on its own. */
+.summary-terms {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+.summary-terms a { color: rgba(255, 255, 255, 0.7); text-decoration: underline; text-underline-offset: 2px; }
+.summary-terms a:hover { color: #fff; }
+
+/* EU withdrawal acknowledgement — gates the Subscribe button for EUR */
+.checkout-waiver {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12.5px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.checkout-waiver input { margin-top: 2px; flex-shrink: 0; accent-color: #ff3366; }
+
 /* Launch-promo banner inside checkout (coupon applied) */
 .checkout-promo {
   display: flex;

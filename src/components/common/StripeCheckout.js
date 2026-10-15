@@ -78,10 +78,15 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
   const elements = useElements();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  // EU consumer law: a digital service that starts at once needs the buyer's
+  // express request plus acknowledgement that the 14-day withdrawal right is
+  // lost. Currency is routed by verified country, so EUR means EEA/UK/CH.
+  const needsWaiver = currency === 'EUR';
+  const [waived, setWaived] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements || busy) return;
+    if (!stripe || !elements || busy || (needsWaiver && !waived)) return;
     setBusy(true);
     setError('');
 
@@ -125,7 +130,13 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
         onLoadError={(ev) => setError(ev?.error?.message || t('premium.notConfigured'))}
       />
       {error && <p className="m-0 mt-3 text-sm text-infrared">{error}</p>}
-      <button type="submit" className="btn btn-primary btn-full mt-5" disabled={!stripe || busy}>
+      {needsWaiver && (
+        <label className="checkout-waiver">
+          <input type="checkbox" checked={waived} onChange={(e) => setWaived(e.target.checked)} />
+          <span>{t('premium.euWithdrawal')}</span>
+        </label>
+      )}
+      <button type="submit" className="btn btn-primary btn-full mt-5" disabled={!stripe || busy || (needsWaiver && !waived)}>
         {busy ? t('premium.processing') : (cta || t('premium.subscribeNow'))}
       </button>
     </form>

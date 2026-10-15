@@ -1637,6 +1637,22 @@ function App() {
                     </svg>
                     {t('premium.autoRenew', { cycle: cycleWord })}
                   </p>
+                  {/* 改正特商法 12条の6: the screen with the order button must show
+                      the price and period (above), when payment is taken, and how
+                      to cancel — in the same words as the tokushōhō page. */}
+                  <ul className="summary-terms">
+                    <li>{t('premium.paymentTiming')}</li>
+                    <li>{t('premium.cancelTerms')}</li>
+                    <li>
+                      <a href="https://torahub.io/tokushoho" target="_blank" rel="noopener noreferrer nofollow">
+                        {t('premium.legalDisclosure')}
+                      </a>
+                      {' · '}
+                      <a href="https://torahub.io/terms" target="_blank" rel="noopener noreferrer">
+                        {t('premium.termsLink')}
+                      </a>
+                    </li>
+                  </ul>
                 </div>
 
                 <div className="payment-section">
