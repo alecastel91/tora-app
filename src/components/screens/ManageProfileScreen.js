@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNativeDesktop } from '../../utils/desktopV2';
+import { useDesktopStrings } from '../desktop/strings';
 import { getCurrencySymbol } from '../../utils/currencies';
 import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
 import RevenueChart from '../common/RevenueChart';
@@ -21,6 +22,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const { t } = useLanguage();
   // Desktop v3 lays this screen out as a panel grid (desktop-v3.css .d3-manage).
   const nativeDesktop = useNativeDesktop();
+  const td = useDesktopStrings();
   // Free tier sees the Dashboard as a blurred teaser that opens Premium.
   // Documents stays open — riders/press kits feed accepted deals and gating
   // them would break bookings already in motion. (Availability + travel
@@ -30,7 +32,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const renderLockedPane = (content, message) => (
     <LockedPane message={message} onUnlock={onOpenPremium}>{content}</LockedPane>
   );
-  const [activeTab, setActiveTab] = useState(initialTab || 'dashboard'); // dashboard, documents
+  const [activeTab, setActiveTab] = useState(initialTab || 'dashboard'); // dashboard, documents (+ 'actions' on desktop v3)
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
   const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
@@ -500,14 +502,15 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   };
 
   // Dashboard Tab
-  const renderDashboardTab = () => {
+  // part: undefined (phone: everything) | 'actions' | 'insights' (desktop tabs)
+  const renderDashboardTab = ({ part } = {}) => {
     const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
     const revenueLabel = isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
 
     return (
-    <div className="dashboard-tab">
+    <div className={`dashboard-tab${part ? ` is-${part}` : ''}`}>
       {/* Hero Metrics - 2x2 Grid */}
-      <div className="hero-metrics hero-metrics-four">
+      {part !== 'actions' && <div className="hero-metrics hero-metrics-four">
         {/* Top Row */}
         <div className="metric-card">
           <div className="metric-icon"><CalendarIcon /></div>
@@ -538,10 +541,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           </div>
           <div className="metric-label">{t('manage.expectedMetric', { label: revenueLabel })}</div>
         </div>
-      </div>
+      </div>}
 
       {/* Actions Required Section */}
-      <div className="dashboard-section actions-required-section">
+      {part !== 'insights' && <div className="dashboard-section actions-required-section">
         <h3><AlertIcon /> {t('manage.actionsRequired')} {actionItems.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
         <div className="action-items">
           {actionItems.length === 0 ? (
@@ -568,16 +571,16 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
             })
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Revenue/Costs Chart */}
-      <div className="dashboard-section revenue-overview-section">
+      {part !== 'actions' && <div className="dashboard-section revenue-overview-section">
         <h3><TrendingUpIcon /> {t('manage.overviewTitle', { label: revenueLabel })}</h3>
         <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />
-      </div>
+      </div>}
 
       {/* Profile reach — internal view/like/connection tracking */}
-      {reach && (
+      {part !== 'actions' && reach && (
         <div className="dashboard-section">
           <h3><TrendingUpIcon /> {t('manage.profileReach')} <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/35">· {t('manage.last30')}</span></h3>
           <div className="grid grid-cols-3 gap-2.5 mt-3">
@@ -635,7 +638,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
       )}
 
       {/* Top cities played */}
-      {topCities.length > 0 && (
+      {part !== 'actions' && topCities.length > 0 && (
         <div className="dashboard-section">
           <h3><LocationIcon /> {t('manage.topCities')}</h3>
           <div className="mt-3 flex flex-col gap-2.5">
@@ -896,13 +899,21 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation — desktop v3 splits the dashboard into Actions and Insights */}
       <div className="tab-navigation">
+        {nativeDesktop && (
+          <button
+            className={`tab-button ${activeTab === 'actions' ? 'active' : ''}`}
+            onClick={() => handleTabChange('actions')}
+          >
+            {t('manage.actionsRequired')}{actionItems.length > 0 && <span className="d3-tab-count">{actionItems.length}</span>}
+          </button>
+        )}
         <button
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => handleTabChange('dashboard')}
         >
-          {t('manage.dashboard')}
+          {nativeDesktop ? td('insights') : t('manage.dashboard')}
         </button>
         <button
           className={`tab-button ${activeTab === 'documents' ? 'active' : ''}`}
@@ -920,9 +931,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
+        {activeTab === 'actions' && (manageLocked
+          ? renderLockedPane(renderDashboardTab({ part: 'actions' }), t('manage.dashboardLockedMsg'))
+          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'actions' })}</>)}
         {activeTab === 'dashboard' && (manageLocked
-          ? renderLockedPane(renderDashboardTab(), t('manage.dashboardLockedMsg'))
-          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab()}</>)}
+          ? renderLockedPane(renderDashboardTab(nativeDesktop ? { part: 'insights' } : {}), t('manage.dashboardLockedMsg'))
+          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab(nativeDesktop ? { part: 'insights' } : {})}</>)}
         {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}
       </div>
 

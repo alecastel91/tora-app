@@ -58,6 +58,7 @@ const EN = {
   dates: 'Dates',
   tours: 'Tours',
   calendar: 'Calendar',
+  insights: 'Insights',
 };
 
 const CATALOG = {
@@ -114,6 +115,7 @@ const CATALOG = {
     dates: '日程',
     tours: 'ツアー',
     calendar: 'カレンダー',
+    insights: 'インサイト',
   },
   zh: {
     home: '仪表盘',
@@ -167,6 +169,7 @@ const CATALOG = {
     dates: '日期',
     tours: '巡演',
     calendar: '日历',
+    insights: '洞察',
   },
   ko: {
     home: '대시보드',
@@ -220,6 +223,7 @@ const CATALOG = {
     dates: '일정',
     tours: '투어',
     calendar: '캘린더',
+    insights: '인사이트',
   },
   es: {
     home: 'Panel',
@@ -273,6 +277,7 @@ const CATALOG = {
     dates: 'Fechas',
     tours: 'Giras',
     calendar: 'Calendario',
+    insights: 'Estadísticas',
   },
   fr: {
     home: 'Tableau de bord',
@@ -326,6 +331,7 @@ const CATALOG = {
     dates: 'Dates',
     tours: 'Tournées',
     calendar: 'Calendrier',
+    insights: 'Statistiques',
   },
   it: {
     home: 'Dashboard',
@@ -379,6 +385,7 @@ const CATALOG = {
     dates: 'Date',
     tours: 'Tour',
     calendar: 'Calendario',
+    insights: 'Statistiche',
   },
   pt: {
     home: 'Painel',
@@ -432,6 +439,7 @@ const CATALOG = {
     dates: 'Datas',
     tours: 'Turnês',
     calendar: 'Calendário',
+    insights: 'Estatísticas',
   },
 };
 
