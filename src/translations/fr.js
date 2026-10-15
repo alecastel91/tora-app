@@ -423,6 +423,8 @@ const fr = {
     bookingCancelled: 'Réservation annulée',
     failedToCancelBooking: "Impossible d'annuler la réservation",
     cancelBooking: '× Annuler la réservation',
+    frozenByMe: 'Vous avez bloqué {{name}}. Votre réservation n\'est pas affectée : gérez-la dans Réservations.',
+    frozenNotice: 'La messagerie n\'est pas disponible pour cette réservation. Gérez-la dans Réservations.',
     cannotMessageInactive: 'Vous ne pouvez pas écrire à des profils inactifs',
     attachDocument: 'Joindre un document',
     pendingRequestNotice: "Demande de connexion en attente. Vous pourrez écrire quand {{name}} l'aura acceptée.",

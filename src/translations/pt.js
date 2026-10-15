@@ -423,6 +423,8 @@ const pt = {
     bookingCancelled: 'Reserva cancelada',
     failedToCancelBooking: 'Não foi possível cancelar a reserva',
     cancelBooking: '× Cancelar reserva',
+    frozenByMe: 'Você bloqueou {{name}}. Sua reserva não é afetada — gerencie-a em Reservas.',
+    frozenNotice: 'As mensagens não estão disponíveis para esta reserva. Gerencie-a em Reservas.',
     cannotMessageInactive: 'Não pode enviar mensagens a perfis inativos',
     attachDocument: 'Anexar documento',
     pendingRequestNotice: 'Pedido de ligação pendente. Você poderá enviar mensagens quando {{name}} o aceitar.',

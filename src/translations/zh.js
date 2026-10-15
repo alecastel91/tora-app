@@ -423,6 +423,8 @@ const zh = {
     bookingCancelled: '预订已取消',
     failedToCancelBooking: '无法取消预订',
     cancelBooking: '× 取消预订',
+    frozenByMe: '你已屏蔽 {{name}}。你的预订不受影响，可在“预订”中管理。',
+    frozenNotice: '此预订无法发送消息。请在“预订”中管理。',
     cannotMessageInactive: '无法给不活跃的档案发消息',
     attachDocument: '附加文件',
     pendingRequestNotice: '联系请求待处理。待{{name}}接受后即可发送消息。',

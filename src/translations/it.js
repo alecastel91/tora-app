@@ -423,6 +423,8 @@ const it = {
     bookingCancelled: 'Prenotazione annullata',
     failedToCancelBooking: 'Impossibile annullare la prenotazione',
     cancelBooking: '× Annulla prenotazione',
+    frozenByMe: 'Hai bloccato {{name}}. La tua prenotazione non cambia: gestiscila in Prenotazioni.',
+    frozenNotice: 'La messaggistica non è disponibile per questa prenotazione. Gestiscila in Prenotazioni.',
     cannotMessageInactive: 'Non puoi inviare messaggi a profili inattivi',
     attachDocument: 'Allega documento',
     pendingRequestNotice: 'Richiesta di collegamento in sospeso. Potrai inviare messaggi quando {{name}} la accetterà.',

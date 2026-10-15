@@ -423,6 +423,8 @@ const ja = {
     bookingCancelled: '予約をキャンセルしました',
     failedToCancelBooking: '予約のキャンセルに失敗しました',
     cancelBooking: '× 予約をキャンセル',
+    frozenByMe: '{{name}}さんをブロックしています。ブッキングには影響ありません。ブッキングから管理できます。',
+    frozenNotice: 'このブッキングではメッセージを送れません。ブッキングから管理してください。',
     cannotMessageInactive: '利用停止中のプロフィールにはメッセージを送れません',
     attachDocument: '書類を添付',
     pendingRequestNotice: 'コネクションリクエストが承認待ちです。{{name}}が承認するとメッセージを送れます。',

@@ -126,6 +126,9 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   const messagesContainerRef = useRef(null);
   const skipAutoScrollRef = useRef(false);
   const [hasOlder, setHasOlder] = useState(false);
+  // A thread over an agreed booking survives a block, frozen: readable, no
+  // new messages. { blockedByMe } decides which line replaces the composer.
+  const [frozen, setFrozen] = useState(null);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const inputRef = useRef(null);
   const otherFileInputRef = useRef(null);
@@ -281,6 +284,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
       // Transform backend messages to match the format expected by the UI
       const transformedMessages = (response.messages || []).map(transformThreadMessage);
       setHasOlder(!!response.hasMore);
+      setFrozen(response.frozen ? { blockedByMe: !!response.blockedByMe } : null);
 
       // Backend now embeds the linked deal on each message, so we can
       // build dealStatuses from the same response — no second round-trip.
@@ -1101,7 +1105,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
           </div>
         </div>
         {/* Report + block (App Review 1.2); blocking closes the thread. */}
-        <SafetyMenu profile={user} className="chat-header-menu" onBlocked={onClose} />
+        {!frozen && <SafetyMenu profile={user} className="chat-header-menu" onBlocked={onClose} />}
       </div>
 
       {/* Banner for deleted profiles */}
@@ -2024,6 +2028,15 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
         const hasPendingRequest = Object.values(connectionRequests).some(req =>
           req && req.status === 'PENDING' && req.type === 'CONNECTION_REQUEST' && req.from === currentUser.id
         );
+
+        // Frozen over an agreed booking: the record stays, the channel closes.
+        if (frozen) {
+          return (
+            <div className="chat-input-disabled">
+              <p>{frozen.blockedByMe ? t('chat.frozenByMe', { name: user.name }) : t('chat.frozenNotice')}</p>
+            </div>
+          );
+        }
 
         // User is deleted
         if (user.isDeleted || user.deleted) {

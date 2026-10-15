@@ -423,6 +423,8 @@ const ko = {
     bookingCancelled: '부킹이 취소되었습니다',
     failedToCancelBooking: '부킹을 취소하지 못했습니다',
     cancelBooking: '× 부킹 취소',
+    frozenByMe: '{{name}}님을 차단했습니다. 예약에는 영향이 없으며 예약 탭에서 관리할 수 있습니다.',
+    frozenNotice: '이 예약에서는 메시지를 보낼 수 없습니다. 예약 탭에서 관리하세요.',
     cannotMessageInactive: '비활성 프로필에는 메시지를 보낼 수 없습니다',
     attachDocument: '문서 첨부',
     pendingRequestNotice: '연결 요청 대기 중입니다. {{name}} 님이 수락하면 메시지를 보낼 수 있습니다.',

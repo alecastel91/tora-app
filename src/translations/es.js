@@ -423,6 +423,8 @@ const es = {
     bookingCancelled: 'Reserva cancelada',
     failedToCancelBooking: 'No se pudo cancelar la reserva',
     cancelBooking: '× Cancelar reserva',
+    frozenByMe: 'Has bloqueado a {{name}}. Tu reserva no se ve afectada: gestiónala en Reservas.',
+    frozenNotice: 'La mensajería no está disponible para esta reserva. Gestiónala en Reservas.',
     cannotMessageInactive: 'No puedes enviar mensajes a perfiles inactivos',
     attachDocument: 'Adjuntar documento',
     pendingRequestNotice: 'Solicitud de conexión pendiente. Podrás enviar mensajes cuando {{name}} la acepte.',

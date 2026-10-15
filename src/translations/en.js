@@ -423,6 +423,8 @@ const en = {
     bookingCancelled: 'Booking cancelled',
     failedToCancelBooking: 'Failed to cancel booking',
     cancelBooking: '× Cancel Booking',
+    frozenByMe: 'You blocked {{name}}. Your booking is unaffected — manage it in Bookings.',
+    frozenNotice: 'Messaging is unavailable for this booking. Manage it in Bookings.',
     cannotMessageInactive: 'You cannot send messages to inactive profiles',
     attachDocument: 'Attach document',
     pendingRequestNotice: 'Connection request pending. You can send messages once {{name}} accepts your request.',
