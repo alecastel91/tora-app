@@ -42,6 +42,7 @@ import SearchWorkspace from './components/desktop/SearchWorkspace';
 import ProfileWorkspace from './components/desktop/ProfileWorkspace';
 import ChatContextPanel from './components/desktop/ChatContextPanel';
 import CommandPalette from './components/desktop/CommandPalette';
+import SettingsNav from './components/desktop/SettingsNav';
 import { useDesktopStrings } from './components/desktop/strings';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
@@ -936,6 +937,9 @@ function App() {
               <div style={{ width: '24px' }}></div>
             </div>
 
+            {/* Desktop v3: a section index beside the content (desktop-v3.css
+                lays the screen out as a grid when the nav is present). */}
+            {nativeDesktop && <SettingsNav />}
             <div className="settings-content">
             {/* Subscription & Usage Section */}
             <div className="settings-section subscription-section">
