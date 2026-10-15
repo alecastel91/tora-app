@@ -701,8 +701,12 @@
   html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
     max-width: 1280px;
     padding: 0 var(--d2-gutter) 48px;
-    /* App.css forces .edit-profile-screen.screen.active { display: flex !important } */
+    /* App.css forces .edit-profile-screen.screen.active { display: flex !important }
+       and clips it (overflow hidden, fixed height) — the pane is the scroller here */
     display: grid !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
     grid-template-columns: 176px minmax(0, 1fr) 264px;
     grid-template-rows: auto 1fr;
     column-gap: 24px;
