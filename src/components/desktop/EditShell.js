@@ -13,8 +13,11 @@ import { useDesktopStrings } from './strings';
 export const EditHeader = ({ title, onCancel, onSave, saving, blocked }) => {
   const { t } = useLanguage();
   return (
-    <header className="d3-edit-head">
-      <h1 className="m-0 font-futuristic text-[20px] font-semibold tracking-tight text-white">{title}</h1>
+    <header className="d3-edit-head d3-subhead">
+      <button type="button" className="back-btn" onClick={onCancel} aria-label={t('common.close')} disabled={saving}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+      </button>
+      <h1 className="m-0 flex-1 font-futuristic text-[22px] font-semibold text-white">{title}</h1>
       <div className="flex items-center gap-2">
         <button className="btn btn-outline" onClick={onCancel} disabled={saving}>{t('editProfile.cancel')}</button>
         <button className="btn btn-primary" onClick={onSave} disabled={saving || blocked}>

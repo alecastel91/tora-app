@@ -1033,3 +1033,95 @@
     white-space: nowrap;
   }
 }
+
+/* ===========================================================================
+   SUB-PAGE HEADERS — one idiom for Edit Profile, Manage, Representing agent,
+   Roster, Add profile: a round close button on the left, the title, and the
+   page's actions on the right (Edit keeps Cancel / Save there).
+   ======================================================================== */
+@media (min-width: 1024px) {
+  html.desktop-v3 .d3-edit-head,
+  html.desktop-v3 .d3-manage .manage-artist-header,
+  html.desktop-v3 .d3-agents .search-agents-header,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen .represented-artists-header,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen:not(.d3-edit) .edit-profile-header {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 18px 0 12px;
+    margin: 0 0 16px;
+    background: none;
+    border: 0;
+    backdrop-filter: none;
+  }
+
+  html.desktop-v3 .d3-edit-head { position: sticky; top: 0; z-index: 5; background: rgba(8, 8, 10, 0.86); backdrop-filter: blur(14px); border-bottom: 1px solid var(--d2-line); margin: 0 calc(-1 * var(--d2-gutter)) 20px; padding: 14px var(--d2-gutter); }
+
+  html.desktop-v3 .d3-edit-head .back-btn,
+  html.desktop-v3 .d3-manage .manage-artist-header .back-btn,
+  html.desktop-v3 .d3-agents .search-agents-header .back-btn,
+  html.desktop-v3 .represented-artists-header .back-btn,
+  html.desktop-v3 .edit-profile-header .back-btn {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+
+  html.desktop-v3 .d3-edit-head h1,
+  html.desktop-v3 .d3-manage .manage-artist-header h1,
+  html.desktop-v3 .d3-agents .search-agents-header h1,
+  html.desktop-v3 .represented-artists-header h1,
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .edit-profile-header h1 {
+    flex: 1;
+    margin: 0;
+    text-align: left;
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  /* Representing agent / Find agent: your agents on the left, the search
+     and its results on the right. Takes the whole canvas. */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-agents) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-agents) > .md-master { display: none; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-agents { max-width: 1120px; padding: 0 var(--d2-gutter) 48px; position: static; height: auto; }
+
+  html.desktop-v3 .d3-agents .search-agents-content {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    padding: 0;
+    overflow: visible;
+  }
+
+  html.desktop-v3 .d3-agents .search-agents-content:not(:has(> .d3-agents-current)) { grid-template-columns: minmax(0, 1fr); }
+
+  html.desktop-v3 .d3-agents .d3-agents-current {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: 1px solid var(--d2-line) !important;
+    border-radius: var(--d2-r-card) !important;
+    background: var(--d2-surface) !important;
+  }
+
+  html.desktop-v3 .d3-agents .search-agents-content:has(> .d3-agents-current) > :not(.d3-agents-current) { grid-column: 2; }
+  html.desktop-v3 .d3-agents .search-agents-content:not(:has(> .d3-agents-current)) { max-width: 760px; }
+  html.desktop-v3 .d3-agents .search-form { margin: 0 0 12px; }
+  html.desktop-v3 .d3-agents .artist-item { margin-bottom: 8px; }
+
+  /* Roster and Add profile: the whole canvas, in a calm column */
+  html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
+  html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }
+  html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen),
+  html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen:not(.d3-edit) { max-width: 960px; padding: 0 var(--d2-gutter) 48px; }
+}
