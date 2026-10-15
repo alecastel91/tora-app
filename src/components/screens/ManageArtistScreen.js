@@ -21,7 +21,8 @@ import { raProfileUrl } from '../../utils/urls';
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, info, documents (calendar: Tour > Calendar > artist)
+  // 'actions' | 'dashboard' (= Insights) | 'info' | 'documents' (calendar: Tour > Calendar > artist)
+  const [activeTab, setActiveTab] = useState('actions');
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
   const [actionItems, setActionItems] = useState([]);
 
@@ -479,10 +480,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
     return `${symbol}${formatted}`;
   };
 
-  const renderDashboardTab = () => (
+  // Two parts: 'actions' is the Actions Required tab, 'insights' the rest.
+  const renderDashboardTab = ({ part } = { part: 'insights' }) => (
     <div className="dashboard-tab">
       {/* Hero Metrics - 2x2 Grid */}
-      <div className="hero-metrics hero-metrics-four">
+      {part === 'insights' && <div className="hero-metrics hero-metrics-four">
         {/* Top Row */}
         <div className="metric-card">
           <div className="metric-icon"><CalendarIcon /></div>
@@ -514,13 +516,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           </div>
           <div className="metric-label">{t('manageArtist.expectedRevenue')}</div>
         </div>
-      </div>
+      </div>}
       {/* Fees are redacted on roster deals this agent did not book, so the
           tiles legitimately read 0 for those gigs. */}
-      <p className="form-hint" style={{ margin: '-8px 0 16px' }}>{t('manageArtist.feesScopeHint')}</p>
+      {part === 'insights' && <p className="form-hint" style={{ margin: '-8px 0 16px' }}>{t('manageArtist.feesScopeHint')}</p>}
 
       {/* Action Items */}
-      <div className="dashboard-section">
+      {part === 'actions' && <div className="dashboard-section">
         <div className="section-header">
           <h3><AlertIcon /> {t('manageArtist.actionsRequired')}</h3>
           <span className="badge">{actionItems.length}</span>
@@ -547,13 +549,13 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
             })
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Revenue Chart */}
-      <div className="dashboard-section revenue-overview-section">
+      {part === 'insights' && <div className="dashboard-section revenue-overview-section">
         <h3><TrendingUpIcon /> {t('manageArtist.revenueOverview')}</h3>
         <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />
-      </div>
+      </div>}
     </div>
   );
 
@@ -1196,10 +1198,16 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
+          className={`tab-button ${activeTab === 'actions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('actions')}
+        >
+          {t('manage.actionsRequired')}{actionItems.length > 0 ? ` (${actionItems.length})` : ''}
+        </button>
+        <button
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
         >
-          {t('manageArtist.dashboard')}
+          {t('manage.insights')}
         </button>
         <button
           className={`tab-button ${activeTab === 'info' ? 'active' : ''}`}
@@ -1223,7 +1231,8 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
-        {activeTab === 'dashboard' && <><PrivacyNote>{t('manageArtist.privateDashboard')}</PrivacyNote>{renderDashboardTab()}</>}
+        {activeTab === 'actions' && <><PrivacyNote>{t('manageArtist.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'actions' })}</>}
+        {activeTab === 'dashboard' && <><PrivacyNote>{t('manageArtist.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'insights' })}</>}
         {activeTab === 'info' && renderArtistInfoTab()}
         {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}
       </div>

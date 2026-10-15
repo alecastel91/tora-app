@@ -23,6 +23,14 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
     setShowNotifications(false);
   }, [activeTab]);
 
+  // Escape closes the dropdown, like any other transient surface.
+  useEffect(() => {
+    if (!showNotifications) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setShowNotifications(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [showNotifications]);
+
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
     // Remove the dot when notifications are opened

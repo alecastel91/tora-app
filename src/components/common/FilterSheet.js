@@ -18,6 +18,7 @@ import FilterList from './FilterList';
  *   options(draft),     // [{ value, label }] — function of draft for dependent sections
  *   visible?(draft),    // hide section (e.g. Country until a Zone is chosen)
  *   allLabel?,          // summary label when single-select value is 'all'
+ *   emptyLabel?,        // summary label for an empty multi-select (default: search.selectGenres)
  *   resets?,            // keys reset to 'all' when this section changes
  * }
  */
@@ -52,7 +53,7 @@ const FilterSheet = ({ sections, values, onApply, onClose, clearedValues }) => {
   const summaryFor = (section) => {
     const v = draft[section.key];
     if (section.multi) {
-      return v.length > 0 ? t('search.nSelected', { n: v.length }) : t('search.selectGenres');
+      return v.length > 0 ? t('search.nSelected', { n: v.length }) : (section.emptyLabel || t('search.selectGenres'));
     }
     if (v === 'all') return section.allLabel;
     const opt = section.options(draft).find((o) => o.value === v);

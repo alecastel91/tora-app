@@ -226,10 +226,16 @@ export const AppProvider = ({ children }) => {
 
   // Helper function to reload profile data (call after likes/connections change)
   const lastReloadSignatureRef = useRef('');
+  // Reloads can overlap: the 60s poll that started BEFORE a like resolves
+  // AFTER the optimistic update and writes the old likedProfiles back, then
+  // the post-like reload lands — heart on, off, on. Only the newest reload
+  // may publish.
+  const reloadSeqRef = useRef(0);
   const reloadProfileData = async () => {
     const userId = user?.id;
     if (!user || !userId) return;
     if (isLoadingProfileData) return; // Prevent duplicate fetches
+    const seq = ++reloadSeqRef.current;
 
     try {
       setIsLoadingProfileData(true);
@@ -239,6 +245,7 @@ export const AppProvider = ({ children }) => {
         apiService.getProfileData(userId),
         apiService.getCurrentUser()
       ]);
+      if (seq !== reloadSeqRef.current) return; // a newer reload superseded this one
 
       // A profile switch during this poll/reload supersedes it — discard rather
       // than clobber the new profile's graph with the old profile's data (F6-02).

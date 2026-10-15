@@ -4,6 +4,7 @@ import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, Sliders
 import RevenueChart from '../common/RevenueChart';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
+import { roleLabel } from '../../utils/roles';
 import PrivacyNote from '../common/PrivacyNote';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -27,7 +28,9 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const renderLockedPane = (content, message) => (
     <LockedPane message={message} onUnlock={onOpenPremium}>{content}</LockedPane>
   );
-  const [activeTab, setActiveTab] = useState(initialTab || 'dashboard'); // dashboard, documents
+  // 'actions' | 'dashboard' (= Insights) | 'documents'. 'dashboard' keeps its
+  // value so deep links that open Manage on it keep working.
+  const [activeTab, setActiveTab] = useState(initialTab || 'actions');
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
   const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
@@ -496,15 +499,18 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
     return name ? name.charAt(0).toUpperCase() : 'A';
   };
 
-  // Dashboard Tab
-  const renderDashboardTab = () => {
+  // Dashboard, in two parts: 'actions' is the Actions Required tab, 'insights'
+  // is the metrics, chart, reach, top cities and who-viewed-you.
+  const renderDashboardTab = ({ part } = { part: 'insights' }) => {
     const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
     const revenueLabel = isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
+    const showActions = part === 'actions';
+    const showInsights = part === 'insights';
 
     return (
     <div className="dashboard-tab">
       {/* Hero Metrics - 2x2 Grid */}
-      <div className="hero-metrics hero-metrics-four">
+      {showInsights && <div className="hero-metrics hero-metrics-four">
         {/* Top Row */}
         <div className="metric-card">
           <div className="metric-icon"><CalendarIcon /></div>
@@ -535,10 +541,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           </div>
           <div className="metric-label">{t('manage.expectedMetric', { label: revenueLabel })}</div>
         </div>
-      </div>
+      </div>}
 
       {/* Actions Required Section */}
-      <div className="dashboard-section actions-required-section">
+      {showActions && <div className="dashboard-section actions-required-section">
         <h3><AlertIcon /> {t('manage.actionsRequired')} {actionItems.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
         <div className="action-items">
           {actionItems.length === 0 ? (
@@ -565,16 +571,16 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
             })
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Revenue/Costs Chart */}
-      <div className="dashboard-section revenue-overview-section">
+      {showInsights && <div className="dashboard-section revenue-overview-section">
         <h3><TrendingUpIcon /> {t('manage.overviewTitle', { label: revenueLabel })}</h3>
         <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />
-      </div>
+      </div>}
 
       {/* Profile reach — internal view/like/connection tracking */}
-      {reach && (
+      {showInsights && reach && (
         <div className="dashboard-section">
           <h3><TrendingUpIcon /> {t('manage.profileReach')} <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/35">· {t('manage.last30')}</span></h3>
           <div className="grid grid-cols-3 gap-2.5 mt-3">
@@ -631,8 +637,47 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         </div>
       )}
 
+      {/* Who viewed you — unique viewers, last 30 days */}
+      {showInsights && reach?.viewerRoles && (() => {
+        const roles = ['ARTIST', 'AGENT', 'PROMOTER', 'VENUE'];
+        const totalViewers = roles.reduce((n, r) => n + (reach.viewerRoles[r] || 0), 0);
+        const cities = reach.viewerCities || [];
+        return (
+          <div className="dashboard-section">
+            <h3><TrendingUpIcon /> {t('manage.whoViewedYou')} <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/35">· {t('manage.last30')}</span></h3>
+            {totalViewers === 0 ? (
+              <div className="action-empty mt-3">{t('manage.noViewersYet')}</div>
+            ) : (
+              <>
+                {cities.length > 0 && (
+                  <div className="mt-3 flex flex-col gap-2.5">
+                    {cities.map((c) => (
+                      <div key={`${c.city}|${c.country}`} className="flex items-center gap-3">
+                        <span className="w-20 shrink-0 truncate text-xs text-white/70">{c.city}</span>
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                          <div className="h-full rounded-full" style={{ width: `${(c.viewers / cities[0].viewers) * 100}%`, background: 'linear-gradient(to right, rgba(255,51,102,0.35), rgba(255,51,102,0.8))' }} />
+                        </div>
+                        <span className="w-14 shrink-0 text-right text-[11px] text-white/45">{c.viewers}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {roles.filter((r) => reach.viewerRoles[r] > 0).map((r) => (
+                    <span key={r} className="rounded-full border border-white/10 bg-[#0a0a0e] px-3 py-1 text-[11px] text-white/70">
+                      {roleLabel(r, t)} <span className="text-white">{reach.viewerRoles[r]}</span>
+                    </span>
+                  ))}
+                </div>
+                <p className="m-0 mt-3 text-[11px] text-white/45">{t('manage.returningViewers', { n: reach.returningViewers || 0 })}</p>
+              </>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Top cities played */}
-      {topCities.length > 0 && (
+      {showInsights && topCities.length > 0 && (
         <div className="dashboard-section">
           <h3><LocationIcon /> {t('manage.topCities')}</h3>
           <div className="mt-3 flex flex-col gap-2.5">
@@ -896,10 +941,16 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
       {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
+          className={`tab-button ${activeTab === 'actions' ? 'active' : ''}`}
+          onClick={() => handleTabChange('actions')}
+        >
+          {t('manage.actionsRequired')}{actionItems.length > 0 ? ` (${actionItems.length})` : ''}
+        </button>
+        <button
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => handleTabChange('dashboard')}
         >
-          {t('manage.dashboard')}
+          {t('manage.insights')}
         </button>
         <button
           className={`tab-button ${activeTab === 'documents' ? 'active' : ''}`}
@@ -917,9 +968,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
+        {activeTab === 'actions' && (manageLocked
+          ? renderLockedPane(renderDashboardTab({ part: 'actions' }), t('manage.dashboardLockedMsg'))
+          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'actions' })}</>)}
         {activeTab === 'dashboard' && (manageLocked
-          ? renderLockedPane(renderDashboardTab(), t('manage.dashboardLockedMsg'))
-          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab()}</>)}
+          ? renderLockedPane(renderDashboardTab({ part: 'insights' }), t('manage.dashboardLockedMsg'))
+          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'insights' })}</>)}
         {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}
       </div>
 
