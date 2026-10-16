@@ -1015,6 +1015,20 @@
     background: var(--d2-surface);
     box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
   }
+  /* Guide: a page inside the frame, not a takeover; same header idiom */
+  html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); }
+  html.desktop-v3 .guide-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
+  html.desktop-v3 .guide-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; position: static; }
+  html.desktop-v3 .guide-screen > .settings-header .back-button svg { width: 18px; height: 18px; }
+  html.desktop-v3 .guide-screen > .settings-header h1 { flex: 0 0 auto; text-align: left; font-size: 22px; letter-spacing: -0.01em; text-transform: none; }
+  html.desktop-v3 .guide-screen > .max-w-2xl { max-width: 760px; margin-left: var(--d2-gutter); }
+  /* Add profile: actions sit right, like every other form */
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .form-actions { justify-content: flex-end; gap: 10px; }
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .form-actions .btn { flex: 0 0 auto; min-width: 150px; }
+  /* Tour: the artist picker is a control, not a banner */
+  html.desktop-v3 .d3-tour .artist-selector select,
+  html.desktop-v3 .d3-tour .form-group > select,
+  html.desktop-v3 .d3-tour .matches-filters .filter-group > select { max-width: 420px; }
   html.desktop-v3 .onboarding-overlay { background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(6px); }
   html.desktop-v3 .onboarding-sheet {
     width: 520px;
