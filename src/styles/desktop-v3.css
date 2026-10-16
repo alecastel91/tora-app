@@ -1209,7 +1209,7 @@
   html.desktop-v3 .md-split:has(> .md-detail > .view-profile-screen .d3-vp) > .md-master { display: none; }
   html.desktop-v2.desktop-v3 .md-split > .md-detail > .view-profile-screen:has(.d3-vp) { max-width: none; margin: 0; padding: 0; }
   /* one agent in a 3-up grid was stretching to a third of the column */
-  html.desktop-v3 .d3-rep > div { grid-template-columns: repeat(auto-fill, minmax(0, 150px)); }
+  html.desktop-v3 .d3-rep .grid { grid-template-columns: repeat(auto-fill, minmax(0, 150px)); }
   /* Roster and Add profile: the whole canvas, in a calm column */
   html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
   html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }
