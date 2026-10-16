@@ -991,6 +991,39 @@
 }
 
 /* ===========================================================================
+   DIALOGS — sheets become dialogs: a popover for the bell, centred cards for
+   confirms and onboarding. The modal card itself is sized in desktop-v2.css.
+   ======================================================================== */
+@media (min-width: 1024px) {
+  html.desktop-v3 .notifications-dropdown {
+    position: fixed;
+    top: calc(var(--d2-top) + 8px);
+    right: var(--d2-gutter);
+    left: auto;
+    margin: 0;
+    width: 400px;
+    max-height: min(640px, 75vh);
+    border-radius: var(--d2-r-card);
+    border: 1px solid var(--d2-line);
+    background: var(--d2-surface);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+  }
+  html.desktop-v3 .onboarding-overlay { background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(6px); }
+  html.desktop-v3 .onboarding-sheet {
+    width: 520px;
+    height: min(720px, 86vh);
+    max-height: 86vh;
+    padding: 20px 28px 24px;
+    border: 1px solid var(--d2-line);
+    border-radius: 14px;
+    background: var(--d2-surface);
+  }
+  html.desktop-v3 .delete-modal,
+  html.desktop-v3 .message-modal-bottom { max-width: 480px; border-radius: 14px; }
+  html.desktop-v3 .modal-content .modal-header h2 { font-size: 17px; }
+}
+
+/* ===========================================================================
    SEGMENTED STRIPS — every tab the width of the longest label, so a strip
    reads as one control rather than a row of differently sized buttons.
    ======================================================================== */
