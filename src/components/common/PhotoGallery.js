@@ -8,7 +8,9 @@ import InlineDrawer from './InlineDrawer';
 // tapping it expands the section inline (drawer-style) to the full grid,
 // with a "See less" collapse. Tapping any photo opens the single-photo
 // lightbox. Hidden entirely when empty.
-const PhotoGallery = ({ photos, title }) => {
+const COLS = { 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4' };
+
+const PhotoGallery = ({ photos, title, cols = 2 }) => {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
@@ -16,7 +18,8 @@ const PhotoGallery = ({ photos, title }) => {
   const list = (Array.isArray(photos) ? photos : []).filter((p) => typeof p === 'string' && p);
   if (list.length === 0) return null;
 
-  const extras = list.slice(2);
+  const extras = list.slice(cols);
+  const gridClass = `grid ${COLS[cols] || COLS[2]} gap-2.5`;
   const open = lightboxIndex !== null;
   const step = (delta) => setLightboxIndex((i) => (i + delta + list.length) % list.length);
 
@@ -28,9 +31,9 @@ const PhotoGallery = ({ photos, title }) => {
   return (
     <div className="mb-6 text-left">
       <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{title}</p>
-      <div className="grid grid-cols-2 gap-2.5">
-        {list.slice(0, 2).map((src, i) => {
-          const isMoreTile = i === 1 && extras.length > 0 && !expanded;
+      <div className={gridClass}>
+        {list.slice(0, cols).map((src, i) => {
+          const isMoreTile = i === cols - 1 && extras.length > 0 && !expanded;
           return (
             <button
               key={`${src}-${i}`}
@@ -52,15 +55,15 @@ const PhotoGallery = ({ photos, title }) => {
 
       {/* Inline drawer with the remaining photos */}
       {extras.length > 0 && (
-        <InlineDrawer expanded={expanded} className="grid grid-cols-2 gap-2.5 pt-2.5">
+        <InlineDrawer expanded={expanded} className={`${gridClass} pt-2.5`}>
             {extras.map((src, j) => (
               <button
-                key={`${src}-${j + 2}`}
+                key={`${src}-${j + cols}`}
                 type="button"
-                onClick={() => setLightboxIndex(j + 2)}
+                onClick={() => setLightboxIndex(j + cols)}
                 className={tileClass}
               >
-                <img src={src} alt={`${title} ${j + 3}`} loading="lazy" className="w-full h-full object-cover" />
+                <img src={src} alt={`${title} ${j + cols + 1}`} loading="lazy" className="w-full h-full object-cover" />
               </button>
             ))}
         </InlineDrawer>

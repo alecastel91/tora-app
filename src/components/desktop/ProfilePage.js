@@ -5,7 +5,7 @@ import { roleLabel, roleChipClass } from '../../utils/roles';
 import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
 import { formatEventDate } from '../../utils/dates';
 import { networkSectionsForRole } from '../../utils/networkSections';
-import { BookingsIcon, HeartIcon, LocationIcon } from '../../utils/icons';
+import { HeartIcon, LocationIcon } from '../../utils/icons';
 import VerifiedBadge from '../common/VerifiedBadge';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
@@ -141,6 +141,9 @@ const ProfilePage = ({
             )}
             {role === 'VENUE' && profile.venueCapacity && <Stat value={Number(profile.venueCapacity).toLocaleString()} label={t('profile.capacity')} />}
             {role === 'VENUE' && profile.venueRooms && <Stat value={profile.venueRooms} label={t('profile.rooms')} />}
+            {Array.isArray(profile.badges) && profile.badges.length > 0 && (
+              <div className="ml-auto"><ProfileBadges badges={profile.badges} /></div>
+            )}
           </div>
         </header>
 
@@ -182,10 +185,10 @@ const ProfilePage = ({
                   {artistTours.map((tour) => (
                     <div
                       key={tour.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={onOpenTourKickstart}
-                      className="cursor-pointer rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 transition-colors hover:border-infrared/40"
+                      role={isBooker ? 'button' : undefined}
+                      tabIndex={isBooker ? 0 : undefined}
+                      onClick={isBooker ? () => onOpenTourKickstart(tour) : undefined}
+                      className={`rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 transition-colors ${isBooker ? 'cursor-pointer hover:border-infrared/40' : ''}`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
@@ -230,7 +233,7 @@ const ProfilePage = ({
 
             {(role === 'VENUE' || role === 'PROMOTER') && (
               <div className="d3-vp-gallery">
-                <PhotoGallery photos={profile.photos} title={role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')} />
+                <PhotoGallery cols={4} photos={profile.photos} title={role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')} />
               </div>
             )}
 
@@ -262,16 +265,6 @@ const ProfilePage = ({
                   {links.map((l) => <LinkRow key={l.key} href={l.href} icon={l.icon} label={l.label} />)}
                 </div>
               </Panel>
-            )}
-            {Array.isArray(profile.badges) && profile.badges.length > 0 && (
-              <Panel><ProfileBadges badges={profile.badges} /></Panel>
-            )}
-            {role === 'ARTIST' && profile.gigsCompleted > 0 && (
-              <button type="button" onClick={onOpenGigs} className="d3-panel flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:border-white/25">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#111117] text-infrared [&>svg]:h-4 [&>svg]:w-4"><BookingsIcon /></span>
-                <span className="flex-1 text-[13px] font-medium text-white">{t('viewProfile.gigsViaTora', { n: profile.gigsCompleted })}</span>
-                <span className="text-xs text-white/30">›</span>
-              </button>
             )}
             {similarProfiles.length >= 2 && (
               <Panel title={t('viewProfile.similarProfiles')}>

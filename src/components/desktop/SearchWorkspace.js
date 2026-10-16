@@ -17,8 +17,8 @@ const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 /* Desktop v3 Search: the map and the list at once.
    - Filters live in the shared FilterSheet (a right-hand drawer on desktop,
      via the v2 .filter-screen rules) — the same sheet Tour uses.
-   - A city clicked on the globe opens the globe's own members panel beside
-     the map: a second list, scoped to that city, while the left list stays
+   - A city clicked on the globe filters the LEFT list to that city (the globe's
+     own members panel stays off here); clearing the globe selection restores
      the whole search.
    - The map can take the whole window (button top-left, clear of the members panel; Esc to leave). */
 
@@ -212,6 +212,11 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
               userCity={user?.city}
               userCountry={user?.country}
               onLockedCity={() => onOpenPremium?.()}
+              listTakesOver
+              onSelectionChange={(sel) => {
+                if (!premium) return; // location filters are a premium feature; the lock handles the tap
+                setFilters((f) => ({ ...f, city: sel?.city || 'all', country: sel?.country || (sel?.city ? f.country : 'all') }));
+              }}
               topInset={premium ? 16 : 64}
               bottomInset={16}
             />

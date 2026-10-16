@@ -102,7 +102,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     for (const [flag, tab] of Object.entries(intents)) {
       if (sessionStorage.getItem(flag)) { sessionStorage.removeItem(flag); setActiveTab(tab); }
     }
-    const openKickstart = () => { sessionStorage.removeItem('tora:tour-kickstart-intent'); setActiveTab('kickstart'); };
+    // a profile's tour card names the tour: the desktop board opens on it
+    const linked = sessionStorage.getItem('tora:tour-kickstart-tour');
+    if (linked) { sessionStorage.removeItem('tora:tour-kickstart-tour'); setD3TourId(linked); }
+    const openKickstart = (e) => {
+      sessionStorage.removeItem('tora:tour-kickstart-intent'); sessionStorage.removeItem('tora:tour-kickstart-tour');
+      setActiveTab('kickstart');
+      if (e?.detail?.tourId) setD3TourId(e.detail.tourId);
+    };
     const openCalendar = () => { sessionStorage.removeItem('tora:tour-calendar-intent'); setActiveTab('calendar'); };
     window.addEventListener('tora:tour-kickstart', openKickstart);
     window.addEventListener('tora:tour-calendar', openCalendar);

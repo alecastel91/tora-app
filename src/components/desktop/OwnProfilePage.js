@@ -204,7 +204,7 @@ const OwnProfilePage = ({
           )}
 
           {(role === 'VENUE' || role === 'PROMOTER') && (
-            <div className="d3-vp-gallery"><PhotoGallery photos={user?.photos} title={role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')} /></div>
+            <div className="d3-vp-gallery"><PhotoGallery cols={4} photos={user?.photos} title={role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')} /></div>
           )}
           {role === 'VENUE' && <RoomsTechCard rooms={user?.venueRoomsSpec} />}
 

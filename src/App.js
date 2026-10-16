@@ -35,7 +35,7 @@ import './styles/desktop-v3.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import AchievementsScreen from './components/screens/AchievementsScreen';
 import InviteFriendsSection from './components/common/InviteFriendsSection';
-import { isDesktopV2, useNativeDesktop, useMediaQuery } from './utils/desktopV2';
+import { isDesktopV2, useNativeDesktop, useMediaQuery, isDesktopV3 } from './utils/desktopV2';
 import DashboardScreen from './components/desktop/DashboardScreen';
 import BookingsBoard from './components/desktop/BookingsBoard';
 import SearchWorkspace from './components/desktop/SearchWorkspace';
@@ -250,7 +250,7 @@ function App() {
   // Desktop v2 feed rail: gated on the SAME 1280px breakpoint as its CSS, so on
   // a phone the subtree never mounts at all (.desktop-only would only hide it —
   // InviteFriendsSection would still mount and fetch).
-  const showD2Rail = useMediaQuery('(min-width: 1280px)', isDesktopV2());
+  const showD2Rail = useMediaQuery('(min-width: 1280px)', isDesktopV2() && !isDesktopV3()); // v3 keeps News for news; the rail's pieces live on the Dashboard
   // First-login "Getting started" carousel (reopenable from Settings).
   const [showGettingStarted, setShowGettingStarted] = useState(false);
   const [preferredCurrency, setPreferredCurrency] = useState('USD');

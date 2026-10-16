@@ -9,6 +9,7 @@ import { isOffDeal } from '../../utils/dealStatus';
 import { formatEventDate, formatTimestamp } from '../../utils/dates';
 import { roleLabel } from '../../utils/roles';
 import { Avatar } from './primitives';
+import InviteFriendsSection from '../common/InviteFriendsSection';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { HandshakeIcon, MessageIcon, CalendarCheckIcon, BookingsIcon } from '../../utils/icons';
 import {
@@ -293,6 +294,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
               </ul>
             )}
           </Panel>
+          <div className="d3-panel d3-dash-invite"><InviteFriendsSection /></div>
         </div>
 
       </div>

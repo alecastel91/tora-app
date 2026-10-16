@@ -559,10 +559,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           onOpenNested={setNestedProfile}
           onToggleTourInterest={handleToggleTourInterest}
           onTourOffer={() => setShowTourOffer(true)}
-          onOpenTourKickstart={() => {
+          onOpenTourKickstart={(tour) => {
             sessionStorage.setItem('tora:tour-kickstart-intent', '1');
+            if (tour?.id) sessionStorage.setItem('tora:tour-kickstart-tour', tour.id);
             window.dispatchEvent(new CustomEvent('tora:navigate-tab', { detail: { tab: 'tour' } }));
-            window.dispatchEvent(new CustomEvent('tora:tour-kickstart'));
+            window.dispatchEvent(new CustomEvent('tora:tour-kickstart', { detail: { tourId: tour?.id || null } }));
             onClose && onClose();
           }}
           onOpenPremium={onOpenPremium}
