@@ -36,6 +36,9 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [full, setFull] = useState(false);
+  // A city/country tapped on the globe narrows the LIST only. It must stay out
+  // of `filters`, which drive the fetch the globe's own pins come from.
+  const [mapSel, setMapSel] = useState(null);
   const seq = useRef(0); // only the newest request may paint
 
   const run = useCallback(async () => {
@@ -85,12 +88,17 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
     setShowFilters(false);
   };
 
-  const list = useMemo(() => (premium ? results
-    // FREE discovery spans the country but leads with the member's own city.
-    : [...results].sort((a, b) => (a.city === user?.city ? 0 : 1) - (b.city === user?.city ? 0 : 1))),
-  [results, premium, user?.city]);
+  const list = useMemo(() => {
+    const base = premium ? results
+      // FREE discovery spans the country but leads with the member's own city.
+      : [...results].sort((a, b) => (a.city === user?.city ? 0 : 1) - (b.city === user?.city ? 0 : 1));
+    if (mapSel?.city) return base.filter((p) => p.city === mapSel.city);
+    if (mapSel?.country) return base.filter((p) => p.country === mapSel.country);
+    return base;
+  }, [results, premium, user?.city, mapSel]);
 
   const activeChips = [
+    ...(mapSel?.city || mapSel?.country ? [{ key: 'map', label: mapSel.city || mapSel.country, clear: () => setMapSel(null) }] : []),
     ...filters.roles.map((r) => ({ key: `r:${r}`, label: roleLabel(r, t), clear: () => setFilters((f) => ({ ...f, roles: f.roles.filter((x) => x !== r) })) })),
     ...filters.genres.map((g) => ({ key: `g:${g}`, label: g, clear: () => setFilters((f) => ({ ...f, genres: f.genres.filter((x) => x !== g) })) })),
     ...(filters.city !== 'all' ? [{ key: 'city', label: filters.city, clear: () => setFilters((f) => ({ ...f, city: 'all' })) }]
@@ -213,10 +221,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
               userCountry={user?.country}
               onLockedCity={() => onOpenPremium?.()}
               listTakesOver
-              onSelectionChange={(sel) => {
-                if (!premium) return; // location filters are a premium feature; the lock handles the tap
-                setFilters((f) => ({ ...f, city: sel?.city || 'all', country: sel?.country || (sel?.city ? f.country : 'all') }));
-              }}
+              onSelectionChange={setMapSel}
               topInset={premium ? 16 : 64}
               bottomInset={16}
             />

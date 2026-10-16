@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useDesktopStrings } from './strings';
@@ -11,7 +11,7 @@ import { Avatar } from './primitives';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { SearchIcon } from '../../utils/icons';
 import {
-  statusLabel, statusChipClass, counterpartFor, isConsentOnlyFor, bookedArtistName,
+  statusLabel, statusChipClass, counterpartFor, bookedArtistName,
   statusLineFor, feeText, tabFor,
 } from './dealRow';
 
@@ -35,6 +35,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
+  const pendingOpen = useRef(null); // a deal deep-linked before it was loaded
   const [mineOnly, setMineOnly] = useState(false);
   const [sort, setSort] = useState({ key: 'date', dir: 1 }); // date asc by default; past flips below
 
@@ -60,13 +61,25 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
       if (!id) return;
       setSelectedId(id);
       const deal = deals.find((d) => d.id === id);
-      if (deal) setTab(tabFor(deal)); else load();
+      if (deal) setTab(tabFor(deal));
+      else { pendingOpen.current = id; load(); }
     };
     window.addEventListener('tora:open-deal', onOpen);
     return () => window.removeEventListener('tora:open-deal', onOpen);
   }, [deals, load]);
 
-  const visibleDeals = useMemo(() => deals.filter((d) => !isConsentOnlyFor(d, user) && !d.redactedForVenue), [deals, user]);
+  // ...and move to its tab once the refetch brings it in.
+  useEffect(() => {
+    const id = pendingOpen.current;
+    if (!id) return;
+    const deal = deals.find((d) => d.id === id);
+    if (deal) { setTab(tabFor(deal)); pendingOpen.current = null; }
+  }, [deals]);
+
+  // Consent-only and venue-redacted deals stay in the pipeline: they carry no
+  // fee, but a tagged venue approves or declines them here and the inspector
+  // renders the consent card for them.
+  const visibleDeals = deals;
   const byTab = useMemo(() => TABS.reduce((acc, k) => ({ ...acc, [k]: visibleDeals.filter((d) => tabFor(d) === k) }), {}), [visibleDeals]);
 
   const rows = useMemo(() => {

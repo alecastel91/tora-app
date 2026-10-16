@@ -83,6 +83,14 @@ function App() {
   const HOME_TAB = nativeDesktop ? 'home' : 'news';
   const [activeTab, setActiveTab] = useState(HOME_TAB);
 
+  // Narrowing the window (or turning v3 off) unmounts the Dashboard and drops
+  // Home from the tab bar; without this the main area is left blank with no
+  // way back to it.
+  useEffect(() => {
+    if (!nativeDesktop && activeTab === 'home') switchTab('news');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativeDesktop, activeTab]);
+
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
   // Goes through switchTab so the target joins mountedTabs (keep-mounted
   // invariant) and scroll bookkeeping runs.

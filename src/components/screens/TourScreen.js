@@ -1654,6 +1654,34 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   };
 
   // Tour Kickstart Tab Content
+  /* Tour Kickstart filters (no Roles). One renderer, mounted by whichever
+     layout is live: the phone/v2 card list, or the v3 board. On v3 the board
+     keeps its Filters button in the toolbar with no tour selected, so the
+     sheet cannot live inside the detail pane. */
+  const renderTourFilterSheet = () => (showTourFilters ? (
+              <FilterSheet
+                values={{ period: tourMonthFilter, zone: tourZoneFilter, country: tourCountryFilter, genres: tourGenreFilter }}
+                clearedValues={{ period: 'all', zone: 'all', country: 'all', genres: [] }}
+                onClose={() => setShowTourFilters(false)}
+                onApply={(v) => {
+                  setTourMonthFilter(v.period); setTourZoneFilter(v.zone);
+                  setTourCountryFilter(v.country); setTourGenreFilter(v.genres);
+                  setShowTourFilters(false);
+                }}
+                sections={[
+                  { key: 'period', label: t('tour.period'), multi: false, allLabel: t('tour.allMonths'),
+                    options: () => monthOptions.map((o) => ({ value: o.value, label: o.label })) },
+                  { key: 'zone', label: t('editProfile.zone'), multi: false, allLabel: t('manageArtist.allZones'), resets: ['country'],
+                    options: () => [{ value: 'all', label: t('manageArtist.allZones') }, ...zones.map((z) => ({ value: z, label: z }))] },
+                  { key: 'country', label: t('editProfile.country'), multi: false, allLabel: t('manageArtist.allCountries'),
+                    visible: (d) => d.zone !== 'all',
+                    options: (d) => [{ value: 'all', label: t('manageArtist.allCountries') }, ...(countriesByZone[d.zone] || []).map((c) => ({ value: c, label: c }))] },
+                  { key: 'genres', label: t('search.genres'), multi: true,
+                    options: () => genresList.map((g) => ({ value: g, label: g })) },
+                ]}
+              />
+  ) : null);
+
   const renderTourKickstart = ({ only = null } = {}) => {
     // Show upgrade prompt for basic users
     if (!isPremiumUser()) {
@@ -1903,30 +1931,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               action: <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />,
             })}
 
-            {/* Full-page filters — shared FilterSheet (no Roles for tours) */}
-            {showTourFilters && (
-              <FilterSheet
-                values={{ period: tourMonthFilter, zone: tourZoneFilter, country: tourCountryFilter, genres: tourGenreFilter }}
-                clearedValues={{ period: 'all', zone: 'all', country: 'all', genres: [] }}
-                onClose={() => setShowTourFilters(false)}
-                onApply={(v) => {
-                  setTourMonthFilter(v.period); setTourZoneFilter(v.zone);
-                  setTourCountryFilter(v.country); setTourGenreFilter(v.genres);
-                  setShowTourFilters(false);
-                }}
-                sections={[
-                  { key: 'period', label: t('tour.period'), multi: false, allLabel: t('tour.allMonths'),
-                    options: () => monthOptions.map((o) => ({ value: o.value, label: o.label })) },
-                  { key: 'zone', label: t('editProfile.zone'), multi: false, allLabel: t('manageArtist.allZones'), resets: ['country'],
-                    options: () => [{ value: 'all', label: t('manageArtist.allZones') }, ...zones.map((z) => ({ value: z, label: z }))] },
-                  { key: 'country', label: t('editProfile.country'), multi: false, allLabel: t('manageArtist.allCountries'),
-                    visible: (d) => d.zone !== 'all',
-                    options: (d) => [{ value: 'all', label: t('manageArtist.allCountries') }, ...(countriesByZone[d.zone] || []).map((c) => ({ value: c, label: c }))] },
-                  { key: 'genres', label: t('search.genres'), multi: true,
-                    options: () => genresList.map((g) => ({ value: g, label: g })) },
-                ]}
-              />
-            )}
+            {!only && renderTourFilterSheet()}
 
             {/* Tour cards or empty state */}
             {filteredTours.length === 0 ? (
@@ -2192,9 +2197,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             ) : !premium ? (
               renderTourKickstart()
             ) : (
+              <>
               <TourBoard
                 tours={boardTours}
-                loading={owner && toursLoading}
+                loading={toursLoading}
                 owner={owner}
                 selectedId={d3TourId}
                 onSelect={setD3TourId}
@@ -2215,6 +2221,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 )}
                 detail={d3TourId ? renderTourKickstart({ only: d3TourId }) : null}
               />
+              {!owner && renderTourFilterSheet()}
+              </>
             )}
           </>
         );

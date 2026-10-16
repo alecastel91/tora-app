@@ -40,17 +40,21 @@ const PremiumPlans = ({
   const perMonth = t('agentSeat.perMonth');
 
   const cta = (plan) => {
+    // Free first: an agency-covered member is on the agency's plan, not Free,
+    // so this column offers nothing — switching to a membership means monthly
+    // or yearly, and routing 'free' into onSelectPlan opened monthly checkout.
+    if (plan === 'free') {
+      if (onAgencyPlan) return <div className="h-[38px]" />;
+      return isFree
+        ? <button className="btn btn-outline w-full" disabled>{t('premium.currentPlan')}</button>
+        : <div className="h-[38px]" />;
+    }
     if (onAgencyPlan) {
       return (
         <button className={`btn ${plan === 'yearly' ? 'btn-primary' : 'btn-outline'} w-full`} disabled={!canLeaveAgency} onClick={() => onSelectPlan(plan)}>
           {t('premium.switchToMembership')}
         </button>
       );
-    }
-    if (plan === 'free') {
-      return isFree
-        ? <button className="btn btn-outline w-full" disabled>{t('premium.currentPlan')}</button>
-        : <div className="h-[38px]" />;
     }
     if (plan === 'monthly') {
       if (hasMonthly) return <button className="btn btn-outline w-full" disabled>{t('premium.currentPlan')}</button>;

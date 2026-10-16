@@ -78,11 +78,14 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
       apiService.getDeals({ profileId: user.id }).catch(() => null),
       apiService.getConversations(user.id).catch(() => null),
     ]);
-    setData({
-      actions: a?.items || [],
-      deals: d?.deals || [],
-      conversations: c?.conversations || [],
-    });
+    // Each call can fail on its own (the 60s poll, a flaky network). Keep what
+    // we already had rather than showing an empty dashboard that reads as
+    // "nothing is waiting on you".
+    setData((prev) => ({
+      actions: a ? (a.items || []) : prev.actions,
+      deals: d ? (d.deals || []) : prev.deals,
+      conversations: c ? (c.conversations || []) : prev.conversations,
+    }));
   }, [user?.id]);
 
   useEffect(() => { load(); }, [load]);

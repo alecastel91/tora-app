@@ -157,20 +157,6 @@
     z-index: var(--z-screen);
   }
 
-  /* ---- Messages: the deal beside the thread ---- */
-  html.desktop-v3 .d3-chat-context {
-    position: fixed;
-    top: var(--d2-top);
-    right: 0;
-    bottom: 0;
-    width: 320px;
-    z-index: calc(var(--z-overlay) + 1);
-    overflow-y: auto;
-    background: var(--d2-surface);
-    border-left: 1px solid var(--d2-line);
-  }
-
-
   /* The thread column at desk density */
   html.desktop-v3 .chat-screen .chat-header { padding: 10px 16px; }
   html.desktop-v3 .chat-screen .chat-messages { padding: 20px 24px; gap: 10px; }
@@ -178,8 +164,8 @@
   html.desktop-v3 .chat-screen .chat-input-container { padding: 12px 16px 16px; }
   html.desktop-v3 .chat-screen .chat-input-disabled { padding: 14px 24px; font-size: 13px; }
 
-  /* ---- Make an Offer: a right-hand drawer, the conversation or the tour
-     list stays in view. From chat it takes the context panel's place. ---- */
+  /* ---- Make an Offer: a right-hand drawer, so the conversation or the
+     tour list stays in view beside it. ---- */
   html.desktop-v3 .make-offer-modal-overlay {
     top: var(--d2-top);
     right: 0;
@@ -193,7 +179,6 @@
   html.desktop-v3 .make-offer-modal-overlay > .make-offer-modal { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; background: transparent; }
   /* from Tour: a drawer beside the pipeline; from chat: it takes the thread column (v2 sets left) */
   html.desktop-v3 .md-drawer.make-offer-modal-overlay { left: auto; }
-  html.desktop-v3 body:has(> .make-offer-modal-overlay:not(.md-drawer)) .d3-chat-context { display: none; }
   html.desktop-v3 .make-offer-header { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--d2-line); background: transparent; }
   html.desktop-v3 .make-offer-header .back-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; }
   html.desktop-v3 .make-offer-header .back-btn svg { width: 18px; height: 18px; }

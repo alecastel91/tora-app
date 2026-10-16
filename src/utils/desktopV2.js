@@ -47,11 +47,15 @@ else if (param === 'v1' || param === 'off') store(null);
 
 apply(localStorage.getItem(KEY));
 
-// Console flip for same-scroll A/B: toraDesktop('v3'), toraDesktop('v1').
+// Console flip: toraDesktop('v3'), toraDesktop('v1'). The level is read from
+// the <html> class at render time, which React cannot observe, so flipping it
+// in place would leave v3 screens mounted with v2 CSS (or the reverse). The
+// level is persisted, so a reload lands on it cleanly.
 window.toraDesktop = (level) => {
   const next = LEVELS.includes(level) ? level : null;
   store(next);
   apply(next);
+  window.location.reload();
   return next || 'v1';
 };
 
@@ -59,8 +63,9 @@ window.toraDesktop = (level) => {
 export function useMediaQuery(query, enabled = true) {
   const [on, setOn] = useState(() => enabled && window.matchMedia(query).matches);
   useEffect(() => {
-    if (!enabled) return undefined;
+    if (!enabled) { setOn(false); return undefined; }
     const mq = window.matchMedia(query);
+    setOn(mq.matches); // `enabled` may have just flipped — re-sync before listening
     const onChange = () => setOn(mq.matches);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
