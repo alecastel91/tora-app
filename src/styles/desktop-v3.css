@@ -511,6 +511,11 @@
     gap: 14px;
   }
 
+  /* Achievements: same header idiom, one calm column */
+  html.desktop-v3 .achievements-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
+  html.desktop-v3 .achievements-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; }
+  html.desktop-v3 .achievements-screen > .settings-header .back-button svg { width: 18px; height: 18px; }
+  html.desktop-v3 .achievements-screen > .settings-content { max-width: 1120px; margin: 0 auto; padding: 8px var(--d2-gutter) 48px; }
   html.desktop-v3 .settings-screen .settings-header h1,
   html.desktop-v3 .premium-screen .premium-header h1 {
     flex: 0 0 auto;
