@@ -819,8 +819,7 @@
   }
 
   html.desktop-v3 .d3-manage .manage-artist-content { padding: 0; }
-  html.desktop-v3 .d3-manage .artist-info-tab .btn-primary,
-  html.desktop-v3 .d3-manage .manage-artist-content > div > .btn.btn-primary { width: auto; align-self: flex-start; justify-self: start; margin-top: 4px; padding: 9px 16px; }
+  html.desktop-v3 .d3-manage .manage-artist-content .btn.btn-primary:not(.action-btn) { width: auto !important; max-width: none; align-self: flex-start; justify-self: start; margin-top: 4px; padding: 9px 16px; }
 
   /* the Actions tab is one wide list; the actions section loses its stretch rules */
   html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) { grid-template-columns: minmax(0, 1fr); }
@@ -1203,8 +1202,10 @@
   html.desktop-v3 .represented-artists-content .artist-row-actions .btn-sm { padding: 6px 12px; }
 
   /* A profile opened from a sub page (roster) is the full profile page */
-  html.desktop-v3 .md-split:has(> .md-detail > .d3-vp) > .md-master { display: none; }
-  html.desktop-v3 .md-split:has(> .md-detail > .d3-vp) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(.d3-vp) > .md-master { display: none; }
+  html.desktop-v3 .md-split:has(.d3-vp) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen:has(.d3-vp) { max-width: none; padding: 0; }
+  html.desktop-v3 .represented-artists-screen:has(.d3-vp) > :not(.d3-vp) { display: none; }
   /* Roster and Add profile: the whole canvas, in a calm column */
   html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
   html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }
