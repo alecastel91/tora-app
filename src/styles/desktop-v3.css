@@ -1201,11 +1201,15 @@
   html.desktop-v3 .represented-artists-content .artist-row-actions { display: flex; align-items: center; gap: 6px; }
   html.desktop-v3 .represented-artists-content .artist-row-actions .btn-sm { padding: 6px 12px; }
 
-  /* A profile opened from a sub page (roster) is the full profile page */
-  html.desktop-v3 .md-split:has(.d3-vp) > .md-master { display: none; }
-  html.desktop-v3 .md-split:has(.d3-vp) { grid-template-columns: minmax(0, 1fr); }
-  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen:has(.d3-vp) { max-width: none; padding: 0; }
-  html.desktop-v3 .represented-artists-screen:has(.d3-vp) > :not(.d3-vp) { display: none; }
+  /* A profile opened from a Profile sub page (the roster) is the full profile
+     page: RepresentedArtistsScreen returns ViewProfileScreen in its own place,
+     so the detail pane holds .view-profile-screen directly. Scoped to that —
+     SearchScreen's .md-split must keep its results column. */
+  html.desktop-v3 .md-split:has(> .md-detail > .view-profile-screen .d3-vp) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(> .md-detail > .view-profile-screen .d3-vp) > .md-master { display: none; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .view-profile-screen:has(.d3-vp) { max-width: none; margin: 0; padding: 0; }
+  /* one agent in a 3-up grid was stretching to a third of the column */
+  html.desktop-v3 .d3-rep > div { grid-template-columns: repeat(auto-fill, minmax(0, 150px)); }
   /* Roster and Add profile: the whole canvas, in a calm column */
   html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
   html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }

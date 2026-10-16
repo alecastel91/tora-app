@@ -35,7 +35,7 @@ const RepresentationSection = ({ profiles, fallbackEntries, onOpenProfile }) => 
   }
 
   return (
-    <div className="mb-5 text-left">
+    <div className="d3-rep mb-5 text-left">
       <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 flex items-center gap-1.5">
         <span className="inline-flex [&>svg]:w-3.5 [&>svg]:h-3.5"><HandshakeIcon /></span>
         {t('profile.representedByTitle')}
