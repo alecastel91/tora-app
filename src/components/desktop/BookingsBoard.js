@@ -7,7 +7,7 @@ import { subscribeToDeals } from '../../services/realtime';
 import BookingsScreen, { getDealDisplayStatus, DEAL_DISPLAY_STATUSES } from '../screens/BookingsScreen';
 import { OFF_STATUSES } from '../../utils/dealStatus';
 import { formatEventDate } from '../../utils/dates';
-import { getAvatarClass } from '../../utils/roles';
+import { Avatar } from './primitives';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { SearchIcon } from '../../utils/icons';
 import {
@@ -178,12 +178,10 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
                     </span>
                   </span>
                   <span className="flex min-w-0 items-center gap-2.5">
-                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full text-[12px] font-semibold text-white ${getAvatarClass(other?.role)}`}>
-                      {other?.avatar ? <img src={other.avatar} alt="" className="h-full w-full object-cover" /> : (other?.name || '?').charAt(0).toUpperCase()}
-                    </span>
+                    <Avatar profile={other} className="h-8 w-8 text-[12px]" />
                     <span className="min-w-0">
                       <span className="block truncate text-[13px] text-white">{other?.name || t('bookings.theOtherParty')}</span>
-                      {forName && <span className="block truncate text-[11px] text-white/45">{td('forArtist', { name: forName })}</span>}
+                      {forName && <span className="block truncate text-[11px] text-white/45">{t('bookings.forArtist', { name: forName })}</span>}
                     </span>
                   </span>
                   <span className="min-w-0">

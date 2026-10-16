@@ -5,7 +5,8 @@ import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import { getDealDisplayStatus } from '../screens/BookingsScreen';
 import { formatEventDate } from '../../utils/dates';
-import { getAvatarClass, roleLabel } from '../../utils/roles';
+import { roleLabel } from '../../utils/roles';
+import { Avatar } from './primitives';
 import { statusLabel, statusChipClass, statusLineFor, feeText } from './dealRow';
 
 /* Desktop v3 Messages: the deal beside the thread. A desk has room for the
@@ -45,9 +46,7 @@ const ChatContextPanel = ({ profile, onOpenProfile, onSwitchTab }) => {
   return (
     <aside className="d3-chat-context">
       <div className="flex flex-col items-center px-5 pb-5 pt-6 text-center">
-        <span className={`flex h-16 w-16 items-center justify-center overflow-hidden rounded-full text-xl font-semibold text-white ${getAvatarClass(profile.role)}`}>
-          {profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover" /> : (profile.name || '?').charAt(0).toUpperCase()}
-        </span>
+        <Avatar profile={profile} className="h-16 w-16 text-xl" />
         <h2 className="mt-3 text-[16px] font-semibold text-white">{profile.name}</h2>
         <p className="mt-0.5 text-[12px] text-white/50">
           {roleLabel(profile.role, t)}{profile.city ? ` · ${profile.city}` : ''}

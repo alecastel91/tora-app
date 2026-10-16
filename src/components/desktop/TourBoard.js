@@ -2,7 +2,7 @@ import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useDesktopStrings } from './strings';
 import { formatEventDate } from '../../utils/dates';
-import { getAvatarClass } from '../../utils/roles';
+import { Avatar } from './primitives';
 import LoadingGlobe from '../common/LoadingGlobe';
 
 /* Desktop v3 Tours: a pipeline table — one row per tour — with the selected
@@ -51,9 +51,7 @@ const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, t
               >
                 <span className="flex min-w-0 items-center gap-2.5">
                   {!owner && (
-                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full text-[12px] font-semibold text-white ${getAvatarClass('ARTIST')}`}>
-                      {tour.artist?.avatar ? <img src={tour.artist.avatar} alt="" className="h-full w-full object-cover" /> : (tour.artist?.name || '?').charAt(0).toUpperCase()}
-                    </span>
+                    <Avatar profile={{ ...tour.artist, role: 'ARTIST' }} className="h-8 w-8 text-[12px]" />
                   )}
                   <span className="min-w-0">
                     <span className="block truncate text-[13px] text-white">{owner ? t('tour.tourTitle', { location: tour.country || tour.zone }) : (tour.artist?.name || t('tour.unknownArtist'))}</span>

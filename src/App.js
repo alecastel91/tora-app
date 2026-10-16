@@ -35,7 +35,7 @@ import './styles/desktop-v3.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import AchievementsScreen from './components/screens/AchievementsScreen';
 import InviteFriendsSection from './components/common/InviteFriendsSection';
-import { isDesktopV2, useNativeDesktop } from './utils/desktopV2';
+import { isDesktopV2, useNativeDesktop, useMediaQuery } from './utils/desktopV2';
 import DashboardScreen from './components/desktop/DashboardScreen';
 import BookingsBoard from './components/desktop/BookingsBoard';
 import SearchWorkspace from './components/desktop/SearchWorkspace';
@@ -250,16 +250,7 @@ function App() {
   // Desktop v2 feed rail: gated on the SAME 1280px breakpoint as its CSS, so on
   // a phone the subtree never mounts at all (.desktop-only would only hide it —
   // InviteFriendsSection would still mount and fetch).
-  const [showD2Rail, setShowD2Rail] = useState(
-    () => isDesktopV2() && window.matchMedia('(min-width: 1280px)').matches
-  );
-  useEffect(() => {
-    if (!isDesktopV2()) return undefined;
-    const mq = window.matchMedia('(min-width: 1280px)');
-    const onChange = () => setShowD2Rail(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
+  const showD2Rail = useMediaQuery('(min-width: 1280px)', isDesktopV2());
   // First-login "Getting started" carousel (reopenable from Settings).
   const [showGettingStarted, setShowGettingStarted] = useState(false);
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
@@ -653,7 +644,7 @@ function App() {
 
   const tabScreens = {
     ...(nativeDesktop && {
-      home: <DashboardScreen onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onSwitchTab={switchTab} onOpenPremium={() => setShowPremium(true)} isActive={activeTab === 'home'} />,
+      home: <DashboardScreen onOpenChat={openChatInMessages} onSwitchTab={switchTab} isActive={activeTab === 'home'} />,
       search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
       bookings: <BookingsBoard onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
     }),

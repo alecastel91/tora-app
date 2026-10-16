@@ -62,18 +62,6 @@
     grid-column: 1 / -1;
   }
 
-  /* NewsScreen embedded as a panel: strip its phone gutters and the
-     tab-bar clearance. Deeper than .tab-panel > .screen, so v2's news rule
-     does not reach it; unlayered, so Tailwind's px-5/pt-6/pb-24 lose. */
-  html.desktop-v3 .d3-feed-embed .news-screen {
-    padding: 0;
-    min-height: 0;
-  }
-
-  html.desktop-v3 .d3-feed-embed .news-screen > .mb-5 {
-    margin-bottom: 16px;
-  }
-
   /* ---- Bookings pipeline: table left, inspector right ---- */
   html.desktop-v3 .d3-board {
     display: grid;
@@ -344,13 +332,6 @@
     text-align: left;
   }
 
-  html.desktop-v3 .d3-tour-side {
-    position: sticky;
-    top: 0;
-    max-height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2);
-    overflow-y: auto;
-  }
-
   /* mode switch: Calendar | Tours */
   html.desktop-v3 .d3-tour-modes {
     display: inline-flex;
@@ -398,69 +379,6 @@
   html.desktop-v3 .d3-tours .tour-cards-list { display: block; }
   html.desktop-v3 .d3-tours .tour-card,
   html.desktop-v3 .d3-tours .tour-cards-list > div { margin: 0; }
-
-  html.desktop-v3 .d3-tour-side-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    display: flex;
-    gap: 2px;
-    margin: 0;
-    padding: 10px 10px 8px;
-    background: var(--d2-surface);
-    border-bottom: 1px solid var(--d2-line);
-  }
-
-  html.desktop-v3 .d3-tour-side-tabs button {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    padding: 8px 10px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: none;
-    color: rgba(255, 255, 255, 0.5);
-    font: inherit;
-    font-size: 12.5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  html.desktop-v3 .d3-tour-side-tabs button svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  html.desktop-v3 .d3-tour-side-tabs button:hover {
-    color: #fff;
-  }
-
-  html.desktop-v3 .d3-tour-side-tabs button.is-on {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-  }
-
-  html.desktop-v3 .d3-tour-side-body {
-    padding: 12px 14px 16px;
-  }
-
-  html.desktop-v3 .d3-tour-side .matches-results {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  @container (max-width: 980px) {
-    html.desktop-v3 .d3-tour-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    html.desktop-v3 .d3-tour-side {
-      position: static;
-      max-height: none;
-    }
-  }
 
   /* drawers dock at the right edge over the side panel */
   html.desktop-v3 .md-drawer {
@@ -844,16 +762,6 @@
   }
 
   html.desktop-v3 .d3-manage .manage-artist-content { padding: 0; }
-
-  html.desktop-v3 .d3-tab-count {
-    margin-left: 7px;
-    padding: 1px 7px;
-    border-radius: 999px;
-    background: var(--d2-accent);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-  }
 
   /* the Actions tab is one wide list; the actions section loses its stretch rules */
   html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) { grid-template-columns: minmax(0, 1fr); }

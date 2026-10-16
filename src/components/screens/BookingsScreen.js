@@ -18,7 +18,7 @@ import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl, isPdfFile } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
-import { OFF_STATUSES } from '../../utils/dealStatus';
+import { OFF_STATUSES, formatFee, isConsentOnlyFor } from '../../utils/dealStatus';
 import { bookingStatusLine } from '../../utils/bookingStatus';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -467,24 +467,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     setExpandedDealId(expandedDealId === dealId ? null : dealId);
   };
 
-  // Safely format a monetary amount. Returns null when the value is missing —
-  // e.g. a deal REDACTED for a tagged venue has no currentFee — so callers can
-  // omit the fee entirely instead of crashing on `.toLocaleString()`.
-  const formatFee = (fee) => {
-    const n = Number(fee);
-    if (fee == null || fee === '' || Number.isNaN(n)) return null;
-    return Number.isInteger(n)
-      ? n.toLocaleString()
-      : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  // This profile is only the tagged event-venue for the deal (a promoter's
-  // event to be held here) — not the initiator, artist, or booking party.
-  const isConsentOnlyDeal = (deal) =>
-    deal.eventVenueId === currentUser?.id &&
-    deal.initiator?.id !== currentUser?.id &&
-    deal.venue?.id !== currentUser?.id &&
-    deal.artist?.id !== currentUser?.id;
+  const isConsentOnlyDeal = (deal) => isConsentOnlyFor(deal, currentUser);
 
   // Pending consent requests surface as their own action cards at the top.
   const pendingConsentDeals = deals.filter(

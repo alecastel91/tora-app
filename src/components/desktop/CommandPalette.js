@@ -4,7 +4,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import OverlayPortal from '../common/OverlayPortal';
-import { getAvatarClass, roleLabel } from '../../utils/roles';
+import { roleLabel } from '../../utils/roles';
+import { Avatar } from './primitives';
 
 /* ⌘K / Ctrl+K: jump to a page or a profile from anywhere. Desktop v3 only
    (App.js mounts it through useNativeDesktop). Also opens on the
@@ -105,9 +106,7 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
                     >
                       {item.kind === 'profile' ? (
                         <>
-                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-semibold text-white ${getAvatarClass(item.profile.role)}`}>
-                            {item.profile.avatar ? <img src={item.profile.avatar} alt="" className="h-full w-full object-cover" /> : (item.label || '?').charAt(0).toUpperCase()}
-                          </span>
+                          <Avatar profile={{ ...item.profile, name: item.label }} className="h-7 w-7 text-[11px]" />
                           <span className="min-w-0 flex-1 truncate">{item.label}</span>
                           <span className="shrink-0 text-[11px] text-white/40">{roleLabel(item.profile.role, t)}{item.profile.city ? ` · ${item.profile.city}` : ''}</span>
                         </>

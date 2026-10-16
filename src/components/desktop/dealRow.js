@@ -4,7 +4,7 @@
 import { isArtistSideForDeal } from '../../utils/contractSigner';
 import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
 import { bookingStatusLine } from '../../utils/bookingStatus';
-import { isOffDeal } from '../../utils/dealStatus';
+import { isOffDeal, formatFee, isConsentOnlyFor } from '../../utils/dealStatus';
 
 const STATUS_KEY = {
   PENDING: 'statusPending',
@@ -37,10 +37,7 @@ export function statusChipClass(status) {
   return `inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] whitespace-nowrap ${TONE[tone]}`;
 }
 
-/** The deal only reaches this profile as the tagged event venue — no commercials to show. */
-export const isConsentOnlyFor = (deal, user) =>
-  !!user && deal.eventVenueId === user.id
-  && deal.initiator?.id !== user.id && deal.venue?.id !== user.id && deal.artist?.id !== user.id;
+export { isConsentOnlyFor };
 
 /** Who the viewer is dealing with, as BookingsScreen names it on the card. */
 export function counterpartFor(deal, user) {
@@ -71,8 +68,10 @@ export function tabFor(deal) {
   return day >= startOfToday() ? 'upcoming' : 'past';
 }
 
-export const feeText = (deal) =>
-  (Number(deal.currentFee) > 0 ? `${Number(deal.currentFee).toLocaleString()} ${deal.currency || ''}`.trim() : '—');
+export const feeText = (deal) => {
+  const fee = formatFee(deal.currentFee);
+  return fee == null ? '—' : `${fee} ${deal.currency || ''}`.trim();
+};
 
 /** Local calendar key for a Date, matching the 'YYYY-MM-DD' strings in availableDates. */
 export const dayKey = (d) =>

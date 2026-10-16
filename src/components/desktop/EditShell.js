@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { getAvatarClass, roleLabel } from '../../utils/roles';
+import { roleLabel, roleChipClass } from '../../utils/roles';
+import { Avatar } from './primitives';
 import { LocationIcon } from '../../utils/icons';
 import SettingsNav from './SettingsNav';
 import { useDesktopStrings } from './strings';
@@ -37,16 +38,14 @@ export const EditPreview = ({ draft, genres, photos }) => {
   const td = useDesktopStrings();
   const role = draft?.role;
   const location = [draft?.city, draft?.country].filter(Boolean).join(', ') || draft?.location;
-  const tone = { ARTIST: 'border-[#667EEA]/50 text-[#667EEA]', VENUE: 'border-[#F5576C]/50 text-[#F5576C]', PROMOTER: 'border-[#FFC107]/50 text-[#FFC107]', AGENT: 'border-[#43E97B]/50 text-[#43E97B]' }[role] || 'border-white/30 text-white/70';
+  const tone = roleChipClass(role);
   const links = ['website', 'instagram', 'residentAdvisor', 'linkedin', 'mixtape', 'spotify'].filter((k) => draft?.[k]).length;
   return (
     <aside className="d3-edit-preview">
       <p className="m-0 mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/35">{td('preview')}</p>
       <div className="d3-panel overflow-hidden">
         <div className="flex items-center gap-3 px-4 pt-4">
-          <span className={`flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full text-lg font-semibold text-white ${getAvatarClass(role)}`}>
-            {draft?.avatar ? <img src={draft.avatar} alt="" className="h-full w-full object-cover" /> : (draft?.name || '?').charAt(0).toUpperCase()}
-          </span>
+          <Avatar profile={draft} className="h-14 w-14 text-lg" />
           <span className="min-w-0">
             <span className="block truncate font-futuristic text-[16px] font-semibold text-white">{draft?.name || t('profile.yourName')}</span>
             <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-white/55">

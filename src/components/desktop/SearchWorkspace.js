@@ -112,9 +112,9 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
     { key: 'country', label: t('editProfile.country'), multi: false, allLabel: t('manageArtist.allCountries'), resets: ['city'],
       visible: (d) => d.zone !== 'all',
       options: (d) => [{ value: 'all', label: t('manageArtist.allCountries') }, ...(countriesByZone[d.zone] || []).map((c) => ({ value: c, label: c }))] },
-    { key: 'city', label: t('editProfile.city'), multi: false, allLabel: td('allCities'),
+    { key: 'city', label: t('editProfile.city'), multi: false, allLabel: t('calendar.allCities'),
       visible: (d) => d.country !== 'all',
-      options: (d) => [{ value: 'all', label: td('allCities') }, ...(citiesByCountry[d.country] || []).map((c) => ({ value: c, label: c }))] },
+      options: (d) => [{ value: 'all', label: t('calendar.allCities') }, ...(citiesByCountry[d.country] || []).map((c) => ({ value: c, label: c }))] },
   ];
 
   const FullscreenGlyph = ({ exit }) => (

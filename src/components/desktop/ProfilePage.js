@@ -1,12 +1,11 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useDesktopStrings } from './strings';
-import { getAvatarClass, roleLabel } from '../../utils/roles';
-import { raProfileUrl } from '../../utils/urls';
-import { RA_LOGO_WHITE } from '../../utils/brandAssets';
+import { roleLabel, roleChipClass } from '../../utils/roles';
+import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
 import { formatEventDate } from '../../utils/dates';
 import { networkSectionsForRole } from '../../utils/networkSections';
-import { BookingsIcon, GlobeIcon, HeartIcon, LocationIcon } from '../../utils/icons';
+import { BookingsIcon, HeartIcon, LocationIcon } from '../../utils/icons';
 import VerifiedBadge from '../common/VerifiedBadge';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
@@ -28,37 +27,6 @@ import SafetyMenu from '../common/SafetyMenu';
    column (bio, roster, tours, media, gallery, tech), and the reference
    material in the side column (links, badges, similar profiles, safety). */
 
-const fmtStat = (n) => {
-  const v = Number(n) || 0;
-  return v >= 1000 ? `${(v / 1000).toFixed(1).replace(/\.0$/, '')}K` : String(v);
-};
-
-const Label = ({ children }) => (
-  <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">{children}</p>
-);
-
-const Section = ({ title, children, className = '' }) => (
-  <section className={`min-w-0 ${className}`}>
-    {title && <Label>{title}</Label>}
-    {children}
-  </section>
-);
-
-const Panel = ({ title, children }) => (
-  <section className="d3-panel px-4 pb-4 pt-3.5">
-    {title && <Label>{title}</Label>}
-    {children}
-  </section>
-);
-
-const InstagramGlyph = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-  </svg>
-);
-
 const LinkRow = ({ href, icon, label }) => (
   <a
     href={href}
@@ -71,20 +39,6 @@ const LinkRow = ({ href, icon, label }) => (
     <span className="text-[11px] text-white/30">↗</span>
   </a>
 );
-
-const Stat = ({ value, label, onClick }) => {
-  const inner = (
-    <>
-      <span className="block font-futuristic text-[20px] font-semibold leading-none tracking-tight text-white">{value}</span>
-      <span className="mt-1 block text-[10px] uppercase tracking-[0.14em] text-white/40">{label}</span>
-    </>
-  );
-  return onClick ? (
-    <button onClick={onClick} className="cursor-pointer rounded-lg px-3 py-2 text-left transition-colors hover:bg-white/[0.04]">{inner}</button>
-  ) : (
-    <div className="px-3 py-2">{inner}</div>
-  );
-};
 
 const ProfilePage = ({
   profile, currentUser, embeds, artistTours = [], similarProfiles = [],
@@ -99,12 +53,7 @@ const ProfilePage = ({
   const isBooker = currentUser?.role === 'PROMOTER' || currentUser?.role === 'VENUE';
   const isOwn = profile.id === currentUser?.id;
 
-  const links = [
-    profile.website && { key: 'web', href: profile.website, icon: <GlobeIcon />, label: t('profile.officialWebsite') },
-    profile.instagram && { key: 'ig', href: `https://instagram.com/${profile.instagram.replace('@', '')}`, icon: <InstagramGlyph />, label: 'Instagram' },
-    profile.residentAdvisor && { key: 'ra', href: raProfileUrl(profile.residentAdvisor), icon: <img src={RA_LOGO_WHITE} alt="RA" className="h-auto w-[16px]" />, label: t('editProfile.residentAdvisorLabel') },
-    profile.linkedin && { key: 'li', href: profile.linkedin, icon: <span className="text-[11px] font-semibold">in</span>, label: 'LinkedIn' },
-  ].filter(Boolean);
+  const links = profileLinks(profile, t);
 
   const memberSince = profile.memberSince
     ? t('viewProfile.memberSince', { date: new Date(profile.memberSince).toLocaleDateString(locale, { month: 'short', year: 'numeric' }) })
@@ -138,9 +87,7 @@ const ProfilePage = ({
           </button>
 
           <div className="flex items-start gap-6">
-            <span className={`flex h-[112px] w-[112px] shrink-0 items-center justify-center overflow-hidden rounded-full text-4xl font-semibold text-white ring-1 ring-white/15 ${getAvatarClass(role)}`}>
-              {profile.avatar ? <img src={profile.avatar} alt={profile.name} className="h-full w-full object-cover" /> : (profile.name || '?').charAt(0).toUpperCase()}
-            </span>
+            <Avatar profile={profile} alt={profile.name} className="h-[112px] w-[112px] text-4xl ring-1 ring-white/15" />
             <div className="min-w-0 flex-1 pt-1">
               <h1 className="m-0 flex items-center gap-2 font-futuristic text-[28px] font-semibold leading-tight tracking-tight text-white">
                 <span className="truncate">{profile.name}</span>
@@ -148,8 +95,7 @@ const ProfilePage = ({
               </h1>
               {role === 'AGENT' && profile.agencyName && <p className="m-0 mt-0.5 text-[13px] text-white/50">{profile.agencyName}</p>}
               <p className="m-0 mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-white/60">
-                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${
-                  { ARTIST: 'border-[#667EEA]/50 text-[#667EEA]', VENUE: 'border-[#F5576C]/50 text-[#F5576C]', PROMOTER: 'border-[#FFC107]/50 text-[#FFC107]', AGENT: 'border-[#43E97B]/50 text-[#43E97B]' }[role] || 'border-white/30 text-white/70'}`}>
+                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${roleChipClass(role)}`}>
                   {roleLabel(role, t)}
                 </span>
                 {profile.location && <span className="inline-flex items-center gap-1 [&>svg]:h-3.5 [&>svg]:w-3.5"><LocationIcon />{profile.location}</span>}

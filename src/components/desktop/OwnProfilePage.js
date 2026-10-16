@@ -1,10 +1,9 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useDesktopStrings } from './strings';
-import { getAvatarClass, roleLabel, ROLES } from '../../utils/roles';
-import { raProfileUrl } from '../../utils/urls';
-import { RA_LOGO_WHITE } from '../../utils/brandAssets';
-import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, GlobeIcon, LinkIcon, LocationIcon, StarIcon, ShieldIcon } from '../../utils/icons';
+import { getAvatarClass, roleLabel, roleChipClass, roleBloom, ROLES } from '../../utils/roles';
+import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
+import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, LocationIcon, StarIcon, ShieldIcon } from '../../utils/icons';
 import VerifiedBadge from '../common/VerifiedBadge';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
@@ -32,32 +31,6 @@ const GridIcon = () => (
     <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
   </svg>
 );
-const InstagramGlyph = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4" /><line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
-  </svg>
-);
-
-const fmtStat = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K` : `${n ?? 0}`);
-
-const Label = ({ children }) => (
-  <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">{children}</p>
-);
-const Section = ({ title, children }) => (
-  <section className="min-w-0">{title && <Label>{title}</Label>}{children}</section>
-);
-const Panel = ({ title, action, children }) => (
-  <section className="d3-panel px-4 pb-3 pt-3.5">
-    {(title || action) && (
-      <div className="mb-2 flex items-baseline justify-between gap-3">
-        {title && <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">{title}</p>}
-        {action}
-      </div>
-    )}
-    {children}
-  </section>
-);
-
 const Action = ({ icon, label, onClick, dot, primary }) => (
   <button
     type="button"
@@ -71,13 +44,6 @@ const Action = ({ icon, label, onClick, dot, primary }) => (
   </button>
 );
 
-const Stat = ({ value, label, onClick }) => (
-  <button onClick={onClick} className="cursor-pointer rounded-lg px-3 py-2 text-left transition-colors hover:bg-white/[0.04]">
-    <span className="block font-futuristic text-[20px] font-semibold leading-none text-white">{value}</span>
-    <span className="mt-1 block text-[10px] uppercase tracking-[0.14em] text-white/40">{label}</span>
-  </button>
-);
-
 const OwnProfilePage = ({
   user, userProfiles, defaultProfileId, embeds, ownBadges, rosterArtists, artistActionsMap, ownHasActions,
   representedByProfiles, networkSections, likedProfilesList, likerProfilesList, connectionsList, trialInfo,
@@ -87,15 +53,10 @@ const OwnProfilePage = ({
   const { t } = useLanguage();
   const td = useDesktopStrings();
   const role = user?.role;
-  const roleTone = { ARTIST: 'border-[#667EEA]/50 text-[#667EEA]', VENUE: 'border-[#F5576C]/50 text-[#F5576C]', PROMOTER: 'border-[#FFC107]/50 text-[#FFC107]', AGENT: 'border-[#43E97B]/50 text-[#43E97B]' }[role] || 'border-white/30 text-white/70';
-  const bloom = { ARTIST: 'rgba(102,126,234,0.22)', VENUE: 'rgba(245,87,108,0.18)', PROMOTER: 'rgba(255,193,7,0.14)', AGENT: 'rgba(67,233,123,0.14)' }[role] || 'rgba(255,255,255,0.08)';
+  const roleTone = roleChipClass(role);
+  const bloom = roleBloom(role);
 
-  const links = [
-    user?.website && { key: 'web', href: user.website, icon: <GlobeIcon />, label: t('profile.officialWebsite') },
-    user?.instagram && { key: 'ig', href: `https://instagram.com/${user.instagram.replace('@', '')}`, icon: <InstagramGlyph />, label: 'Instagram' },
-    user?.residentAdvisor && { key: 'ra', href: raProfileUrl(user.residentAdvisor), icon: <img src={RA_LOGO_WHITE} alt="RA" className="h-auto w-[16px]" />, label: t('editProfile.residentAdvisorLabel') },
-    user?.linkedin && { key: 'li', href: user.linkedin, icon: <LinkIcon />, label: 'LinkedIn' },
-  ].filter(Boolean);
+  const links = profileLinks(user, t);
 
   const unverified = user?.verifyStatus !== 'VERIFIED';
   const inReview = user?.verifyStatus === 'PENDING_REVIEW';
@@ -273,9 +234,7 @@ const OwnProfilePage = ({
                       onClick={() => !active && onSwitchProfile(p.id)}
                       className={`flex w-full items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-left transition-colors ${active ? 'bg-white/[0.05]' : 'cursor-pointer hover:bg-white/[0.04]'}`}
                     >
-                      <span className={`flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-semibold text-white ${getAvatarClass(p.role)}`}>
-                        {p.avatar ? <img src={p.avatar} alt="" className="h-full w-full object-cover" /> : (p.name || '?').charAt(0).toUpperCase()}
-                      </span>
+                      <Avatar profile={p} className="h-7 w-7 text-[11px]" />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[12.5px] text-white/90">{p.name}</span>
                         <span className="block truncate text-[10.5px] text-white/40">{roleLabel(p.role, t)}</span>

@@ -23,7 +23,6 @@ import { counterpartRoles, matchDatesFor } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import TourBoard from '../desktop/TourBoard';
-import { useDesktopStrings } from '../desktop/strings';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -83,7 +82,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // every fetch below keeps its gating. 'calendar' has no meaning as a side
   // tab there, so it resolves to Matches.
   const nativeDesktop = useNativeDesktop();
-  const td = useDesktopStrings();
   // Desktop v3 has two modes under Tour: 'calendar' (the grid with Matches
   // beside it) and 'tours' (a full-width pipeline of tours). The mode drives
   // activeTab so every fetch keeps its gating: calendar mode = 'matches',
@@ -2167,7 +2165,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         const modeTabs = (
           <div className="d3-tour-modes">
             <button type="button" className={d3Mode === 'calendar' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('calendar'); }}>
-              <CalendarIcon /><span>{td('calendar')}</span>
+              <CalendarIcon /><span>{t('profile.calendar')}</span>
             </button>
             <button type="button" className={d3Mode === 'matches' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('matches'); }}>
               <TargetIcon /><span>{t('tour.calendarMatches')}</span>
@@ -2208,7 +2206,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       : <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />}
                   </>
                 )}
-                detail={renderTourKickstart({ only: d3TourId })}
+                detail={d3TourId ? renderTourKickstart({ only: d3TourId }) : null}
               />
             )}
           </>

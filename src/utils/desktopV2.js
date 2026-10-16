@@ -22,7 +22,6 @@
 import { useEffect, useState } from 'react';
 
 const KEY = 'tora-desktop-layout'; // 'v2' | 'v3'; absent = v1
-const LEGACY_KEY = 'tora-desktop-v2'; // first iteration stored '1' here
 const LEVELS = ['v2', 'v3'];
 const DESKTOP_MQ = '(min-width: 1024px)';
 
@@ -36,7 +35,6 @@ function apply(level) {
 }
 
 function store(level) {
-  localStorage.removeItem(LEGACY_KEY);
   if (level) localStorage.setItem(KEY, level);
   else localStorage.removeItem(KEY);
 }
@@ -46,7 +44,6 @@ function store(level) {
 const param = new URLSearchParams(window.location.search).get('desktop');
 if (LEVELS.includes(param)) store(param);
 else if (param === 'v1' || param === 'off') store(null);
-else if (localStorage.getItem(LEGACY_KEY) === '1') store('v2');
 
 apply(localStorage.getItem(KEY));
 
@@ -57,21 +54,23 @@ window.toraDesktop = (level) => {
   apply(next);
   return next || 'v1';
 };
-window.toraDesktopV2 = (on) => window.toraDesktop(on === false ? 'v1' : 'v2'); // first-iteration name
+
+/** Reactive matchMedia: true while the query matches (subscribed only when `enabled`). */
+export function useMediaQuery(query, enabled = true) {
+  const [on, setOn] = useState(() => enabled && window.matchMedia(query).matches);
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const mq = window.matchMedia(query);
+    const onChange = () => setOn(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query, enabled]);
+  return on;
+}
 
 /**
  * True only when the v3 flag is on AND the window is desktop-sized. This is
  * the single gate for mounting desktop-native screens, so the phone never
  * renders one — not hidden, not mounted (hidden subtrees would still fetch).
  */
-export function useNativeDesktop() {
-  const [on, setOn] = useState(() => isDesktopV3() && window.matchMedia(DESKTOP_MQ).matches);
-  useEffect(() => {
-    if (!isDesktopV3()) return undefined;
-    const mq = window.matchMedia(DESKTOP_MQ);
-    const onChange = () => setOn(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-  return on;
-}
+export const useNativeDesktop = () => useMediaQuery(DESKTOP_MQ, isDesktopV3());

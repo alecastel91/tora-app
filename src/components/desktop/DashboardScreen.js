@@ -7,7 +7,8 @@ import { subscribeToDeals } from '../../services/realtime';
 import { getDealDisplayStatus } from '../screens/BookingsScreen';
 import { isOffDeal } from '../../utils/dealStatus';
 import { formatEventDate, formatTimestamp } from '../../utils/dates';
-import { getAvatarClass, roleLabel } from '../../utils/roles';
+import { roleLabel } from '../../utils/roles';
+import { Avatar } from './primitives';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { HandshakeIcon, MessageIcon, CalendarCheckIcon, BookingsIcon } from '../../utils/icons';
 import {
@@ -56,20 +57,12 @@ const StatTile = ({ icon, label, value, accent = false, onClick }) => (
   </button>
 );
 
-const Avatar = ({ profile, size = 'h-9 w-9' }) => (
-  <span className={`${size} shrink-0 overflow-hidden rounded-full flex items-center justify-center text-[13px] font-semibold text-white ${getAvatarClass(profile?.role)}`}>
-    {profile?.avatar
-      ? <img src={profile.avatar} alt="" className="h-full w-full object-cover" />
-      : (profile?.name || '?').charAt(0).toUpperCase()}
-  </span>
-);
-
 // The sidebar dot counts booking-workflow actions only (representation
 // requests route to Messages); the tile says the same number as the dot.
 const BOOKING_ACTIONS = new Set(['offer_received', 'counter_offer_pending', 'contract_to_send', 'contract_to_sign', 'payment_to_mark_sent', 'payment_to_confirm_received', 'payment_to_resolve']);
 const ACTION_ROWS = 8;
 
-const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium, isActive = true }) => {
+const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
   const { user } = useAppContext();
   const { t } = useLanguage();
   const td = useDesktopStrings();
@@ -101,7 +94,7 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
     return () => clearInterval(id);
   }, [isActive, load]);
 
-  const today = startOfToday();
+  const today = useMemo(startOfToday, [data.deals]); // one Date per data change, so the memos below hold
   const deals = useMemo(() => data.deals.filter((d) => !isConsentOnlyFor(d, user) && !d.redactedForVenue), [data.deals, user]);
   const openOffers = useMemo(() => deals.filter((d) => d.status === 'PENDING' || d.status === 'NEGOTIATING').length, [deals]);
   const upcoming = useMemo(() => deals
@@ -152,7 +145,7 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
         {/* ---- header: who you are, and the four numbers that matter ---- */}
         <div className="d3-dash-span flex flex-wrap items-end justify-between gap-5">
           <div className="flex items-center gap-4">
-            <Avatar profile={user} size="h-12 w-12" />
+            <Avatar profile={user} className="h-12 w-12 text-[15px]" />
             <div>
               <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-white">{user.name}</h1>
               <p className="mt-0.5 text-[12.5px] text-white/50">
@@ -223,10 +216,10 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
                           </span>
                         </span>
                         <span className="flex min-w-0 items-center gap-2.5">
-                          <Avatar profile={other} size="h-8 w-8" />
+                          <Avatar profile={other} className="h-8 w-8 text-[12px]" />
                           <span className="min-w-0">
                             <span className="block truncate text-[13.5px] text-white">{other?.name || t('bookings.theOtherParty')}</span>
-                            {forName && <span className="block truncate text-[11.5px] text-white/45">{td('forArtist', { name: forName })}</span>}
+                            {forName && <span className="block truncate text-[11.5px] text-white/45">{t('bookings.forArtist', { name: forName })}</span>}
                           </span>
                         </span>
                         <span className="min-w-0">
@@ -266,7 +259,7 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
               ))}
             </div>
             <div className="mt-3 flex items-center gap-4 px-2 pb-1 text-[10.5px] text-white/45">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#43E97B]/40" />{td('legendAvailable')}</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#43E97B]/40" />{t('calendar.available')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-infrared" />{td('legendGig')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />{td('legendTravel')}</span>
             </div>
@@ -281,7 +274,7 @@ const DashboardScreen = ({ onOpenChat, onOpenProfile, onSwitchTab, onOpenPremium
                       onClick={() => onOpenChat(conv.profile)}
                       className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-white/[0.04]"
                     >
-                      <Avatar profile={conv.profile} size="h-8 w-8" />
+                      <Avatar profile={conv.profile} className="h-8 w-8 text-[12px]" />
                       <span className="min-w-0 flex-1">
                         <span className={`block truncate text-[13px] ${conv.unreadCount > 0 ? 'font-semibold text-white' : 'text-white/85'}`}>{conv.profile?.name}</span>
                         <span className="block truncate text-[11.5px] text-white/45">{conv.lastMessage?.text}</span>
