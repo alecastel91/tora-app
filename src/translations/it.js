@@ -1551,7 +1551,6 @@ const it = {
 
   agency: {
     title: 'Agenzia',
-    intro: 'Gli agenti della stessa agenzia si collegano così ognuno paga la tariffa dell\'agenzia.',
     howItWorks: 'Ogni agente paga per i propri artisti. Il prezzo per artista dipende da quanti artisti rappresenta l\'intera agenzia su TORA: più ne rappresenta, meno costa ogni artista, per tutti.',
     fact1: 'Paghi solo per gli artisti del tuo roster, con la tua carta.',
     fact2: 'La tua tariffa segue il totale dell\'agenzia e può scendere o salire. Ogni cambiamento vale dal prossimo rinnovo, mai a metà ciclo.',
@@ -1579,7 +1578,6 @@ const it = {
     invitedYou: '{{agency}} ti ha invitato a entrare nella sua agenzia su TORA.',
     accept: 'Entra',
     decline: 'Rifiuta',
-    members: 'Membri',
     pendingRequests: 'Richieste di ingresso',
     pendingInvites: 'Inviti in sospeso',
     approve: 'Approva',
@@ -1600,8 +1598,6 @@ const it = {
     dissolve: 'Sciogli l\'agenzia',
     dissolveConfirm: 'Sciogliere {{agency}}? Ogni membro torna alla tariffa singola dal prossimo rinnovo.',
     agentProfileRequired: 'Aggiungi un profilo agente per entrare in un\'agenzia.',
-    lastAdmin: 'Rendi amministratore un altro membro prima di uscire.',
-    example: 'Esempio: un agente con 8 artisti paga €134,20 al mese da solo; in un\'agenzia di 24 artisti, 8 × €11,90 = €95,20.',
   },
 
   manage: {

@@ -1563,7 +1563,6 @@ const en = {
   // Common
   agency: {
     title: 'Agency',
-    intro: 'Agents from the same agency link up so each pays the agency\'s rate.',
     howItWorks: 'Every agent pays for their own artists. The price per artist depends on how many artists the whole agency represents on TORA — the more the agency represents, the less each artist costs, for everyone in it.',
     fact1: 'You pay only for the artists on your own roster, on your own card.',
     fact2: 'Your rate follows the agency total and can go down or up. Any change applies from your next renewal, never mid-cycle.',
@@ -1591,7 +1590,6 @@ const en = {
     invitedYou: '{{agency}} invited you to join their agency on TORA.',
     accept: 'Join',
     decline: 'Decline',
-    members: 'Members',
     pendingRequests: 'Requests to join',
     pendingInvites: 'Pending invites',
     approve: 'Approve',
@@ -1612,8 +1610,6 @@ const en = {
     dissolve: 'Dissolve agency',
     dissolveConfirm: 'Dissolve {{agency}}? Every member goes back to the solo rate from their next renewal.',
     agentProfileRequired: 'Add an agent profile to join an agency.',
-    lastAdmin: 'Make another member admin before leaving.',
-    example: 'Example: an agent with 8 artists pays €134.20 a month alone; in an agency of 24 artists, 8 × €11.90 = €95.20.',
   },
 
   manage: {

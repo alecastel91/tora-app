@@ -3,7 +3,7 @@ import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
-import { AGENT_BANDS, AGENCY_DISCOUNTS, agencySeatPrice, formatMoney, normalizeCurrency } from '../../utils/money';
+import { AGENT_BANDS, agencySeatPrice, formatMoney, normalizeCurrency } from '../../utils/money';
 
 /**
  * Settings → Agency. Agents of one agency link up so each pays their OWN
@@ -25,7 +25,7 @@ export const AgencyLadder = ({ currency }) => {
           return (
             <tr key={i}>
               <td>{label}</td>
-              <td className="agency-ladder-price">{formatMoney(agencySeatPrice(cur, i), cur)}{AGENCY_DISCOUNTS[i] ? <small> −{AGENCY_DISCOUNTS[i]}%</small> : null}</td>
+              <td className="agency-ladder-price">{formatMoney(agencySeatPrice(cur, i), cur)}</td>
             </tr>
           );
         })}

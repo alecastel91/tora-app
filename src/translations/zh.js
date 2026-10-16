@@ -1551,7 +1551,6 @@ const zh = {
 
   agency: {
     title: '经纪公司',
-    intro: '同一经纪公司的经纪人相互关联，各自按经纪公司费率付费。',
     howItWorks: '每位经纪人只为自己的艺人付费。每位艺人的价格取决于整个经纪公司在 TORA 上代理的艺人总数——代理得越多，每位艺人的价格越低，对公司里的每个人都是如此。',
     fact1: '你只为自己名单上的艺人付费，用你自己的卡。',
     fact2: '你的费率随经纪公司总数变动，可升可降。任何变动从下次续费起生效，绝不在周期中途。',
@@ -1579,7 +1578,6 @@ const zh = {
     invitedYou: '{{agency}} 邀请你加入其在 TORA 上的经纪公司。',
     accept: '加入',
     decline: '拒绝',
-    members: '成员',
     pendingRequests: '加入申请',
     pendingInvites: '待处理邀请',
     approve: '批准',
@@ -1600,8 +1598,6 @@ const zh = {
     dissolve: '解散经纪公司',
     dissolveConfirm: '解散 {{agency}}？所有成员从下次续费起回到单独费率。',
     agentProfileRequired: '请先添加经纪人档案再加入经纪公司。',
-    lastAdmin: '退出前请先将另一位成员设为管理员。',
-    example: '例：有 8 位艺人的经纪人单独付费每月 €134.20；在拥有 24 位艺人的经纪公司中，8 × €11.90 = €95.20。',
   },
 
   manage: {
