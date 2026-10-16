@@ -132,7 +132,19 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
       </div>
 
       {/* Band breakdown */}
-      <div className="agent-seat-bands">
+      {agency ? (
+        <div className="agent-seat-bands">
+          {BANDS.map((band, i) => (
+            <div key={i} className={`agent-seat-band${i === agency.band ? ' is-active' : ''}`}>
+              <span className="agent-seat-band-range">{bandLabel(band, i)} {t('agentSeat.artists')}</span>
+              <span className="agent-seat-band-rate">
+                <strong>{money(agencySeatPrice(currency, i, interval))}</strong> /{t('agentSeat.perArtist')} · {isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="agent-seat-bands">
         {BANDS.map((band, i) => {
           const rate = band.monthly[currency] * mult;
           const active = estimate > (i === 0 ? 0 : BANDS[i - 1].upTo);
@@ -146,6 +158,7 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
           );
         })}
       </div>
+      )}
 
       {!isPaid && <p className="agent-seat-note">{t('agentSeat.freeNote')}</p>}
 
