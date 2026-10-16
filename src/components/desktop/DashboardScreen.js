@@ -103,9 +103,6 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
     .sort((a, b) => new Date(a.date) - new Date(b.date)), [deals, today]);
   const unread = useMemo(() => data.conversations.reduce((n, c) => n + (c.unreadCount || 0), 0), [data.conversations]);
   const yourMove = useMemo(() => data.actions.filter((a) => BOOKING_ACTIONS.has(a.type)).length, [data.actions]);
-  const threads = useMemo(() => [...data.conversations]
-    .sort((a, b) => (b.unreadCount > 0) - (a.unreadCount > 0) || new Date(b.lastMessage?.createdAt || 0) - new Date(a.lastMessage?.createdAt || 0))
-    .slice(0, 6), [data.conversations]);
 
   // Next 14 days: availability (profile), gigs (confirmed deals), travel.
   const days = useMemo(() => {
@@ -266,34 +263,6 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
             </div>
           </Panel>
 
-          <Panel title={td('recentThreads')} action={{ label: td('viewAll'), onClick: () => onSwitchTab('messages') }}>
-            {threads.length === 0 ? <Empty text={td('noThreads')} /> : (
-              <ul className="flex flex-col">
-                {threads.map((conv) => (
-                  <li key={conv.profile?.id}>
-                    <button
-                      onClick={() => onOpenChat(conv.profile)}
-                      className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-white/[0.04]"
-                    >
-                      <Avatar profile={conv.profile} className="h-8 w-8 text-[12px]" />
-                      <span className="min-w-0 flex-1">
-                        <span className={`block truncate text-[13px] ${conv.unreadCount > 0 ? 'font-semibold text-white' : 'text-white/85'}`}>{conv.profile?.name}</span>
-                        <span className="block truncate text-[11.5px] text-white/45">{conv.lastMessage?.text}</span>
-                      </span>
-                      <span className="flex shrink-0 flex-col items-end gap-1">
-                        <span className="text-[10px] text-white/35">
-                          {formatTimestamp(conv.lastMessage?.createdAt, locale, { year: undefined, hour: undefined, minute: undefined })}
-                        </span>
-                        {conv.unreadCount > 0 && (
-                          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-infrared px-1 text-[10px] font-semibold text-white">{conv.unreadCount}</span>
-                        )}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Panel>
           <div className="d3-panel d3-dash-invite"><InviteFriendsSection /></div>
         </div>
 

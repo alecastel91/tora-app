@@ -168,7 +168,7 @@ const ProfilePage = ({
               </Section>
             )}
 
-            {role === 'ARTIST' && !premiumViewer && (
+            {role === 'ARTIST' && isBooker && !premiumViewer && (
               <Section title={t('viewProfile.activeTours')}>
                 <button type="button" onClick={() => onOpenPremium && onOpenPremium()} className="relative block w-full cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0e] text-left transition-colors hover:border-infrared/40">
                   <div className="select-none p-4 blur-[7px]" aria-hidden>
@@ -179,37 +179,38 @@ const ProfilePage = ({
               </Section>
             )}
 
-            {role === 'ARTIST' && premiumViewer && artistTours.length > 0 && (
+            {role === 'ARTIST' && isBooker && premiumViewer && artistTours.length > 0 && (
               <Section title={t('viewProfile.activeTours')}>
-                <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-                  {artistTours.map((tour) => (
-                    <div
-                      key={tour.id}
-                      role={isBooker ? 'button' : undefined}
-                      tabIndex={isBooker ? 0 : undefined}
-                      onClick={isBooker ? () => onOpenTourKickstart(tour) : undefined}
-                      className={`rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 transition-colors ${isBooker ? 'cursor-pointer hover:border-infrared/40' : ''}`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="m-0 truncate text-[13.5px] font-medium text-white">{t('tour.tourTitle', { location: tour.country || tour.zone })}</p>
-                          <p className="m-0 mt-1 text-[10.5px] uppercase tracking-[0.12em] text-white/40">
-                            {formatEventDate(tour.startDate, locale, { month: 'short', day: 'numeric' })} — {formatEventDate(tour.endDate, locale, { month: 'short', day: 'numeric', year: 'numeric' })}
-                            {(tour.feeExpectation || tour.priceOnRequest) ? ` · ${tour.priceOnRequest ? t('tour.priceOnRequest') : tour.feeExpectation}` : ''}
-                            {(tour.interestsCount || 0) > 0 ? ` · ${t('tour.interestedCountPublic', { n: tour.interestsCount })}` : ''}
+                <div className="flex flex-col gap-2">
+                  {artistTours.map((tour) => {
+                    const meta = [
+                      `${formatEventDate(tour.startDate, locale, { month: 'short', day: 'numeric' })} — ${formatEventDate(tour.endDate, locale, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+                      (tour.feeExpectation || tour.priceOnRequest) ? (tour.priceOnRequest ? t('tour.priceOnRequest') : tour.feeExpectation) : null,
+                      (tour.interestsCount || 0) > 0 ? t('tour.interestedCountPublic', { n: tour.interestsCount }) : null,
+                    ].filter(Boolean);
+                    return (
+                      <div
+                        key={tour.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => onOpenTourKickstart(tour)}
+                        className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 transition-colors hover:border-infrared/40"
+                      >
+                        <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+                          <p className="m-0 text-[13.5px] font-medium text-white">{t('tour.tourTitle', { location: tour.country || tour.zone })}</p>
+                          <p className="m-0 flex flex-wrap gap-x-2 text-[10.5px] uppercase tracking-[0.12em] text-white/40">
+                            {meta.map((m, i) => <span key={i}>{i > 0 && <span className="mr-2 text-white/25">·</span>}{m}</span>)}
                           </p>
                         </div>
-                        {isBooker && (
-                          <div className="flex shrink-0 items-center gap-1.5">
-                            <button type="button" className={`btn btn-small ${tour.myInterest ? 'btn-liked' : 'btn-outline'}`} onClick={(e) => { e.stopPropagation(); onToggleTourInterest(tour); }}>
-                              <HeartIcon filled={!!tour.myInterest} />
-                            </button>
-                            <button type="button" className="btn btn-primary btn-small" onClick={(e) => { e.stopPropagation(); onTourOffer(); }}>{t('tour.makeAnOffer')}</button>
-                          </div>
-                        )}
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          <button type="button" className={`btn btn-small ${tour.myInterest ? 'btn-liked' : 'btn-outline'}`} onClick={(e) => { e.stopPropagation(); onToggleTourInterest(tour); }}>
+                            <HeartIcon filled={!!tour.myInterest} />
+                          </button>
+                          <button type="button" className="btn btn-primary btn-small" onClick={(e) => { e.stopPropagation(); onTourOffer(); }}>{t('tour.makeAnOffer')}</button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </Section>
             )}
