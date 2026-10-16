@@ -234,14 +234,6 @@ function App() {
   const [showGettingStarted, setShowGettingStarted] = useState(false);
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
   const [accountUser, setAccountUser] = useState(null); // Account-level user data (email, currency, etc)
-  // The agency this account's agent profile belongs to (null = solo). Loaded
-  // for agents; drives the agency rate on the Premium screen and checkout.
-  const [organisation, setOrganisation] = useState(null);
-  useEffect(() => {
-    if (!user?.id || !userProfiles?.some((p) => p.role === 'AGENT')) { setOrganisation(null); return; }
-    apiService.getOrganisation().then((d) => setOrganisation(d.organisation || null)).catch(() => setOrganisation(null));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, userProfiles?.length]);
 
   // Show Getting Started once per ACCOUNT (server-side onboardedAt — any
   // device). Skip counts as seen; reopenable from Settings. The localStorage
@@ -278,6 +270,14 @@ function App() {
   };
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
   const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles } = useAppContext();
+  // The agency this account's agent profile belongs to (null = solo). Loaded
+  // for agents; drives the agency rate on the Premium screen and checkout.
+  const [organisation, setOrganisation] = useState(null);
+  useEffect(() => {
+    if (!user?.id || !userProfiles?.some((p) => p.role === 'AGENT')) { setOrganisation(null); return; }
+    apiService.getOrganisation().then((d) => setOrganisation(d.organisation || null)).catch(() => setOrganisation(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, userProfiles?.length]);
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
   // after t/setShowPremium so the [t] dependency isn't read before init.
