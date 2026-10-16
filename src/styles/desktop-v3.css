@@ -170,10 +170,6 @@
     border-left: 1px solid var(--d2-line);
   }
 
-  html.desktop-v3 .app-container:has(> .d3-chat-context) .chat-screen,
-  html.desktop-v3 .app-container:has(> .d3-chat-context) .make-offer-modal-overlay:not(.md-drawer) {
-    right: 320px;
-  }
 
   /* The thread column at desk density */
   html.desktop-v3 .chat-screen .chat-header { padding: 10px 16px; }
@@ -433,9 +429,16 @@
   html.desktop-v3 .md-drawer {
     left: auto;
     right: 0;
-    width: min(680px, 56vw);
-    justify-content: flex-end;
+    /* the pipeline's detail column: 40% of the canvas plus the outer gutter */
+    width: calc((100vw - var(--d2-sidebar) - var(--d2-gutter) * 2 - var(--d2-gap)) * 0.4 + var(--d2-gutter));
+    min-width: 440px;
+    padding: 0 var(--d2-gutter) 0 0;
+    background: var(--d2-surface);
+    justify-content: stretch;
+    align-items: stretch;
   }
+  html.desktop-v3 .md-drawer > .modal-content,
+  html.desktop-v3 .md-drawer > .modal-container { width: 100%; border: 0; border-left: 1px solid var(--d2-line); border-radius: 0; background: transparent; }
 
   /* ---- Tour (phone sub-tabs, v2 frame only): sub-tabs as a segmented
      control like the pipeline's. ---- */
@@ -529,7 +532,7 @@
 
   html.desktop-v3 .d3-settings-nav {
     position: sticky;
-    top: 0;
+    top: 64px;
     align-self: start;
     padding: 20px 16px 20px var(--d2-gutter);
   }
@@ -816,6 +819,8 @@
   }
 
   html.desktop-v3 .d3-manage .manage-artist-content { padding: 0; }
+  html.desktop-v3 .d3-manage .artist-info-tab .btn-primary,
+  html.desktop-v3 .d3-manage .manage-artist-content > div > .btn.btn-primary { width: auto; align-self: flex-start; justify-self: start; margin-top: 4px; padding: 9px 16px; }
 
   /* the Actions tab is one wide list; the actions section loses its stretch rules */
   html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) { grid-template-columns: minmax(0, 1fr); }
@@ -1197,11 +1202,14 @@
   html.desktop-v3 .represented-artists-content .artist-row-actions { display: flex; align-items: center; gap: 6px; }
   html.desktop-v3 .represented-artists-content .artist-row-actions .btn-sm { padding: 6px 12px; }
 
+  /* A profile opened from a sub page (roster) is the full profile page */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-vp) > .md-master { display: none; }
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-vp) { grid-template-columns: minmax(0, 1fr); }
   /* Roster and Add profile: the whole canvas, in a calm column */
   html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
   html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }
   html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen),
   html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) { grid-template-columns: minmax(0, 1fr); }
   html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen,
-  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen:not(.d3-edit) { max-width: 960px; padding: 0 var(--d2-gutter) 48px; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen:not(.d3-edit) { max-width: 1120px; padding: 0 var(--d2-gutter) 48px; }
 }

@@ -7,6 +7,8 @@
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const EN = {
+  noCitiesYet: 'No cities yet — they appear once bookings you manage are confirmed.',
+  reachArtistOnly: 'Views, likes and connections are tracked on the artist\'s own profile.',
   home: 'Dashboard',
   yourMove: 'Your move',
   openOffers: 'Open offers',
@@ -52,6 +54,8 @@ const EN = {
 const CATALOG = {
   en: EN,
   ja: {
+    noCitiesYet: 'まだ都市はありません。管理するブッキングが確定すると表示されます。',
+    reachArtistOnly: '閲覧・いいね・つながりはアーティスト本人のプロフィールで集計されます。',
     home: 'ダッシュボード',
     yourMove: 'あなたの番',
     openOffers: '進行中のオファー',
@@ -94,6 +98,8 @@ const CATALOG = {
     dates: '日程',
   },
   zh: {
+    noCitiesYet: '还没有城市——您管理的演出确认后会显示在这里。',
+    reachArtistOnly: '浏览、点赞和人脉数据在艺人本人的资料中统计。',
     home: '仪表盘',
     yourMove: '待你处理',
     openOffers: '进行中的报价',
@@ -136,6 +142,8 @@ const CATALOG = {
     dates: '日期',
   },
   ko: {
+    noCitiesYet: '아직 도시가 없습니다. 관리하는 예약이 확정되면 표시됩니다.',
+    reachArtistOnly: '조회·좋아요·연결은 아티스트 본인 프로필에서 집계됩니다.',
     home: '대시보드',
     yourMove: '내 차례',
     openOffers: '진행 중인 오퍼',
@@ -178,6 +186,8 @@ const CATALOG = {
     dates: '일정',
   },
   es: {
+    noCitiesYet: 'Aún no hay ciudades: aparecen cuando se confirman las reservas que gestionas.',
+    reachArtistOnly: 'Las visitas, likes y conexiones se registran en el perfil del propio artista.',
     home: 'Panel',
     yourMove: 'Te toca',
     openOffers: 'Ofertas abiertas',
@@ -220,6 +230,8 @@ const CATALOG = {
     dates: 'Fechas',
   },
   fr: {
+    noCitiesYet: 'Pas encore de villes : elles apparaissent quand les bookings que vous gérez sont confirmés.',
+    reachArtistOnly: 'Vues, likes et connexions sont suivis sur le profil de l\'artiste.',
     home: 'Tableau de bord',
     yourMove: 'À vous de jouer',
     openOffers: 'Offres en cours',
@@ -262,6 +274,8 @@ const CATALOG = {
     dates: 'Dates',
   },
   it: {
+    noCitiesYet: 'Ancora nessuna città: compaiono quando le prenotazioni che gestisci vengono confermate.',
+    reachArtistOnly: 'Visualizzazioni, like e connessioni sono tracciati sul profilo dell\'artista.',
     home: 'Dashboard',
     yourMove: 'Tocca a te',
     openOffers: 'Offerte aperte',
@@ -304,6 +318,8 @@ const CATALOG = {
     dates: 'Date',
   },
   pt: {
+    noCitiesYet: 'Ainda sem cidades: aparecem quando as reservas que gere são confirmadas.',
+    reachArtistOnly: 'Visualizações, likes e ligações são registados no perfil do próprio artista.',
     home: 'Painel',
     yourMove: 'Sua vez',
     openOffers: 'Ofertas em aberto',

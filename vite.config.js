@@ -5,6 +5,9 @@ import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ command }) => {
+  // Worktrees symlink node_modules to the main checkout; two dev servers sharing
+  // one optimizer cache hand lazy chunks (react-pdf) a second copy of React.
+  const cacheDir = process.env.VITE_CACHE_DIR || 'node_modules/.vite';
   // Upload source maps to Sentry so production stack traces are readable
   // (F9-04) — but ONLY when the three Sentry env vars are set (Vercel prod).
   // Without them (local, CI, tokenless), the build is byte-for-byte what it was
@@ -24,6 +27,7 @@ export default defineConfig(({ command }) => {
   const iconBase = isBeta ? '/pwa-beta' : '/pwa';
 
   return ({
+  cacheDir,
   plugins: [
     // Tell the React plugin to handle JSX inside .js files (dev server)
     react({

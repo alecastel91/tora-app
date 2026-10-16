@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNativeDesktop } from '../../utils/desktopV2';
+import { useDesktopStrings } from '../desktop/strings';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import { dealIsForArtist } from '../../utils/dealStatus';
 import PrivacyNote from '../common/PrivacyNote';
 import { roleLabel } from '../../utils/roles';
 import { getCurrencySymbol } from '../../utils/currencies';
 import RevenueChart from '../common/RevenueChart';
-import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon } from "../../utils/icons";
+import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, LocationIcon } from "../../utils/icons";
 import Modal from '../common/Modal';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
@@ -24,6 +25,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { t } = useLanguage();
   // Desktop v3 lays this screen out as a panel grid (desktop-v3.css .d3-manage).
   const nativeDesktop = useNativeDesktop();
+  const td = useDesktopStrings();
   // 'actions' | 'dashboard' (= Insights) | 'info' | 'documents' (calendar: Tour > Calendar > artist)
   const [activeTab, setActiveTab] = useState('actions');
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
@@ -555,6 +557,18 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       </div>}
 
       {/* Revenue Chart */}
+      {part === 'insights' && nativeDesktop && (
+        <>
+          <div className="dashboard-section">
+            <h3><LocationIcon /> {t('manage.topCities')}</h3>
+            <div className="action-empty mt-3">{td('noCitiesYet')}</div>
+          </div>
+          <div className="dashboard-section">
+            <h3><TrendingUpIcon /> {t('manage.profileReach')} <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/35">· {t('manage.last30')}</span></h3>
+            <div className="action-empty mt-3">{td('reachArtistOnly')}</div>
+          </div>
+        </>
+      )}
       {part === 'insights' && <div className="dashboard-section revenue-overview-section">
         <h3><TrendingUpIcon /> {t('manageArtist.revenueOverview')}</h3>
         <RevenueChart events={revenueEvents} currencySymbol={getCurrencySymbol(preferredCurrency)} />

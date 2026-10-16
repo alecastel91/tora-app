@@ -10,3 +10,4 @@ frontend.log
 *.log
 dist-preview
 .env.beta.vercel
+.vite-desktop

@@ -39,7 +39,6 @@ import { isDesktopV2, useNativeDesktop, useMediaQuery, isDesktopV3 } from './uti
 import DashboardScreen from './components/desktop/DashboardScreen';
 import BookingsBoard from './components/desktop/BookingsBoard';
 import SearchWorkspace from './components/desktop/SearchWorkspace';
-import ChatContextPanel from './components/desktop/ChatContextPanel';
 import CommandPalette from './components/desktop/CommandPalette';
 import SettingsNav from './components/desktop/SettingsNav';
 import PremiumPlans from './components/desktop/PremiumPlans';
@@ -884,10 +883,6 @@ function App() {
             onClose={() => { setActiveChatUser(null); setChatOpenDeal(null); setChatDraft(null); }}
             onOpenProfile={(profile) => setViewingProfile(profile)}
           />
-        )}
-        {/* Desktop v3: the deal beside the thread (desktop-v3.css shrinks the chat) */}
-        {nativeDesktop && activeChatUser && !viewingProfile && (
-          <ChatContextPanel profile={activeChatUser} onOpenProfile={(profile) => setViewingProfile(profile)} onSwitchTab={switchTab} />
         )}
         {viewingProfile && (
           <ViewProfileScreen
