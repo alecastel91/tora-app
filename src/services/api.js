@@ -421,6 +421,52 @@ class ApiService {
   }
 
   // --- Safety: blocks + reports (App Review guideline 1.2) ---------------
+  // ---- Agency organisations ----
+  async getOrganisation() {
+    const response = await fetch(`${API_URL}/organisations/me`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async suggestOrganisation() {
+    const response = await fetch(`${API_URL}/organisations/suggest`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async inviteToOrganisation(email) {
+    const response = await fetch(`${API_URL}/organisations/invites`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ email }) });
+    return this.handleResponse(response);
+  }
+  async revokeOrganisationInvite(memberId) {
+    const response = await fetch(`${API_URL}/organisations/invites/${memberId}`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async respondOrganisationInvite(memberId, accept) {
+    const response = await fetch(`${API_URL}/organisations/invites/${memberId}/${accept ? 'accept' : 'decline'}`, { method: 'POST', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async requestToJoinOrganisation() {
+    const response = await fetch(`${API_URL}/organisations/requests`, { method: 'POST', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async withdrawOrganisationRequest() {
+    const response = await fetch(`${API_URL}/organisations/requests/mine`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async decideOrganisationMember(memberId, action) {
+    const response = await fetch(`${API_URL}/organisations/members/${memberId}/${action}`, { method: 'POST', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async removeOrganisationMember(memberId) {
+    const response = await fetch(`${API_URL}/organisations/members/${memberId}`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async renameOrganisation(name) {
+    const response = await fetch(`${API_URL}/organisations/me`, { method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify({ name }) });
+    return this.handleResponse(response);
+  }
+  async dissolveOrganisation() {
+    const response = await fetch(`${API_URL}/organisations/me`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
   async getBlocks() {
     const response = await fetch(`${API_URL}/blocks`, { headers: this.getHeaders() });
     return this.handleResponse(response);

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney, yearlyPerMonth, YEARLY_MULT } from '../../utils/money';
+import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney, yearlyPerMonth, YEARLY_MULT, agencySeatPrice } from '../../utils/money';
 
 const bandLabel = (band, i) => {
   const from = i === 0 ? 1 : BANDS[i - 1].upTo + 1;
@@ -13,10 +13,12 @@ const bandLabel = (band, i) => {
  * ladder: agents pay per artist they represent, on a graduated scale, so
  * the price scales with the roster instead of forcing a package.
  */
-const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', currency = 'USD', onSubscribe }) => {
+const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', currency = 'USD', agency = null, onSubscribe }) => {
   // Account currency (fixed once subscribed); formats every amount below.
   const money = (n) => formatMoney(n, currency);
-  const total = (n) => agentMonthlyTotal(n, currency);
+  // In an agency every seat costs the band rate of the agency's TOTAL —
+  // flat, not graduated (the agency total already earned the band).
+  const total = (n) => (agency ? n * agencySeatPrice(currency, agency.band) : agentMonthlyTotal(n, currency));
   const { t } = useLanguage();
   // Paid agents start on their ACTUAL billing interval, so the CTA reads as
   // "current plan" until they change something (seats or interval). Everyone
@@ -78,6 +80,11 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
           </button>
         </div>
       </div>
+
+      {agency && (
+        <p className="agent-seat-agency">{t('agency.premiumMember', { agency: agency.name, total: agency.total, rate: money(agencySeatPrice(currency, agency.band)) })}</p>
+      )}
+      {!agency && <p className="agent-seat-agency is-solo">{t('agency.premiumSolo')}</p>}
 
       {/* Interactive estimator — makes the graduated model tangible. */}
       <div className="agent-seat-estimator">

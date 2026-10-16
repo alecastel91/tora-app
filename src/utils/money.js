@@ -47,6 +47,24 @@ export const EXTRA_PRICES = {
   offers_3:      { EUR: 12, JPY: 2080, USD: 13.90 },
 };
 
+// Agency rate: members of one agency each pay their own seats at the band of
+// the agency's TOTAL artists. Server: AGENCY_COUPONS on a flat band-1 price.
+export const AGENCY_DISCOUNTS = [0, 25, 40, 55, 65];
+/** Band index (0-4) for an agency's total artist count. */
+export function bandFor(total) {
+  const n = Math.max(0, Math.floor(Number(total) || 0));
+  for (let i = 0; i < AGENT_BANDS.length; i++) if (n <= AGENT_BANDS[i].upTo) return i;
+  return AGENT_BANDS.length - 1;
+}
+/** What one seat costs an agency member in `band`, per month, major units. */
+export function agencySeatPrice(currency, band, interval = 'month') {
+  const cur = normalizeCurrency(currency);
+  const base = AGENT_BANDS[0].monthly[cur] * (interval === 'year' ? YEARLY_MULT : 1);
+  const off = AGENCY_DISCOUNTS[band] || 0;
+  const v = base * (100 - off) / 100;
+  return cur === 'JPY' ? Math.round(v) : Math.round(v * 100) / 100;
+}
+
 /** Total monthly cost for a roster of `n` artists, billed graduated. */
 export function agentMonthlyTotal(n, currency) {
   const cur = normalizeCurrency(currency);
