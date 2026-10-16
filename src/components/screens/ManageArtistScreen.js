@@ -525,7 +525,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
       {part === 'insights' && <p className="form-hint" style={{ margin: '-8px 0 16px' }}>{t('manageArtist.feesScopeHint')}</p>}
 
       {/* Action Items */}
-      {part === 'actions' && <div className="dashboard-section">
+      {part === 'actions' && <div className={`dashboard-section${nativeDesktop ? ' actions-required-section' : ''}`}>
         <div className="section-header">
           <h3><AlertIcon /> {t('manageArtist.actionsRequired')}</h3>
           <span className="badge">{actionItems.length}</span>
@@ -1180,7 +1180,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         <button className="back-btn" onClick={onClose}>
           <CloseIcon />
         </button>
-        <h1>{t('manageArtist.manage')}</h1>
+        <h1>{nativeDesktop ? t('manage.manageTitle', { name: artistProfile?.name || artist.name }) : t('manageArtist.manage')}</h1>
       </div>
 
       {/* Artist Info Bar */}

@@ -1050,6 +1050,52 @@
   html.desktop-v3 .d3-agents .search-form { margin: 0 0 12px; }
   html.desktop-v3 .d3-agents .artist-item { margin-bottom: 8px; }
 
+  /* Find Artist opens inside the roster column: roster chrome steps aside */
+  html.desktop-v2.desktop-v3 .d3-agents.search-artists-screen { position: static; inset: auto; height: auto; min-height: 0; max-width: none; padding: 0; background: none; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen:has(.search-artists-screen) > :not(.represented-artists-content),
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen:has(.search-artists-screen) > .represented-artists-content > :not(.search-artists-screen) { display: none; }
+  html.desktop-v3 .d3-agents .search-agents-header h1 { text-transform: none; letter-spacing: -0.015em; }
+  /* search results as thin rows, same as the roster */
+  html.desktop-v3 .d3-agents .artists-list { display: block; padding: 4px 10px; border: 1px solid var(--d2-line); border-radius: var(--d2-r-card); background: var(--d2-surface); }
+  html.desktop-v3 .d3-agents .artists-list .artist-item { margin: 0; padding: 9px 6px; gap: 12px; background: none; border: 0; border-bottom: 1px solid var(--d2-line); border-radius: 0; }
+  html.desktop-v3 .d3-agents .artists-list .artist-item:last-child { border-bottom: 0; }
+  html.desktop-v3 .d3-agents .artists-list .artist-item:hover { background: rgba(255, 255, 255, 0.03); }
+  html.desktop-v3 .d3-agents .artists-list .artist-avatar { width: 32px; height: 32px; font-size: 13px; }
+  html.desktop-v3 .d3-agents .artists-list .artist-details { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  html.desktop-v3 .d3-agents .artists-list .artist-details h4 { margin: 0; font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html.desktop-v3 .d3-agents .artists-list .artist-details .artist-location { margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; }
+  html.desktop-v3 .d3-agents .artists-list .artist-item .btn-sm { padding: 6px 12px; }
+  html.desktop-v3 .d3-agents .results-header, html.desktop-v3 .d3-agents .info-banner { margin-left: 0; margin-right: 0; }
+
+  /* Roster: one thin row per artist — avatar · name · city · manage · remove */
+  html.desktop-v3 .represented-artists-header .add-artist-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; }
+  html.desktop-v3 .represented-artists-header .add-artist-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
+  html.desktop-v3 .represented-artists-screen > .rounded-2xl { margin: 0 0 14px; padding: 10px 14px; border-radius: var(--d2-r-card); }
+  html.desktop-v3 .represented-artists-content { padding: 0; }
+  html.desktop-v3 .represented-artists-content .artists-list { display: block; padding: 4px 10px; border: 1px solid var(--d2-line); border-radius: var(--d2-r-card); background: var(--d2-surface); }
+  html.desktop-v3 .represented-artists-content .artist-card-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 9px 6px;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--d2-line);
+    border-radius: 0;
+    transition: background 0.15s;
+  }
+  html.desktop-v3 .represented-artists-content .artist-card-row:last-child { border-bottom: 0; }
+  html.desktop-v3 .represented-artists-content .artist-card-row:hover { background: rgba(255, 255, 255, 0.03); }
+  html.desktop-v3 .represented-artists-content .artist-card-main { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 0; }
+  html.desktop-v3 .represented-artists-content .artist-avatar-small { width: 32px; height: 32px; font-size: 13px; margin: 0; }
+  html.desktop-v3 .represented-artists-content .artist-row-info { display: flex; flex-direction: row; align-items: baseline; gap: 10px; min-width: 0; }
+  html.desktop-v3 .represented-artists-content .artist-name-inline { font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+  html.desktop-v3 .represented-artists-content .artist-location-inline { font-size: 12px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; margin: 0; }
+  html.desktop-v3 .represented-artists-content .artist-row-actions { display: flex; align-items: center; gap: 6px; }
+  html.desktop-v3 .represented-artists-content .artist-row-actions .btn-sm { padding: 6px 12px; }
+
   /* Roster and Add profile: the whole canvas, in a calm column */
   html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
   html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }
