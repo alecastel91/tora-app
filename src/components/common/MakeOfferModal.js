@@ -9,6 +9,8 @@ import apiService from '../../services/api';
 import CitySearch from './CitySearch';
 import TimeField from './TimeField';
 import VenueSearch from './VenueSearch';
+import { useNativeDesktop } from '../../utils/desktopV2';
+import { CloseIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 // The final payment can never be due before the deposit.
@@ -19,6 +21,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
 
   const { user: currentUser } = useAppContext();
   const [loading, setLoading] = useState(false);
+  const nativeDesktop = useNativeDesktop(); // desktop-v3.css docks this as a drawer
   const [error, setError] = useState('');
   const [representedArtists, setRepresentedArtists] = useState([]);
   // Bumped whenever geography is prefilled externally (modal open, venue pick)
@@ -423,9 +426,11 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
       <div className="make-offer-modal" onClick={(e) => e.stopPropagation()}>
         <div className="make-offer-header">
           <button className="back-btn" onClick={onClose}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            {nativeDesktop ? <CloseIcon /> : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
           </button>
           <h2>{t('tour.makeAnOffer')}</h2>
           <div style={{ width: '24px' }}></div>

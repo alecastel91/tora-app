@@ -45,15 +45,15 @@ const ChatContextPanel = ({ profile, onOpenProfile, onSwitchTab }) => {
 
   return (
     <aside className="d3-chat-context">
-      <div className="flex flex-col items-center px-5 pb-5 pt-6 text-center">
-        <Avatar profile={profile} className="h-16 w-16 text-xl" />
-        <h2 className="mt-3 text-[16px] font-semibold text-white">{profile.name}</h2>
-        <p className="mt-0.5 text-[12px] text-white/50">
-          {roleLabel(profile.role, t)}{profile.city ? ` · ${profile.city}` : ''}
-        </p>
+      <div className="flex items-center gap-3 px-4 py-3.5">
+        <Avatar profile={profile} className="h-10 w-10 text-[14px]" />
+        <div className="min-w-0 flex-1">
+          <h2 className="m-0 truncate text-[14px] font-semibold text-white">{profile.name}</h2>
+          <p className="m-0 truncate text-[12px] text-white/50">{roleLabel(profile.role, t)}{profile.city ? ` · ${profile.city}` : ''}</p>
+        </div>
         <button
           onClick={() => onOpenProfile(profile)}
-          className="mt-3 cursor-pointer rounded-lg border border-white/15 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/80 transition-colors hover:border-white/35 hover:text-white"
+          className="shrink-0 cursor-pointer rounded-lg border border-white/15 px-2.5 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-white/80 transition-colors hover:border-white/35 hover:text-white"
         >
           {td('viewProfile')}
         </button>

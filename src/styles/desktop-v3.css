@@ -173,6 +173,53 @@
     right: 320px;
   }
 
+  /* The thread column at desk density */
+  html.desktop-v3 .chat-screen .chat-header { padding: 10px 16px; }
+  html.desktop-v3 .chat-screen .chat-messages { padding: 20px 24px; gap: 10px; }
+  html.desktop-v3 .chat-screen .message-bubble { max-width: min(520px, 72%); }
+  html.desktop-v3 .chat-screen .chat-input-container { padding: 12px 16px 16px; }
+  html.desktop-v3 .chat-screen .chat-input-disabled { padding: 14px 24px; font-size: 13px; }
+
+  /* ---- Make an Offer: a right-hand drawer, the conversation or the tour
+     list stays in view. From chat it takes the context panel's place. ---- */
+  html.desktop-v3 .make-offer-modal-overlay {
+    top: var(--d2-top);
+    right: 0;
+    bottom: 0;
+    background: var(--d2-surface);
+    border-left: 1px solid var(--d2-line);
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 0;
+  }
+  html.desktop-v3 .make-offer-modal-overlay > .make-offer-modal { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; background: transparent; }
+  /* from Tour: a drawer beside the pipeline; from chat: it takes the thread column (v2 sets left) */
+  html.desktop-v3 .md-drawer.make-offer-modal-overlay { left: auto; width: min(620px, 46vw); }
+  html.desktop-v3 body:has(> .make-offer-modal-overlay:not(.md-drawer)) .d3-chat-context { display: none; }
+  html.desktop-v3 .make-offer-header { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--d2-line); background: transparent; }
+  html.desktop-v3 .make-offer-header .back-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; }
+  html.desktop-v3 .make-offer-header .back-btn svg { width: 18px; height: 18px; }
+  html.desktop-v3 .make-offer-header h2 { flex: 1; margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 20px; font-weight: 600; letter-spacing: -0.015em; text-transform: none; text-align: left; }
+  html.desktop-v3 .make-offer-recipient { padding: 12px 20px; gap: 12px; background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--d2-line); }
+  html.desktop-v3 .make-offer-recipient .recipient-avatar { width: 36px; height: 36px; font-size: 14px; }
+  html.desktop-v3 .make-offer-recipient .recipient-info h3 { font-size: 13.5px; font-weight: 600; text-transform: none; letter-spacing: 0; margin: 0 0 2px; }
+  html.desktop-v3 .make-offer-recipient .recipient-info p { font-size: 12px; }
+  html.desktop-v3 .make-offer-modal .make-offer-recipient,
+  html.desktop-v3 .make-offer-modal .make-offer-form { max-width: none; }
+  html.desktop-v3 .make-offer-form { padding: 18px 20px 24px; }
+  html.desktop-v3 .make-offer-form .form-section { margin-bottom: 22px; }
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-section h3,
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-section h4 { margin: 0 0 12px; padding: 0; border: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+  html.desktop-v3 .make-offer-form .form-group { margin-bottom: 14px; }
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-group label { font-size: 11px; letter-spacing: 0.08em; margin-bottom: 5px; }
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-input,
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-textarea,
+  html.desktop-v3 .make-offer-modal .make-offer-form select { padding: 9px 12px; font-size: 13.5px; border-radius: var(--d2-r-ctl); }
+  html.desktop-v3 .make-offer-form .form-row { gap: 12px; margin-bottom: 0; }
+  html.desktop-v3 .make-offer-form .form-hint { font-size: 12px; }
+  html.desktop-v3 .make-offer-actions { justify-content: flex-end; padding: 12px 20px; background: transparent; border-top: 1px solid var(--d2-line); }
+  html.desktop-v3 .make-offer-actions .btn { flex: 0 0 auto; padding: 9px 16px; }
+
   /* No thread open: the list keeps its column, the thread area is a hint */
   html.desktop-v3 .app-content > .tab-panel:has(> .d3-msg-empty) {
     display: grid;
