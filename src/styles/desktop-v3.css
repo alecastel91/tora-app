@@ -192,7 +192,7 @@
   }
   html.desktop-v3 .make-offer-modal-overlay > .make-offer-modal { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; background: transparent; }
   /* from Tour: a drawer beside the pipeline; from chat: it takes the thread column (v2 sets left) */
-  html.desktop-v3 .md-drawer.make-offer-modal-overlay { left: auto; width: min(620px, 46vw); }
+  html.desktop-v3 .md-drawer.make-offer-modal-overlay { left: auto; }
   html.desktop-v3 body:has(> .make-offer-modal-overlay:not(.md-drawer)) .d3-chat-context { display: none; }
   html.desktop-v3 .make-offer-header { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--d2-line); background: transparent; }
   html.desktop-v3 .make-offer-header .back-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; }
@@ -428,11 +428,14 @@
   /* drawers dock at the right edge over the side panel */
   html.desktop-v3 .md-drawer {
     left: auto;
-    right: 0;
-    /* the pipeline's detail column: 40% of the canvas plus the outer gutter */
-    width: calc((100vw - var(--d2-sidebar) - var(--d2-gutter) * 2 - var(--d2-gap)) * 0.4 + var(--d2-gutter));
-    min-width: 440px;
-    padding: 0 var(--d2-gutter) 0 0;
+    /* Sit exactly over the pipeline's detail column so the card underneath is
+       covered, not peeking out. The board is grid-template-columns
+       minmax(0,1fr) minmax(400px,40%) inside the canvas, so the detail column
+       is 40% of (viewport - sidebar - both gutters), floored at 400px, and its
+       right edge is one gutter in from the viewport. */
+    right: var(--d2-gutter);
+    width: max(400px, calc((100vw - var(--d2-sidebar) - var(--d2-gutter) * 2) * 0.4));
+    padding: 0;
     background: var(--d2-surface);
     justify-content: stretch;
     align-items: stretch;

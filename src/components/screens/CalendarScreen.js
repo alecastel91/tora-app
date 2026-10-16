@@ -734,11 +734,12 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}`}
           data-weekday={new Date(currentYear, currentMonth, day).getDay()}
           data-day={day}
-          onClick={() => {
-            console.log('[CalendarScreen] onClick fired for day:', day);
-            handleDateMouseDown(day);
-            handleDateMouseUp();
-          }}
+          /* No onClick: mousedown already toggles the day and mouseup saves it.
+             A click fires after both, so a single click toggled twice and the
+             day never changed — only a multi-day drag worked, because then the
+             release lands on a different cell and no click fires here. Touch
+             goes through onTouchStart (which preventDefaults the synthetic
+             click) and onTouchEnd, so the phone is unaffected. */
           onMouseDown={(e) => {
             e.preventDefault();
             handleDateMouseDown(day);
