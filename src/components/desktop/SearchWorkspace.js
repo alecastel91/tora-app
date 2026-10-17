@@ -9,6 +9,7 @@ import { ROLES, roleLabel, getAvatarClass } from '../../utils/roles';
 import { appAlert } from '../../utils/dialogs';
 import { HeartIcon, SearchIcon } from '../../utils/icons';
 import LoadingGlobe from '../common/LoadingGlobe';
+import ConnectAction from '../common/ConnectAction';
 import OverlayPortal from '../common/OverlayPortal';
 import FilterSheet, { FilterButton } from '../common/FilterSheet';
 
@@ -24,8 +25,8 @@ const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 
 const EMPTY = { roles: [], genres: [], zone: 'all', country: 'all', city: 'all' };
 
-const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
-  const { user, likedProfiles, toggleLike, connectedUsers, sentRequests, receivedRequests } = useAppContext();
+const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium }) => {
+  const { user, likedProfiles, toggleLike } = useAppContext(); // connect state lives in ConnectAction
   const { t } = useLanguage();
   const td = useDesktopStrings();
   const premium = isPremiumViewer(user);
@@ -106,6 +107,9 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
       : filters.zone !== 'all' ? [{ key: 'zone', label: filters.zone, clear: () => setFilters(EMPTY) }] : []),
   ];
 
+  // The filter drawer sits over the profile that opens behind it.
+  const onOpenProfile = (p) => { setShowFilters(false); openProfile(p); };
+
   const like = async (p) => {
     try { await toggleLike(p.id, p); } catch (e) { appAlert(e.message || t('common.error')); }
   };
@@ -174,8 +178,6 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
               <p className="py-14 text-center text-[13px] text-white/35">{t('search.noResults')}</p>
             ) : list.map((profile) => {
               const liked = likedProfiles.has(profile.id);
-              const connected = connectedUsers.has(profile.id);
-              const pending = sentRequests.has(profile.id) || receivedRequests.has(profile.id);
               return (
                 <div key={profile.id} className="search-result-card">
                   <div className="result-content">
@@ -195,13 +197,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
                     <button className={`btn ${liked ? 'btn-liked' : 'btn-outline'} btn-like`} onClick={() => like(profile)}>
                       <HeartIcon filled={liked} /> {liked ? t('search.liked') : t('search.like')}
                     </button>
-                    {connected ? (
-                      <button className="btn btn-message btn-connect" onClick={() => onOpenChat(profile)}>{t('search.message')}</button>
-                    ) : pending ? (
-                      <button className="btn btn-disabled btn-connect" disabled>{t('search.pending')}</button>
-                    ) : (
-                      <button className="btn btn-primary btn-connect" onClick={() => onOpenProfile(profile)}>{td('view')}</button>
-                    )}
+                    <ConnectAction profile={profile} onMessage={onOpenChat} onOpenPremium={onOpenPremium} />
                   </div>
                 </div>
               );
@@ -221,7 +217,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile, onOpenPremium }) => {
               userCountry={user?.country}
               onLockedCity={() => onOpenPremium?.()}
               listTakesOver
-              onSelectionChange={setMapSel}
+              onSelectionChange={(sel, meta) => setMapSel(sel || (meta?.empty ? { country: meta.country, empty: true } : null))}
               topInset={premium ? 16 : 64}
               bottomInset={16}
             />

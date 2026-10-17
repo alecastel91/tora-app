@@ -41,7 +41,7 @@ const LinkRow = ({ href, icon, label }) => (
 );
 
 const ProfilePage = ({
-  profile, currentUser, embeds, artistTours = [], similarProfiles = [],
+  profile, currentUser, embeds, artistTours = [], similarProfiles = [], likers, likedProfiles,
   isLiked, isConnected, hasPendingRequest, actionBusy, premiumViewer,
   onClose, onLike, onMessage, onConnect, onRemove, onOpenGigs, onOpenList, onOpenNested,
   onToggleTourInterest, onTourOffer, onOpenTourKickstart, onOpenPremium,
@@ -145,6 +145,25 @@ const ProfilePage = ({
               <div className="ml-auto"><ProfileBadges badges={profile.badges} /></div>
             )}
           </div>
+
+          {/* Social proof, as on the phone: only the likers this viewer also likes */}
+          {(() => {
+            if (isOwn || !Array.isArray(likers) || likers.length === 0 || !likedProfiles) return null;
+            const familiar = likers.filter((l) => likedProfiles.has(l.id)).slice(0, 2);
+            if (familiar.length === 0) return null;
+            const others = (profile.likesReceived ?? likers.length) - familiar.length;
+            return (
+              <button
+                type="button"
+                onClick={() => onOpenList('likes')}
+                className="mt-2 cursor-pointer bg-transparent p-0 text-left text-[12.5px] text-white/50 hover:text-white/70"
+              >
+                {t('viewProfile.likedBy')}{' '}
+                <span className="font-medium text-white/85">{familiar.map((l) => l.name).join(', ')}</span>
+                {others > 0 && <> {t('viewProfile.andOthers', { n: others })}</>}
+              </button>
+            );
+          })()}
         </header>
 
         {/* ---- body ---- */}

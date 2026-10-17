@@ -523,7 +523,9 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     setSelectedCity(null);
     // The app's country name comes from a member in it; an atlas-only name
     // ("Czechia") would not match the filters, so an empty country carries nothing.
-    onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null);
+    // A country with nobody in it still IS a selection — reported separately so
+    // callers that turn the selection into a server query keep ignoring it.
+    onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null, { country: name, empty: !inCountry.length });
     const center = geoCentroid(f);
     focusOn(center[0], center[1]);
     setTip(null);

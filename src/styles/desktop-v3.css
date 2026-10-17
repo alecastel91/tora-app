@@ -961,22 +961,6 @@
     grid-column: 1 / -1;
   }
 
-  /* ---- Notifications: a side panel, not a dropdown. backdrop-filter on the
-     header makes it the containing block for fixed descendants, so the
-     offsets are taken from the header's own box. ---- */
-  html.desktop-v3 .notifications-dropdown {
-    position: fixed;
-    top: 100%;
-    right: 0;
-    margin: 0;
-    width: 380px;
-    height: calc(100dvh - var(--d2-top));
-    max-height: none;
-    border: 0;
-    border-left: 1px solid var(--d2-line);
-    border-radius: 0;
-    background: var(--d2-surface);
-  }
 }
 
 @media (min-width: 1600px) {
@@ -995,7 +979,11 @@
    ======================================================================== */
 @media (min-width: 1024px) {
   html.desktop-v3 .notifications-dropdown {
+    /* backdrop-filter on the header makes it the containing block AND the
+       stacking context for this fixed child, so raising z-index here cannot
+       lift it over a screen — the guide is lowered under the header instead. */
     position: fixed;
+    height: auto;
     top: calc(var(--d2-top) + 8px);
     right: var(--d2-gutter);
     left: auto;
@@ -1008,7 +996,9 @@
     box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
   }
   /* Guide: a page inside the frame, not a takeover; same header idiom */
-  html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); }
+  /* Sits inside the frame, so it must not paint over the header chrome it
+     leaves visible — the bell dropdown opened behind it otherwise. */
+  html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); z-index: 50; }
   html.desktop-v3 .guide-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
   html.desktop-v3 .guide-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; position: static; }
   html.desktop-v3 .guide-screen > .settings-header .back-button svg { width: 18px; height: 18px; }

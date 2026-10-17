@@ -9,7 +9,7 @@ import { getAvatarClass } from '../../utils/roles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import CountBadge from '../common/CountBadge';
 
-const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
+const MessagesScreen = ({ onOpenChat, onCloseChat, chatOpen = false, isActive = true }) => {
   const { user, getConversations, acceptRequest, declineRequest } = useAppContext();
   const { t } = useLanguage();
   const [conversations, setConversations] = useState([]);
@@ -180,7 +180,7 @@ const MessagesScreen = ({ onOpenChat, chatOpen = false, isActive = true }) => {
                   ${activeTab === id
                     ? 'text-infrared border-infrared'
                     : 'text-white/40 border-transparent hover:text-white/70'}`}
-      onClick={() => setActiveTab(id)}
+      onClick={() => { if (id !== activeTab && chatOpen) onCloseChat?.(); setActiveTab(id); }}
     >
       {icon}
       {label}

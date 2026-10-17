@@ -663,7 +663,7 @@ function App() {
     // chatOpen (not a key remount): MessagesScreen refetches once when a
     // chat closes, to pick up read-state changes. A key here remounted the
     // permanently-mounted screen twice per chat session.
-    messages: <MessagesScreen onOpenChat={openChatInMessages} chatOpen={!!activeChatUser} isActive={activeTab === 'messages'} />,
+    messages: <MessagesScreen onOpenChat={openChatInMessages} onCloseChat={() => setActiveChatUser(null)} chatOpen={!!activeChatUser} isActive={activeTab === 'messages'} />,
   };
 
   // Stripe-hosted billing portal: update card, view invoices, cancel.
@@ -825,7 +825,7 @@ function App() {
         {showGuide && <GuideScreen onClose={() => setShowGuide(false)} />}
         <GettingStartedSheet open={showGettingStarted} onClose={closeGettingStarted} />
         <Header
-          onOpenSettings={() => setShowSettings(true)}
+          onOpenSettings={() => { setShowGuide(false); setShowSettings(true); }}
           onSwitchTab={switchTab}
           activeTab={activeTab}
         />
