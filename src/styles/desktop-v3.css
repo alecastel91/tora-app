@@ -978,6 +978,13 @@
    confirms and onboarding. The modal card itself is sized in desktop-v2.css.
    ======================================================================== */
 @media (min-width: 1024px) {
+  /* The header outranks the sub-page layer (guide, profile, Settings, Premium,
+     Achievements — all --z-screen), so the bell and the gear stay reachable
+     whatever is open. It stays under --z-modal so dialogs still cover it.
+     Its backdrop-filter makes it the stacking context for the dropdown, which
+     is why the dropdown cannot be lifted on its own. */
+  html.desktop-v3 .app-header { z-index: calc(var(--z-screen) + 10); }
+
   html.desktop-v3 .notifications-dropdown {
     /* backdrop-filter on the header makes it the containing block AND the
        stacking context for this fixed child, so raising z-index here cannot
@@ -998,7 +1005,7 @@
   /* Guide: a page inside the frame, not a takeover; same header idiom */
   /* Sits inside the frame, so it must not paint over the header chrome it
      leaves visible — the bell dropdown opened behind it otherwise. */
-  html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); z-index: 50; }
+  html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); z-index: var(--z-screen); }
   html.desktop-v3 .guide-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
   html.desktop-v3 .guide-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; position: static; }
   html.desktop-v3 .guide-screen > .settings-header .back-button svg { width: 18px; height: 18px; }

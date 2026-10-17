@@ -146,7 +146,10 @@ const ProfilePage = ({
             )}
           </div>
 
-          {/* Social proof, as on the phone: only the likers this viewer also likes */}
+          {/* Social proof, as on the phone: only the likers this viewer also
+              likes. Inert for now on both surfaces — GET /connections/likers/:id
+              is owner-only (F2-09), so `likers` is [] for anyone else. It needs a
+              server endpoint that returns just the likers the viewer already likes. */}
           {(() => {
             if (isOwn || !Array.isArray(likers) || likers.length === 0 || !likedProfiles) return null;
             const familiar = likers.filter((l) => likedProfiles.has(l.id)).slice(0, 2);

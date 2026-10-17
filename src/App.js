@@ -175,11 +175,27 @@ function App() {
   const closeAllOverlays = () => {
     setActiveChatUser(null);
     setChatOpenDeal(null);
-    setViewingProfile(null);
-    setShowSettings(false);
-    setShowPremium(false);
-    setShowAchievements(false);
+    closeSubPages();
   };
+
+  /* One sub-page at a time. The guide, a profile, Settings, Premium and
+     Achievements all occupy the same layer inside the frame, and they are
+     rendered as siblings in a fixed order — so stacking them means the one
+     you open last is not necessarily the one on top. Opening any of them
+     closes the rest, which is also what the header chrome expects: it sits
+     above this layer so the bell stays reachable whatever is open. */
+  const closeSubPages = (keep) => {
+    if (keep !== 'guide') setShowGuide(false);
+    if (keep !== 'profile') setViewingProfile(null);
+    if (keep !== 'settings') setShowSettings(false);
+    if (keep !== 'premium') setShowPremium(false);
+    if (keep !== 'achievements') setShowAchievements(false);
+  };
+  const goGuide = () => { closeSubPages('guide'); setShowGuide(true); };
+  const goProfile = (profile) => { closeSubPages('profile'); setViewingProfile(profile); };
+  const goSettings = () => { closeSubPages('settings'); setShowSettings(true); };
+  const goPremium = () => { closeSubPages('premium'); setShowPremium(true); };
+  const goAchievements = () => { closeSubPages('achievements'); setShowAchievements(true); };
   useLayoutEffect(() => {
     if (appContentRef.current) {
       appContentRef.current.scrollTop = tabScrollPositions.current[activeTab] || 0;
@@ -214,7 +230,7 @@ function App() {
   // from inside it rather than being the only way in.
   const [showGuide, setShowGuide] = useState(false);
   useEffect(() => {
-    const open = () => setShowGuide(true);
+    const open = () => goGuide();
     window.addEventListener('tora:open-guide', open);
     return () => window.removeEventListener('tora:open-guide', open);
   }, []);
@@ -310,7 +326,7 @@ function App() {
         t('offer.limitMessage', { n: limit, date: when }),
         { title: t('offer.limitTitle'), confirmLabel: t('search.upgradeNow') }
       );
-      if (upgrade) setShowPremium(true);
+      if (upgrade) goPremium();
     };
     window.addEventListener('tora:offer-limit', onLimit);
     return () => window.removeEventListener('tora:offer-limit', onLimit);
@@ -318,7 +334,7 @@ function App() {
 
   // Open the Premium screen from anywhere (e.g. the agent at-cap modal).
   useEffect(() => {
-    const openPremium = () => setShowPremium(true);
+    const openPremium = () => goPremium();
     window.addEventListener('tora:open-premium', openPremium);
     return () => window.removeEventListener('tora:open-premium', openPremium);
   }, []);
@@ -652,13 +668,13 @@ function App() {
   const tabScreens = {
     ...(nativeDesktop && {
       home: <DashboardScreen onOpenChat={openChatInMessages} onSwitchTab={switchTab} isActive={activeTab === 'home'} />,
-      search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
+      search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={goProfile} onOpenPremium={goPremium} />,
       bookings: <BookingsBoard onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
     }),
-    profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
-    ...(!nativeDesktop && { search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} /> }),
-    news: <NewsScreen onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
-    tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,
+    profile: <ProfileScreen onOpenPremium={goPremium} onOpenAchievements={goAchievements} accountUser={accountUser} onSwitchTab={switchTab} />,
+    ...(!nativeDesktop && { search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={goPremium} accountUser={accountUser} /> }),
+    news: <NewsScreen onOpenProfile={goProfile} onOpenPremium={goPremium} />,
+    tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={goPremium} accountUser={accountUser} isActive={activeTab === 'tour'} />,
     ...(!nativeDesktop && { bookings: <BookingsScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} /> }),
     // chatOpen (not a key remount): MessagesScreen refetches once when a
     // chat closes, to pick up read-state changes. A key here remounted the
@@ -712,7 +728,7 @@ function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('upgrade') && user?.id) {
-      setShowPremium(true);
+      goPremium();
       params.delete('upgrade');
       const qs = params.toString();
       window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''));
@@ -825,7 +841,7 @@ function App() {
         {showGuide && <GuideScreen onClose={() => setShowGuide(false)} />}
         <GettingStartedSheet open={showGettingStarted} onClose={closeGettingStarted} />
         <Header
-          onOpenSettings={() => { setShowGuide(false); setShowSettings(true); }}
+          onOpenSettings={goSettings}
           onSwitchTab={switchTab}
           activeTab={activeTab}
         />
@@ -889,7 +905,7 @@ function App() {
             onOpenDealHandled={() => setChatOpenDeal(null)}
             initialDraft={chatDraft}
             onClose={() => { setActiveChatUser(null); setChatOpenDeal(null); setChatDraft(null); }}
-            onOpenProfile={(profile) => setViewingProfile(profile)}
+            onOpenProfile={goProfile}
           />
         )}
         {viewingProfile && (
@@ -906,8 +922,8 @@ function App() {
               ...['news', 'search', 'tour', 'bookings', 'messages', 'profile'].map((id) => ({ id, label: t(`nav.${id}`) })),
               { id: 'settings', label: t('settings.title') },
             ]}
-            onGo={(id) => (id === 'settings' ? setShowSettings(true) : switchTab(id))}
-            onOpenProfile={(profile) => setViewingProfile(profile)}
+            onGo={(id) => (id === 'settings' ? goSettings() : switchTab(id))}
+            onOpenProfile={goProfile}
           />
         )}
         <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} bookingsHasDot={bookingsActionCount > 0 && activeTab !== 'bookings'} homeTab={nativeDesktop} />
@@ -944,7 +960,7 @@ function App() {
                 <p>{t('settingsExtra.premiumTeaser')}</p>
                 <button
                   className="btn btn-primary"
-                  onClick={() => { setShowSettings(false); setShowPremium(true); }}
+                  onClick={goPremium}
                 >
                   {t('settingsExtra.explorePremium')}
                 </button>
@@ -955,7 +971,7 @@ function App() {
                   <AgentTierCard
                     profile={user}
                     plan={planKind}
-                    onManage={() => { setShowSettings(false); setShowPremium(true); }}
+                    onManage={goPremium}
                   />
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
                     <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleOpenBillingPortal}>
@@ -973,8 +989,7 @@ function App() {
                       <button
                         className="btn btn-upgrade-small"
                         onClick={() => {
-                          setShowSettings(false);
-                          setShowPremium(true);
+                          goPremium();
                         }}
                       >
                         {t('premium.upgradeToPremium')}
@@ -984,8 +999,7 @@ function App() {
                       <button
                         className="btn btn-upgrade-small"
                         onClick={() => {
-                          setShowSettings(false);
-                          setShowPremium(true);
+                          goPremium();
                         }}
                       >
                         {t('premium.upgradeToYearly')}
