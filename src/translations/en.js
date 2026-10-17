@@ -40,13 +40,15 @@ const en = {
     reduceSeats: 'Reduce to {{n}} seats · {{price}}',
     switchToYearly: 'Switch to Yearly · {{price}}',
     switchToMonthly: 'Switch to Monthly · {{price}}',
+    reducingCostsMore: 'Removing {{n}} seat(s) leaves a cheaper band — your plan becomes {{price}}',
+    addingCostsLess: 'Adding {{n}} seat(s) reaches a cheaper band — your plan becomes {{price}}',
     reducingSeats: 'Removing {{n}} seat(s) — nothing due today, your renewal price drops',
     addingSeats: 'Adding {{n}} more',
     buyingSeats: 'Subscribing for {{n}} seats',
     alreadyHave: 'You already represent {{artists}} artist(s) — included',
     freeRepresenting: 'You represent {{artists}} artist(s) on the free plan',
     currentSeats: 'Current plan · {{n}} seats',
-    foot: 'Your bill always matches your current roster — add or remove artists anytime and the price adjusts automatically.',
+    foot: 'You are billed for the seats you buy. Add or remove seats anytime; the rate per artist follows the band your total reaches.',
   },
 
   connect: {

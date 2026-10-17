@@ -40,13 +40,15 @@ const es = {
     reduceSeats: 'Reducir a {{n}} plazas · {{price}}',
     switchToYearly: 'Cambiar a anual · {{price}}',
     switchToMonthly: 'Cambiar a mensual · {{price}}',
+    reducingCostsMore: 'Quitar {{n}} plaza(s) sale de un tramo más barato: tu plan pasa a {{price}}',
+    addingCostsLess: 'Añadir {{n}} plaza(s) alcanza un tramo más barato: tu plan pasa a {{price}}',
     reducingSeats: 'Quitas {{n}} plaza(s) — nada que pagar hoy, tu renovación baja',
     addingSeats: 'Añadiendo {{n}} más',
     buyingSeats: 'Suscribiéndote a {{n}} plazas',
     alreadyHave: 'Ya representas a {{artists}} artista(s) — incluido',
     freeRepresenting: 'Representas a {{artists}} artista(s) en el plan gratis',
     currentSeats: 'Plan actual · {{n}} plazas',
-    foot: 'Tu factura siempre coincide con tu roster actual: añade o quita artistas cuando quieras y el precio se ajusta automáticamente.',
+    foot: 'Se te cobra por las plazas que compras. Añade o quita plazas cuando quieras; la tarifa por artista sigue el tramo que alcanza tu total.',
   },
 
   connect: {

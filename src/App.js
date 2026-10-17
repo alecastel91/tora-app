@@ -1613,7 +1613,10 @@ function App() {
                       </div>
                       <div className="summary-breakdown-row is-add">
                         <span>{t('premium.addingSeatsRow', { n: addedSeats })}</span>
-                        <span>+{planDetail.addedPriceLabel}/{cycleWord}</span>
+                        {/* A seat change can lower the total (a smaller roster
+                            can leave a cheaper band), so the sign is computed,
+                            never assumed — this is the 12条の6 screen. */}
+                        <span>{(planDetail.addedDelta ?? 0) < 0 ? '−' : '+'}{planDetail.addedPriceLabel}/{cycleWord}</span>
                       </div>
                     </div>
                   )}

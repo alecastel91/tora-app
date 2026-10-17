@@ -40,13 +40,15 @@ const ja = {
     reduceSeats: '{{n}}席に減らす · {{price}}',
     switchToYearly: '年間プランに切替 · {{price}}',
     switchToMonthly: '月間プランに切替 · {{price}}',
+    reducingCostsMore: '{{n}}席を減らすと価格帯が上がり、プランは{{price}}になります',
+    addingCostsLess: '{{n}}席を追加すると安い価格帯に入り、プランは{{price}}になります',
     reducingSeats: '{{n}}席を削減 — 本日の支払いなし、次回更新額が下がります',
     addingSeats: '{{n}}席を追加',
     buyingSeats: '{{n}}席で登録',
     alreadyHave: 'すでに{{artists}}名を担当 — 含まれます',
     freeRepresenting: '無料プランで{{artists}}名を担当',
     currentSeats: '現在のプラン · {{n}}席',
-    foot: 'ご請求額は常に現在のロスターに一致します — いつでもアーティストを追加・削除でき、料金は自動的に調整されます。',
+    foot: '購入した席数に対して課金されます。席はいつでも増減でき、アーティスト1名あたりの単価は合計数が到達した価格帯に従います。',
   },
 
   connect: {

@@ -40,13 +40,15 @@ const ko = {
     reduceSeats: '{{n}}석으로 줄이기 · {{price}}',
     switchToYearly: '연간으로 전환 · {{price}}',
     switchToMonthly: '월간으로 전환 · {{price}}',
+    reducingCostsMore: '{{n}}석을 줄이면 더 저렴한 구간에서 벗어나 요금제가 {{price}}가 됩니다',
+    addingCostsLess: '{{n}}석을 추가하면 더 저렴한 구간에 들어가 요금제가 {{price}}가 됩니다',
     reducingSeats: '{{n}}석 축소 — 오늘 결제 없음, 갱신 금액이 낮아집니다',
     addingSeats: '{{n}}석 추가',
     buyingSeats: '{{n}}석 구독',
     alreadyHave: '이미 {{artists}}명 대행 — 포함됨',
     freeRepresenting: '무료 플랜으로 {{artists}}명 대행',
     currentSeats: '현재 플랜 · {{n}}석',
-    foot: '청구액은 항상 현재 로스터와 일치합니다 — 언제든 아티스트를 추가하거나 제거하면 가격이 자동으로 조정됩니다.',
+    foot: '구매한 좌석 수만큼 청구됩니다. 좌석은 언제든 늘리거나 줄일 수 있으며, 아티스트 1명당 단가는 총 수가 도달한 구간을 따릅니다.',
   },
 
   connect: {

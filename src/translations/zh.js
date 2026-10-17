@@ -40,13 +40,15 @@ const zh = {
     reduceSeats: '减少到 {{n}} 个席位 · {{price}}',
     switchToYearly: '切换为年付 · {{price}}',
     switchToMonthly: '切换为月付 · {{price}}',
+    reducingCostsMore: '减少 {{n}} 个席位会离开更便宜的档位——你的套餐将变为 {{price}}',
+    addingCostsLess: '增加 {{n}} 个席位可进入更便宜的档位——你的套餐将变为 {{price}}',
     reducingSeats: '减少 {{n}} 个席位 — 今日无需付款，续订价格降低',
     addingSeats: '再增加 {{n}} 个',
     buyingSeats: '订阅 {{n}} 个席位',
     alreadyHave: '你已代理 {{artists}} 位艺人 — 已包含',
     freeRepresenting: '免费方案下代理 {{artists}} 位艺人',
     currentSeats: '当前方案 · {{n}} 个席位',
-    foot: '你的账单始终与当前名单一致——随时添加或移除艺人，价格会自动调整。',
+    foot: '按你购买的席位计费。席位可随时增减，每位艺人的单价取决于总数所达到的档位。',
   },
 
   connect: {
