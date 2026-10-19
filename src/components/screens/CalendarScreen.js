@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isArtistSideForDeal } from '../../utils/contractSigner';
 import { OFF_STATUSES, dealIsForArtist } from '../../utils/dealStatus';
@@ -84,6 +84,10 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
 
   // Drag selection state
   const [isDragging, setIsDragging] = useState(false);
+  // A touch is followed by synthesized mouse events on the same element; this
+  // is how we tell them apart so a single tap is a single toggle.
+  const touchedAt = useRef(0);
+  const afterTouch = () => Date.now() - touchedAt.current < 800;
   const [dragStartDate, setDragStartDate] = useState(null);
   const [dragMode, setDragMode] = useState(null); // 'select' or 'deselect'
   const [hasDragged, setHasDragged] = useState(false); // Track if the user actually dragged
@@ -734,19 +738,22 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}`}
           data-weekday={new Date(currentYear, currentMonth, day).getDay()}
           data-day={day}
-          /* No onClick: mousedown already toggles the day and mouseup saves it.
-             A click fires after both, so a single click toggled twice and the
-             day never changed — only a multi-day drag worked, because then the
-             release lands on a different cell and no click fires here. Touch
-             goes through onTouchStart (which preventDefaults the synthetic
-             click) and onTouchEnd, so the phone is unaffected. */
+          /* A tap fires touchstart, touchend AND the compatibility mouse events
+             (mousedown, mouseup, click) — five in total. With a click handler
+             as well that was three toggles per tap, which only looked right
+             because three is odd; a plain mouse click was two and did nothing.
+             So: no onClick, and the mouse handlers stand down for a moment
+             after a touch, leaving exactly one toggle per interaction either
+             way. */
           onMouseDown={(e) => {
+            if (afterTouch()) return;
             e.preventDefault();
             handleDateMouseDown(day);
           }}
-          onMouseEnter={() => handleDateMouseEnter(day)}
-          onMouseUp={() => handleDateMouseUp()}
+          onMouseEnter={() => { if (!afterTouch()) handleDateMouseEnter(day); }}
+          onMouseUp={() => { if (!afterTouch()) handleDateMouseUp(); }}
           onTouchStart={(e) => {
+            touchedAt.current = Date.now();
             e.preventDefault();
             handleDateMouseDown(day);
           }}
@@ -757,7 +764,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             const cell = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.calendar-day[data-day]');
             if (cell) handleDateMouseEnter(Number(cell.dataset.day));
           }}
-          onTouchEnd={() => handleDateMouseUp()}
+          onTouchEnd={() => { touchedAt.current = Date.now(); handleDateMouseUp(); }}
           style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'pointer' }}
         >
           <span className="calendar-day-num">{day}</span>
