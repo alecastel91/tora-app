@@ -42,7 +42,6 @@ import SearchWorkspace from './components/desktop/SearchWorkspace';
 import CommandPalette from './components/desktop/CommandPalette';
 import SettingsNav from './components/desktop/SettingsNav';
 import PremiumPlans from './components/desktop/PremiumPlans';
-import { useDesktopStrings } from './components/desktop/strings';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
@@ -80,7 +79,6 @@ function App() {
   // Desktop v3 (flag + >= 1024px) lands on the dashboard instead and swaps
   // three tabs for desktop-native screens; the phone never takes this branch.
   const nativeDesktop = useNativeDesktop();
-  const td = useDesktopStrings();
   const HOME_TAB = nativeDesktop ? 'home' : 'news';
   const [activeTab, setActiveTab] = useState(HOME_TAB);
 
@@ -886,7 +884,7 @@ function App() {
               {/* Desktop v3 Messages: the list keeps its column and the
                   thread area says so until a conversation is open. */}
               {tab === 'messages' && nativeDesktop && !activeChatUser && (
-                <div className="d3-msg-empty desktop-only"><p>{td('selectThread')}</p></div>
+                <div className="d3-msg-empty desktop-only"><p>{t('desktop.selectThread')}</p></div>
               )}
               {tab === 'news' && showD2Rail && (
                 <aside className="d2-rail desktop-only">
@@ -935,7 +933,7 @@ function App() {
         {nativeDesktop && (
           <CommandPalette
             pages={[
-              { id: 'home', label: td('home') },
+              { id: 'home', label: t('desktop.home') },
               ...['news', 'search', 'tour', 'bookings', 'messages', 'profile'].map((id) => ({ id, label: t(`nav.${id}`) })),
               { id: 'settings', label: t('settings.title') },
             ]}

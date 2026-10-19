@@ -4,12 +4,10 @@ import { BellIcon, GearIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { isDesktopV2, useNativeDesktop } from '../../utils/desktopV2';
-import { useDesktopStrings } from '../desktop/strings';
 
 const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   const { notifications } = useAppContext();
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   // v3 + desktop-sized: the only case the ⌘K pill exists at all (not hidden — absent)
   const nativeDesktop = useNativeDesktop();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -63,7 +61,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
       {/* Desktop v2: the brand lives in the sidebar, so the bar carries the
           page instead of a hidden logo. Reuses the existing nav.* keys. */}
       {isDesktopV2() && (
-        <div className="d2-page-title desktop-only">{activeTab === 'home' ? td('home') : t(`nav.${activeTab}`)}</div>
+        <div className="d2-page-title desktop-only">{activeTab === 'home' ? t('desktop.home') : t(`nav.${activeTab}`)}</div>
       )}
       <div className="header-icons relative flex gap-3">
         {/* Desktop v3: jump anywhere. The palette listens for this event. */}
@@ -72,7 +70,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
             className="d3-k"
             onClick={() => window.dispatchEvent(new CustomEvent('tora:open-palette'))}
           >
-            <span>{td('jumpTo')}</span>
+            <span>{t('desktop.jumpTo')}</span>
             <kbd>⌘K</kbd>
           </button>
         )}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import { formatEventDate } from '../../utils/dates';
 import { Avatar } from './primitives';
 import LoadingGlobe from '../common/LoadingGlobe';
@@ -20,7 +19,6 @@ const STATUS = {
 
 const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, toolbar, detail }) => {
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const locale = t('dateFormat.locale');
   const range = (tour) => `${formatEventDate(tour.startDate, locale, { month: 'short', day: 'numeric', year: undefined })} — ${formatEventDate(tour.endDate, locale, { month: 'short', day: 'numeric' })}`;
 
@@ -30,11 +28,11 @@ const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, t
         <div className="flex flex-wrap items-center gap-3 border-b border-white/[0.07] px-3 py-2.5">{toolbar}</div>
         <div className="d3-tour-row px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
           <span className="truncate">{owner ? t('tour.tourKickstart') : t('tour.artist')}</span>
-          <span className="truncate">{td('dates')}</span>
+          <span className="truncate">{t('desktop.dates')}</span>
           <span className="truncate text-right">{t('tour.gigsConfirmed')}</span>
           <span className="truncate text-right">{t('tour.interestedCount')}</span>
           <span className="truncate">{owner ? t('tour.revenueTarget') : t('tour.feeRangeLabel')}</span>
-          <span className="truncate">{td('colStatus')}</span>
+          <span className="truncate">{t('desktop.colStatus')}</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2">
           {loading ? <LoadingGlobe label={t('tour.loadingTours')} /> : tours.length === 0 ? (
@@ -80,7 +78,7 @@ const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, t
         </div>
       </div>
       <div className="d3-panel relative overflow-y-auto p-3">
-        {!selectedId && <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-8 text-center text-[13px] text-white/35">{td('selectTour')}</p>}
+        {!selectedId && <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-8 text-center text-[13px] text-white/35">{t('desktop.selectTour')}</p>}
         {selectedId && detail}
       </div>
     </div>

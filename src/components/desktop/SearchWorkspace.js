@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import { isPremiumViewer } from '../../utils/subscription';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
@@ -28,7 +27,6 @@ const EMPTY = { roles: [], genres: [], zone: 'all', country: 'all', city: 'all' 
 const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium }) => {
   const { user, likedProfiles, toggleLike } = useAppContext(); // connect state lives in ConnectAction
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const premium = isPremiumViewer(user);
 
   const [query, setQuery] = useState('');
@@ -115,7 +113,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
   };
 
   const sections = [
-    { key: 'roles', label: t('search.roles'), multi: true, emptyLabel: td('allRoles'),
+    { key: 'roles', label: t('search.roles'), multi: true, emptyLabel: t('desktop.allRoles'),
       options: () => ROLES.map((r) => ({ value: r, label: roleLabel(r, t) })) },
     { key: 'genres', label: t('search.genres'), multi: true,
       options: () => genresList.map((g) => ({ value: g, label: g })) },
@@ -166,12 +164,12 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
                     {c.label}<span className="text-white/50">×</span>
                   </button>
                 ))}
-                <button onClick={() => setFilters(EMPTY)} className="cursor-pointer px-1.5 py-1 text-[11px] text-white/40 hover:text-white">{td('clear')}</button>
+                <button onClick={() => setFilters(EMPTY)} className="cursor-pointer px-1.5 py-1 text-[11px] text-white/40 hover:text-white">{t('desktop.clear')}</button>
               </div>
             )}
           </div>
 
-          <div className="px-3 py-2 text-[11px] text-white/45">{td('results', { n: list.length })}</div>
+          <div className="px-3 py-2 text-[11px] text-white/45">{t('desktop.results', { n: list.length })}</div>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
             {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? (
@@ -224,8 +222,8 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
           </Suspense>
           <button
             onClick={() => setFull((v) => !v)}
-            aria-label={full ? td('exitFullscreen') : td('fullscreen')}
-            title={full ? td('exitFullscreen') : td('fullscreen')}
+            aria-label={full ? t('desktop.exitFullscreen') : t('desktop.fullscreen')}
+            title={full ? t('desktop.exitFullscreen') : t('desktop.fullscreen')}
             className="absolute left-3 top-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/10 bg-black/50 text-white/80 backdrop-blur-md transition-colors hover:border-white/30 hover:text-white [&>svg]:h-4 [&>svg]:w-4"
           >
             <FullscreenGlyph exit={full} />

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import { getAvatarClass, roleLabel, roleChipClass, roleBloom, ROLES } from '../../utils/roles';
 import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
 import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, LocationIcon, StarIcon, ShieldIcon } from '../../utils/icons';
@@ -52,7 +51,6 @@ const OwnProfilePage = ({
   onOpenLikes, onOpenLikers, onOpenConnections, onOpenAchievements, onOpenPremium, onVerify, onOpenProfile, onManageArtist,
 }) => {
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const role = user?.role;
   const roleTone = roleChipClass(role);
   const bloom = roleBloom(role);
@@ -227,7 +225,7 @@ const OwnProfilePage = ({
         {/* ---- aside: your network, your profiles, your links ---- */}
         <aside className="flex min-w-0 flex-col gap-4">
           <Panel
-            title={td('profilesLabel')}
+            title={t('desktop.profilesLabel')}
             action={<button onClick={onOpenSwitcher} className="cursor-pointer text-[11px] text-white/40 hover:text-white">{t('profile.switchProfileLabel')}</button>}
           >
             <ul className="m-0 flex list-none flex-col p-0">

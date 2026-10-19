@@ -1,6 +1,5 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import { roleLabel, roleChipClass } from '../../utils/roles';
 import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
 import { formatEventDate } from '../../utils/dates';
@@ -47,7 +46,6 @@ const ProfilePage = ({
   onToggleTourInterest, onTourOffer, onOpenTourKickstart, onOpenPremium,
 }) => {
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const locale = t('dateFormat.locale');
   const role = profile.role;
   const isBooker = currentUser?.role === 'PROMOTER' || currentUser?.role === 'VENUE';

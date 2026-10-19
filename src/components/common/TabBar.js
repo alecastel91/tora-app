@@ -2,7 +2,6 @@ import React from 'react';
 import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon, NewsIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 import CountBadge from './CountBadge';
-import { useDesktopStrings } from '../desktop/strings';
 import { useAppContext } from '../../contexts/AppContext';
 import { getAvatarClass, roleLabel } from '../../utils/roles';
 
@@ -21,11 +20,10 @@ const DashboardIcon = () => (
 // entry leads the list. Never true on the phone.
 const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0, bookingsHasDot = false, homeTab = false }) => {
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const { user } = useAppContext();
 
   const tabs = [
-    ...(homeTab ? [{ id: 'home', icon: DashboardIcon, label: td('home') }] : []),
+    ...(homeTab ? [{ id: 'home', icon: DashboardIcon, label: t('desktop.home') }] : []),
     // Feed first, profile last — the order thumbs already know from
     // Instagram/LinkedIn/X; the two work tabs sit under the right thumb.
     { id: 'news', icon: NewsIcon, label: t('nav.news') },

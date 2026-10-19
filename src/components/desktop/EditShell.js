@@ -4,7 +4,6 @@ import { roleLabel, roleChipClass } from '../../utils/roles';
 import { Avatar } from './primitives';
 import { LocationIcon } from '../../utils/icons';
 import SettingsNav from './SettingsNav';
-import { useDesktopStrings } from './strings';
 
 /* Desktop v3 editor chrome around the existing Edit Profile form: a sticky
    header with the title and the Cancel / Save actions, a section index on
@@ -35,14 +34,13 @@ export const EditIndex = () => (
 
 export const EditPreview = ({ draft, genres, photos }) => {
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const role = draft?.role;
   const location = [draft?.city, draft?.country].filter(Boolean).join(', ') || draft?.location;
   const tone = roleChipClass(role);
   const links = ['website', 'instagram', 'residentAdvisor', 'linkedin', 'mixtape', 'spotify'].filter((k) => draft?.[k]).length;
   return (
     <aside className="d3-edit-preview">
-      <p className="m-0 mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/35">{td('preview')}</p>
+      <p className="m-0 mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/35">{t('desktop.preview')}</p>
       <div className="d3-panel overflow-hidden">
         <div className="flex items-center gap-3 px-4 pt-4">
           <Avatar profile={draft} className="h-14 w-14 text-lg" />

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNativeDesktop } from '../../utils/desktopV2';
-import { useDesktopStrings } from '../desktop/strings';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import { dealIsForArtist } from '../../utils/dealStatus';
 import PrivacyNote from '../common/PrivacyNote';
@@ -25,7 +24,6 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { t } = useLanguage();
   // Desktop v3 lays this screen out as a panel grid (desktop-v3.css .d3-manage).
   const nativeDesktop = useNativeDesktop();
-  const td = useDesktopStrings();
   // 'actions' | 'dashboard' (= Insights) | 'info' | 'documents' (calendar: Tour > Calendar > artist)
   const [activeTab, setActiveTab] = useState('actions');
   const [artistProfile, setArtistProfile] = useState(artist); // Store full artist profile
@@ -561,11 +559,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         <>
           <div className="dashboard-section">
             <h3><LocationIcon /> {t('manage.topCities')}</h3>
-            <div className="action-empty mt-3">{td('noCitiesYet')}</div>
+            <div className="action-empty mt-3">{t('desktop.noCitiesYet')}</div>
           </div>
           <div className="dashboard-section">
             <h3><TrendingUpIcon /> {t('manage.profileReach')} <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/35">· {t('manage.last30')}</span></h3>
-            <div className="action-empty mt-3">{td('reachArtistOnly')}</div>
+            <div className="action-empty mt-3">{t('desktop.reachArtistOnly')}</div>
           </div>
         </>
       )}

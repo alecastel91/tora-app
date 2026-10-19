@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import { subscribeToDeals } from '../../services/realtime';
 import { getDealDisplayStatus } from '../screens/BookingsScreen';
@@ -66,7 +65,6 @@ const ACTION_ROWS = 8;
 const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
   const { user } = useAppContext();
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const locale = t('dateFormat.locale');
 
   const [data, setData] = useState({ actions: [], deals: [], conversations: [] });
@@ -155,20 +153,20 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <StatTile icon={<HandshakeIcon />} label={td('yourMove')} value={yourMove} accent onClick={() => onSwitchTab('bookings')} />
-            <StatTile icon={<BookingsIcon />} label={td('openOffers')} value={openOffers} onClick={() => onSwitchTab('bookings')} />
-            <StatTile icon={<CalendarCheckIcon />} label={td('confirmedAhead')} value={upcoming.length} onClick={() => onSwitchTab('tour')} />
-            <StatTile icon={<MessageIcon />} label={td('unread')} value={unread} accent onClick={() => onSwitchTab('messages')} />
+            <StatTile icon={<HandshakeIcon />} label={t('desktop.yourMove')} value={yourMove} accent onClick={() => onSwitchTab('bookings')} />
+            <StatTile icon={<BookingsIcon />} label={t('desktop.openOffers')} value={openOffers} onClick={() => onSwitchTab('bookings')} />
+            <StatTile icon={<CalendarCheckIcon />} label={t('desktop.confirmedAhead')} value={upcoming.length} onClick={() => onSwitchTab('tour')} />
+            <StatTile icon={<MessageIcon />} label={t('desktop.unread')} value={unread} accent onClick={() => onSwitchTab('messages')} />
           </div>
         </div>
 
         {/* ---- left: the work ---- */}
         <div className="flex min-w-0 flex-col gap-5">
           <Panel
-            title={td('needsAction')}
-            action={{ label: data.actions.length > ACTION_ROWS ? `${td('viewAll')} · ${data.actions.length}` : td('viewAll'), onClick: () => onSwitchTab('bookings') }}
+            title={t('desktop.needsAction')}
+            action={{ label: data.actions.length > ACTION_ROWS ? `${t('desktop.viewAll')} · ${data.actions.length}` : t('desktop.viewAll'), onClick: () => onSwitchTab('bookings') }}
           >
-            {data.actions.length === 0 ? <Empty text={td('allClear')} /> : (
+            {data.actions.length === 0 ? <Empty text={t('desktop.allClear')} /> : (
               <ul className="flex flex-col">
                 {data.actions.slice(0, ACTION_ROWS).map((item) => {
                   const { title, actionLabel } = localizeActionItem(item, t);
@@ -195,8 +193,8 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
             )}
           </Panel>
 
-          <Panel title={td('upcomingGigs')} action={{ label: td('viewAll'), onClick: () => onSwitchTab('bookings') }}>
-            {upcoming.length === 0 ? <Empty text={td('noUpcoming')} /> : (
+          <Panel title={t('desktop.upcomingGigs')} action={{ label: t('desktop.viewAll'), onClick: () => onSwitchTab('bookings') }}>
+            {upcoming.length === 0 ? <Empty text={t('desktop.noUpcoming')} /> : (
               <ul className="flex flex-col">
                 {upcoming.slice(0, 6).map((deal) => {
                   const other = counterpartFor(deal, user);
@@ -240,7 +238,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
 
         {/* ---- right: time and people ---- */}
         <div className="flex min-w-0 flex-col gap-5">
-          <Panel title={td('nextDays')} action={{ label: td('viewAll'), onClick: () => onSwitchTab('tour') }}>
+          <Panel title={t('desktop.nextDays')} action={{ label: t('desktop.viewAll'), onClick: () => onSwitchTab('tour') }}>
             <div className="grid grid-cols-7 gap-1.5 px-1">
               {days.map((d, i) => (
                 <div
@@ -261,8 +259,8 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
             </div>
             <div className="mt-3 flex items-center gap-4 px-2 pb-1 text-[10.5px] text-white/45">
               <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#43E97B]/40" />{t('calendar.available')}</span>
-              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-infrared" />{td('legendGig')}</span>
-              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />{td('legendTravel')}</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-infrared" />{t('desktop.legendGig')}</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />{t('desktop.legendTravel')}</span>
             </div>
           </Panel>
 

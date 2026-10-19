@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import OverlayPortal from '../common/OverlayPortal';
 import { roleLabel } from '../../utils/roles';
@@ -14,7 +13,6 @@ import { Avatar } from './primitives';
 const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
   const { user } = useAppContext();
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [profiles, setProfiles] = useState([]);
@@ -87,13 +85,13 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onInputKey}
-            placeholder={td('jumpTo')}
+            placeholder={t('desktop.jumpTo')}
             className="h-13 w-full border-b border-white/[0.08] bg-transparent px-5 py-4 text-[15px] text-white placeholder-white/35 outline-none"
           />
           <ul className="max-h-[48vh] overflow-y-auto p-2">
             {items.length === 0 && <li className="px-3 py-6 text-center text-[13px] text-white/35">{t('search.noResults')}</li>}
             {items.map((item, i) => {
-              const header = item.kind !== lastKind ? (item.kind === 'page' ? td('pages') : td('profilesLabel')) : null;
+              const header = item.kind !== lastKind ? (item.kind === 'page' ? t('desktop.pages') : t('desktop.profilesLabel')) : null;
               lastKind = item.kind;
               return (
                 <React.Fragment key={`${item.kind}:${item.id}`}>

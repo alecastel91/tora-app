@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useDesktopStrings } from './strings';
 import apiService from '../../services/api';
 import { subscribeToDeals } from '../../services/realtime';
 import BookingsScreen, { getDealDisplayStatus, DEAL_DISPLAY_STATUSES } from '../screens/BookingsScreen';
@@ -26,7 +25,6 @@ const TAB_KEY = { upcoming: 'bookings.tabUpcoming', past: 'bookings.tabPast', de
 const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, isActive = true }) => {
   const { user } = useAppContext();
   const { t } = useLanguage();
-  const td = useDesktopStrings();
   const locale = t('dateFormat.locale');
 
   const [deals, setDeals] = useState([]);
@@ -138,7 +136,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={td('searchBookings')}
+                placeholder={t('desktop.searchBookings')}
                 className="h-8 w-full rounded-lg border border-white/10 bg-white/[0.02] pl-8 pr-3 text-[12.5px] text-white placeholder-white/35 outline-none focus:border-white/25"
               />
             </label>
@@ -147,7 +145,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
               className={`flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 text-[12px] font-medium transition-colors
                           ${mineOnly ? 'border-infrared/50 bg-infrared/10 text-white' : 'border-white/10 bg-white/[0.02] text-white/55 hover:text-white'}`}
             >
-              {td('yourMove')}
+              {t('desktop.yourMove')}
               {myMoveCount(byTab[tab]) > 0 && <span className="rounded-full bg-infrared px-1.5 text-[10px] font-semibold text-white">{myMoveCount(byTab[tab])}</span>}
             </button>
             <select
@@ -161,14 +159,14 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
           </div>
 
           <div className="d3-row px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
-            <SortHead k="date">{td('colDate')}</SortHead><span className="truncate">{td('colCounterpart')}</span>
-            <span className="truncate">{td('colEvent')}</span><SortHead k="fee">{td('colFee')}</SortHead>
-            <span className="truncate">{td('colStatus')} · {td('colNext')}</span>
+            <SortHead k="date">{t('desktop.colDate')}</SortHead><span className="truncate">{t('desktop.colCounterpart')}</span>
+            <span className="truncate">{t('desktop.colEvent')}</span><SortHead k="fee">{t('desktop.colFee')}</SortHead>
+            <span className="truncate">{t('desktop.colStatus')} · {t('desktop.colNext')}</span>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2">
             {loading ? <LoadingGlobe label={t('bookings.loadingBookings')} /> : rows.length === 0 ? (
-              <p className="py-14 text-center text-[13px] text-white/35">{td('noBookings')}</p>
+              <p className="py-14 text-center text-[13px] text-white/35">{t('desktop.noBookings')}</p>
             ) : rows.map((deal) => {
               const other = counterpartFor(deal, user);
               const forName = bookedArtistName(deal, user);
@@ -215,7 +213,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
         {/* ---------------- inspector ---------------- */}
         <div className="d3-panel relative p-3">
           {!selectedId && (
-            <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-8 text-center text-[13px] text-white/35">{td('selectBooking')}</p>
+            <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-8 text-center text-[13px] text-white/35">{t('desktop.selectBooking')}</p>
           )}
           {/* Always mounted (deals ready before the first click); focus mode
               renders nothing until a deal is chosen. */}
