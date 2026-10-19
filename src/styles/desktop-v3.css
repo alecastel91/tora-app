@@ -518,6 +518,10 @@
     text-transform: none;
   }
 
+  /* Agency pricing: phone-first markup, so the ladder fills the desktop
+     column and leaves the price stranded from its band. */
+  html.desktop-v3 .agency-section .agency-ladder { max-width: 560px; }
+
   html.desktop-v3 .d3-settings-nav {
     position: sticky;
     top: 64px;

@@ -1770,7 +1770,7 @@ function App() {
                   <ul className="summary-terms">
                     {user?.role === 'AGENT' && (organisation?.status === 'ACTIVE'
                       ? <li className="summary-terms-agency">{t('agency.checkoutMember', { total: organisation.artistTotal })}</li>
-                      : <li className="summary-terms-agency">{t('agency.checkoutNudge')} <button type="button" className="summary-terms-link" onClick={() => { setShowSubscription(false); setShowPremium(false); setShowSettings(true); }}>{t('agency.linkUpFirst')}</button></li>)}
+                      : <li className="summary-terms-agency">{t('agency.checkoutNudge')} <button type="button" className="summary-terms-link" onClick={() => { setShowSubscription(false); goSettings(); }}>{t('agency.linkUpFirst')}</button></li>)}
                     <li>{t(isPlanChange ? 'premium.changeTiming' : 'premium.paymentTiming')}</li>
                     <li>{t('premium.cancelTerms')}</li>
                     <li className="summary-terms-legal">

@@ -43,6 +43,10 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   }, [minSeats]);
   const additional = Math.max(0, estimate - baseline);
   const reducing = isPaid ? Math.max(0, currentSeats - estimate) : 0;
+
+  const isYearly = interval === 'year';
+  const mult = isYearly ? YEARLY_MULT : 1;
+
   // What the plan actually costs before and after, so the sentence under the
   // stepper can never contradict the price on the button.
   const totalNow = isPaid ? total(currentSeats) * (currentInterval === 'year' ? YEARLY_MULT : 1) : 0;
@@ -50,9 +54,6 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   const costsMore = isPaid && totalNext > totalNow;
   const intervalChanged = isPaid && interval !== currentInterval;
   const unchanged = isPaid && estimate === currentSeats && !intervalChanged;
-
-  const isYearly = interval === 'year';
-  const mult = isYearly ? YEARLY_MULT : 1;
 
   const est = (() => {
     const mo = total(estimate);

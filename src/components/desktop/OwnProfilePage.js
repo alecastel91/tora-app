@@ -14,6 +14,7 @@ import RoomsTechCard from '../common/RoomsTechCard';
 import RepresentationSection from '../common/RepresentationSection';
 import HighlightsList from '../common/HighlightsList';
 import OnboardingChecklist from '../common/OnboardingChecklist';
+import AgencyJoinPrompt from '../common/AgencyJoinPrompt';
 
 /* Desktop v3 — your own profile, designed for the desk. ProfileScreen keeps
    every fetch, flow, sub-screen and modal and hands this component its state
@@ -148,6 +149,10 @@ const OwnProfilePage = ({
               <span className="btn btn-primary shrink-0">{inReview ? t('verify.statusButton') : t('verify.verifyButton')}</span>
             </button>
           )}
+
+          {/* The only discovery path for agency pricing. The phone shows it in
+              ProfileScreen's body, which desktop returns before reaching. */}
+          {user?.role === 'AGENT' && <AgencyJoinPrompt userId={user?.id} />}
 
           <OnboardingChecklist key={user?.id || 'anon'} />
 
