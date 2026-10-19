@@ -43,12 +43,12 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   }, [minSeats]);
   const additional = Math.max(0, estimate - baseline);
   const reducing = isPaid ? Math.max(0, currentSeats - estimate) : 0;
-
   const isYearly = interval === 'year';
   const mult = isYearly ? YEARLY_MULT : 1;
-
   // What the plan actually costs before and after, so the sentence under the
-  // stepper can never contradict the price on the button.
+  // stepper can never contradict the price on the button. Must stay BELOW
+  // `mult` — reading it above its declaration is a TDZ ReferenceError that
+  // only shows at runtime, and it takes the whole app down with it.
   const totalNow = isPaid ? total(currentSeats) * (currentInterval === 'year' ? YEARLY_MULT : 1) : 0;
   const totalNext = total(estimate) * mult;
   const costsMore = isPaid && totalNext > totalNow;
