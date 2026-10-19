@@ -21,9 +21,15 @@
  */
 import { useEffect, useState } from 'react';
 
-const KEY = 'tora-desktop-layout'; // 'v2' | 'v3'; absent = v1
-const LEVELS = ['v2', 'v3'];
+const KEY = 'tora-desktop-layout'; // 'v1' | 'v2' | 'v3'; absent = DEFAULT_LEVEL
+const LEVELS = ['v1', 'v2', 'v3'];
 const DESKTOP_MQ = '(min-width: 1024px)';
+
+/* The desktop someone gets when they have expressed no preference. Flipping
+   this to 'v3' IS the adoption switch, and it is why 'v1' has to be a stored
+   value in its own right: an opt-out that merely cleared the key would be
+   silently undone here on the very next load, exactly when it is needed. */
+const DEFAULT_LEVEL = 'v1';
 
 export const isDesktopV2 = () => document.documentElement.classList.contains('desktop-v2');
 export const isDesktopV3 = () => document.documentElement.classList.contains('desktop-v3');
@@ -35,28 +41,29 @@ function apply(level) {
 }
 
 function store(level) {
-  if (level) localStorage.setItem(KEY, level);
-  else localStorage.removeItem(KEY);
+  if (LEVELS.includes(level)) localStorage.setItem(KEY, level);
+  else localStorage.removeItem(KEY); // 'reset' — follow DEFAULT_LEVEL again
 }
 
-// ?desktop=v2 / v3 turns a layout on, ?desktop=v1 (or =off) turns it off, and
-// any of them updates the stored preference so the next plain load keeps it.
+// ?desktop=v1|v2|v3 records a deliberate choice that survives later loads;
+// =off is a synonym for v1, the rollback switch. =reset forgets the choice.
 const param = new URLSearchParams(window.location.search).get('desktop');
 if (LEVELS.includes(param)) store(param);
-else if (param === 'v1' || param === 'off') store(null);
+else if (param === 'off') store('v1');
+else if (param === 'reset') store(null);
 
-apply(localStorage.getItem(KEY));
+apply(localStorage.getItem(KEY) || DEFAULT_LEVEL);
 
 // Console flip: toraDesktop('v3'), toraDesktop('v1'). The level is read from
 // the <html> class at render time, which React cannot observe, so flipping it
 // in place would leave v3 screens mounted with v2 CSS (or the reverse). The
 // level is persisted, so a reload lands on it cleanly.
 window.toraDesktop = (level) => {
-  const next = LEVELS.includes(level) ? level : null;
+  const next = LEVELS.includes(level) ? level : DEFAULT_LEVEL;
   store(next);
   apply(next);
   window.location.reload();
-  return next || 'v1';
+  return next;
 };
 
 /** Reactive matchMedia: true while the query matches (subscribed only when `enabled`). */
