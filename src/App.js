@@ -176,7 +176,11 @@ function App() {
   const closeAllOverlays = () => {
     setActiveChatUser(null);
     setChatOpenDeal(null);
-    closeSubPages();
+    setShowGuide(false);
+    setViewingProfile(null);
+    setShowSettings(false);
+    setShowPremium(false);
+    setShowAchievements(false);
   };
 
   /* One sub-page at a time. The guide, a profile, Settings, Premium and
@@ -186,6 +190,10 @@ function App() {
      closes the rest, which is also what the header chrome expects: it sits
      above this layer so the bell stays reachable whatever is open. */
   const closeSubPages = (keep) => {
+    // Desktop only. The phone stacks these as full-screen pages and relies on
+    // it: opening Premium from a locked feature on someone's profile and then
+    // dismissing it should return you to that profile, not to the tab.
+    if (!nativeDesktop) return;
     if (keep !== 'guide') setShowGuide(false);
     if (keep !== 'profile') setViewingProfile(null);
     if (keep !== 'settings') setShowSettings(false);
