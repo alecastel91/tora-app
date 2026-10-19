@@ -1,8 +1,9 @@
 // Agent billing — frontend mirror of tora-backend/src/config/pricing.js +
-// utils/agentTiers.js. Agents pay PER SEAT (per represented artist) on a
-// graduated scale — there are no fixed tiers. The free plan covers
-// AGENT_FREE_ARTISTS; a paid subscription (MONTHLY/YEARLY) is unlimited and
-// billed by roster size. See AgentSeatPricing for the band table.
+// utils/agentTiers.js. Agents pay PER SEAT (per represented artist), FLAT by
+// band: every artist is billed at the rate the count reaches — your own roster
+// solo, the agency's total in an agency. The free plan covers
+// AGENT_FREE_ARTISTS; paid agents are capped by the seats they bought.
+// See AgentSeatPricing for the band table.
 
 // Free agents can represent this many artists before a subscription is needed.
 export const AGENT_FREE_ARTISTS = 1;

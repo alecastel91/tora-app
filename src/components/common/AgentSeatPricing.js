@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-import { AGENT_BANDS as BANDS, agentMonthlyTotal, formatMoney, yearlyPerMonth, YEARLY_MULT } from '../../utils/money';
+import { AGENT_BANDS as BANDS, bandFor, seatPriceAt, formatMoney, yearlyPerMonth, YEARLY_MULT } from '../../utils/money';
 
 const bandLabel = (band, i) => {
   const from = i === 0 ? 1 : BANDS[i - 1].upTo + 1;
@@ -10,13 +10,16 @@ const bandLabel = (band, i) => {
 
 /**
  * Per-seat pricing panel for AGENT profiles. Replaces the old fixed-tier
- * ladder: agents pay per artist they represent, on a graduated scale, so
+ * ladder: agents pay per artist they represent, flat by band, so
  * the price scales with the roster instead of forcing a package.
  */
-const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', currency = 'USD', onSubscribe }) => {
+const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, currentInterval = 'month', currency = 'USD', agency = null, onSubscribe }) => {
   // Account currency (fixed once subscribed); formats every amount below.
   const money = (n) => formatMoney(n, currency);
-  const total = (n) => agentMonthlyTotal(n, currency);
+  // Flat for everyone: every artist at the rate the count reaches. The count
+  // is the agency's total for a member, the agent's own roster otherwise.
+  const countBand = (n) => (agency ? agency.band : bandFor(n));
+  const total = (n) => n * seatPriceAt(currency, countBand(n));
   const { t } = useLanguage();
   // Paid agents start on their ACTUAL billing interval, so the CTA reads as
   // "current plan" until they change something (seats or interval). Everyone
@@ -28,8 +31,10 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   // purchased seats, or a free agent's current roster (their included allowance).
   const baseline = isPaid ? currentSeats : rosterCount;
   // Floor = current roster (can't hold fewer seats than artists represented).
-  // A paid agent MAY pick below their purchased seats — that's a downgrade:
-  // nothing due today, the renewal price drops.
+  // A paid agent MAY pick below their purchased seats. Under flat pricing that
+  // is NOT always cheaper: dropping from 11 to 10 seats leaves the 11-25 band
+  // and every remaining artist re-rates upward, so the copy has to be told by
+  // the arithmetic rather than by the direction of the change.
   const minSeats = Math.max(rosterCount, 1);
   const [estimate, setEstimate] = useState(Math.max(currentSeats, minSeats));
   // Props can arrive after mount (profile loads late) — keep the picker legal.
@@ -38,16 +43,21 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
   }, [minSeats]);
   const additional = Math.max(0, estimate - baseline);
   const reducing = isPaid ? Math.max(0, currentSeats - estimate) : 0;
+  // What the plan actually costs before and after, so the sentence under the
+  // stepper can never contradict the price on the button.
+  const totalNow = isPaid ? total(currentSeats) * (currentInterval === 'year' ? YEARLY_MULT : 1) : 0;
+  const totalNext = total(estimate) * mult;
+  const costsMore = isPaid && totalNext > totalNow;
   const intervalChanged = isPaid && interval !== currentInterval;
   const unchanged = isPaid && estimate === currentSeats && !intervalChanged;
 
   const isYearly = interval === 'year';
   const mult = isYearly ? YEARLY_MULT : 1;
 
-  const est = useMemo(() => {
+  const est = (() => {
     const mo = total(estimate);
     return { perPeriod: mo * mult, perMonth: isYearly ? yearlyPerMonth(mo * mult) : mo };
-  }, [estimate, mult, isYearly]);
+  })();
 
   return (
     <div className="agent-seat">
@@ -79,7 +89,12 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
         </div>
       </div>
 
-      {/* Interactive estimator — makes the graduated model tangible. */}
+      {agency && (
+        <p className="agent-seat-agency">{t('agency.premiumMember', { agency: agency.name, total: agency.total, rate: money(seatPriceAt(currency, agency.band)) })}</p>
+      )}
+      {!agency && <p className="agent-seat-agency is-solo">{t('agency.premiumSolo')}</p>}
+
+      {/* Interactive estimator — makes the band model tangible. */}
       <div className="agent-seat-estimator">
         <div className="agent-seat-estimator-row">
           <span className="agent-seat-estimator-label">{t('agentSeat.estimatorLabel')}</span>
@@ -93,10 +108,12 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
         <p className="agent-seat-context">
           {additional > 0
             ? (isPaid
-                ? t('agentSeat.addingSeats', { n: additional })
+                ? (costsMore ? t('agentSeat.addingSeats', { n: additional }) : t('agentSeat.addingCostsLess', { n: additional, price: money(totalNext) }))
                 : t('agentSeat.buyingSeats', { n: estimate }))
             : reducing > 0
-              ? t('agentSeat.reducingSeats', { n: reducing })
+              ? (costsMore
+                  ? t('agentSeat.reducingCostsMore', { n: reducing, price: money(totalNext) })
+                  : t('agentSeat.reducingSeats', { n: reducing }))
               : (isPaid
                   ? t('agentSeat.alreadyHave', { artists: rosterCount })
                   : t('agentSeat.freeRepresenting', { artists: rosterCount }))}
@@ -127,13 +144,13 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
       {/* Band breakdown */}
       <div className="agent-seat-bands">
         {BANDS.map((band, i) => {
-          const rate = band.monthly[currency] * mult;
-          const active = estimate > (i === 0 ? 0 : BANDS[i - 1].upTo);
+          const rate = seatPriceAt(currency, i, interval);
+          const active = i === countBand(estimate);
           return (
             <div key={i} className={`agent-seat-band${active ? ' is-active' : ''}`}>
               <span className="agent-seat-band-range">{bandLabel(band, i)} {t('agentSeat.artists')}</span>
               <span className="agent-seat-band-rate">
-                {money(rate)}<em>/{t('agentSeat.perArtist')} · {isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}</em>
+                <strong>{money(rate)}</strong> /{t('agentSeat.perArtist')} · {isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth')}
               </span>
             </div>
           );
@@ -156,7 +173,10 @@ const AgentSeatPricing = ({ rosterCount = 0, currentSeats = 0, isPaid = false, c
             added: isPaid ? Math.max(0, seats - currentSeats) : 0,
             currentSeats,
             currentPriceLabel: money(currentPeriod),
-            addedPriceLabel: money(est.perPeriod - currentPeriod),
+            // Signed: under flat pricing a seat change can move the total
+            // either way, and the checkout prints this with its own sign.
+            addedDelta: est.perPeriod - currentPeriod,
+            addedPriceLabel: money(Math.abs(est.perPeriod - currentPeriod)),
             amount: est.perPeriod,
             priceLabel: money(est.perPeriod),
             perMonthLabel: isYearly ? money(est.perMonth) : null,

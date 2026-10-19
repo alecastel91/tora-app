@@ -48,6 +48,7 @@ import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
 import BlockedMembers from './components/common/BlockedMembers';
 import StripeCheckout from './components/common/StripeCheckout';
+import AgencySection from './components/common/AgencySection';
 import BetaTools from './components/common/BetaTools';
 import AssistantChat from './components/common/AssistantChat';
 import GuideScreen from './components/common/GuideScreen';
@@ -314,6 +315,14 @@ function App() {
   };
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
   const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles } = useAppContext();
+  // The agency this account's agent profile belongs to (null = solo). Loaded
+  // for agents; drives the agency rate on the Premium screen and checkout.
+  const [organisation, setOrganisation] = useState(null);
+  useEffect(() => {
+    if (!user?.id || !userProfiles?.some((p) => p.role === 'AGENT')) { setOrganisation(null); return; }
+    apiService.getOrganisation().then((d) => setOrganisation(d.organisation || null)).catch(() => setOrganisation(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, userProfiles?.length]);
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
   // after t/setShowPremium so the [t] dependency isn't read before init.
@@ -978,6 +987,7 @@ function App() {
                       {t('premium.manageBilling')}
                     </button>
                   )}
+                  <AgencySection currency={accountUser?.billingCurrency} onChange={setOrganisation} />
                 </>
               ) : (
                 <>
@@ -1576,6 +1586,7 @@ function App() {
                   isPaid={paidAgent}
                   currentInterval={user?.subscriptionTier === 'YEARLY' ? 'year' : 'month'}
                   currency={cur}
+                  agency={organisation?.status === 'ACTIVE' ? { name: organisation.name, band: organisation.band, total: organisation.artistTotal } : null}
                   onSubscribe={(interval, detail) => handleSelectPlan(interval === 'year' ? 'yearly' : 'monthly', detail)}
                 />
               </div>
@@ -1712,7 +1723,10 @@ function App() {
                       </div>
                       <div className="summary-breakdown-row is-add">
                         <span>{t('premium.addingSeatsRow', { n: addedSeats })}</span>
-                        <span>+{planDetail.addedPriceLabel}/{cycleWord}</span>
+                        {/* A seat change can lower the total (a smaller roster
+                            can leave a cheaper band), so the sign is computed,
+                            never assumed — this is the 12条の6 screen. */}
+                        <span>{(planDetail.addedDelta ?? 0) < 0 ? '−' : '+'}{planDetail.addedPriceLabel}/{cycleWord}</span>
                       </div>
                     </div>
                   )}
@@ -1754,6 +1768,9 @@ function App() {
                       the price and period (above), when payment is taken, and how
                       to cancel — in the same words as the tokushōhō page. */}
                   <ul className="summary-terms">
+                    {user?.role === 'AGENT' && (organisation?.status === 'ACTIVE'
+                      ? <li className="summary-terms-agency">{t('agency.checkoutMember', { total: organisation.artistTotal })}</li>
+                      : <li className="summary-terms-agency">{t('agency.checkoutNudge')} <button type="button" className="summary-terms-link" onClick={() => { setShowSubscription(false); setShowPremium(false); setShowSettings(true); }}>{t('agency.linkUpFirst')}</button></li>)}
                     <li>{t(isPlanChange ? 'premium.changeTiming' : 'premium.paymentTiming')}</li>
                     <li>{t('premium.cancelTerms')}</li>
                     <li className="summary-terms-legal">

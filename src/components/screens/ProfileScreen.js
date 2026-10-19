@@ -29,6 +29,7 @@ import ProfileMiniGrid from '../common/ProfileMiniGrid';
 import AvatarCropModal from '../common/AvatarCropModal';
 import HighlightsList from '../common/HighlightsList';
 import OnboardingChecklist from '../common/OnboardingChecklist';
+import AgencyJoinPrompt from '../common/AgencyJoinPrompt';
 import ProfileListRows from '../common/ProfileListRows';
 import RepresentationSection from '../common/RepresentationSection';
 import { raProfileUrl } from '../../utils/urls';
@@ -713,6 +714,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           Lives on the profile rather than in the feed: it is about setting
           YOUR account up, and the feed is where you read about other people.
           Keyed by profile so switching remounts it (state is per-profile). */}
+      {user?.role === 'AGENT' && <AgencyJoinPrompt userId={user?.id} />}
       <OnboardingChecklist key={user?.id || 'anon'} />
 
       {/* Verification nudge — non-blocking, opens the code screen */}
