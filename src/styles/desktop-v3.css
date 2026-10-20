@@ -350,11 +350,11 @@
     container-type: inline-size;
   }
 
-  /* each mode takes the canvas; the calendar and the matches grid read best
-     a little narrower than the tours pipeline */
+  /* The calendar reads best a little narrower than the tours pipeline.
+     Matches takes the full canvas: it holds two panes, not a reading column. */
   html.desktop-v3 .d3-tour-calendar { max-width: 1120px; margin: 0 auto; }
-  html.desktop-v3 .d3-tour-matches { max-width: 1120px; margin: 0 auto; }
-  html.desktop-v3 .d3-tour-matches .feature-preview { max-width: none; }
+  html.desktop-v3 .d3-tour-matches { max-width: none; }
+  html.desktop-v3 .d3-tour-matches .feature-preview { max-width: none; padding: 0; border: 0; background: none; }
 
   html.desktop-v3 .d3-tour .tour-kickstart-content,
   html.desktop-v3 .d3-tour .coming-soon-placeholder {
@@ -1517,19 +1517,6 @@
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.4);
   }
-  html.desktop-v3 .d3-mat-ovrow {
-    display: grid;
-    grid-template-columns: 46px minmax(0, 1fr);
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-  html.desktop-v3 .d3-mat-ovrow > span {
-    font-size: 9.5px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.35);
-  }
   /* ---- the overlap, drawn on real months ---- */
   /* Months keep a month's proportions: they sit side by side and stop,
      rather than stretching a single month across the whole pane. */
@@ -1639,10 +1626,5 @@
   html.desktop-v3 .d3-mat-tags .d3-mat-count { margin-top: 0; }
   html.desktop-v3 .d3-mat-row > .d3-mat-rel { margin-top: 5px; }
   html.desktop-v3 .d3-mat-loc .d3-mat-rel { margin-right: 8px; vertical-align: 1px; }
-
-  /* The matches canvas is wider than the single reading column the other
-     sub-tabs use, because it holds two panes. */
-  html.desktop-v3 .d3-tour-matches { max-width: none; }
-  html.desktop-v3 .d3-tour-matches .feature-preview { padding: 0; border: 0; background: none; }
 
 }

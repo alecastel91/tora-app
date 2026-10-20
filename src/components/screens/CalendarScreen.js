@@ -182,9 +182,6 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     return new Date(year, month, 1).getDay();
   };
   
-  const daysInMonth = getDaysInMonth(currentMonth, currentYear);
-  const firstDayOfMonth = getFirstDayOfMonth(currentMonth, currentYear);
-
   // Desktop v3 shows two months side by side and a rail beside them. The phone
   // keeps one month and the stacked sections below it.
   const nativeDesktop = useNativeDesktop();
