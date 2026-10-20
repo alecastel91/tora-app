@@ -2248,6 +2248,7 @@ const zh = {
     matGenresShared: "共同的风格",
     matPick: "选择一位查看重叠日期",
     matRanges: "{{n}} 个日期区间",
+    matNightsHere: "对方在此期间，你有 {{n}} 天有空",
   },
 };
 

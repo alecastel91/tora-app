@@ -901,7 +901,16 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <span><b className="is-them" />{t('desktop.matThem')}</span>
               <span><b className="is-you" />{t('desktop.matYou')}</span>
             </div>
-            {sharedNights > 0 && <p className="d3-mat-note">{t('desktop.matNightsCommon', { n: sharedNights })}</p>}
+            {/* An artist's ranges are a travel schedule, not open dates: the
+                lit days mean "you are free while they are in the area", which
+                is not the same claim as a shared open night. */}
+            {sharedNights > 0 && (
+              <p className="d3-mat-note">
+                {pickedMatch.kind === 'match' || opensDates(prof.role)
+                  ? t('desktop.matNightsCommon', { n: sharedNights })
+                  : t('desktop.matNightsHere', { n: sharedNights })}
+              </p>
+            )}
           </div>
         )}
 

@@ -2248,6 +2248,7 @@ const ja = {
     matGenresShared: "共通のジャンル",
     matPick: "相手を選ぶと重なりが表示されます",
     matRanges: "{{n}}件の期間",
+    matNightsHere: "相手の滞在中にあなたが空いている日が{{n}}日",
   },
 };
 

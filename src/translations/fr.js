@@ -2248,6 +2248,7 @@ const fr = {
     matGenresShared: "Genres en commun",
     matPick: "Choisissez quelqu'un pour voir le recoupement",
     matRanges: "{{n}} périodes",
+    matNightsHere: "{{n}} de vos nuits libres pendant leur séjour",
   },
 };
 

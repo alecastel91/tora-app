@@ -2248,6 +2248,7 @@ const es = {
     matGenresShared: "Géneros en común",
     matPick: "Elige a alguien para ver la coincidencia",
     matRanges: "{{n}} rangos de fechas",
+    matNightsHere: "{{n}} de tus noches libres mientras están allí",
   },
 };
 

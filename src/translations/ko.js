@@ -2248,6 +2248,7 @@ const ko = {
     matGenresShared: "공통 장르",
     matPick: "상대를 선택하면 겹치는 날이 표시됩니다",
     matRanges: "기간 {{n}}건",
+    matNightsHere: "상대가 머무는 동안 비어 있는 날 {{n}}일",
   },
 };
 
