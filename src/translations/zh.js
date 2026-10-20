@@ -2247,6 +2247,7 @@ const zh = {
     matNightsCommon: "共有 {{n}} 天",
     matGenresShared: "共同的风格",
     matPick: "选择一位查看重叠日期",
+    matRanges: "{{n}} 个日期区间",
   },
 };
 

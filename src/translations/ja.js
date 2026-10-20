@@ -2247,6 +2247,7 @@ const ja = {
     matNightsCommon: "共通する日が{{n}}日",
     matGenresShared: "共通のジャンル",
     matPick: "相手を選ぶと重なりが表示されます",
+    matRanges: "{{n}}件の期間",
   },
 };
 

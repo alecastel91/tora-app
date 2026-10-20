@@ -2247,6 +2247,7 @@ const it = {
     matNightsCommon: "{{n}} notti in comune",
     matGenresShared: "Generi in comune",
     matPick: "Scegli qualcuno per vedere la sovrapposizione",
+    matRanges: "{{n}} periodi",
   },
 };
 

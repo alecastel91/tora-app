@@ -2247,6 +2247,7 @@ const pt = {
     matNightsCommon: "{{n}} noites em comum",
     matGenresShared: "Géneros em comum",
     matPick: "Escolha alguém para ver a coincidência",
+    matRanges: "{{n}} intervalos de datas",
   },
 };
 

@@ -508,6 +508,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 // Both sides' open dates, so the desktop can draw the overlap
                 // itself — the matching already had them in hand.
                 sourceDates: source.availableDates || [],
+                sourceGenres: source.genres || [],
                 // Agent view: which represented artist this match is for.
                 forArtist: isAgent ? { id: source.id, name: source.name } : null,
               });
@@ -659,13 +660,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   const matches = filteredMatches;
 
-  // Desktop opens on the strongest lead rather than an empty pane; an exact
-  // date match if there is one, otherwise the first row of the feed.
-  useEffect(() => {
-    if (!nativeDesktop || pickedMatch) return;
-    if (matches.length > 0) setPickedMatch({ kind: 'match', id: `m-${matches[0].profile.id}-0`, match: matches[0] });
-    else if (travelFeed.length > 0) setPickedMatch({ kind: 'feed', id: `f-${travelFeed[0].profile.id}-${travelFeed[0].startDate}-0`, item: travelFeed[0] });
-  }, [nativeDesktop, matches, travelFeed, pickedMatch]);
 
   const handleConnect = (profile) => {
     if (!sentRequests.has(profile.id)) {
@@ -698,78 +692,147 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   /* ---- Desktop v3: Matches as a master-detail ----
      The left column lists every lead at two strengths — exact date matches
-     first, then the live feed; the right pane draws why the top one is a
-     match. Both sides' open dates are already on the match object, so the
-     overlap is computed here rather than fetched. */
+     first, then the live feed, one row per person rather than one per date
+     range. The right pane draws the reason on a real calendar: their open
+     nights, yours, and the ones you share. Both sides' dates are already on
+     the page (the matching needs them), so none of this costs a request. */
 
-  // The window of nights around a match, each marked for who is open on it.
-  const overlapDays = (match) => {
-    const shared = new Set((match.rawDates || []).map(normalizeDate));
-    const mine = new Set((match.sourceDates || []).map(normalizeDate));
-    const theirs = new Set((match.profile?.availableDates || []).map(normalizeDate));
-    const sorted = [...shared].sort();
-    if (sorted.length === 0) return [];
-    const out = [];
-    const cursor = new Date(`${sorted[0]}T00:00:00Z`);
-    const last = new Date(`${sorted[sorted.length - 1]}T00:00:00Z`);
-    // A long run would not fit the pane; the shared nights are what matter,
-    // so the window stops at two weeks.
-    while (cursor <= last && out.length < 14) {
-      const iso = cursor.toISOString().slice(0, 10);
-      out.push({ iso, day: cursor.getUTCDate(), mine: mine.has(iso), theirs: theirs.has(iso), both: shared.has(iso) });
-      cursor.setUTCDate(cursor.getUTCDate() + 1);
-    }
-    return out;
-  };
+  const ISO = (d) => d.toISOString().slice(0, 10);
+  const addDays = (d, n) => { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; };
+
+  // One row per person: a promoter with five open ranges is one lead, not five.
+  const feedByProfile = useMemo(() => {
+    // Someone who is already an exact date match belongs in that group and
+    // not again below it.
+    const alreadyMatched = new Set(matches.map((m) => m.profile?.id));
+    const byId = new Map();
+    travelFeed.forEach((f) => {
+      const id = f.profile?.id;
+      if (!id || alreadyMatched.has(id)) return;
+      if (!byId.has(id)) byId.set(id, { profile: f.profile, items: [], connected: f.connected, liked: f.liked });
+      byId.get(id).items.push(f);
+    });
+    return [...byId.values()];
+  }, [travelFeed, matches]);
 
   // A venue or promoter does not travel — it opens dates. Same list, two
   // headings, so neither role is described in the other's language.
+  const opensDates = (role) => ['VENUE', 'PROMOTER'].includes(String(role || '').toUpperCase());
   const feedGroups = [
-    { key: 'available', label: t('desktop.matAlsoAvailable'), items: travelFeed.filter((f) => f.kind === 'availability') },
-    { key: 'travelling', label: t('desktop.matAlsoTravelling'), items: travelFeed.filter((f) => f.kind !== 'availability') },
+    { key: 'available', label: t('desktop.matAlsoAvailable'), items: feedByProfile.filter((g) => opensDates(g.profile.role)) },
+    { key: 'travelling', label: t('desktop.matAlsoTravelling'), items: feedByProfile.filter((g) => !opensDates(g.profile.role)) },
   ].filter((g) => g.items.length > 0);
 
+  // Desktop opens on the strongest lead rather than an empty pane: an exact
+  // date match if there is one, otherwise the first person in the feed.
+  // Must sit below feedByProfile — the dependency array is read during
+  // render, and reading it above its declaration is a TDZ crash.
+  useEffect(() => {
+    if (!nativeDesktop || pickedMatch) return;
+    // The feed arrives before the matches do; falling back to it too early
+    // would pin a weaker lead and never let go.
+    if (loadingMatches) return;
+    if (matches.length > 0) setPickedMatch({ kind: 'match', id: `m-${matches[0].profile.id}-0`, match: matches[0] });
+    else if (feedByProfile.length > 0) setPickedMatch({ kind: 'group', id: `g-${feedByProfile[0].profile.id}`, group: feedByProfile[0] });
+  }, [nativeDesktop, matches, feedByProfile, pickedMatch, loadingMatches]);
+
+  // Every day worth drawing, as iso -> 'both' | 'them' | 'you'.
+  const dayMarks = (picked) => {
+    const marks = new Map();
+    const mineList = picked.kind === 'match' ? (picked.match.sourceDates || []) : (user?.availableDates || []);
+    new Set(mineList.map(normalizeDate)).forEach((d) => marks.set(d, 'you'));
+
+    if (picked.kind === 'match') {
+      new Set((picked.match.profile?.availableDates || []).map(normalizeDate))
+        .forEach((d) => marks.set(d, marks.get(d) === 'you' ? 'both' : 'them'));
+      new Set((picked.match.rawDates || []).map(normalizeDate)).forEach((d) => marks.set(d, 'both'));
+    } else {
+      picked.group.items.forEach((it) => {
+        const end = new Date(`${it.endDate}T00:00:00Z`);
+        for (let d = new Date(`${it.startDate}T00:00:00Z`); d <= end; d = addDays(d, 1)) {
+          const iso = ISO(d);
+          marks.set(iso, marks.get(iso) === 'you' ? 'both' : 'them');
+        }
+      });
+    }
+    return marks;
+  };
+
+  // Months the other side actually appears in — your own free days alone are
+  // not a reason to draw a month here.
+  const monthsToDraw = (marks) => [...new Set([...marks.entries()]
+    .filter(([, k]) => k !== 'you').map(([iso]) => iso.slice(0, 7)))].sort().slice(0, 3);
+
+  const miniMonth = (ym, marks) => {
+    const [y, mo] = ym.split('-').map(Number);
+    const firstDow = new Date(Date.UTC(y, mo - 1, 1)).getUTCDay();
+    const total = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    const cells = [];
+    t('dateFormat.weekLetters').split(',').forEach((w, i) => cells.push(<i key={`h${i}`} className="is-dow">{w}</i>));
+    for (let i = 0; i < firstDow; i++) cells.push(<i key={`p${i}`} className="is-pad" />);
+    for (let d = 1; d <= total; d++) {
+      const iso = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const kind = marks.get(iso);
+      cells.push(<i key={iso} className={kind ? `is-${kind}` : ''}>{d}</i>);
+    }
+    return (
+      <div className="d3-mini" key={ym}>
+        <p className="d3-mini-name">
+          {new Date(Date.UTC(y, mo - 1, 1)).toLocaleDateString(t('dateFormat.locale'), { month: 'long', year: 'numeric', timeZone: 'UTC' })}
+        </p>
+        <div className="d3-mini-grid">{cells}</div>
+      </div>
+    );
+  };
+
   const matchRowKey = (m, i) => `m-${m.profile.id}-${i}`;
-  const feedRowKey = (f, i) => `f-${f.profile.id}-${f.startDate}-${i}`;
+  const groupRowKey = (g) => `g-${g.profile.id}`;
 
   const desktopMatchRow = (match, i) => {
     const key = matchRowKey(match, i);
-    const days = overlapDays(match);
+    const shared = new Set((match.rawDates || []).map(normalizeDate));
+    const sorted = [...shared].sort();
+    const strip = [];
+    if (sorted.length) {
+      const end = new Date(`${sorted[sorted.length - 1]}T00:00:00Z`);
+      for (let d = new Date(`${sorted[0]}T00:00:00Z`); d <= end && strip.length < 14; d = addDays(d, 1)) strip.push(shared.has(ISO(d)));
+    }
     return (
-      <button
-        type="button"
-        key={key}
+      <button type="button" key={key}
         className={`d3-mat-row${pickedMatch?.id === key ? ' is-on' : ''}`}
-        onClick={() => setPickedMatch({ kind: 'match', id: key, match })}
-      >
+        onClick={() => setPickedMatch({ kind: 'match', id: key, match })}>
         <span className="d3-mat-name">{match.profile.name}</span>
         <span className="d3-mat-sub">
           {match.profile.role} · {match.profile.location}
           {match.forArtist ? ` · ${match.forArtist.name}` : ''}
         </span>
-        {days.length > 0 && (
+        {strip.length > 0 && (
           <span className="d3-mat-strip" aria-hidden>
-            {days.map((d) => <i key={d.iso} className={d.both ? 'is-both' : ''} />)}
+            {strip.map((on, j) => <i key={j} className={on ? 'is-both' : ''} />)}
           </span>
         )}
       </button>
     );
   };
 
-  const desktopFeedRow = (item, i) => {
-    const key = feedRowKey(item, i);
-    const where = [item.destCity, item.destCountry].filter(Boolean).join(', ') || item.zone;
+  const desktopGroupRow = (group) => {
+    const key = groupRowKey(group);
+    const first = group.items[0];
+    const where = [first.destCity, first.destCountry].filter(Boolean).join(', ') || first.zone;
+    const starts = group.items.map((i) => i.startDate).sort();
+    const ends = group.items.map((i) => i.endDate).sort();
     return (
-      <button
-        type="button"
-        key={key}
+      <button type="button" key={key}
         className={`d3-mat-row${pickedMatch?.id === key ? ' is-on' : ''}`}
-        onClick={() => setPickedMatch({ kind: 'feed', id: key, item })}
-      >
-        <span className="d3-mat-name">{item.profile.name}</span>
+        onClick={() => setPickedMatch({ kind: 'group', id: key, group })}>
+        <span className="d3-mat-name">{group.profile.name}</span>
         <span className="d3-mat-sub">
-          {item.profile.role} · {where} · {item.startDate}{item.endDate !== item.startDate ? ` → ${item.endDate}` : ''}
+          {group.profile.role} · {where} · {starts[0]}
+          {ends[ends.length - 1] !== starts[0] ? ` → ${ends[ends.length - 1]}` : ''}
         </span>
+        {group.items.length > 1 && (
+          <span className="d3-mat-count">{t('desktop.matRanges', { n: group.items.length })}</span>
+        )}
       </button>
     );
   };
@@ -777,11 +840,19 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const desktopMatchDetail = () => {
     if (!pickedMatch) return <p className="d3-mat-blank">{t('desktop.matPick')}</p>;
 
-    const prof = pickedMatch.kind === 'match' ? pickedMatch.match.profile : pickedMatch.item.profile;
+    const prof = pickedMatch.kind === 'match' ? pickedMatch.match.profile : pickedMatch.group.profile;
     const isRequested = sentRequests.has(prof.id);
     const isConnected = connectedUsers.has(prof.id);
-    const days = pickedMatch.kind === 'match' ? overlapDays(pickedMatch.match) : [];
-    const shared = days.filter((d) => d.both).length;
+    const marks = dayMarks(pickedMatch);
+    const months = monthsToDraw(marks);
+    const sharedNights = [...marks.values()].filter((k) => k === 'both').length;
+
+    // Only the genres both sides actually work in — their full list is on
+    // their profile, this pane is about what you have in common.
+    const myGenres = pickedMatch.kind === 'match' ? (pickedMatch.match.sourceGenres || []) : (user?.genres || []);
+    const theirGenres = prof.genres || [];
+    const sharedGenres = theirGenres.filter((g) => myGenres.includes(g));
+    const genreList = sharedGenres.length > 0 ? sharedGenres : theirGenres;
 
     return (
       <>
@@ -795,47 +866,35 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <h3 className="truncate">{prof.name}</h3>
               <span className={`role-badge ${(prof.role || '').toLowerCase()}`}>{prof.role}</span>
             </div>
-            <p className="d3-mat-loc">{prof.location}</p>
+            <p className="d3-mat-loc">
+              {prof.location}
+              {/* Real field, filled in by the venue — absent on most profiles today. */}
+              {prof.venueCapacity ? ` · ${t('profile.capacity')} ${Number(prof.venueCapacity).toLocaleString()}` : ''}
+            </p>
           </div>
         </div>
 
-        {days.length > 0 && (
-          <div className="d3-mat-ov">
-            <p className="d3-mat-lbl">{t('desktop.matOverlapTitle')}</p>
-            <div className="d3-mat-ovrow"><span /><div className="d3-mat-cells">
-              {days.map((d) => <b key={d.iso} className="is-date">{d.day}</b>)}
-            </div></div>
-            <div className="d3-mat-ovrow"><span>{t('desktop.matYou')}</span><div className="d3-mat-cells">
-              {days.map((d) => <b key={d.iso} className={d.mine ? 'is-you' : ''} />)}
-            </div></div>
-            <div className="d3-mat-ovrow"><span>{t('desktop.matThem')}</span><div className="d3-mat-cells">
-              {days.map((d) => <b key={d.iso} className={d.theirs ? 'is-them' : ''} />)}
-            </div></div>
-            <div className="d3-mat-ovrow"><span>{t('desktop.matBoth')}</span><div className="d3-mat-cells">
-              {days.map((d) => <b key={d.iso} className={d.both ? 'is-both' : ''}>{d.both ? d.day : ''}</b>)}
-            </div></div>
-            <p className="d3-mat-note">{t('desktop.matNightsCommon', { n: shared })}</p>
-          </div>
-        )}
-
-        {pickedMatch.kind === 'feed' && (
+        {months.length > 0 && (
           <div className="d3-mat-ov">
             <p className="d3-mat-lbl">
-              {pickedMatch.item.kind === 'availability' ? t('tour.feedOpenDates') : t('calendar.travelSchedules')}
+              {pickedMatch.kind === 'match' ? t('desktop.matOverlapTitle')
+                : opensDates(prof.role) ? t('tour.feedOpenDates') : t('calendar.travelSchedules')}
             </p>
-            <p className="d3-mat-note">
-              {[pickedMatch.item.destCity, pickedMatch.item.destCountry].filter(Boolean).join(', ') || pickedMatch.item.zone}
-              {' · '}{pickedMatch.item.startDate}
-              {pickedMatch.item.endDate !== pickedMatch.item.startDate ? ` → ${pickedMatch.item.endDate}` : ''}
-            </p>
+            <div className="d3-mat-months">{months.map((ym) => miniMonth(ym, marks))}</div>
+            <div className="d3-mat-key">
+              <span><b className="is-both" />{t('desktop.matBoth')}</span>
+              <span><b className="is-them" />{t('desktop.matThem')}</span>
+              <span><b className="is-you" />{t('desktop.matYou')}</span>
+            </div>
+            {sharedNights > 0 && <p className="d3-mat-note">{t('desktop.matNightsCommon', { n: sharedNights })}</p>}
           </div>
         )}
 
-        {prof.genres && prof.genres.length > 0 && (
+        {genreList.length > 0 && (
           <div className="d3-mat-ov">
-            <p className="d3-mat-lbl">{t('desktop.matGenresShared')}</p>
+            <p className="d3-mat-lbl">{sharedGenres.length > 0 ? t('desktop.matGenresShared') : t('search.genres')}</p>
             <div className="match-genres-simple">
-              {prof.genres.slice(0, 6).map((g) => <span key={g} className="genre-tag-small">{g}</span>)}
+              {genreList.slice(0, 8).map((g) => <span key={g} className="genre-tag-small">{g}</span>)}
             </div>
           </div>
         )}
@@ -947,7 +1006,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   {feedGroups.map((g) => (
                     <React.Fragment key={g.key}>
                       <p className="d3-mat-group">{g.label} · {g.items.length}</p>
-                      {g.items.map(desktopFeedRow)}
+                      {g.items.map(desktopGroupRow)}
                     </React.Fragment>
                   ))}
                   {matches.length === 0 && feedGroups.length === 0 && !feedLoading && (

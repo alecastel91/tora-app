@@ -2259,6 +2259,7 @@ const en = {
     matNightsCommon: "{{n}} nights in common",
     matGenresShared: "Genres you share",
     matPick: "Pick someone to see the overlap",
+    matRanges: "{{n}} date ranges",
   },
 };
 

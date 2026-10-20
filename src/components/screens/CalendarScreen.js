@@ -1040,7 +1040,9 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
               <span className="d3-cal-chip">{t('desktop.calNothingPlanned')}</span>
             )}
           </div>
-          <button type="button" className="d3-cal-mark" onClick={toggleFocusedDay}>
+          {/* The control is coloured by what it does, not by the day's state:
+              making a day free is green, taking it back is a neutral grey. */}
+          <button type="button" className={`d3-cal-mark${focusedInfo.isFree ? ' is-busy' : ''}`} onClick={toggleFocusedDay}>
             {focusedInfo.isFree ? t('desktop.calMarkBusy') : t('desktop.calMarkFree')}
           </button>
         </>
