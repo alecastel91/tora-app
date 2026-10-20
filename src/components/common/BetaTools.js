@@ -1,23 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import BetaSheet from './BetaSheet';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
-const BANNER_TEXT = 'Test environment — bookings and payments here are not real';
 
 /**
- * Beta-only chrome: the persistent "test environment" banner and the floating
- * feedback widget. Renders nothing outside beta (VITE_TORA_ENV !== 'beta'),
- * so prod builds carry zero visual footprint.
+ * Beta-only chrome: the floating feedback widget and the task sheet behind
+ * it. Renders nothing outside beta (VITE_TORA_ENV !== 'beta'), so prod builds
+ * carry zero visual footprint.
+ * The "test environment" banner that used to sit across the top was removed
+ * deliberately — the BETA button is now the only marker that this is not
+ * production.
  * Deliberately English-only — beta tooling, not product surface.
  */
 const BetaTools = () => {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
-  const bannerRef = useRef(null);
-  const [ticker, setTicker] = useState(false);
 
   // Commit SHA for silent feedback context — fetched once per session.
   useEffect(() => {
@@ -67,41 +66,10 @@ const BetaTools = () => {
     window.addEventListener('pointercancel', onEnd);
   };
 
-  // Shift the sticky header/content below the fixed banner.
-  useEffect(() => {
-    if (!IS_BETA) return undefined;
-    document.body.classList.add('beta-env');
-    return () => document.body.classList.remove('beta-env');
-  }, []);
-
-  // Ticker only when the text doesn't fit on one line at this viewport width.
-  useEffect(() => {
-    if (!IS_BETA) return undefined;
-    const check = () => {
-      const el = bannerRef.current;
-      const text = el && el.firstChild;
-      if (el && text) setTicker(text.scrollWidth > el.clientWidth + 1);
-    };
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
   if (!IS_BETA) return null;
 
   return (
     <>
-      {/* Portaled to <body> so it pins to the true screen top, above the
-          transformed #root (which is anchored 24px down — see App.css).
-          When the text overflows, it becomes a seamless horizontal ticker. */}
-      {createPortal(
-        <div ref={bannerRef} className={`beta-banner${ticker ? ' is-ticker' : ''}`}>
-          <span className="beta-banner-text">{BANNER_TEXT}</span>
-          {ticker && <span className="beta-banner-text" aria-hidden="true">{BANNER_TEXT}</span>}
-        </div>,
-        document.body,
-      )}
-
       <button
         type="button"
         className="beta-fab"

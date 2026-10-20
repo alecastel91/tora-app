@@ -12766,59 +12766,12 @@ textarea.form-textarea:focus {
 }
 
 /* ============================================================
-   Beta environment chrome (banner + feedback FAB) — only renders
-   when VITE_TORA_ENV=beta; zero footprint in prod builds.
+   Beta environment chrome (feedback FAB + task sheet) — only renders
+   when VITE_TORA_ENV=beta; zero footprint in prod builds. The banner
+   that used to sit across the top was removed, and with it the 24px
+   #root offset it needed; --beta-banner-h is no longer set anywhere,
+   so the few rules still reading it fall back to 0px.
    ============================================================ */
-.beta-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 24px;
-  z-index: var(--z-screen);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 10px;
-  background: #241a00;
-  border-bottom: 1px solid rgba(255, 184, 0, 0.35);
-  color: #FFC107;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  /* Never wrap — a 2nd line would overlap the header below it */
-  white-space: nowrap;
-  overflow: hidden;
-}
-.beta-banner-text { flex-shrink: 0; }
-/* When the text overflows, both copies scroll left by their own width for a
-   seamless loop (the second copy is added by BetaTools only in ticker mode) */
-.beta-banner.is-ticker { justify-content: flex-start; padding: 0; }
-.beta-banner.is-ticker .beta-banner-text {
-  padding-left: 56px;
-  animation: beta-ticker 16s linear infinite;
-}
-@keyframes beta-ticker {
-  to { transform: translateX(-100%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .beta-banner.is-ticker .beta-banner-text { animation: none; }
-}
-/* Anchor the whole app 24px below the banner and give it a fresh containing
-   block (transform), so the app's own position:fixed header and position:sticky
-   sub-tabs re-anchor to this shorter box automatically — no per-element offsets,
-   nothing clipped. `body` is position:fixed, so #root can absolutely fill it. */
-body.beta-env { --beta-banner-h: 24px; }
-body.beta-env #root {
-  position: absolute;
-  top: 24px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: auto;
-  transform: translateZ(0);
-}
 
 .beta-fab {
   position: fixed;
