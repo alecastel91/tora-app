@@ -715,5 +715,14 @@ The `api.js` service class organizes endpoints into these groups:
 - Backend handles subscription enforcement; frontend shows appropriate UI gates
 - The API service defaults to `/api` (proxy) or uses `REACT_APP_API_URL` env var
 
-## Lint gate (since 2026-10-01)
-`npm run lint` (ESLint, flat config, `no-undef` only) runs inside `npm run build` and `npm test`, so Vercel refuses a bundle that references a name outside its scope. Three prod crashes came from exactly that (money, embeds, uploading). Never remove the gate from `build`; add globals to eslint.config.js instead of disabling the rule.
+## Lint gate (since 2026-10-01, extended 2026-10-19)
+`npm run lint` runs inside `npm run build` and `npm test`, so Vercel refuses a bundle that fails it. Two rules, both aimed at crashes a green build cannot see — `vite build` parses, it never resolves names or checks their order:
+
+- **`no-undef`** — the name is not in scope at all. Three prod crashes came from this (money in the checkout subtree, embeds in ViewProfile, uploading in the mobile Profile tab).
+- **`no-use-before-define`** (`variables: false`) — the name IS in scope but declared further down, so reading it throws `ReferenceError` at runtime: the temporal dead zone. Two outages came from this: the organisation effect placed above `useAppContext()` (2026-10-16, ~10 min of prod "Something went wrong"), and `mult` read six lines above its `const` in `AgentSeatPricing` (2026-10-19), which replaced the whole app with the error boundary **for every agent, on prod and beta**, until a hard refresh after the fix.
+
+`variables: false` is deliberate and load-bearing. It still reports same-scope use-before-declaration — the dangerous case, and exactly both outages — while ignoring references from nested functions, which only run after initialisation. With `variables: true` the rule reports 64 safe callback references and becomes noise nobody will read. Verified both ways: with the bug reintroduced `npm run build` exits 1; across all of `src` with the bug fixed, zero hits.
+
+Never remove either rule from `build`; add globals to eslint.config.js instead of disabling `no-undef`, and move the declaration instead of disabling `no-use-before-define`.
+
+**What lint still cannot catch:** a component that renders but throws for other reasons. After touching a component that does arithmetic or reads context, render it — dev stack, headless, or a throwaway `renderToString` harness. A green build proves the module parses, not that a screen appears.
