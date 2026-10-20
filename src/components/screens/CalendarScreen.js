@@ -754,6 +754,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         }
       }
 
+      // Cells are a fixed height so the grid never reflows around its content.
+      // The two-month desktop grid has room for one chip and a count; the
+      // phone's taller cells keep two.
+      const chipLimit = nativeDesktop ? 1 : 2;
+
       days.push(
         <div
           key={`day-${day}`}
@@ -799,7 +804,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
               a drag-select or toggle the day, on mouse or touch. */}
           {dayDeals.length > 0 && (
             <div className="calendar-day-events">
-              {dayDeals.slice(0, 2).map(({ deal, label }) => (
+              {dayDeals.slice(0, chipLimit).map(({ deal, label }) => (
                 <button
                   key={deal.id}
                   type="button"
@@ -813,7 +818,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   {label}
                 </button>
               ))}
-              {dayDeals.length > 2 && <span className="calendar-day-more">+{dayDeals.length - 2}</span>}
+              {dayDeals.length > chipLimit && <span className="calendar-day-more">+{dayDeals.length - chipLimit}</span>}
             </div>
           )}
           {schedulePos.hasSchedule && (() => {
