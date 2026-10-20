@@ -142,7 +142,7 @@ const GuideScreen = ({ onClose }) => {
     // leave the app showing through. This is a portaled full-screen overlay —
     // it needs its own opaque ground, not the ambient one.
     <div
-      className="fixed inset-0 z-[10040] overflow-y-auto"
+      className="guide-screen fixed inset-0 z-[10040] overflow-y-auto"
       style={{ backgroundColor: '#0a0a0a' }}
     >
       {/* The app's own sub-screen header (Settings, Achievements): sticky bar,

@@ -34,6 +34,8 @@ import ProfileListRows from '../common/ProfileListRows';
 import RepresentationSection from '../common/RepresentationSection';
 import { raProfileUrl } from '../../utils/urls';
 import { networkSectionsForRole } from '../../utils/networkSections';
+import { useNativeDesktop } from '../../utils/desktopV2';
+import OwnProfilePage from '../desktop/OwnProfilePage';
 
 // --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
 const GridIcon = () => (
@@ -85,6 +87,10 @@ const fmtStat = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')
 const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitchTab }) => {
   const { user, updateUser, userProfiles, switchProfile, addProfile, deleteProfile, likedProfiles, likedProfilesData, connectedUsers, connectedUsersData, likerProfilesData, refreshAccountUser } = useAppContext();
   const { t } = useLanguage();
+  // Desktop v3 renders the main body through a page designed for a desk
+  // (components/desktop/OwnProfilePage). The phone body below is unchanged,
+  // and it still serves as the narrow master column beside a sub-screen.
+  const nativeDesktop = useNativeDesktop();
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showBetaFeedback, setShowBetaFeedback] = useState(false);
   const [showManageProfile, setShowManageProfile] = useState(false);
@@ -418,7 +424,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // Network strips: completed-deal counterparts (shared role config).
   const networkSections = networkSectionsForRole(user?.role, ownEnriched?.network);
 
-  function renderProfileBody() {
+  function renderProfileBody({ compact = false } = {}) {
   // The official TORA account is an admin/broadcast profile: no networking
   // stats or actions, no role — just identity + the website. It keeps full
   // app access (search/news/messages via the tab bar).
@@ -490,8 +496,41 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     // Own black base so the global pink ambient doesn't bleed in — the Profile
     // shows only its single role colour.
     <div className="screen active profile-screen px-5 pt-6 pb-5" style={{ backgroundColor: '#000' }}>
-      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
-          modals live OUTSIDE it so they aren't trapped under the app header. */}
+      {nativeDesktop && !compact ? (
+        <OwnProfilePage
+          user={user}
+          userProfiles={userProfiles}
+          defaultProfileId={defaultProfileId}
+          embeds={embeds}
+          ownBadges={ownBadges}
+          rosterArtists={rosterArtists}
+          artistActionsMap={artistActionsMap}
+          ownHasActions={ownHasActions}
+          representedByProfiles={ownEnriched?.representedByProfiles}
+          networkSections={networkSections}
+          likedProfilesList={likedProfilesList}
+          likerProfilesList={likerProfilesList}
+          connectionsList={connectionsList}
+          trialInfo={getTrialTimeRemaining()}
+          fileInputRef={fileInputRef}
+          onPickAvatar={(e) => (e && e.target && e.target.files ? handleImageUpload(e) : fileInputRef.current?.click())}
+          onEdit={() => { closeSubScreens(); setShowEditProfile(true); }}
+          onManage={() => { closeSubScreens(); setShowManageProfile(true); }}
+          onRoster={() => { closeSubScreens(); setShowRepresentedArtists(true); }}
+          onFindAgent={() => { closeSubScreens(); setShowFindAgent(true); }}
+          onOpenSwitcher={() => setShowProfileSwitcher(true)}
+          onAddProfile={() => { closeSubScreens(); setShowAddProfile(true); }}
+          onSwitchProfile={switchProfile}
+          onOpenLikes={() => setShowLikesList(true)}
+          onOpenLikers={() => setShowLikersList(true)}
+          onOpenConnections={() => setShowConnectionsList(true)}
+          onOpenAchievements={onOpenAchievements}
+          onOpenPremium={onOpenPremium}
+          onVerify={() => setShowVerification(true)}
+          onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }}
+          onManageArtist={(artist) => { closeSubScreens(); setManagingArtist(artist); }}
+        />
+      ) : (
       <div className="relative isolate">
       {/* deep-space backdrop: role-colored bloom + faint engineering grid, fading out */}
       <div
@@ -894,6 +933,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       </div>
 
       </div>
+      )}
 
       {/* Likes List Modal */}
       <Modal
@@ -1104,7 +1144,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // reads consts like roleBloomColor (TDZ).
   const renderSplit = (detail) => (
     <div className="md-split">
-      <div className="md-master">{renderProfileBody()}</div>
+      <div className="md-master">{renderProfileBody({ compact: true })}</div>
       <div className="md-detail">{detail}</div>
     </div>
   );

@@ -2,11 +2,28 @@ import React from 'react';
 import { ProfileIcon, SearchIcon, BookingsIcon, MessageIcon, PlaneIcon, NewsIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 import CountBadge from './CountBadge';
+import { useAppContext } from '../../contexts/AppContext';
+import { getAvatarClass, roleLabel } from '../../utils/roles';
 
-const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0, bookingsHasDot = false }) => {
+// Desktop v3 dashboard glyph — lives here rather than in utils/icons because
+// no other surface has a home tab.
+const DashboardIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3" y="3" width="8" height="10" rx="1.5" />
+    <rect x="13" y="3" width="8" height="6" rx="1.5" />
+    <rect x="13" y="11" width="8" height="10" rx="1.5" />
+    <rect x="3" y="15" width="8" height="6" rx="1.5" />
+  </svg>
+);
+
+// homeTab — desktop v3 only (App.js passes useNativeDesktop()): a Dashboard
+// entry leads the list. Never true on the phone.
+const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposalsCount = 0, bookingsHasDot = false, homeTab = false }) => {
   const { t } = useLanguage();
+  const { user } = useAppContext();
 
   const tabs = [
+    ...(homeTab ? [{ id: 'home', icon: DashboardIcon, label: t('desktop.home') }] : []),
     // Feed first, profile last — the order thumbs already know from
     // Instagram/LinkedIn/X; the two work tabs sit under the right thumb.
     { id: 'news', icon: NewsIcon, label: t('nav.news') },
@@ -45,6 +62,19 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
                           : 'text-white/40 hover:text-white/70'}`}
             onClick={() => onTabChange(tab.id)}
           >
+            {/* Desktop v3: the Profile entry is a chip — who you are, at the
+                foot of the sidebar. Everything else renders as before. */}
+            {homeTab && tab.id === 'profile' && user ? (
+              <span className="d3-chip flex w-full items-center gap-2.5 text-left">
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full text-[12px] font-semibold text-white ${getAvatarClass(user.role)}`}>
+                  {user.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : (user.name || '?').charAt(0).toUpperCase()}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-[13px] font-medium">{user.name}</span>
+                  <span className="block truncate text-[11px] text-white/45">{roleLabel(user.role, t)}</span>
+                </span>
+              </span>
+            ) : (
             <div className="relative flex items-center justify-center [&_svg]:w-5 [&_svg]:h-5">
               <Icon />
               {(showMessagesBadge || showTourBadge) && (
@@ -55,7 +85,8 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
                                  shadow-[0_0_6px_rgba(255,51,102,0.7)]" />
               )}
             </div>
-            <span>{tab.label}</span>
+            )}
+            {!(homeTab && tab.id === 'profile' && user) && <span>{tab.label}</span>}
           </button>
         );
       })}

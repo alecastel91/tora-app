@@ -1,0 +1,1630 @@
+/* ============================================================================
+   DESKTOP V3 — the desktop-NATIVE product, on top of the v2 frame.
+   ----------------------------------------------------------------------------
+   ?desktop=v3 (console: toraDesktop('v3')). <html> carries BOTH desktop-v2
+   (the frame) and desktop-v3 (these screens). Same invariant as desktop-v2.css:
+   every rule sits under @media (min-width: 1024px) AND html.desktop-v3, so the
+   flag off matches nothing and the phone is out of range by construction. The
+   v3 screens themselves only mount through useNativeDesktop() (>= 1024px).
+
+   Loads after desktop-v2.css. Where a v2 rule must be beaten on specificity
+   (the tab-panel measure cap), the selector carries both classes.
+   ========================================================================= */
+
+@media (min-width: 1024px) {
+  /* ---- v3 screens own their canvas: no reading-measure cap, no auto margins.
+     Beats v2's cap (0,6,1) on equal specificity by loading later. ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.d3-screen {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+  }
+
+  /* Sidebar: the dashboard sits first, so the hairline that separates
+     Discover from Work moves down one row (v2 draws it before child 4). */
+  html.desktop-v3 .tab-item:nth-child(4) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  html.desktop-v3 .tab-item:nth-child(5) {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--d2-line);
+  }
+
+  /* ---- shared surfaces ---- */
+  html.desktop-v3 .d3-panel {
+    background: var(--d2-surface);
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+  }
+
+  /* Fixed-height workspaces: the page scroller holds still and the panes
+     scroll inside. Height = viewport minus the top bar and the gutters. */
+  html.desktop-v3 .d3-fill {
+    height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2);
+    min-height: 480px;
+  }
+
+  /* ---- Dashboard ---- */
+  html.desktop-v3 .d3-dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--d2-rail);
+    gap: var(--d2-gap);
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  html.desktop-v3 .d3-dash-invite { padding: 4px 16px 8px; }
+  html.desktop-v3 .d3-dash-invite .settings-section { margin: 0; padding: 10px 0 0; background: none; border: 0; box-shadow: none; }
+  html.desktop-v3 .d3-dash-span {
+    grid-column: 1 / -1;
+  }
+
+  /* ---- Bookings pipeline: table left, inspector right ---- */
+  html.desktop-v3 .d3-board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(400px, 40%);
+    gap: var(--d2-gap);
+  }
+
+  html.desktop-v3 .d3-board > * {
+    min-height: 0;
+    overflow: auto;
+  }
+
+  /* The existing BookingsScreen, in focus mode, is the inspector's body: its
+     expanded card must be a static block inside the pane — not the
+     position:fixed right-hand pane that v2/responsive.css make of it. */
+  html.desktop-v3 .bookings-screen--focus .booking-card,
+  html.desktop-v3 .bookings-screen--focus .booking-card.expanded {
+    position: relative; /* not fixed — but still the anchor for the date badge */
+    width: auto;
+    left: auto;
+    top: auto;
+    bottom: auto;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    box-shadow: none;
+    z-index: auto;
+    overflow: visible;
+  }
+
+  html.desktop-v3 .bookings-screen--focus .booking-card:hover {
+    background: #0a0a0e;
+    border-color: var(--d2-line);
+  }
+
+  html.desktop-v3 .bookings-screen--focus .booking-card .booking-header {
+    cursor: default;
+  }
+
+  /* date · counterpart · event · fee · status (chip + the status sentence) */
+  html.desktop-v3 .d3-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1.25fr) minmax(0, 1fr) 96px minmax(0, 1.4fr);
+    gap: 12px;
+    align-items: center;
+  }
+
+  /* ---- Search workspace: list left, map right ---- */
+  html.desktop-v3 .d3-ws {
+    display: grid;
+    grid-template-columns: 440px minmax(0, 1fr);
+    gap: var(--d2-gap);
+  }
+
+  html.desktop-v3 .d3-ws > * {
+    min-height: 0;
+  }
+
+  html.desktop-v3 .d3-ws-globe {
+    position: relative; /* SearchGlobe is absolute inset-0 inside its stage */
+    overflow: hidden;
+    border-radius: var(--d2-r-card);
+    border: 1px solid var(--d2-line);
+    background: #040407;
+  }
+
+  html.desktop-v3 .d3-ws .search-result-card {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  html.desktop-v3 .d3-ws .search-result-card .result-actions .btn {
+    padding: 6px 10px;
+  }
+
+  /* The map takes the whole window (Esc leaves). SearchGlobe's own
+     ResizeObserver redraws the canvas; the members panel keeps working. */
+  html.desktop-v3 .d3-ws-globe--full {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-screen);
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* .app-content is a stacking context (z-index:1), so the map alone cannot
+     paint over the sidebar/top bar (z 100 in the container's context). While
+     the map is full, lift the whole content layer above them. */
+  html.desktop-v3 .app-container:has(.d3-ws-globe--full) .app-content {
+    z-index: var(--z-screen);
+  }
+
+  /* The thread column at desk density */
+  html.desktop-v3 .chat-screen .chat-header { padding: 10px 16px; }
+  html.desktop-v3 .chat-screen .chat-messages { padding: 20px 24px; gap: 10px; }
+  html.desktop-v3 .chat-screen .message-bubble { max-width: min(520px, 72%); }
+  html.desktop-v3 .chat-screen .chat-input-container { padding: 12px 16px 16px; }
+  html.desktop-v3 .chat-screen .chat-input-disabled { padding: 14px 24px; font-size: 13px; }
+
+  /* ---- Make an Offer: a right-hand drawer, so the conversation or the
+     tour list stays in view beside it. ---- */
+  html.desktop-v3 .make-offer-modal-overlay {
+    top: var(--d2-top);
+    right: 0;
+    bottom: 0;
+    background: var(--d2-surface);
+    border-left: 1px solid var(--d2-line);
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 0;
+  }
+  html.desktop-v3 .make-offer-modal-overlay > .make-offer-modal { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; background: transparent; }
+  /* from Tour: a drawer beside the pipeline; from chat: it takes the thread column (v2 sets left) */
+  html.desktop-v3 .md-drawer.make-offer-modal-overlay { left: auto; }
+  html.desktop-v3 .make-offer-header { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--d2-line); background: transparent; }
+  html.desktop-v3 .make-offer-header .back-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; }
+  html.desktop-v3 .make-offer-header .back-btn svg { width: 18px; height: 18px; }
+  html.desktop-v3 .make-offer-header h2 { flex: 1; margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 20px; font-weight: 600; letter-spacing: -0.015em; text-transform: none; text-align: left; }
+  html.desktop-v3 .make-offer-recipient { padding: 12px 20px; gap: 12px; background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--d2-line); }
+  html.desktop-v3 .make-offer-recipient .recipient-avatar { width: 36px; height: 36px; font-size: 14px; }
+  html.desktop-v3 .make-offer-recipient .recipient-info h3 { font-size: 13.5px; font-weight: 600; text-transform: none; letter-spacing: 0; margin: 0 0 2px; }
+  html.desktop-v3 .make-offer-recipient .recipient-info p { font-size: 12px; }
+  html.desktop-v3 .make-offer-modal .make-offer-recipient,
+  html.desktop-v3 .make-offer-modal .make-offer-form { max-width: none; }
+  html.desktop-v3 .make-offer-form { padding: 18px 20px 24px; }
+  html.desktop-v3 .make-offer-form .form-section { margin-bottom: 22px; }
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-section h3,
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-section h4 { margin: 0 0 12px; padding: 0; border: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+  html.desktop-v3 .make-offer-form .form-group { margin-bottom: 14px; }
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-group label { font-size: 11px; letter-spacing: 0.08em; margin-bottom: 5px; }
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-input,
+  html.desktop-v3 .make-offer-modal .make-offer-form .form-textarea,
+  html.desktop-v3 .make-offer-modal .make-offer-form select { padding: 9px 12px; font-size: 13.5px; border-radius: var(--d2-r-ctl); }
+  html.desktop-v3 .make-offer-form .form-row { gap: 12px; margin-bottom: 0; }
+  html.desktop-v3 .make-offer-form .form-hint { font-size: 12px; }
+  html.desktop-v3 .make-offer-actions { justify-content: flex-end; padding: 12px 20px; background: transparent; border-top: 1px solid var(--d2-line); }
+  html.desktop-v3 .make-offer-actions .btn { flex: 0 0 auto; padding: 9px 16px; }
+
+  /* No thread open: the list keeps its column, the thread area is a hint */
+  html.desktop-v3 .app-content > .tab-panel:has(> .d3-msg-empty) {
+    display: grid;
+    grid-template-columns: var(--d2-master) minmax(0, 1fr);
+    gap: var(--d2-gap);
+    align-items: start;
+  }
+
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel:has(> .d3-msg-empty) > .screen.messages-screen {
+    max-width: none;
+    margin: 0;
+  }
+
+  html.desktop-v3 .d3-msg-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2);
+    border: 1px dashed var(--d2-line);
+    border-radius: var(--d2-r-card);
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 13px;
+  }
+
+  /* ---- Own profile page (OwnProfilePage.js) — same bones as ProfilePage ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.profile-screen:has(> .d3-op) {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  html.desktop-v3 .d3-op {
+    text-align: left; /* the phone profile centres everything */
+    container-type: inline-size;
+  }
+
+  html.desktop-v3 .d3-op-head {
+    position: relative;
+    overflow: hidden;
+    padding: 22px 24px 14px;
+  }
+
+  /* A narrow band (1024px window, or a pane) puts the actions under the
+     identity instead of squeezing the name out. */
+  @container (max-width: 1000px) {
+    html.desktop-v3 .d3-op-head > .flex {
+      flex-wrap: wrap;
+    }
+
+    html.desktop-v3 .d3-op-actions {
+      width: 100%;
+      justify-content: flex-start;
+      padding-top: 4px;
+    }
+  }
+
+  @container (max-width: 900px) {
+    html.desktop-v3 .d3-op-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  html.desktop-v3 .d3-op-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 28px;
+    align-items: start;
+    margin-top: 24px;
+  }
+
+  html.desktop-v3 .d3-op h1,
+  html.desktop-v3 .d3-op .font-futuristic {
+    letter-spacing: -0.015em;
+  }
+
+  html.desktop-v3 .d3-op main .grid-cols-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* the roster grid */
+  }
+
+  html.desktop-v3 .d3-op-body .mb-5,
+  html.desktop-v3 .d3-op-body .mb-6,
+  html.desktop-v3 .d3-op-body .mb-8 {
+    margin-bottom: 0;
+  }
+
+  /* the checklist card keeps its own margins on the phone */
+  html.desktop-v3 .d3-op main > .onboarding-checklist {
+    margin: 0;
+  }
+
+  /* ---- Sidebar: the profile chip ---- */
+  html.desktop-v3 .tab-item:has(> .d3-chip) {
+    height: auto;
+    padding: 8px 10px;
+  }
+
+  /* ---- Top bar: ⌘K ---- */
+  html.desktop-v3 .d3-k {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 32px;
+    min-width: 220px;
+    padding: 0 10px 0 12px;
+    border: 1px solid var(--d2-line-strong);
+    border-radius: var(--d2-r-ctl);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  html.desktop-v3 .d3-k:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  html.desktop-v3 .d3-k span {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  html.desktop-v3 .d3-k kbd {
+    font-family: inherit;
+    font-size: 10px;
+    padding: 1px 5px;
+    border: 1px solid var(--d2-line-strong);
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ---- Tour workspace (desktop v3): the calendar always on the left, the
+     Matches / Tour Kickstart panel on the right. Drawers (create / edit tour,
+     offers) dock over the side panel instead of shrinking the workspace. ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.tour-screen.d3-tour,
+  html.desktop-v2.desktop-v3 body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen.d3-tour {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0;
+    min-height: 0;
+    container-type: inline-size;
+  }
+
+  /* The calendar reads best a little narrower than the tours pipeline.
+     Matches takes the full canvas: it holds two panes, not a reading column. */
+  html.desktop-v3 .d3-tour-calendar { max-width: 1120px; margin: 0 auto; }
+  html.desktop-v3 .d3-tour-matches { max-width: none; }
+  html.desktop-v3 .d3-tour-matches .feature-preview { max-width: none; padding: 0; border: 0; background: none; }
+
+  html.desktop-v3 .d3-tour .tour-kickstart-content,
+  html.desktop-v3 .d3-tour .coming-soon-placeholder {
+    padding: 0;
+    text-align: left;
+  }
+
+  /* mode switch: Calendar | Tours */
+  html.desktop-v3 .d3-tour-modes {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: 16px;
+    border: 1px solid var(--d2-line);
+    border-radius: 10px;
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v3 .d3-tour-modes button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    color: rgba(255, 255, 255, 0.5);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  html.desktop-v3 .d3-tour-modes button svg { width: 14px; height: 14px; }
+  html.desktop-v3 .d3-tour-modes button:hover { color: #fff; }
+  html.desktop-v3 .d3-tour-modes button.is-on { background: rgba(255, 255, 255, 0.08); color: #fff; }
+
+  /* tours pipeline rows: tour · dates · gigs · interest · revenue/fee · status */
+  html.desktop-v3 .d3-tour-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) 92px 100px minmax(0, 1.2fr) minmax(0, 0.9fr);
+    gap: 12px;
+    align-items: center;
+  }
+
+  html.desktop-v3 .d3-tours { height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2 - 62px); }
+
+  /* the detail pane shows one tour card: no list chrome, no gutters */
+  html.desktop-v3 .d3-tours .tour-kickstart-content,
+  html.desktop-v3 .d3-tours .tour-kickstart-section { padding: 0; margin: 0; }
+  html.desktop-v3 .d3-tours .tour-cards-list { display: block; }
+  html.desktop-v3 .d3-tours .tour-card,
+  html.desktop-v3 .d3-tours .tour-cards-list > div { margin: 0; }
+
+  /* drawers dock at the right edge over the side panel */
+  html.desktop-v3 .md-drawer {
+    left: auto;
+    /* Sit exactly over the pipeline's detail column so the card underneath is
+       covered, not peeking out. The board is grid-template-columns
+       minmax(0,1fr) minmax(400px,40%) inside the canvas, so the detail column
+       is 40% of (viewport - sidebar - both gutters), floored at 400px, and its
+       right edge is one gutter in from the viewport. */
+    right: var(--d2-gutter);
+    width: max(400px, calc((100vw - var(--d2-sidebar) - var(--d2-gutter) * 2) * 0.4));
+    padding: 0;
+    background: var(--d2-surface);
+    justify-content: stretch;
+    align-items: stretch;
+  }
+  html.desktop-v3 .md-drawer > .modal-content,
+  html.desktop-v3 .md-drawer > .modal-container { width: 100%; border: 0; border-left: 1px solid var(--d2-line); border-radius: 0; background: transparent; }
+
+  /* ---- Tour (phone sub-tabs, v2 frame only): sub-tabs as a segmented
+     control like the pipeline's. ---- */
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.tour-screen,
+  html.desktop-v2.desktop-v3 .app-content > .tab-panel > .screen.tour-screen.tour-screen--calendar {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  html.desktop-v3 .tour-tabs {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: 16px;
+    border: 1px solid var(--d2-line);
+    border-radius: 10px;
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v3 .tour-tab {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  html.desktop-v3 .tour-tab:hover {
+    color: #fff;
+  }
+
+  html.desktop-v3 .tour-tab.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  /* The app sets `* { overscroll-behavior: none }` for the phone's rubber
+     band. On a desk it has a side effect: a wheel over ANY inner scroll
+     container that does not overflow is swallowed instead of chained to the
+     page, so the page only scrolls with the cursor outside the panel. Chain
+     everywhere; only the page itself keeps the rubber band off. */
+  html.desktop-v3 .app-container * { overscroll-behavior: auto; }
+  html.desktop-v3 .app-content { overscroll-behavior: contain; }
+
+  /* =========================================================================
+     SCREENS DESIGNED FOR THE DESK (round 4). Not the phone blocks split into
+     columns: Settings gets a section index; Premium becomes a pricing page;
+     the profile is a page of its own (components/desktop/ProfilePage).
+     ====================================================================== */
+
+  /* ---- Settings: index on the left, content on the right. The grid only
+     applies when the nav is present, so Achievements (which borrows the
+     settings chrome) keeps its single column. ---- */
+  html.desktop-v3 .settings-screen:has(> .d3-settings-nav) {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  html.desktop-v3 .settings-screen:has(> .d3-settings-nav) > .settings-header {
+    grid-column: 1 / -1;
+    max-width: none;
+    margin: 0;
+    padding: 12px var(--d2-gutter);
+    justify-content: flex-start;
+    gap: 14px;
+  }
+
+  /* Achievements: same header idiom, one calm column */
+  html.desktop-v3 .achievements-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
+  html.desktop-v3 .achievements-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; }
+  html.desktop-v3 .achievements-screen > .settings-header .back-button svg { width: 18px; height: 18px; }
+  html.desktop-v3 .achievements-screen > .settings-content { max-width: 1120px; margin: 0 auto; padding: 8px var(--d2-gutter) 48px; }
+  html.desktop-v3 .settings-screen .settings-header h1,
+  html.desktop-v3 .premium-screen .premium-header h1 {
+    flex: 0 0 auto;
+    text-align: left;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  /* Agency pricing: phone-first markup, so the ladder fills the desktop
+     column and leaves the price stranded from its band. */
+  html.desktop-v3 .agency-section .agency-ladder { max-width: 560px; }
+
+  html.desktop-v3 .d3-settings-nav {
+    position: sticky;
+    top: 64px;
+    align-self: start;
+    padding: 20px 16px 20px var(--d2-gutter);
+  }
+
+  html.desktop-v3 .settings-screen:has(> .d3-settings-nav) > .settings-content {
+    max-width: 920px;
+    margin: 0;
+    padding: 20px var(--d2-gutter) 48px 24px;
+  }
+
+  html.desktop-v3 .settings-screen .settings-section {
+    margin: 0 0 16px;
+    padding: 18px 20px 10px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+    scroll-margin-top: 16px;
+  }
+
+  html.desktop-v3 .settings-screen .settings-section:last-child {
+    border: 1px solid var(--d2-line);
+  }
+
+  /* ---- Premium: a pricing page — the pitch as a header row, the plans side
+     by side, the comparison table beneath. DOM order is hero, table, plans;
+     grid `order` puts the plans before the table. ---- */
+  html.desktop-v3 .premium-screen .premium-header,
+  html.desktop-v3 .premium-screen .premium-content {
+    max-width: 1120px;
+  }
+
+  html.desktop-v3 .premium-screen .premium-header {
+    justify-content: flex-start;
+    gap: 14px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  html.desktop-v3 .premium-screen .premium-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  html.desktop-v3 .premium-screen .premium-content > * {
+    margin: 0;
+    order: 5; /* anything unnamed (the extras shop) goes last */
+  }
+
+  /* ---- the three plan columns (PremiumPlans.js) ---- */
+  html.desktop-v3 .premium-screen .premium-content > .d3-plans {
+    order: 1;
+  }
+
+  html.desktop-v3 .d3-plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+    margin-top: 14px;
+  }
+
+  /* the phone's premium rules track display numerals out; a price is tight */
+  html.desktop-v3 .d3-plan-price,
+  html.desktop-v3 .d3-plan-price * {
+    letter-spacing: -0.015em;
+  }
+
+  html.desktop-v3 .d3-plans-note {
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  html.desktop-v3 .premium-screen .premium-hero {
+    order: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: center;
+    text-align: left;
+    padding: 18px 20px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v3 .premium-screen .premium-hero .premium-icon-large {
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+
+  html.desktop-v3 .premium-screen .premium-hero .premium-title {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  html.desktop-v3 .premium-screen .premium-hero .premium-description {
+    margin: 2px 0 0;
+    max-width: none;
+  }
+
+  html.desktop-v3 .premium-screen .premium-content > .premium-note { order: 1; }
+  html.desktop-v3 .premium-screen .premium-content > .premium-pricing { order: 2; }
+  html.desktop-v3 .premium-screen .premium-content > .premium-features { order: 3; }
+  html.desktop-v3 .premium-screen .premium-content > .premium-extras-note { order: 4; }
+
+  html.desktop-v3 .premium-screen .premium-pricing {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: stretch;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  html.desktop-v3 .premium-screen .premium-pricing > .price-card {
+    flex: 1 1 0;
+    margin: 0;
+  }
+
+  /* ---- Edit profile: an editor (EditShell.js around the existing form).
+     Sticky header with the actions; section index left; live preview right;
+     the form in one calm column between them. The phone-sized master pane
+     steps aside — an editor takes the whole canvas. ---- */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-edit) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-edit) > .md-master {
+    display: none;
+  }
+
+  /* the pane is the size container — an element cannot query its own size */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-edit) > .md-detail {
+    container-type: inline-size;
+  }
+
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+    max-width: 1280px;
+    padding: 0 var(--d2-gutter) 48px;
+    /* App.css forces .edit-profile-screen.screen.active { display: flex !important }
+       and clips it (overflow hidden, fixed height) — the pane is the scroller here */
+    display: grid !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    grid-template-columns: 176px minmax(0, 1fr) 264px;
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .d3-edit-head {
+    grid-column: 1 / -1;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 calc(-1 * var(--d2-gutter)) 20px;
+    padding: 14px var(--d2-gutter);
+    background: rgba(8, 8, 10, 0.86);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--d2-line);
+  }
+
+  html.desktop-v3 .d3-edit-nav {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+  }
+
+  html.desktop-v3 .d3-edit > .edit-profile-content {
+    max-width: none;
+    padding: 0;
+  }
+
+  html.desktop-v3 .d3-edit .edit-section {
+    margin: 0 0 16px;
+    padding: 18px 20px 14px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+    scroll-margin-top: 84px;
+  }
+
+  /* the actions live in the sticky header on desktop */
+  html.desktop-v3 .d3-edit .edit-actions {
+    display: none;
+  }
+
+  html.desktop-v3 .d3-edit-preview {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+  }
+
+  html.desktop-v3 .d3-edit .font-futuristic {
+    letter-spacing: -0.015em;
+  }
+
+  /* the pane's width: ~1040px in a 1440 window, ~710px in a 1024 window */
+  @container (max-width: 840px) {
+    html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+      grid-template-columns: 160px minmax(0, 1fr);
+    }
+
+    html.desktop-v3 .d3-edit-preview {
+      display: none;
+    }
+  }
+
+  @container (max-width: 560px) {
+    html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    html.desktop-v3 .d3-edit-nav {
+      display: none;
+    }
+  }
+
+  /* ---- Manage (own profile + agent-per-artist): a panel grid. Takes the
+     whole canvas; the phone-sized master steps aside. ---- */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-manage) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-manage) > .md-master { display: none; }
+
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-manage {
+    max-width: 1280px;
+    padding: 0 var(--d2-gutter) 48px;
+  }
+
+  /* header: back + title left, identity and the tab strip on one row */
+  html.desktop-v3 .d3-manage .manage-artist-header {
+    position: static;
+    padding: 18px 0 12px;
+    border-bottom: 0;
+    gap: 12px;
+  }
+
+  html.desktop-v3 .d3-manage .manage-artist-header h1 {
+    flex: 1;
+    text-align: left;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  html.desktop-v3 .d3-manage .artist-info-bar {
+    display: none; /* the title already names the profile */
+  }
+
+  html.desktop-v3 .d3-manage .tab-navigation {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    margin: 0 0 20px;
+    border: 1px solid var(--d2-line);
+    border-radius: 10px;
+    background: var(--d2-surface);
+  }
+
+  html.desktop-v3 .d3-manage .tab-button {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  html.desktop-v3 .d3-manage .tab-button.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  html.desktop-v3 .d3-manage .manage-artist-content { padding: 0; }
+  html.desktop-v3 .d3-manage .manage-artist-content .btn.btn-primary:not(.action-btn) { width: auto !important; max-width: none; align-self: flex-start; justify-self: start; margin-top: 4px; padding: 9px 16px; }
+
+  /* the Actions tab is one wide list; the actions section loses its stretch rules */
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) > .actions-required-section { grid-row: auto; display: block; }
+  /* one thin row per action, like the pipelines: icon · what · detail · do */
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-items { overflow: visible; display: block; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 10px 6px;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--d2-line);
+    border-radius: 0;
+    transition: background 0.15s;
+  }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item:last-child { border-bottom: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item:hover { background: rgba(255, 255, 255, 0.03); }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-icon { width: 28px; height: 28px; margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-icon svg { width: 16px; height: 16px; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-content { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-title { font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-subtitle { font-size: 12px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; margin: 0; }
+  html.desktop-v3 .d3-manage .dashboard-tab:has(> .actions-required-section) .action-item .btn { padding: 6px 12px; }
+
+  /* Insights: metrics across, then revenue left / reach + cities right */
+  html.desktop-v3 .d3-manage .dashboard-tab:not(:has(> .actions-required-section)) > .dashboard-section.revenue-overview-section { grid-column: 1; grid-row: 2 / span 3; align-self: stretch; }
+
+  /* dashboard: metrics across the top, then two columns of panels */
+  html.desktop-v3 .d3-manage .dashboard-tab {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .d3-manage .hero-metrics {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: none;
+    margin: 0;
+  }
+
+  html.desktop-v3 .d3-manage .dashboard-section {
+    margin: 0;
+    padding: 16px 18px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    background: var(--d2-surface);
+  }
+
+  /* actions fill the left column top to bottom; revenue, reach and cities
+     stack on the right */
+  html.desktop-v3 .d3-manage .dashboard-tab > .actions-required-section {
+    grid-column: 1;
+    grid-row: 2 / span 4;
+    align-self: stretch; /* as tall as the right column, however long it is */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  html.desktop-v3 .d3-manage .dashboard-tab > .dashboard-section:not(.actions-required-section) { grid-column: 2; }
+  html.desktop-v3 .d3-manage .actions-required-section .action-items { flex: 1; min-height: 0; overflow-y: auto; }
+
+  /* documents: categories two across */
+  html.desktop-v3 .d3-manage .artist-info-tab {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+
+  html.desktop-v3 .d3-manage .artist-info-tab > .dashboard-section { margin: 0; }
+
+  /* the privacy note sits above the grid */
+  html.desktop-v3 .d3-manage .manage-artist-content > .privacy-note { margin-bottom: 14px; }
+
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen { max-width: 1040px; }
+
+  /* ---- Profile page (ProfilePage.js). The screen is a fixed overlay with
+     overflow hidden; .d3-vp is its scroller. Container queries keep the
+     body one column where the page is narrow (the search pane). ---- */
+  html.desktop-v3 .view-profile-screen .d3-vp {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    container-type: inline-size;
+  }
+
+  html.desktop-v3 .d3-vp-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px var(--d2-gutter) 56px;
+  }
+
+  html.desktop-v3 .d3-vp-head {
+    position: relative;
+    overflow: hidden;
+    padding: 22px 24px 14px 72px;
+  }
+
+  html.desktop-v3 .d3-vp-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 28px;
+    align-items: start;
+    margin-top: 24px;
+  }
+
+  @container (max-width: 880px) {
+    html.desktop-v3 .d3-vp-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* the phone's display rules track headings out; a page title is tight */
+  html.desktop-v3 .d3-vp h1,
+  html.desktop-v3 .d3-vp .font-futuristic {
+    letter-spacing: -0.015em;
+  }
+
+  /* roster tiles: four across in the main column, not two phone-sized squares */
+  html.desktop-v3 .d3-vp main .grid-cols-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* the shared sub-components carry phone bottom margins; the grid gaps them */
+  html.desktop-v3 .d3-vp-body .mb-5 {
+    margin-bottom: 0;
+  }
+
+  html.desktop-v3 .d3-vp-safety .safety-footer {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    justify-content: flex-start;
+  }
+
+  /* Matches is a master-detail now — see the block at the end of this file. */
+
+}
+
+@media (min-width: 1600px) {
+  html.desktop-v3 .d3-ws {
+    grid-template-columns: 480px minmax(0, 1fr);
+  }
+
+  html.desktop-v3 .d3-board {
+    grid-template-columns: minmax(0, 1fr) minmax(440px, 38%);
+  }
+}
+
+/* ===========================================================================
+   DIALOGS — sheets become dialogs: a popover for the bell, centred cards for
+   confirms and onboarding. The modal card itself is sized in desktop-v2.css.
+   ======================================================================== */
+@media (min-width: 1024px) {
+  /* The header outranks the sub-page layer (guide, profile, Settings, Premium,
+     Achievements — all --z-screen), so the bell and the gear stay reachable
+     whatever is open. It stays under --z-modal so dialogs still cover it.
+     Its backdrop-filter makes it the stacking context for the dropdown, which
+     is why the dropdown cannot be lifted on its own. */
+  html.desktop-v3 .app-header { z-index: calc(var(--z-screen) + 10); }
+
+  html.desktop-v3 .notifications-dropdown {
+    /* backdrop-filter on the header makes it the containing block AND the
+       stacking context for this fixed child, so raising z-index here cannot
+       lift it over a screen — the guide is lowered under the header instead. */
+    position: fixed;
+    height: auto;
+    top: calc(var(--d2-top) + 8px);
+    right: var(--d2-gutter);
+    left: auto;
+    margin: 0;
+    width: 400px;
+    max-height: min(640px, 75vh);
+    border-radius: var(--d2-r-card);
+    border: 1px solid var(--d2-line);
+    background: var(--d2-surface);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+  }
+  /* Guide: a page inside the frame, not a takeover; same header idiom */
+  /* Sits inside the frame, so it must not paint over the header chrome it
+     leaves visible — the bell dropdown opened behind it otherwise. */
+  html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); z-index: var(--z-screen); }
+  html.desktop-v3 .guide-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
+  html.desktop-v3 .guide-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; position: static; }
+  html.desktop-v3 .guide-screen > .settings-header .back-button svg { width: 18px; height: 18px; }
+  html.desktop-v3 .guide-screen > .settings-header h1 { flex: 0 0 auto; text-align: left; font-size: 22px; letter-spacing: -0.01em; text-transform: none; }
+  html.desktop-v3 .guide-screen > .max-w-2xl { max-width: 760px; margin-left: var(--d2-gutter); }
+  /* Add profile: actions sit right, like every other form */
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .form-actions { justify-content: flex-end; gap: 10px; }
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .form-actions .btn { flex: 0 0 auto; min-width: 150px; }
+  /* Tour: the artist picker is a control, not a banner */
+  html.desktop-v3 .d3-tour .artist-selector select,
+  html.desktop-v3 .d3-tour .form-group > select,
+  html.desktop-v3 .d3-tour .matches-filters .filter-group > select { max-width: 420px; }
+  html.desktop-v3 .onboarding-overlay { background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(6px); }
+  html.desktop-v3 .onboarding-sheet {
+    width: 520px;
+    height: min(720px, 86vh);
+    max-height: 86vh;
+    padding: 20px 28px 24px;
+    border: 1px solid var(--d2-line);
+    border-radius: 14px;
+    background: var(--d2-surface);
+  }
+  html.desktop-v3 .delete-modal,
+  html.desktop-v3 .message-modal-bottom { max-width: 480px; border-radius: 14px; }
+  html.desktop-v3 .modal-content .modal-header h2 { font-size: 17px; }
+}
+
+/* ===========================================================================
+   SEGMENTED STRIPS — every tab the width of the longest label, so a strip
+   reads as one control rather than a row of differently sized buttons.
+   ======================================================================== */
+@media (min-width: 1024px) {
+  html.desktop-v3 .d3-tour-modes,
+  html.desktop-v3 .d3-manage .tab-navigation,
+  html.desktop-v3 .tour-tabs,
+  html.desktop-v3 .d3-seg {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+
+  html.desktop-v3 .d3-tour-modes > button,
+  html.desktop-v3 .d3-manage .tab-navigation > .tab-button,
+  html.desktop-v3 .tour-tabs > .tour-tab,
+  html.desktop-v3 .d3-seg > button {
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+/* ===========================================================================
+   SUB-PAGE HEADERS — one idiom for Edit Profile, Manage, Representing agent,
+   Roster, Add profile: a round close button on the left, the title, and the
+   page's actions on the right (Edit keeps Cancel / Save there).
+   ======================================================================== */
+@media (min-width: 1024px) {
+  html.desktop-v3 .d3-edit-head,
+  html.desktop-v3 .d3-manage .manage-artist-header,
+  html.desktop-v3 .d3-agents .search-agents-header,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen .represented-artists-header,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen:not(.d3-edit) .edit-profile-header {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 18px 0 12px;
+    margin: 0 0 16px;
+    background: none;
+    border: 0;
+    backdrop-filter: none;
+  }
+
+  html.desktop-v3 .d3-edit-head { position: sticky; top: 0; z-index: 5; background: rgba(8, 8, 10, 0.86); backdrop-filter: blur(14px); border-bottom: 1px solid var(--d2-line); margin: 0 calc(-1 * var(--d2-gutter)) 20px; padding: 14px var(--d2-gutter); }
+
+  html.desktop-v3 .d3-edit-head .back-btn,
+  html.desktop-v3 .d3-manage .manage-artist-header .back-btn,
+  html.desktop-v3 .d3-agents .search-agents-header .back-btn,
+  html.desktop-v3 .represented-artists-header .back-btn,
+  html.desktop-v3 .edit-profile-header .back-btn {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+
+  html.desktop-v3 .d3-edit-head h1,
+  html.desktop-v3 .d3-manage .manage-artist-header h1,
+  html.desktop-v3 .d3-agents .search-agents-header h1,
+  html.desktop-v3 .represented-artists-header h1,
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .edit-profile-header h1 {
+    flex: 1;
+    margin: 0;
+    text-align: left;
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  /* Representing agent / Find agent: your agents on the left, the search
+     and its results on the right. Takes the whole canvas. */
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-agents) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(> .md-detail > .d3-agents) > .md-master { display: none; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-agents { max-width: 1120px; padding: 0 var(--d2-gutter) 48px; position: static; height: auto; }
+
+  html.desktop-v3 .d3-agents .search-agents-content {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    padding: 0;
+    overflow: visible;
+  }
+
+  html.desktop-v3 .d3-agents .search-agents-content:not(:has(> .d3-agents-current)) { grid-template-columns: minmax(0, 1fr); }
+
+  html.desktop-v3 .d3-agents .d3-agents-current {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    margin: 0 !important;
+    padding: 16px !important;
+    border: 1px solid var(--d2-line) !important;
+    border-radius: var(--d2-r-card) !important;
+    background: var(--d2-surface) !important;
+  }
+
+  html.desktop-v3 .d3-agents .search-agents-content:has(> .d3-agents-current) > :not(.d3-agents-current) { grid-column: 2; }
+  html.desktop-v3 .d3-agents .search-agents-content:not(:has(> .d3-agents-current)) { max-width: 760px; }
+  html.desktop-v3 .d3-agents .search-form { margin: 0 0 12px; }
+  html.desktop-v3 .d3-agents .artist-item { margin-bottom: 8px; }
+
+  /* Find Artist opens inside the roster column: roster chrome steps aside */
+  html.desktop-v2.desktop-v3 .d3-agents.search-artists-screen { position: static; inset: auto; height: auto; min-height: 0; max-width: none; padding: 0; background: none; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen:has(.search-artists-screen) > :not(.represented-artists-content),
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen:has(.search-artists-screen) > .represented-artists-content > :not(.search-artists-screen) { display: none; }
+  html.desktop-v3 .d3-agents .search-agents-header h1 { text-transform: none; letter-spacing: -0.015em; }
+  /* search results as thin rows, same as the roster */
+  html.desktop-v3 .d3-agents .artists-list { display: block; padding: 4px 10px; border: 1px solid var(--d2-line); border-radius: var(--d2-r-card); background: var(--d2-surface); }
+  html.desktop-v3 .d3-agents .artists-list .artist-item { margin: 0; padding: 9px 6px; gap: 12px; background: none; border: 0; border-bottom: 1px solid var(--d2-line); border-radius: 0; }
+  html.desktop-v3 .d3-agents .artists-list .artist-item:last-child { border-bottom: 0; }
+  html.desktop-v3 .d3-agents .artists-list .artist-item:hover { background: rgba(255, 255, 255, 0.03); }
+  html.desktop-v3 .d3-agents .artists-list .artist-avatar { width: 32px; height: 32px; font-size: 13px; }
+  html.desktop-v3 .d3-agents .artists-list .artist-details { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  html.desktop-v3 .d3-agents .artists-list .artist-details h4 { margin: 0; font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html.desktop-v3 .d3-agents .artists-list .artist-details .artist-location { margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; }
+  html.desktop-v3 .d3-agents .artists-list .artist-item .btn-sm { padding: 6px 12px; }
+  html.desktop-v3 .d3-agents .results-header, html.desktop-v3 .d3-agents .info-banner { margin-left: 0; margin-right: 0; }
+
+  /* Roster: one thin row per artist — avatar · name · city · manage · remove */
+  html.desktop-v3 .represented-artists-header .add-artist-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; }
+  html.desktop-v3 .represented-artists-header .add-artist-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
+  html.desktop-v3 .represented-artists-screen > .rounded-2xl { margin: 0 0 14px; padding: 10px 14px; border-radius: var(--d2-r-card); }
+  html.desktop-v3 .represented-artists-content { padding: 0; }
+  html.desktop-v3 .represented-artists-content .artists-list { display: block; padding: 4px 10px; border: 1px solid var(--d2-line); border-radius: var(--d2-r-card); background: var(--d2-surface); }
+  html.desktop-v3 .represented-artists-content .artist-card-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 9px 6px;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--d2-line);
+    border-radius: 0;
+    transition: background 0.15s;
+  }
+  html.desktop-v3 .represented-artists-content .artist-card-row:last-child { border-bottom: 0; }
+  html.desktop-v3 .represented-artists-content .artist-card-row:hover { background: rgba(255, 255, 255, 0.03); }
+  html.desktop-v3 .represented-artists-content .artist-card-main { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 0; }
+  html.desktop-v3 .represented-artists-content .artist-avatar-small { width: 32px; height: 32px; font-size: 13px; margin: 0; }
+  html.desktop-v3 .represented-artists-content .artist-row-info { display: flex; flex-direction: row; align-items: baseline; gap: 10px; min-width: 0; }
+  html.desktop-v3 .represented-artists-content .artist-name-inline { font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+  html.desktop-v3 .represented-artists-content .artist-location-inline { font-size: 12px; color: rgba(255, 255, 255, 0.45); white-space: nowrap; margin: 0; }
+  html.desktop-v3 .represented-artists-content .artist-row-actions { display: flex; align-items: center; gap: 6px; }
+  html.desktop-v3 .represented-artists-content .artist-row-actions .btn-sm { padding: 6px 12px; }
+
+  /* A profile opened from a Profile sub page (the roster) is the full profile
+     page: RepresentedArtistsScreen returns ViewProfileScreen in its own place,
+     so the detail pane holds .view-profile-screen directly. Scoped to that —
+     SearchScreen's .md-split must keep its results column. */
+  html.desktop-v3 .md-split:has(> .md-detail > .view-profile-screen .d3-vp) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v3 .md-split:has(> .md-detail > .view-profile-screen .d3-vp) > .md-master { display: none; }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .view-profile-screen:has(.d3-vp) { max-width: none; margin: 0; padding: 0; }
+  /* one agent in a 3-up grid was stretching to a third of the column */
+  html.desktop-v3 .d3-rep .grid { grid-template-columns: repeat(auto-fill, minmax(0, 150px)); }
+  /* Roster and Add profile: the whole canvas, in a calm column */
+  html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen) > .md-master,
+  html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) > .md-master { display: none; }
+  html.desktop-v3 .md-split:has(> .md-detail > .represented-artists-screen),
+  html.desktop-v3 .md-split:has(> .md-detail > .edit-profile-screen:not(.d3-edit)) { grid-template-columns: minmax(0, 1fr); }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen:not(.d3-edit) { max-width: 1120px; padding: 0 var(--d2-gutter) 48px; }
+}
+
+/* ===================================================================
+   Tour › Calendar (desktop v3)
+   Two months side by side, and everything that is not the grid — the
+   day you clicked, the totals, travel, visibility — in a rail beside
+   them. The phone keeps one month with the sections stacked below it;
+   both gates below hold that apart.
+   =================================================================== */
+@media (min-width: 1024px) {
+
+  html.desktop-v3 .calendar-content.d3-cal {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 292px;
+    gap: 20px;
+    align-items: start;
+  }
+  /* The grid and the bookings list stack down the left; only the rail
+     crosses to the right, spanning however many rows the left produces. */
+  html.desktop-v3 .d3-cal > * { grid-column: 1; min-width: 0; }
+  html.desktop-v3 .d3-cal > .d3-cal-rail {
+    grid-column: 2;
+    grid-row: 1 / span 99;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: sticky;
+    top: calc(var(--d2-top) + 16px);
+  }
+  html.desktop-v3 .d3-cal > .dashboard-section { margin: 0; }
+  html.desktop-v3 .d3-cal > .dashboard-section + .dashboard-section { margin-top: 20px; }
+
+  /* ---- the two month grids ---- */
+  html.desktop-v3 .d3-cal-months {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  html.desktop-v3 .d3-cal-mname {
+    margin: 0 0 7px;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  /* Half the width per cell, so the Outlook-style density from
+     responsive.css has to come down with it. */
+  html.desktop-v3 .d3-cal-months .calendar-grid-inline .calendar-day {
+    min-height: 64px;
+    padding: 4px 4px 15px;
+  }
+  html.desktop-v3 .d3-cal-months .calendar-day-num { font-size: 11px; padding: 2px 5px; }
+  html.desktop-v3 .d3-cal-months .calendar-day-events { gap: 2px; margin-top: 3px; }
+  html.desktop-v3 .d3-cal-months .calendar-day-chip { font-size: 9px; padding: 2px 4px; border-radius: 4px; }
+  html.desktop-v3 .d3-cal-months .calendar-day-more { font-size: 9px; padding-left: 4px; }
+  html.desktop-v3 .d3-cal-months .calendar-grid-inline .calendar-weekday { padding: 7px 0; font-size: 9px; }
+  /* The destination stays legible on the narrower cell: it is the point of
+     the ribbon, so it truncates rather than disappearing (full text on hover). */
+  html.desktop-v3 .d3-cal-months .calendar-grid-inline .schedule-label {
+    height: 14px;
+    font-size: 8.5px;
+    padding: 0 4px;
+    gap: 3px;
+  }
+  html.desktop-v3 .d3-cal-months .schedule-city {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html.desktop-v3 .d3-cal-months .schedule-plane { width: 8px; height: 8px; flex: 0 0 auto; }
+
+  /* The day the rail is describing. */
+  html.desktop-v3 .calendar-grid-inline .calendar-day.is-focused {
+    position: relative;
+    z-index: 1;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+
+  html.desktop-v3 .d3-cal-wrap .calendar-header-inline { margin-bottom: 14px; }
+  html.desktop-v3 .d3-cal-wrap .calendar-instructions { font-size: 11px; }
+
+  /* ---- rail cards ---- */
+  html.desktop-v3 .d3-cal-card {
+    background: var(--d2-surface);
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    padding: 14px;
+  }
+  html.desktop-v3 .d3-cal-lbl {
+    margin: 0 0 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  html.desktop-v3 .d3-cal-empty { margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.35); }
+  html.desktop-v3 .d3-cal-day {
+    margin: 0 0 9px;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+  }
+  html.desktop-v3 .d3-cal-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  html.desktop-v3 .d3-cal-chip {
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html.desktop-v3 .d3-cal-chip.is-free { background: rgba(67, 233, 123, 0.14); color: #7BF0A4; }
+  html.desktop-v3 .d3-cal-chip.is-travel { background: rgba(255, 184, 0, 0.12); color: #E6B85C; }
+  html.desktop-v3 .d3-cal-chip.is-gig { background: rgba(255, 51, 102, 0.16); color: #FF7A9C; }
+
+  /* Free is green everywhere else on this screen; the control that sets it
+     is green too, rather than borrowing the infrared used for actions. */
+  html.desktop-v3 .d3-cal-mark {
+    display: block;
+    width: 100%;
+    margin-top: 11px;
+    padding: 8px;
+    border: 1px solid rgba(67, 233, 123, 0.45);
+    border-radius: var(--d2-r-ctl);
+    background: rgba(67, 233, 123, 0.12);
+    color: #7BF0A4;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  html.desktop-v3 .d3-cal-mark:hover { background: rgba(67, 233, 123, 0.2); }
+  /* Taking a free day back is not a green action. */
+  html.desktop-v3 .d3-cal-mark.is-busy {
+    border-color: var(--d2-line-strong);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.65);
+  }
+  html.desktop-v3 .d3-cal-mark.is-busy:hover { background: rgba(255, 255, 255, 0.09); }
+
+  html.desktop-v3 .d3-cal-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  html.desktop-v3 .d3-cal-stat b {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The sub-tab already says Calendar; the section heading under it says it
+     a second time and pushes the grid down. */
+  html.desktop-v3 .d3-cal > .dashboard-section > h3:first-child { display: none; }
+
+  /* ---- travel + visibility, re-fitted to a 292px rail ---- */
+  html.desktop-v3 .d3-cal-rail .travel-schedules-section,
+  html.desktop-v3 .d3-cal-rail .dashboard-section {
+    margin: 0;
+    padding: 14px;
+    background: var(--d2-surface);
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+  }
+  html.desktop-v3 .d3-cal-rail .travel-schedules-header { margin-bottom: 10px; gap: 8px; }
+  html.desktop-v3 .d3-cal-rail .travel-schedules-header h3,
+  html.desktop-v3 .d3-cal-rail .dashboard-section > h3 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  html.desktop-v3 .d3-cal-rail .travel-schedules-header .btn { padding: 5px 10px; font-size: 10px; }
+  html.desktop-v3 .d3-cal-rail .travel-schedule-item { padding: 8px 0; }
+  html.desktop-v3 .d3-cal-rail .schedule-location { font-size: 12px; }
+  html.desktop-v3 .d3-cal-rail .schedule-bottom-row { font-size: 10.5px; }
+  html.desktop-v3 .d3-cal-rail .no-schedules { padding: 6px 0; }
+  html.desktop-v3 .d3-cal-rail .no-schedules p { font-size: 12px; }
+  /* Two uppercase labels will not sit side by side in a rail this wide. */
+  html.desktop-v3 .d3-cal-rail .dashboard-section .flex.gap-2 { flex-direction: column; }
+  html.desktop-v3 .d3-cal-rail .dashboard-section .flex.gap-2 > button { padding: 7px 10px; font-size: 10px; }
+  /* A long travel list must not push the visibility card off the rail. */
+  html.desktop-v3 .d3-cal-rail .travel-schedules-list {
+    max-height: 290px;
+    overflow-y: auto;
+    margin-right: -6px;
+    padding-right: 6px;
+  }
+
+}
+
+/* ===================================================================
+   Tour › Matches (desktop v3)
+   Leads on the left at two strengths — exact date matches, then the
+   live feed — and on the right the reason: the nights both sides have
+   open, drawn rather than spelled out in a date string.
+   =================================================================== */
+@media (min-width: 1024px) {
+
+  html.desktop-v3 .d3-mat {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+  /* The list scrolls with the page and the detail pane stays put beside it.
+     Clamping the list to its own box instead would need a magic number for
+     the header above it, and that number is wrong the moment the intro or
+     the filter row changes height. */
+  html.desktop-v3 .d3-mat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  html.desktop-v3 .d3-mat-group {
+    margin: 12px 0 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  html.desktop-v3 .d3-mat-group:first-child { margin-top: 0; }
+
+  html.desktop-v3 .d3-mat-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-ctl);
+    background: var(--d2-surface);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  html.desktop-v3 .d3-mat-row:hover { border-color: var(--d2-line-strong); }
+  html.desktop-v3 .d3-mat-row.is-on {
+    border-color: rgba(255, 51, 102, 0.45);
+    background: var(--d2-accent-wash);
+  }
+  html.desktop-v3 .d3-mat-name {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html.desktop-v3 .d3-mat-sub {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.45);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* A glance at the shape of the overlap, before you open the row. */
+  html.desktop-v3 .d3-mat-strip { display: flex; gap: 2px; margin-top: 5px; }
+  html.desktop-v3 .d3-mat-strip i {
+    flex: 1;
+    height: 6px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.09);
+  }
+  html.desktop-v3 .d3-mat-strip i.is-both { background: rgba(67, 233, 123, 0.7); }
+
+  /* ---- detail pane ---- */
+  html.desktop-v3 .d3-mat-detail {
+    position: sticky;
+    top: calc(var(--d2-top) + 16px);
+    background: var(--d2-surface);
+    border: 1px solid var(--d2-line);
+    border-radius: var(--d2-r-card);
+    padding: 20px;
+    min-height: 300px;
+  }
+  html.desktop-v3 .d3-mat-blank {
+    margin: 0;
+    padding: 28px 0;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+  }
+  html.desktop-v3 .d3-mat-head { display: flex; align-items: center; gap: 14px; }
+  html.desktop-v3 .d3-mat-head .match-avatar { width: 52px; height: 52px; flex: 0 0 auto; }
+  html.desktop-v3 .d3-mat-loc { margin: 3px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.45); }
+
+  html.desktop-v3 .d3-mat-ov {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--d2-line);
+  }
+  html.desktop-v3 .d3-mat-lbl {
+    margin: 0 0 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  /* ---- the overlap, drawn on real months ---- */
+  /* Months keep a month's proportions: they sit side by side and stop,
+     rather than stretching a single month across the whole pane. */
+  html.desktop-v3 .d3-mat-months {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 310px);
+    justify-content: start;
+    gap: 26px;
+  }
+  html.desktop-v3 .d3-mini-name {
+    margin: 0 0 8px;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  html.desktop-v3 .d3-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  html.desktop-v3 .d3-mini-grid i {
+    aspect-ratio: 1;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.035);
+    font-style: normal;
+    color: rgba(255, 255, 255, 0.3);
+    font-variant-numeric: tabular-nums;
+  }
+  html.desktop-v3 .d3-mini-grid i.is-dow {
+    aspect-ratio: auto;
+    height: 18px;
+    background: none;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.28);
+  }
+  html.desktop-v3 .d3-mini-grid i.is-pad { background: none; }
+  /* You alone, them alone, and the nights that are the whole point. */
+  html.desktop-v3 .d3-mini-grid i.is-you {
+    background: rgba(67, 233, 123, 0.14);
+    color: rgba(123, 240, 164, 0.85);
+  }
+  html.desktop-v3 .d3-mini-grid i.is-them {
+    background: rgba(255, 51, 102, 0.16);
+    color: #FF9DB5;
+  }
+  html.desktop-v3 .d3-mini-grid i.is-both {
+    background: rgba(67, 233, 123, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(123, 240, 164, 0.75);
+    color: #04140a;
+    font-weight: 600;
+  }
+
+  html.desktop-v3 .d3-mat-key {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  html.desktop-v3 .d3-mat-key span { display: inline-flex; align-items: center; gap: 6px; }
+  html.desktop-v3 .d3-mat-key b { width: 9px; height: 9px; border-radius: 2px; }
+  html.desktop-v3 .d3-mat-key b.is-both { background: rgba(67, 233, 123, 0.5); }
+  html.desktop-v3 .d3-mat-key b.is-them { background: rgba(255, 51, 102, 0.4); }
+  html.desktop-v3 .d3-mat-key b.is-you { background: rgba(67, 233, 123, 0.2); }
+
+  /* How many separate open-date ranges one person is carrying. */
+  html.desktop-v3 .d3-mat-count {
+    align-self: flex-start;
+    margin-top: 5px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.07);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  html.desktop-v3 .d3-mat-note { margin: 10px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+  html.desktop-v3 .d3-mat-actions { display: flex; gap: 10px; margin-top: 20px; }
+  html.desktop-v3 .d3-mat-actions .btn { flex: 1; }
+
+  /* Whether you already know this person, so the control below reads as a
+     consequence rather than a guess. */
+  html.desktop-v3 .d3-mat-rel {
+    align-self: flex-start;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(67, 233, 123, 0.12);
+    color: #7BF0A4;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  html.desktop-v3 .d3-mat-rel.is-liked { background: rgba(255, 51, 102, 0.14); color: #FF9DB5; }
+  html.desktop-v3 .d3-mat-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  html.desktop-v3 .d3-mat-tags .d3-mat-count { margin-top: 0; }
+  html.desktop-v3 .d3-mat-row > .d3-mat-rel { margin-top: 5px; }
+  html.desktop-v3 .d3-mat-loc .d3-mat-rel { margin-right: 8px; vertical-align: 1px; }
+
+}

@@ -19,8 +19,10 @@ import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
-import { counterpartRoles, matchDatesFor } from '../../utils/calendarMatch';
+import { counterpartRoles, matchDatesFor, normalizeDate } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
+import { useNativeDesktop } from '../../utils/desktopV2';
+import TourBoard from '../desktop/TourBoard';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
   const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
@@ -75,6 +77,22 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // 'kickstart'. Opens on Calendar — your data first, the matches it drives
   // next — unless the viewer would only meet the Premium teaser there.
   const [activeTab, setActiveTab] = useState(isPremiumViewer(user) ? 'calendar' : 'matches');
+  // Desktop v3 is a workspace: the calendar is always on the left, and
+  // Matches / Tour Kickstart are a side panel whose tab IS activeTab — so
+  // every fetch below keeps its gating. 'calendar' has no meaning as a side
+  // tab there, so it resolves to Matches.
+  const nativeDesktop = useNativeDesktop();
+  // Desktop v3 has two modes under Tour: 'calendar' (the grid with Matches
+  // beside it) and 'tours' (a full-width pipeline of tours). The mode drives
+  // activeTab so every fetch keeps its gating: calendar mode = 'matches',
+  // tours mode = 'kickstart'. Deep links that set activeTab pick the mode.
+  // Three modes, one per job: 'calendar' | 'matches' | 'tours'. Each takes
+  // the whole canvas; the mode is activeTab under another name, so every
+  // fetch keeps its gating and deep links land.
+  const D3_TAB = { calendar: 'calendar', matches: 'matches', tours: 'kickstart' };
+  const d3Mode = activeTab === 'kickstart' ? 'tours' : activeTab;
+  const setD3Mode = (m) => setActiveTab(D3_TAB[m] || 'calendar');
+  const [d3TourId, setD3TourId] = useState(null);
   // Deep-links: ViewProfile's tour block asks for Kickstart; the onboarding
   // checklist and the Matches "Edit" link ask for Calendar. The sessionStorage
   // flags cover the case where TourScreen wasn't mounted yet when the event
@@ -84,7 +102,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     for (const [flag, tab] of Object.entries(intents)) {
       if (sessionStorage.getItem(flag)) { sessionStorage.removeItem(flag); setActiveTab(tab); }
     }
-    const openKickstart = () => { sessionStorage.removeItem('tora:tour-kickstart-intent'); setActiveTab('kickstart'); };
+    // a profile's tour card names the tour: the desktop board opens on it
+    const linked = sessionStorage.getItem('tora:tour-kickstart-tour');
+    if (linked) { sessionStorage.removeItem('tora:tour-kickstart-tour'); setD3TourId(linked); }
+    const openKickstart = (e) => {
+      sessionStorage.removeItem('tora:tour-kickstart-intent'); sessionStorage.removeItem('tora:tour-kickstart-tour');
+      setActiveTab('kickstart');
+      if (e?.detail?.tourId) setD3TourId(e.detail.tourId);
+    };
     const openCalendar = () => { sessionStorage.removeItem('tora:tour-calendar-intent'); setActiveTab('calendar'); };
     window.addEventListener('tora:tour-kickstart', openKickstart);
     window.addEventListener('tora:tour-calendar', openCalendar);
@@ -229,6 +254,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     setCountryFilter('all'); setGenresFilter([]); setArtistFilter('all');
   };
   const [calendarMatches, setCalendarMatches] = useState([]);
+  // Desktop v3 Matches is a master-detail: this is the row showing in the
+  // right pane, as { kind: 'match' | 'feed', id, match?, item? }.
+  const [pickedMatch, setPickedMatch] = useState(null);
 
   // Industry travel feed: every active schedule (connected > liked > others),
   // server-paginated; the sentinel div drives infinite scroll.
@@ -376,6 +404,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   }, [viewingProfile, calendarMatches]);
   const [selectedTourArtist, setSelectedTourArtist] = useState(null);
   const [selectedTour, setSelectedTour] = useState(null);
+  // An offer opened from Matches has no tour behind it, so it carries its own
+  // country. Without this the modal would prefill whichever tour was last
+  // opened in this session.
+  const [offerCountry, setOfferCountry] = useState(null);
   const [showEditTourModal, setShowEditTourModal] = useState(false);
   const [showMyProposalModal, setShowMyProposalModal] = useState(false);
   const [myProposalData, setMyProposalData] = useState(null);
@@ -477,6 +509,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 dates: formatMatchDates(overlappingDates),
                 matchCount: overlappingDates.length,
                 rawDates: overlappingDates,
+                // Both sides' open dates, so the desktop can draw the overlap
+                // itself — the matching already had them in hand.
+                sourceDates: source.availableDates || [],
+                sourceGenres: source.genres || [],
                 // Agent view: which represented artist this match is for.
                 forArtist: isAgent ? { id: source.id, name: source.name } : null,
               });
@@ -628,6 +664,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   const matches = filteredMatches;
 
+
   const handleConnect = (profile) => {
     if (!sentRequests.has(profile.id)) {
       setSelectedProfile(profile);
@@ -655,6 +692,269 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const handleProfileClick = (profileId) => {
     console.log('[TourScreen] Opening profile:', profileId);
     setViewingProfile(profileId);
+  };
+
+  /* ---- Desktop v3: Matches as a master-detail ----
+     The left column lists every lead at two strengths — exact date matches
+     first, then the live feed, one row per person rather than one per date
+     range. The right pane draws the reason on a real calendar: their open
+     nights, yours, and the ones you share. Both sides' dates are already on
+     the page (the matching needs them), so none of this costs a request. */
+
+  const ISO = (d) => d.toISOString().slice(0, 10);
+  const addDays = (d, n) => { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; };
+
+  // One row per person: a promoter with five open ranges is one lead, not five.
+  const feedByProfile = useMemo(() => {
+    // Someone who is already an exact date match belongs in that group and
+    // not again below it.
+    const alreadyMatched = new Set(matches.map((m) => m.profile?.id));
+    const byId = new Map();
+    travelFeed.forEach((f) => {
+      const id = f.profile?.id;
+      if (!id || alreadyMatched.has(id)) return;
+      if (!byId.has(id)) byId.set(id, { profile: f.profile, items: [], connected: f.connected, liked: f.liked });
+      byId.get(id).items.push(f);
+    });
+    return [...byId.values()];
+  }, [travelFeed, matches]);
+
+  // A venue or promoter does not travel — it opens dates. Same list, two
+  // headings, so neither role is described in the other's language.
+  const opensDates = (role) => ['VENUE', 'PROMOTER'].includes(String(role || '').toUpperCase());
+  // Only a promoter or venue books an artist, and only an artist is booked.
+  const canOffer = (prof) => opensDates(user?.role) && String(prof?.role || '').toUpperCase() === 'ARTIST';
+  const feedGroups = [
+    { key: 'available', label: t('desktop.matAlsoAvailable'), items: feedByProfile.filter((g) => opensDates(g.profile.role)) },
+    { key: 'travelling', label: t('desktop.matAlsoTravelling'), items: feedByProfile.filter((g) => !opensDates(g.profile.role)) },
+  ].filter((g) => g.items.length > 0);
+
+  // Desktop opens on the strongest lead rather than an empty pane: an exact
+  // date match if there is one, otherwise the first person in the feed.
+  // Must sit below feedByProfile — the dependency array is read during
+  // render, and reading it above its declaration is a TDZ crash.
+  useEffect(() => {
+    if (!nativeDesktop || pickedMatch) return;
+    // The feed arrives before the matches do; falling back to it too early
+    // would pin a weaker lead and never let go.
+    if (loadingMatches) return;
+    if (matches.length > 0) setPickedMatch({ kind: 'match', id: `m-${matches[0].profile.id}-0`, match: matches[0] });
+    else if (feedByProfile.length > 0) setPickedMatch({ kind: 'group', id: `g-${feedByProfile[0].profile.id}`, group: feedByProfile[0] });
+  }, [nativeDesktop, matches, feedByProfile, pickedMatch, loadingMatches]);
+
+  // Every day worth drawing, as iso -> 'both' | 'them' | 'you'.
+  const dayMarks = (picked) => {
+    const marks = new Map();
+    const mineList = picked.kind === 'match' ? (picked.match.sourceDates || []) : (user?.availableDates || []);
+    new Set(mineList.map(normalizeDate)).forEach((d) => marks.set(d, 'you'));
+
+    if (picked.kind === 'match') {
+      new Set((picked.match.profile?.availableDates || []).map(normalizeDate))
+        .forEach((d) => marks.set(d, marks.get(d) === 'you' ? 'both' : 'them'));
+      new Set((picked.match.rawDates || []).map(normalizeDate)).forEach((d) => marks.set(d, 'both'));
+    } else {
+      picked.group.items.forEach((it) => {
+        const end = new Date(`${it.endDate}T00:00:00Z`);
+        for (let d = new Date(`${it.startDate}T00:00:00Z`); d <= end; d = addDays(d, 1)) {
+          const iso = ISO(d);
+          marks.set(iso, marks.get(iso) === 'you' ? 'both' : 'them');
+        }
+      });
+    }
+    return marks;
+  };
+
+  // Months the other side actually appears in — your own free days alone are
+  // not a reason to draw a month here.
+  const monthsToDraw = (marks) => [...new Set([...marks.entries()]
+    .filter(([, k]) => k !== 'you').map(([iso]) => iso.slice(0, 7)))].sort().slice(0, 3);
+
+  const miniMonth = (ym, marks) => {
+    const [y, mo] = ym.split('-').map(Number);
+    const firstDow = new Date(Date.UTC(y, mo - 1, 1)).getUTCDay();
+    const total = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    const cells = [];
+    t('dateFormat.weekLetters').split(',').forEach((w, i) => cells.push(<i key={`h${i}`} className="is-dow">{w}</i>));
+    for (let i = 0; i < firstDow; i++) cells.push(<i key={`p${i}`} className="is-pad" />);
+    for (let d = 1; d <= total; d++) {
+      const iso = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const kind = marks.get(iso);
+      cells.push(<i key={iso} className={kind ? `is-${kind}` : ''}>{d}</i>);
+    }
+    return (
+      <div className="d3-mini" key={ym}>
+        <p className="d3-mini-name">
+          {new Date(Date.UTC(y, mo - 1, 1)).toLocaleDateString(t('dateFormat.locale'), { month: 'long', year: 'numeric', timeZone: 'UTC' })}
+        </p>
+        <div className="d3-mini-grid">{cells}</div>
+      </div>
+    );
+  };
+
+  const matchRowKey = (m, i) => `m-${m.profile.id}-${i}`;
+  const groupRowKey = (g) => `g-${g.profile.id}`;
+
+  const desktopMatchRow = (match, i) => {
+    const key = matchRowKey(match, i);
+    const shared = new Set((match.rawDates || []).map(normalizeDate));
+    const sorted = [...shared].sort();
+    const strip = [];
+    if (sorted.length) {
+      const end = new Date(`${sorted[sorted.length - 1]}T00:00:00Z`);
+      for (let d = new Date(`${sorted[0]}T00:00:00Z`); d <= end && strip.length < 14; d = addDays(d, 1)) strip.push(shared.has(ISO(d)));
+    }
+    return (
+      <button type="button" key={key}
+        className={`d3-mat-row${pickedMatch?.id === key ? ' is-on' : ''}`}
+        onClick={() => setPickedMatch({ kind: 'match', id: key, match })}>
+        <span className="d3-mat-name">{match.profile.name}</span>
+        <span className="d3-mat-sub">
+          {match.profile.role} · {match.profile.location}
+          {match.forArtist ? ` · ${match.forArtist.name}` : ''}
+        </span>
+        {connectedUsers.has(match.profile.id) && (
+          <span className="d3-mat-rel">{t('tour.feedConnected')}</span>
+        )}
+        {strip.length > 0 && (
+          <span className="d3-mat-strip" aria-hidden>
+            {strip.map((on, j) => <i key={j} className={on ? 'is-both' : ''} />)}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  const desktopGroupRow = (group) => {
+    const key = groupRowKey(group);
+    const first = group.items[0];
+    const where = [first.destCity, first.destCountry].filter(Boolean).join(', ') || first.zone;
+    const starts = group.items.map((i) => i.startDate).sort();
+    const ends = group.items.map((i) => i.endDate).sort();
+    return (
+      <button type="button" key={key}
+        className={`d3-mat-row${pickedMatch?.id === key ? ' is-on' : ''}`}
+        onClick={() => setPickedMatch({ kind: 'group', id: key, group })}>
+        <span className="d3-mat-name">{group.profile.name}</span>
+        <span className="d3-mat-sub">
+          {group.profile.role} · {where} · {starts[0]}
+          {ends[ends.length - 1] !== starts[0] ? ` → ${ends[ends.length - 1]}` : ''}
+        </span>
+        <span className="d3-mat-tags">
+          {group.items.length > 1 && (
+            <span className="d3-mat-count">{t('desktop.matRanges', { n: group.items.length })}</span>
+          )}
+          {connectedUsers.has(group.profile.id)
+            ? <span className="d3-mat-rel">{t('tour.feedConnected')}</span>
+            : group.liked ? <span className="d3-mat-rel is-liked">{t('tour.feedLiked')}</span> : null}
+        </span>
+      </button>
+    );
+  };
+
+  const desktopMatchDetail = () => {
+    if (!pickedMatch) return <p className="d3-mat-blank">{t('desktop.matPick')}</p>;
+
+    const prof = pickedMatch.kind === 'match' ? pickedMatch.match.profile : pickedMatch.group.profile;
+    const isRequested = sentRequests.has(prof.id);
+    const isConnected = connectedUsers.has(prof.id);
+    const marks = dayMarks(pickedMatch);
+    const months = monthsToDraw(marks);
+    const sharedNights = [...marks.values()].filter((k) => k === 'both').length;
+
+    // Only the genres both sides actually work in — their full list is on
+    // their profile, this pane is about what you have in common.
+    const myGenres = pickedMatch.kind === 'match' ? (pickedMatch.match.sourceGenres || []) : (user?.genres || []);
+    const theirGenres = prof.genres || [];
+    const sharedGenres = theirGenres.filter((g) => myGenres.includes(g));
+    const genreList = sharedGenres.length > 0 ? sharedGenres : theirGenres;
+
+    return (
+      <>
+        <div className="d3-mat-head">
+          <div className={`match-avatar avatar-${(prof.role || 'artist').toLowerCase()} clickable`}
+               onClick={() => handleProfileClick(prof.id)}>
+            {prof.avatar ? <img src={prof.avatar} alt={prof.name} /> : (prof.name || '?').charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="match-name-role !mb-0">
+              <h3 className="truncate">{prof.name}</h3>
+              <span className={`role-badge ${(prof.role || '').toLowerCase()}`}>{prof.role}</span>
+            </div>
+            <p className="d3-mat-loc">
+              {isConnected ? <span className="d3-mat-rel">{t('tour.feedConnected')}</span> : null}
+              {prof.location}
+              {/* Real field, filled in by the venue — absent on most profiles today. */}
+              {prof.venueCapacity ? ` · ${t('profile.capacity')} ${Number(prof.venueCapacity).toLocaleString()}` : ''}
+            </p>
+          </div>
+        </div>
+
+        {months.length > 0 && (
+          <div className="d3-mat-ov">
+            <p className="d3-mat-lbl">
+              {pickedMatch.kind === 'match' ? t('desktop.matOverlapTitle')
+                : opensDates(prof.role) ? t('tour.feedOpenDates') : t('calendar.travelSchedules')}
+            </p>
+            <div className="d3-mat-months">{months.map((ym) => miniMonth(ym, marks))}</div>
+            <div className="d3-mat-key">
+              <span><b className="is-both" />{t('desktop.matBoth')}</span>
+              <span><b className="is-them" />{t('desktop.matThem')}</span>
+              <span><b className="is-you" />{t('desktop.matYou')}</span>
+            </div>
+            {/* An artist's ranges are a travel schedule, not open dates: the
+                lit days mean "you are free while they are in the area", which
+                is not the same claim as a shared open night. */}
+            {sharedNights > 0 && (
+              <p className="d3-mat-note">
+                {pickedMatch.kind === 'match' || opensDates(prof.role)
+                  ? t('desktop.matNightsCommon', { n: sharedNights })
+                  : t('desktop.matNightsHere', { n: sharedNights })}
+              </p>
+            )}
+          </div>
+        )}
+
+        {genreList.length > 0 && (
+          <div className="d3-mat-ov">
+            <p className="d3-mat-lbl">{sharedGenres.length > 0 ? t('desktop.matGenresShared') : t('search.genres')}</p>
+            <div className="match-genres-simple">
+              {genreList.slice(0, 8).map((g) => <span key={g} className="genre-tag-small">{g}</span>)}
+            </div>
+          </div>
+        )}
+
+        <div className="d3-mat-actions">
+          {/* A promoter or venue looking at an artist is here to book them, so
+              the offer leads and the relationship control follows it. Everyone
+              else gets Message when connected and Connect when not — messaging
+              is connection-gated, so a lead you have no relationship with can
+              only be connected to. */}
+          {canOffer(prof) && (
+            <button className="btn btn-primary" onClick={() => {
+              setSelectedTourArtist(prof);
+              setOfferCountry(prof.country || null);
+              setShowMakeOfferModal(true);
+            }}>
+              {t('tour.makeAnOffer')}
+            </button>
+          )}
+          {isConnected ? (
+            <button className={`btn ${canOffer(prof) ? '' : 'btn-message'}`}
+              onClick={() => handleMessage(prof, pickedMatch.kind === 'match'
+                ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
+                : '')}>
+              {t('search.message')}
+            </button>
+          ) : (
+            <button className={`btn ${isRequested ? 'btn-disabled' : canOffer(prof) ? '' : 'btn-primary'}`}
+              onClick={() => handleConnect(prof)} disabled={isRequested}>
+              {isRequested ? t('search.requested') : t('search.connect')}
+            </button>
+          )}
+          <button className="btn" onClick={() => handleProfileClick(prof.id)}>{t('desktop.view')}</button>
+        </div>
+      </>
+    );
   };
 
   // Calendar Matches Tab Content
@@ -730,9 +1030,32 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           })}
 
           <div className="feature-preview">
-            <p className="form-hint" style={{ margin: '0 0 12px' }}>{t('tour.matchesGeoHint')}</p>
+            {!nativeDesktop && <p className="form-hint" style={{ margin: '0 0 12px' }}>{t('tour.matchesGeoHint')}</p>}
 
-            {matches.length > 0 ? (
+            {nativeDesktop ? (
+              <div className="d3-mat">
+                <div className="d3-mat-list">
+                  {matches.length > 0 && (
+                    <>
+                      <p className="d3-mat-group">{t('desktop.matMatching')} · {matches.length}</p>
+                      {matches.map(desktopMatchRow)}
+                    </>
+                  )}
+                  {feedGroups.map((g) => (
+                    <React.Fragment key={g.key}>
+                      <p className="d3-mat-group">{g.label} · {g.items.length}</p>
+                      {g.items.map(desktopGroupRow)}
+                    </React.Fragment>
+                  ))}
+                  {matches.length === 0 && feedGroups.length === 0 && !feedLoading && (
+                    <p className="d3-mat-blank">{t('tour.noMatchesMessage')}</p>
+                  )}
+                  <div ref={feedSentinelRef} className="h-8" />
+                  {feedLoading && <p className="text-center text-xs text-white/35 py-2">{t('common.loading')}</p>}
+                </div>
+                <div className="d3-mat-detail">{desktopMatchDetail()}</div>
+              </div>
+            ) : matches.length > 0 ? (
               <div className="matches-results">
                 <p className="matches-count">
                   {matches.length === 1 ? t('tour.matchFound', { n: matches.length }) : t('tour.matchesFound', { n: matches.length })}
@@ -843,7 +1166,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             {/* Industry travel feed: every ACTIVE schedule out there, beyond
                 strict date matches — connected people first, then liked,
                 then everyone else. Infinite scroll via sentinel. */}
-            {isPremiumUser() && (
+            {!nativeDesktop && isPremiumUser() && (
               <div className="mt-8">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 font-tech m-0">
                   {t('tour.travelFeedTitle')}
@@ -1629,7 +1952,35 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   };
 
   // Tour Kickstart Tab Content
-  const renderTourKickstart = () => {
+  /* Tour Kickstart filters (no Roles). One renderer, mounted by whichever
+     layout is live: the phone/v2 card list, or the v3 board. On v3 the board
+     keeps its Filters button in the toolbar with no tour selected, so the
+     sheet cannot live inside the detail pane. */
+  const renderTourFilterSheet = () => (showTourFilters ? (
+              <FilterSheet
+                values={{ period: tourMonthFilter, zone: tourZoneFilter, country: tourCountryFilter, genres: tourGenreFilter }}
+                clearedValues={{ period: 'all', zone: 'all', country: 'all', genres: [] }}
+                onClose={() => setShowTourFilters(false)}
+                onApply={(v) => {
+                  setTourMonthFilter(v.period); setTourZoneFilter(v.zone);
+                  setTourCountryFilter(v.country); setTourGenreFilter(v.genres);
+                  setShowTourFilters(false);
+                }}
+                sections={[
+                  { key: 'period', label: t('tour.period'), multi: false, allLabel: t('tour.allMonths'),
+                    options: () => monthOptions.map((o) => ({ value: o.value, label: o.label })) },
+                  { key: 'zone', label: t('editProfile.zone'), multi: false, allLabel: t('manageArtist.allZones'), resets: ['country'],
+                    options: () => [{ value: 'all', label: t('manageArtist.allZones') }, ...zones.map((z) => ({ value: z, label: z }))] },
+                  { key: 'country', label: t('editProfile.country'), multi: false, allLabel: t('manageArtist.allCountries'),
+                    visible: (d) => d.zone !== 'all',
+                    options: (d) => [{ value: 'all', label: t('manageArtist.allCountries') }, ...(countriesByZone[d.zone] || []).map((c) => ({ value: c, label: c }))] },
+                  { key: 'genres', label: t('search.genres'), multi: true,
+                    options: () => genresList.map((g) => ({ value: g, label: g })) },
+                ]}
+              />
+  ) : null);
+
+  const renderTourKickstart = ({ only = null } = {}) => {
     // Show upgrade prompt for basic users
     if (!isPremiumUser()) {
       return (
@@ -1685,10 +2036,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
     // ARTISTS + AGENTS: Create and manage tours
     if (isArtist) {
-      const visibleTours = isAgent && selectedArtistId !== 'all' ? myTours.filter((tour) => tour.artist?.id === selectedArtistId) : myTours;
+      const allVisible = isAgent && selectedArtistId !== 'all' ? myTours.filter((tour) => tour.artist?.id === selectedArtistId) : myTours;
+      const visibleTours = only ? allVisible.filter((tour) => tour.id === only) : allVisible;
       return (
         <div className="tour-kickstart-content">
-          <div className="coming-soon-placeholder">
+          {!only && <div className="coming-soon-placeholder">
             {renderSubTabHeader({
               intro: t('tour.kickstartIntro'),
               action: (
@@ -1697,11 +2049,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 </button>
               ),
             })}
-          </div>
+          </div>}
           <div className="tour-kickstart-section">
-            <div className="section-header">
+            {!only && <div className="section-header">
               <h3>{t('tour.myTours')}</h3>
-            </div>
+            </div>}
 
             {/* Tour cards or empty state */}
             {toursLoading ? (
@@ -1866,41 +2218,18 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             monthMatch = ts <= range.toDate && te >= range.fromDate;
           }
         }
-        return zoneMatch && countryMatch && genreMatch && monthMatch;
+        return (!only || tour.id === only) && zoneMatch && countryMatch && genreMatch && monthMatch;
       });
 
       return (
         <div className="tour-kickstart-content">
           <div className="tour-kickstart-section">
-            {renderSubTabHeader({
+            {!only && renderSubTabHeader({
               intro: t('tour.tourOpportunitiesDesc'),
               action: <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />,
             })}
 
-            {/* Full-page filters — shared FilterSheet (no Roles for tours) */}
-            {showTourFilters && (
-              <FilterSheet
-                values={{ period: tourMonthFilter, zone: tourZoneFilter, country: tourCountryFilter, genres: tourGenreFilter }}
-                clearedValues={{ period: 'all', zone: 'all', country: 'all', genres: [] }}
-                onClose={() => setShowTourFilters(false)}
-                onApply={(v) => {
-                  setTourMonthFilter(v.period); setTourZoneFilter(v.zone);
-                  setTourCountryFilter(v.country); setTourGenreFilter(v.genres);
-                  setShowTourFilters(false);
-                }}
-                sections={[
-                  { key: 'period', label: t('tour.period'), multi: false, allLabel: t('tour.allMonths'),
-                    options: () => monthOptions.map((o) => ({ value: o.value, label: o.label })) },
-                  { key: 'zone', label: t('editProfile.zone'), multi: false, allLabel: t('manageArtist.allZones'), resets: ['country'],
-                    options: () => [{ value: 'all', label: t('manageArtist.allZones') }, ...zones.map((z) => ({ value: z, label: z }))] },
-                  { key: 'country', label: t('editProfile.country'), multi: false, allLabel: t('manageArtist.allCountries'),
-                    visible: (d) => d.zone !== 'all',
-                    options: (d) => [{ value: 'all', label: t('manageArtist.allCountries') }, ...(countriesByZone[d.zone] || []).map((c) => ({ value: c, label: c }))] },
-                  { key: 'genres', label: t('search.genres'), multi: true,
-                    options: () => genresList.map((g) => ({ value: g, label: g })) },
-                ]}
-              />
-            )}
+            {!only && renderTourFilterSheet()}
 
             {/* Tour cards or empty state */}
             {filteredTours.length === 0 ? (
@@ -2126,9 +2455,76 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   function renderMain() {
   return (
-    <div ref={screenRef} className={`screen active matches-screen tour-screen${activeTab === 'calendar' ? ' tour-screen--calendar' : ''}`}>
-      {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
-          overlays (modals) live outside it. */}
+    <div ref={screenRef} className={`screen active matches-screen tour-screen${nativeDesktop ? ' d3-tour' : (activeTab === 'calendar' ? ' tour-screen--calendar' : '')}`}>
+      {nativeDesktop ? (() => {
+        const premium = isPremiumUser();
+        const owner = user?.role === 'ARTIST' || user?.role === 'AGENT';
+        const boardTours = owner
+          ? (isAgent && selectedArtistId !== 'all' ? myTours.filter((tour) => tour.artist?.id === selectedArtistId) : myTours)
+          : allTours.filter((tour) => {
+              const zoneMatch = tourZoneFilter === 'all' || tour.zone === tourZoneFilter;
+              const countryMatch = tourCountryFilter === 'all' || tour.country === tourCountryFilter;
+              const genreMatch = tourGenreFilter.length === 0 || (tour.artist?.genres || []).some((g) => tourGenreFilter.includes(g));
+              let monthMatch = true;
+              if (tourMonthFilter !== 'all') {
+                const range = monthKeyToRange(tourMonthFilter);
+                if (range) { const ts = new Date(tour.startDate); const te = new Date(tour.endDate); monthMatch = ts <= range.toDate && te >= range.fromDate; }
+              }
+              return zoneMatch && countryMatch && genreMatch && monthMatch;
+            });
+        const modeTabs = (
+          <div className="d3-tour-modes">
+            <button type="button" className={d3Mode === 'calendar' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('calendar'); }}>
+              <CalendarIcon /><span>{t('profile.calendar')}</span>
+            </button>
+            <button type="button" className={d3Mode === 'matches' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('matches'); }}>
+              <TargetIcon /><span>{t('tour.calendarMatches')}</span>
+            </button>
+            <button type="button" className={d3Mode === 'tours' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('tours'); }}>
+              <PlaneIcon /><span>{t('tour.tourKickstart')}</span>
+            </button>
+          </div>
+        );
+        return (
+          <>
+            {modeTabs}
+            {d3Mode === 'calendar' ? (
+              <section className="d3-tour-main d3-tour-calendar">{renderMyDates()}</section>
+            ) : d3Mode === 'matches' ? (
+              <section className="d3-tour-main d3-tour-matches">{renderCalendarMatches()}</section>
+            ) : !premium ? (
+              renderTourKickstart()
+            ) : (
+              <>
+              <TourBoard
+                tours={boardTours}
+                loading={toursLoading}
+                owner={owner}
+                selectedId={d3TourId}
+                onSelect={setD3TourId}
+                statusLabel={tourStatusLabel}
+                toolbar={(
+                  <>
+                    <span className="min-w-0 flex-1 text-[12px] text-white/45">{owner ? t('tour.kickstartIntro') : t('tour.tourOpportunitiesDesc')}</span>
+                    {isAgent && roster.length > 0 && (
+                      <select className="h-8 cursor-pointer rounded-lg border border-white/10 bg-[#0b0b0e] px-2.5 text-[12px] text-white/80 outline-none" value={selectedArtistId} onChange={(e) => setArtistFilter(e.target.value)}>
+                        <option value="all">{t('tour.allArtists')}</option>
+                        {roster.map((a) => <option key={rosterEntryId(a)} value={rosterEntryId(a)}>{a.name}</option>)}
+                      </select>
+                    )}
+                    {owner
+                      ? <button className="btn btn-primary btn-small shrink-0" onClick={() => { closeTourPanes(); setShowCreateTourModal(true); }}>+ {t('tour.createTour')}</button>
+                      : <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />}
+                  </>
+                )}
+                detail={d3TourId ? renderTourKickstart({ only: d3TourId }) : null}
+              />
+              {!owner && renderTourFilterSheet()}
+              </>
+            )}
+          </>
+        );
+      })() : (
       <div className="relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
@@ -2170,6 +2566,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         {activeTab === 'kickstart' && renderTourKickstart()}
       </div>
       </div>
+      )}
 
       {/* Message Modal */}
       {showMessageModal && selectedProfile && (
@@ -2222,12 +2619,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         onClose={() => {
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);
+          setOfferCountry(null);
         }}
         recipientProfile={selectedTourArtist}
-        preferCountry={selectedTour?.country || null}
+        preferCountry={offerCountry || selectedTour?.country || null}
         onSuccess={() => {
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);
+          setOfferCountry(null);
           // Navigate to Messages tab to see the offer
           onNavigateToMessages();
         }}

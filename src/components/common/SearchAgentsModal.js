@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNativeDesktop } from '../../utils/desktopV2';
 import OverlayPortal from './OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
@@ -11,6 +12,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat }) => {
   const { t } = useLanguage();
+  // Desktop v3: your agents beside the search (desktop-v3.css .d3-agents)
+  const nativeDesktop = useNativeDesktop();
   const [searchQuery, setSearchQuery] = useState('');
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -525,7 +528,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
   return (
     <>
       {/* Main Search Screen */}
-      <div className="screen active search-agents-screen">
+      <div className={`screen active search-agents-screen${nativeDesktop ? ' d3-agents' : ''}`}>
         <div className="search-agents-header">
           <button className="back-btn" onClick={onClose}>
             <CloseIcon />
@@ -536,7 +539,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
         <div className="search-agents-content">
           {/* Representing Agents Section (shown at top) */}
           {representingAgents.length > 0 && (
-            <div style={{
+            <div className="d3-agents-current" style={{
               marginBottom: '12px',
               padding: '8px 10px',
               backgroundColor: 'rgba(255, 51, 102, 0.05)',

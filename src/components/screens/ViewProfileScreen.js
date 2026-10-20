@@ -30,6 +30,8 @@ import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../util
 import { isPremiumViewer } from '../../utils/subscription';
 import { networkSectionsForRole } from '../../utils/networkSections';
 import { RA_LOGO_WHITE } from '../../utils/brandAssets';
+import { useNativeDesktop } from '../../utils/desktopV2';
+import ProfilePage from '../desktop/ProfilePage';
 
 // 1234 -> '1.2K', matching the own-profile stats row.
 const fmtStat = (n) => {
@@ -74,6 +76,9 @@ const BackButton = ({ onClose, label }) => (
 
 const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavigateToMessages, onOpenPremium }) => {
   const { t } = useLanguage();
+  // Desktop v3 renders this screen's state through a page designed for a
+  // desk (components/desktop/ProfilePage); the phone markup below is unchanged.
+  const nativeDesktop = useNativeDesktop();
   const { user: currentUser, likedProfiles, toggleLike, sentRequests, receivedRequests, sendConnectionRequest, connectedUsers, removeConnection } = useAppContext();
   // Callers pass whatever row object they have (search result, conversation
   // partner, roster entry) — those are list projections and may lack detail
@@ -532,6 +537,41 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
   return (
     <div className="screen active view-profile-screen relative">
+      {nativeDesktop ? (
+        <ProfilePage
+          profile={profile}
+          currentUser={currentUser}
+          embeds={embeds}
+          artistTours={artistTours}
+          similarProfiles={similarProfiles}
+          likers={likers}
+          likedProfiles={likedProfiles}
+          isLiked={isLiked}
+          isConnected={isConnected}
+          hasPendingRequest={hasPendingRequest}
+          actionBusy={actionBusy}
+          premiumViewer={isPremiumViewer(currentUser)}
+          onClose={onClose}
+          onLike={handleLike}
+          onMessage={handleMessage}
+          onConnect={handleConnect}
+          onRemove={() => setShowRemoveModal(true)}
+          onOpenGigs={() => setShowGigsModal(true)}
+          onOpenList={setListModal}
+          onOpenNested={setNestedProfile}
+          onToggleTourInterest={handleToggleTourInterest}
+          onTourOffer={() => setShowTourOffer(true)}
+          onOpenTourKickstart={(tour) => {
+            sessionStorage.setItem('tora:tour-kickstart-intent', '1');
+            if (tour?.id) sessionStorage.setItem('tora:tour-kickstart-tour', tour.id);
+            window.dispatchEvent(new CustomEvent('tora:navigate-tab', { detail: { tab: 'tour' } }));
+            window.dispatchEvent(new CustomEvent('tora:tour-kickstart', { detail: { tourId: tour?.id || null } }));
+            onClose && onClose();
+          }}
+          onOpenPremium={onOpenPremium}
+        />
+      ) : (
+      <>
       {/* Floating back arrow — no header bar, the page starts at the avatar */}
       <BackButton onClose={onClose} label={t('common.back')} />
       <div className="view-profile-content relative isolate">
@@ -983,7 +1023,8 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             person is gone from this member's app from that moment. */}
         <SafetyMenu variant="footer" profile={profile} onBlocked={onClose} />
       </div>
-        
+      </>
+      )}
 
       {listModal && (
         <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 p-5" onClick={() => setListModal(null)}>

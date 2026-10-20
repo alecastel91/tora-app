@@ -3,10 +3,13 @@ import NotificationDropdown from './NotificationDropdown';
 import { BellIcon, GearIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { isDesktopV2, useNativeDesktop } from '../../utils/desktopV2';
 
 const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   const { notifications } = useAppContext();
   const { t } = useLanguage();
+  // v3 + desktop-sized: the only case the ⌘K pill exists at all (not hidden — absent)
+  const nativeDesktop = useNativeDesktop();
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotificationDot, setHasNotificationDot] = useState(true);
 
@@ -55,7 +58,22 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
       <div className="logo flex items-center">
         <img src="/tora_logo.png" alt="TORA" className="h-6 w-auto block" />
       </div>
+      {/* Desktop v2: the brand lives in the sidebar, so the bar carries the
+          page instead of a hidden logo. Reuses the existing nav.* keys. */}
+      {isDesktopV2() && (
+        <div className="d2-page-title desktop-only">{activeTab === 'home' ? t('desktop.home') : t(`nav.${activeTab}`)}</div>
+      )}
       <div className="header-icons relative flex gap-3">
+        {/* Desktop v3: jump anywhere. The palette listens for this event. */}
+        {nativeDesktop && (
+          <button
+            className="d3-k"
+            onClick={() => window.dispatchEvent(new CustomEvent('tora:open-palette'))}
+          >
+            <span>{t('desktop.jumpTo')}</span>
+            <kbd>⌘K</kbd>
+          </button>
+        )}
         <button
           className={iconBtnClasses}
           onClick={handleNotificationClick}

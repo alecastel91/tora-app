@@ -22,7 +22,7 @@
 import globals from 'globals';
 
 export default [
-  { ignores: ['dist/**', 'dist-preview/**', 'dev-dist/**', 'public/**'] },
+  { ignores: ['dist/**', 'dist-preview/**', 'dev-dist/**', 'public/**', '.vite-desktop/**'] },
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
     linterOptions: { reportUnusedDisableDirectives: 'off' },

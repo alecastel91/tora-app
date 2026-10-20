@@ -46,7 +46,7 @@ function groupByCity(profiles) {
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, loading = false, onSelectionChange, topInset = 68, bottomInset = 52 }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, loading = false, onSelectionChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
   const { t } = useLanguage();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
@@ -523,7 +523,9 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     setSelectedCity(null);
     // The app's country name comes from a member in it; an atlas-only name
     // ("Czechia") would not match the filters, so an empty country carries nothing.
-    onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null);
+    // A country with nobody in it still IS a selection — reported separately so
+    // callers that turn the selection into a server query keep ignoring it.
+    onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null, { country: name, empty: !inCountry.length });
     const center = geoCentroid(f);
     focusOn(center[0], center[1]);
     setTip(null);
@@ -657,7 +659,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   // ---- coordinated list scroll (touch): swipe up → expand to full page;
   //      pull down at the top → collapse toward the globe / close.
   //      Native listeners because React touch events are passive at the root.
-  const sheetOpen = !!(selectedCity || selectedCountry);
+  // listTakesOver: the host's own list shows the selection (desktop workspace), so no panel here
+  const sheetOpen = !!(selectedCity || selectedCountry) && !(isDesktop && listTakesOver);
   useEffect(() => {
     const el = listRef.current;
     if (!el || !sheetOpen || isDesktop) return undefined; // desktop panel is fixed, no sheet gestures

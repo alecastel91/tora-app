@@ -28,9 +28,20 @@ import { StarIcon } from './utils/icons';
 import { CURRENCIES } from './utils/currencies';
 import './styles/App.css';
 import './styles/responsive.css';
+// Last stylesheet in the graph, deliberately: desktop v2 shadows responsive.css's
+// desktop rules. Inert without the desktop-v2 class on <html> (see utils/desktopV2).
+import './styles/desktop-v2.css';
+import './styles/desktop-v3.css';
 import LoadingGlobe from './components/common/LoadingGlobe';
 import AchievementsScreen from './components/screens/AchievementsScreen';
 import InviteFriendsSection from './components/common/InviteFriendsSection';
+import { isDesktopV2, useNativeDesktop, useMediaQuery, isDesktopV3 } from './utils/desktopV2';
+import DashboardScreen from './components/desktop/DashboardScreen';
+import BookingsBoard from './components/desktop/BookingsBoard';
+import SearchWorkspace from './components/desktop/SearchWorkspace';
+import CommandPalette from './components/desktop/CommandPalette';
+import SettingsNav from './components/desktop/SettingsNav';
+import PremiumPlans from './components/desktop/PremiumPlans';
 import VerificationModal from './components/common/VerificationModal';
 import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
@@ -65,8 +76,19 @@ function App() {
   const [authMode, setAuthMode] = useState(resetToken ? 'reset' : (inviteCodeFromUrl ? 'signup' : 'login'));
   const [loading, setLoading] = useState(true);
   // News is home: first tab in the bar, and where every session starts.
-  const HOME_TAB = 'news';
+  // Desktop v3 (flag + >= 1024px) lands on the dashboard instead and swaps
+  // three tabs for desktop-native screens; the phone never takes this branch.
+  const nativeDesktop = useNativeDesktop();
+  const HOME_TAB = nativeDesktop ? 'home' : 'news';
   const [activeTab, setActiveTab] = useState(HOME_TAB);
+
+  // Narrowing the window (or turning v3 off) unmounts the Dashboard and drops
+  // Home from the tab bar; without this the main area is left blank with no
+  // way back to it.
+  useEffect(() => {
+    if (!nativeDesktop && activeTab === 'home') switchTab('news');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativeDesktop, activeTab]);
 
   // Cross-screen tab navigation (e.g. ViewProfile -> Tour Kickstart).
   // Goes through switchTab so the target joins mountedTabs (keep-mounted
@@ -152,11 +174,35 @@ function App() {
   const closeAllOverlays = () => {
     setActiveChatUser(null);
     setChatOpenDeal(null);
+    setShowGuide(false);
     setViewingProfile(null);
     setShowSettings(false);
     setShowPremium(false);
     setShowAchievements(false);
   };
+
+  /* One sub-page at a time. The guide, a profile, Settings, Premium and
+     Achievements all occupy the same layer inside the frame, and they are
+     rendered as siblings in a fixed order — so stacking them means the one
+     you open last is not necessarily the one on top. Opening any of them
+     closes the rest, which is also what the header chrome expects: it sits
+     above this layer so the bell stays reachable whatever is open. */
+  const closeSubPages = (keep) => {
+    // Desktop only. The phone stacks these as full-screen pages and relies on
+    // it: opening Premium from a locked feature on someone's profile and then
+    // dismissing it should return you to that profile, not to the tab.
+    if (!nativeDesktop) return;
+    if (keep !== 'guide') setShowGuide(false);
+    if (keep !== 'profile') setViewingProfile(null);
+    if (keep !== 'settings') setShowSettings(false);
+    if (keep !== 'premium') setShowPremium(false);
+    if (keep !== 'achievements') setShowAchievements(false);
+  };
+  const goGuide = () => { closeSubPages('guide'); setShowGuide(true); };
+  const goProfile = (profile) => { closeSubPages('profile'); setViewingProfile(profile); };
+  const goSettings = () => { closeSubPages('settings'); setShowSettings(true); };
+  const goPremium = () => { closeSubPages('premium'); setShowPremium(true); };
+  const goAchievements = () => { closeSubPages('achievements'); setShowAchievements(true); };
   useLayoutEffect(() => {
     if (appContentRef.current) {
       appContentRef.current.scrollTop = tabScrollPositions.current[activeTab] || 0;
@@ -191,7 +237,7 @@ function App() {
   // from inside it rather than being the only way in.
   const [showGuide, setShowGuide] = useState(false);
   useEffect(() => {
-    const open = () => setShowGuide(true);
+    const open = () => goGuide();
     window.addEventListener('tora:open-guide', open);
     return () => window.removeEventListener('tora:open-guide', open);
   }, []);
@@ -230,6 +276,11 @@ function App() {
   // actions are actually handled (the count drops to 0), so a still-unhandled
   // item keeps signalling instead of vanishing after one glance.
   const [bookingsActionCount, setBookingsActionCount] = useState(0);
+
+  // Desktop v2 feed rail: gated on the SAME 1280px breakpoint as its CSS, so on
+  // a phone the subtree never mounts at all (.desktop-only would only hide it —
+  // InviteFriendsSection would still mount and fetch).
+  const showD2Rail = useMediaQuery('(min-width: 1280px)', isDesktopV2() && !isDesktopV3()); // v3 keeps News for news; the rail's pieces live on the Dashboard
   // First-login "Getting started" carousel (reopenable from Settings).
   const [showGettingStarted, setShowGettingStarted] = useState(false);
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
@@ -290,7 +341,7 @@ function App() {
         t('offer.limitMessage', { n: limit, date: when }),
         { title: t('offer.limitTitle'), confirmLabel: t('search.upgradeNow') }
       );
-      if (upgrade) setShowPremium(true);
+      if (upgrade) goPremium();
     };
     window.addEventListener('tora:offer-limit', onLimit);
     return () => window.removeEventListener('tora:offer-limit', onLimit);
@@ -298,7 +349,7 @@ function App() {
 
   // Open the Premium screen from anywhere (e.g. the agent at-cap modal).
   useEffect(() => {
-    const openPremium = () => setShowPremium(true);
+    const openPremium = () => goPremium();
     window.addEventListener('tora:open-premium', openPremium);
     return () => window.removeEventListener('tora:open-premium', openPremium);
   }, []);
@@ -630,15 +681,20 @@ function App() {
   };
 
   const tabScreens = {
-    profile: <ProfileScreen onOpenPremium={() => setShowPremium(true)} onOpenAchievements={() => setShowAchievements(true)} accountUser={accountUser} onSwitchTab={switchTab} />,
-    search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} />,
-    news: <NewsScreen onOpenProfile={(profile) => setViewingProfile(profile)} onOpenPremium={() => setShowPremium(true)} />,
-    tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={() => setShowPremium(true)} accountUser={accountUser} isActive={activeTab === 'tour'} />,
-    bookings: <BookingsScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
+    ...(nativeDesktop && {
+      home: <DashboardScreen onOpenChat={openChatInMessages} onSwitchTab={switchTab} isActive={activeTab === 'home'} />,
+      search: <SearchWorkspace onOpenChat={openChatInMessages} onOpenProfile={goProfile} onOpenPremium={goPremium} />,
+      bookings: <BookingsBoard onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} />,
+    }),
+    profile: <ProfileScreen onOpenPremium={goPremium} onOpenAchievements={goAchievements} accountUser={accountUser} onSwitchTab={switchTab} />,
+    ...(!nativeDesktop && { search: <SearchScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onOpenPremium={goPremium} accountUser={accountUser} /> }),
+    news: <NewsScreen onOpenProfile={goProfile} onOpenPremium={goPremium} />,
+    tour: <TourScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} onUnreadProposalsChange={setUnreadProposalsCount} onOpenPremium={goPremium} accountUser={accountUser} isActive={activeTab === 'tour'} />,
+    ...(!nativeDesktop && { bookings: <BookingsScreen onOpenChat={openChatInMessages} onNavigateToMessages={() => switchTab('messages')} isActive={activeTab === 'bookings'} onActionCountChange={setBookingsActionCount} /> }),
     // chatOpen (not a key remount): MessagesScreen refetches once when a
     // chat closes, to pick up read-state changes. A key here remounted the
     // permanently-mounted screen twice per chat session.
-    messages: <MessagesScreen onOpenChat={openChatInMessages} chatOpen={!!activeChatUser} isActive={activeTab === 'messages'} />,
+    messages: <MessagesScreen onOpenChat={openChatInMessages} onCloseChat={() => setActiveChatUser(null)} chatOpen={!!activeChatUser} isActive={activeTab === 'messages'} />,
   };
 
   // Stripe-hosted billing portal: update card, view invoices, cancel.
@@ -687,7 +743,7 @@ function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('upgrade') && user?.id) {
-      setShowPremium(true);
+      goPremium();
       params.delete('upgrade');
       const qs = params.toString();
       window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''));
@@ -800,7 +856,7 @@ function App() {
         {showGuide && <GuideScreen onClose={() => setShowGuide(false)} />}
         <GettingStartedSheet open={showGettingStarted} onClose={closeGettingStarted} />
         <Header
-          onOpenSettings={() => setShowSettings(true)}
+          onOpenSettings={goSettings}
           onSwitchTab={switchTab}
           activeTab={activeTab}
         />
@@ -820,6 +876,33 @@ function App() {
               style={{ display: activeTab === tab ? undefined : 'none' }}
             >
               {tabScreens[tab]}
+              {/* Desktop v2 feed rail. Added as a SIBLING of the screen so
+                  NewsScreen itself is untouched; the panel becomes a two-column
+                  grid in desktop-v2.css. Everything here reuses state already in
+                  this component and existing nav.* keys — no new copy, no new
+                  fetches. Not mounted below 1280px or when the flag is off. */}
+              {/* Desktop v3 Messages: the list keeps its column and the
+                  thread area says so until a conversation is open. */}
+              {tab === 'messages' && nativeDesktop && !activeChatUser && (
+                <div className="d3-msg-empty desktop-only"><p>{t('desktop.selectThread')}</p></div>
+              )}
+              {tab === 'news' && showD2Rail && (
+                <aside className="d2-rail desktop-only">
+                  <div className="d2-rail-card">
+                    {[
+                      { id: 'bookings', count: bookingsActionCount },
+                      { id: 'messages', count: unreadMessagesCount },
+                      { id: 'tour', count: unreadProposalsCount },
+                    ].map(({ id, count }) => (
+                      <button key={id} className="d2-rail-row" onClick={() => switchTab(id)}>
+                        <span>{t(`nav.${id}`)}</span>
+                        <span className={`d2-rail-count${count > 0 ? ' is-active' : ''}`}>{count}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <InviteFriendsSection />
+                </aside>
+              )}
             </div>
           ))}
         </main>
@@ -837,7 +920,7 @@ function App() {
             onOpenDealHandled={() => setChatOpenDeal(null)}
             initialDraft={chatDraft}
             onClose={() => { setActiveChatUser(null); setChatOpenDeal(null); setChatDraft(null); }}
-            onOpenProfile={(profile) => setViewingProfile(profile)}
+            onOpenProfile={goProfile}
           />
         )}
         {viewingProfile && (
@@ -847,7 +930,18 @@ function App() {
             onOpenChat={openChatInMessages}
           />
         )}
-        <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} bookingsHasDot={bookingsActionCount > 0 && activeTab !== 'bookings'} />
+        {nativeDesktop && (
+          <CommandPalette
+            pages={[
+              { id: 'home', label: t('desktop.home') },
+              ...['news', 'search', 'tour', 'bookings', 'messages', 'profile'].map((id) => ({ id, label: t(`nav.${id}`) })),
+              { id: 'settings', label: t('settings.title') },
+            ]}
+            onGo={(id) => (id === 'settings' ? goSettings() : switchTab(id))}
+            onOpenProfile={goProfile}
+          />
+        )}
+        <TabBar activeTab={activeTab} onTabChange={switchTab} unreadMessagesCount={unreadMessagesCount} unreadProposalsCount={unreadProposalsCount} bookingsHasDot={bookingsActionCount > 0 && activeTab !== 'bookings'} homeTab={nativeDesktop} />
         
         {/* Achievements Screen */}
         {showAchievements && (
@@ -867,6 +961,9 @@ function App() {
               <div style={{ width: '24px' }}></div>
             </div>
 
+            {/* Desktop v3: a section index beside the content (desktop-v3.css
+                lays the screen out as a grid when the nav is present). */}
+            {nativeDesktop && <SettingsNav />}
             <div className="settings-content">
             {/* Subscription & Usage Section */}
             <div className="settings-section subscription-section">
@@ -878,7 +975,7 @@ function App() {
                 <p>{t('settingsExtra.premiumTeaser')}</p>
                 <button
                   className="btn btn-primary"
-                  onClick={() => { setShowSettings(false); setShowPremium(true); }}
+                  onClick={goPremium}
                 >
                   {t('settingsExtra.explorePremium')}
                 </button>
@@ -889,7 +986,7 @@ function App() {
                   <AgentTierCard
                     profile={user}
                     plan={planKind}
-                    onManage={() => { setShowSettings(false); setShowPremium(true); }}
+                    onManage={goPremium}
                   />
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
                     <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleOpenBillingPortal}>
@@ -908,8 +1005,7 @@ function App() {
                       <button
                         className="btn btn-upgrade-small"
                         onClick={() => {
-                          setShowSettings(false);
-                          setShowPremium(true);
+                          goPremium();
                         }}
                       >
                         {t('premium.upgradeToPremium')}
@@ -919,8 +1015,7 @@ function App() {
                       <button
                         className="btn btn-upgrade-small"
                         onClick={() => {
-                          setShowSettings(false);
-                          setShowPremium(true);
+                          goPremium();
                         }}
                       >
                         {t('premium.upgradeToYearly')}
@@ -1329,6 +1424,25 @@ function App() {
               </p>
             </div>
             
+            {/* Desktop v3: three plan columns (free / monthly / yearly), the
+                price on top and what each includes beneath. Agents keep the
+                per-seat pricing below. Same prices and handlers either way. */}
+            {nativeDesktop && user?.role !== 'AGENT' ? (
+              <PremiumPlans
+                user={user}
+                money={money}
+                memberPrice={memberPrice}
+                currency={cur}
+                hasMonthly={billingTier(user) === 'MONTHLY'}
+                hasYearly={billingTier(user) === 'YEARLY'}
+                onAgencyPlan={onAgencyPlan}
+                canLeaveAgency={agencyRoster <= 1}
+                onMembership={onMembership}
+                onSelectPlan={handleSelectPlan}
+                onExplain={setInfoFeature}
+              />
+            ) : (
+            <>
             <div className="premium-features">
               <h3>{t('premium.comparePlans')}</h3>
               <div className="features-table">
@@ -1544,6 +1658,8 @@ function App() {
               </>
               );
             })()}
+            </>
+            )}
 
             <ExtrasShop user={user} />
           </div>
@@ -1660,7 +1776,7 @@ function App() {
                   <ul className="summary-terms">
                     {user?.role === 'AGENT' && (organisation?.status === 'ACTIVE'
                       ? <li className="summary-terms-agency">{t('agency.checkoutMember', { total: organisation.artistTotal })}</li>
-                      : <li className="summary-terms-agency">{t('agency.checkoutNudge')} <button type="button" className="summary-terms-link" onClick={() => { setShowSubscription(false); setShowPremium(false); setShowSettings(true); }}>{t('agency.linkUpFirst')}</button></li>)}
+                      : <li className="summary-terms-agency">{t('agency.checkoutNudge')} <button type="button" className="summary-terms-link" onClick={() => { setShowSubscription(false); goSettings(); }}>{t('agency.linkUpFirst')}</button></li>)}
                     <li>{t(isPlanChange ? 'premium.changeTiming' : 'premium.paymentTiming')}</li>
                     <li>{t('premium.cancelTerms')}</li>
                     <li className="summary-terms-legal">

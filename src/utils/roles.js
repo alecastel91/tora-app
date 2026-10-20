@@ -14,6 +14,19 @@ export function getAvatarClass(role) {
 // can't read the --color-role-* CSS tokens. Keep in sync with
 // styles/variables.css and tora-theme.css.
 /** One profile per role per account — so an account holds at most ROLES.length profiles. */
+/** Outline pill colours for a role, from the --color-role-* theme tokens. */
+export const roleChipClass = (role) => ({
+  ARTIST: 'border-role-artist/50 text-role-artist',
+  VENUE: 'border-role-venue/50 text-role-venue',
+  PROMOTER: 'border-role-promoter/50 text-role-promoter',
+  AGENT: 'border-role-agent/50 text-role-agent',
+}[role] || 'border-white/30 text-white/70');
+
+/** A soft wash of the role colour for backgrounds. */
+export const roleBloom = (role, pct = 18) => (ROLES.includes(role)
+  ? `color-mix(in srgb, var(--color-role-${role.toLowerCase()}) ${pct}%, transparent)`
+  : 'rgba(255,255,255,0.08)');
+
 export const ROLES = ['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'];
 
 export const ROLE_COLOR = {

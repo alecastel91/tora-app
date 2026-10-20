@@ -15,7 +15,11 @@ import InlineDrawer from './InlineDrawer';
 // in a single snap row with a right-edge fade while more content remains.
 // Each tile carries a role chip: a small role icon tinted with the canonical
 // role color (language-independent, Artist/Agent stay distinct).
-const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid' }) => {
+// cols — tiles per row in the grid variant (3 on the phone; the desktop
+// pages pass 4). Static class names so Tailwind emits them.
+const COLS = { 3: 'grid-cols-3', 4: 'grid-cols-4', 5: 'grid-cols-5', 6: 'grid-cols-6' };
+
+const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3 }) => {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
@@ -93,20 +97,21 @@ const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid' }) => {
     );
   }
 
-  const extras = list.slice(3);
+  const n = COLS[cols] ? cols : 3;
+  const extras = list.slice(n);
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-2">
-        {list.slice(0, 3).map((p, i) =>
-          renderTile(p, i === 2 && extras.length > 0 && !expanded ? extras.length : 0, false)
+      <div className={`grid ${COLS[n]} gap-2`}>
+        {list.slice(0, n).map((p, i) =>
+          renderTile(p, i === n - 1 && extras.length > 0 && !expanded ? extras.length : 0, false)
         )}
       </div>
 
       {/* Inline drawer with the remaining profiles */}
       {extras.length > 0 && (
         <div className={`overflow-hidden transition-[max-height] duration-300 ${expanded ? 'max-h-[1200px]' : 'max-h-0'}`}>
-          <div className="grid grid-cols-3 gap-2 pt-2">
+          <div className={`grid ${COLS[n]} gap-2 pt-2`}>
             {extras.map((p) => renderTile(p, 0, false))}
           </div>
         </div>

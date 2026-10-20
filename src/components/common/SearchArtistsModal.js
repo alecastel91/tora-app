@@ -7,8 +7,10 @@ import apiService from '../../services/api';
 import ViewProfileScreen from '../screens/ViewProfileScreen';
 import LoadingGlobe from './LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useNativeDesktop } from '../../utils/desktopV2';
 
 const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
+  const nativeDesktop = useNativeDesktop(); // desktop-v3.css .d3-agents
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [artists, setArtists] = useState([]);
@@ -380,12 +382,14 @@ const SearchArtistsModal = ({ onClose, onSelectArtist, currentAgentId }) => {
   return (
     <>
       {/* Main Search Modal */}
-      <div className="screen active search-artists-screen">
+      <div className={`screen active search-artists-screen${nativeDesktop ? ' d3-agents' : ''}`}>
         <div className="search-agents-header">
           <button className="back-btn" onClick={onClose}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
+            {nativeDesktop ? <CloseIcon /> : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+            )}
           </button>
           <h1>{t('findArtist.title')}</h1>
           <div style={{ width: '24px' }}></div>
