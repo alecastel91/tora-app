@@ -19,7 +19,7 @@ import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
-import { counterpartRoles, matchDatesFor } from '../../utils/calendarMatch';
+import { counterpartRoles, matchDatesFor, normalizeDate } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import TourBoard from '../desktop/TourBoard';
@@ -254,6 +254,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     setCountryFilter('all'); setGenresFilter([]); setArtistFilter('all');
   };
   const [calendarMatches, setCalendarMatches] = useState([]);
+  // Desktop v3 Matches is a master-detail: this is the row showing in the
+  // right pane, as { kind: 'match' | 'feed', id, match?, item? }.
+  const [pickedMatch, setPickedMatch] = useState(null);
 
   // Industry travel feed: every active schedule (connected > liked > others),
   // server-paginated; the sentinel div drives infinite scroll.
@@ -502,6 +505,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 dates: formatMatchDates(overlappingDates),
                 matchCount: overlappingDates.length,
                 rawDates: overlappingDates,
+                // Both sides' open dates, so the desktop can draw the overlap
+                // itself — the matching already had them in hand.
+                sourceDates: source.availableDates || [],
                 // Agent view: which represented artist this match is for.
                 forArtist: isAgent ? { id: source.id, name: source.name } : null,
               });
@@ -653,6 +659,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   const matches = filteredMatches;
 
+  // Desktop opens on the strongest lead rather than an empty pane; an exact
+  // date match if there is one, otherwise the first row of the feed.
+  useEffect(() => {
+    if (!nativeDesktop || pickedMatch) return;
+    if (matches.length > 0) setPickedMatch({ kind: 'match', id: `m-${matches[0].profile.id}-0`, match: matches[0] });
+    else if (travelFeed.length > 0) setPickedMatch({ kind: 'feed', id: `f-${travelFeed[0].profile.id}-${travelFeed[0].startDate}-0`, item: travelFeed[0] });
+  }, [nativeDesktop, matches, travelFeed, pickedMatch]);
+
   const handleConnect = (profile) => {
     if (!sentRequests.has(profile.id)) {
       setSelectedProfile(profile);
@@ -680,6 +694,170 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const handleProfileClick = (profileId) => {
     console.log('[TourScreen] Opening profile:', profileId);
     setViewingProfile(profileId);
+  };
+
+  /* ---- Desktop v3: Matches as a master-detail ----
+     The left column lists every lead at two strengths — exact date matches
+     first, then the live feed; the right pane draws why the top one is a
+     match. Both sides' open dates are already on the match object, so the
+     overlap is computed here rather than fetched. */
+
+  // The window of nights around a match, each marked for who is open on it.
+  const overlapDays = (match) => {
+    const shared = new Set((match.rawDates || []).map(normalizeDate));
+    const mine = new Set((match.sourceDates || []).map(normalizeDate));
+    const theirs = new Set((match.profile?.availableDates || []).map(normalizeDate));
+    const sorted = [...shared].sort();
+    if (sorted.length === 0) return [];
+    const out = [];
+    const cursor = new Date(`${sorted[0]}T00:00:00Z`);
+    const last = new Date(`${sorted[sorted.length - 1]}T00:00:00Z`);
+    // A long run would not fit the pane; the shared nights are what matter,
+    // so the window stops at two weeks.
+    while (cursor <= last && out.length < 14) {
+      const iso = cursor.toISOString().slice(0, 10);
+      out.push({ iso, day: cursor.getUTCDate(), mine: mine.has(iso), theirs: theirs.has(iso), both: shared.has(iso) });
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+    return out;
+  };
+
+  // A venue or promoter does not travel — it opens dates. Same list, two
+  // headings, so neither role is described in the other's language.
+  const feedGroups = [
+    { key: 'available', label: t('desktop.matAlsoAvailable'), items: travelFeed.filter((f) => f.kind === 'availability') },
+    { key: 'travelling', label: t('desktop.matAlsoTravelling'), items: travelFeed.filter((f) => f.kind !== 'availability') },
+  ].filter((g) => g.items.length > 0);
+
+  const matchRowKey = (m, i) => `m-${m.profile.id}-${i}`;
+  const feedRowKey = (f, i) => `f-${f.profile.id}-${f.startDate}-${i}`;
+
+  const desktopMatchRow = (match, i) => {
+    const key = matchRowKey(match, i);
+    const days = overlapDays(match);
+    return (
+      <button
+        type="button"
+        key={key}
+        className={`d3-mat-row${pickedMatch?.id === key ? ' is-on' : ''}`}
+        onClick={() => setPickedMatch({ kind: 'match', id: key, match })}
+      >
+        <span className="d3-mat-name">{match.profile.name}</span>
+        <span className="d3-mat-sub">
+          {match.profile.role} · {match.profile.location}
+          {match.forArtist ? ` · ${match.forArtist.name}` : ''}
+        </span>
+        {days.length > 0 && (
+          <span className="d3-mat-strip" aria-hidden>
+            {days.map((d) => <i key={d.iso} className={d.both ? 'is-both' : ''} />)}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  const desktopFeedRow = (item, i) => {
+    const key = feedRowKey(item, i);
+    const where = [item.destCity, item.destCountry].filter(Boolean).join(', ') || item.zone;
+    return (
+      <button
+        type="button"
+        key={key}
+        className={`d3-mat-row${pickedMatch?.id === key ? ' is-on' : ''}`}
+        onClick={() => setPickedMatch({ kind: 'feed', id: key, item })}
+      >
+        <span className="d3-mat-name">{item.profile.name}</span>
+        <span className="d3-mat-sub">
+          {item.profile.role} · {where} · {item.startDate}{item.endDate !== item.startDate ? ` → ${item.endDate}` : ''}
+        </span>
+      </button>
+    );
+  };
+
+  const desktopMatchDetail = () => {
+    if (!pickedMatch) return <p className="d3-mat-blank">{t('desktop.matPick')}</p>;
+
+    const prof = pickedMatch.kind === 'match' ? pickedMatch.match.profile : pickedMatch.item.profile;
+    const isRequested = sentRequests.has(prof.id);
+    const isConnected = connectedUsers.has(prof.id);
+    const days = pickedMatch.kind === 'match' ? overlapDays(pickedMatch.match) : [];
+    const shared = days.filter((d) => d.both).length;
+
+    return (
+      <>
+        <div className="d3-mat-head">
+          <div className={`match-avatar avatar-${(prof.role || 'artist').toLowerCase()} clickable`}
+               onClick={() => handleProfileClick(prof.id)}>
+            {prof.avatar ? <img src={prof.avatar} alt={prof.name} /> : (prof.name || '?').charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="match-name-role !mb-0">
+              <h3 className="truncate">{prof.name}</h3>
+              <span className={`role-badge ${(prof.role || '').toLowerCase()}`}>{prof.role}</span>
+            </div>
+            <p className="d3-mat-loc">{prof.location}</p>
+          </div>
+        </div>
+
+        {days.length > 0 && (
+          <div className="d3-mat-ov">
+            <p className="d3-mat-lbl">{t('desktop.matOverlapTitle')}</p>
+            <div className="d3-mat-ovrow"><span /><div className="d3-mat-cells">
+              {days.map((d) => <b key={d.iso} className="is-date">{d.day}</b>)}
+            </div></div>
+            <div className="d3-mat-ovrow"><span>{t('desktop.matYou')}</span><div className="d3-mat-cells">
+              {days.map((d) => <b key={d.iso} className={d.mine ? 'is-you' : ''} />)}
+            </div></div>
+            <div className="d3-mat-ovrow"><span>{t('desktop.matThem')}</span><div className="d3-mat-cells">
+              {days.map((d) => <b key={d.iso} className={d.theirs ? 'is-them' : ''} />)}
+            </div></div>
+            <div className="d3-mat-ovrow"><span>{t('desktop.matBoth')}</span><div className="d3-mat-cells">
+              {days.map((d) => <b key={d.iso} className={d.both ? 'is-both' : ''}>{d.both ? d.day : ''}</b>)}
+            </div></div>
+            <p className="d3-mat-note">{t('desktop.matNightsCommon', { n: shared })}</p>
+          </div>
+        )}
+
+        {pickedMatch.kind === 'feed' && (
+          <div className="d3-mat-ov">
+            <p className="d3-mat-lbl">
+              {pickedMatch.item.kind === 'availability' ? t('tour.feedOpenDates') : t('calendar.travelSchedules')}
+            </p>
+            <p className="d3-mat-note">
+              {[pickedMatch.item.destCity, pickedMatch.item.destCountry].filter(Boolean).join(', ') || pickedMatch.item.zone}
+              {' · '}{pickedMatch.item.startDate}
+              {pickedMatch.item.endDate !== pickedMatch.item.startDate ? ` → ${pickedMatch.item.endDate}` : ''}
+            </p>
+          </div>
+        )}
+
+        {prof.genres && prof.genres.length > 0 && (
+          <div className="d3-mat-ov">
+            <p className="d3-mat-lbl">{t('desktop.matGenresShared')}</p>
+            <div className="match-genres-simple">
+              {prof.genres.slice(0, 6).map((g) => <span key={g} className="genre-tag-small">{g}</span>)}
+            </div>
+          </div>
+        )}
+
+        <div className="d3-mat-actions">
+          {isConnected ? (
+            <button className="btn btn-message"
+              onClick={() => handleMessage(prof, pickedMatch.kind === 'match'
+                ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
+                : '')}>
+              {t('search.message')}
+            </button>
+          ) : (
+            <button className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
+              onClick={() => handleConnect(prof)} disabled={isRequested}>
+              {isRequested ? t('search.requested') : t('search.connect')}
+            </button>
+          )}
+          <button className="btn" onClick={() => handleProfileClick(prof.id)}>{t('desktop.view')}</button>
+        </div>
+      </>
+    );
   };
 
   // Calendar Matches Tab Content
@@ -755,9 +933,32 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           })}
 
           <div className="feature-preview">
-            <p className="form-hint" style={{ margin: '0 0 12px' }}>{t('tour.matchesGeoHint')}</p>
+            {!nativeDesktop && <p className="form-hint" style={{ margin: '0 0 12px' }}>{t('tour.matchesGeoHint')}</p>}
 
-            {matches.length > 0 ? (
+            {nativeDesktop ? (
+              <div className="d3-mat">
+                <div className="d3-mat-list">
+                  {matches.length > 0 && (
+                    <>
+                      <p className="d3-mat-group">{t('desktop.matMatching')} · {matches.length}</p>
+                      {matches.map(desktopMatchRow)}
+                    </>
+                  )}
+                  {feedGroups.map((g) => (
+                    <React.Fragment key={g.key}>
+                      <p className="d3-mat-group">{g.label} · {g.items.length}</p>
+                      {g.items.map(desktopFeedRow)}
+                    </React.Fragment>
+                  ))}
+                  {matches.length === 0 && feedGroups.length === 0 && !feedLoading && (
+                    <p className="d3-mat-blank">{t('tour.noMatchesMessage')}</p>
+                  )}
+                  <div ref={feedSentinelRef} className="h-8" />
+                  {feedLoading && <p className="text-center text-xs text-white/35 py-2">{t('common.loading')}</p>}
+                </div>
+                <div className="d3-mat-detail">{desktopMatchDetail()}</div>
+              </div>
+            ) : matches.length > 0 ? (
               <div className="matches-results">
                 <p className="matches-count">
                   {matches.length === 1 ? t('tour.matchFound', { n: matches.length }) : t('tour.matchesFound', { n: matches.length })}
@@ -868,7 +1069,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             {/* Industry travel feed: every ACTIVE schedule out there, beyond
                 strict date matches — connected people first, then liked,
                 then everyone else. Infinite scroll via sentinel. */}
-            {isPremiumUser() && (
+            {!nativeDesktop && isPremiumUser() && (
               <div className="mt-8">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 font-tech m-0">
                   {t('tour.travelFeedTitle')}

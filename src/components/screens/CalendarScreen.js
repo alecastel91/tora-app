@@ -10,6 +10,7 @@ import apiService from '../../services/api';
 import { clampDateRange } from '../../utils/dates';
 import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer } from '../../utils/subscription';
+import { useNativeDesktop } from '../../utils/desktopV2';
 
 /**
  * Own availability + travel schedule. With `targetProfile` (an agent editing a
@@ -183,7 +184,19 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   
   const daysInMonth = getDaysInMonth(currentMonth, currentYear);
   const firstDayOfMonth = getFirstDayOfMonth(currentMonth, currentYear);
-  
+
+  // Desktop v3 shows two months side by side and a rail beside them. The phone
+  // keeps one month and the stacked sections below it.
+  const nativeDesktop = useNativeDesktop();
+  // The month at `offset` months after the one being shown, as {month, year}.
+  const monthAt = (offset) => {
+    const d = new Date(currentYear, currentMonth + offset, 1);
+    return { month: d.getMonth(), year: d.getFullYear() };
+  };
+  // The day the rail is describing: {month, year, day}. Set by a plain click
+  // on a cell; the desktop rail is the only thing that reads it.
+  const [focusedDay, setFocusedDay] = useState(null);
+
   const monthNames = [
     t('dateFormat.january'), t('dateFormat.february'), t('dateFormat.march'),
     t('dateFormat.april'), t('dateFormat.may'), t('dateFormat.june'),
@@ -304,9 +317,12 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     }
   };
 
-  // Handle mouse/touch down on a date (start potential drag)
-  const handleDateMouseDown = (day) => {
-    const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+  // Handle mouse/touch down on a date (start potential drag).
+  // `month`/`year` default to the month on screen; the desktop's second month
+  // passes its own, so a cell always writes the key it displays.
+  const handleDateMouseDown = (day, month = currentMonth, year = currentYear) => {
+    const dateKey = `${year}-${month + 1}-${day}`;
+    setFocusedDay({ day, month, year });
     setIsDragging(true);
     setHasDragged(false); // Reset drag tracking
     setDragStartDate(dateKey);
@@ -328,10 +344,10 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   };
 
   // Handle mouse/touch enter on a date (during drag)
-  const handleDateMouseEnter = (day) => {
+  const handleDateMouseEnter = (day, month = currentMonth, year = currentYear) => {
     if (!isDragging) return;
 
-    const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+    const dateKey = `${year}-${month + 1}-${day}`;
 
     // If entering a different date, this is a drag not a click
     if (dateKey !== dragStartDate) {
@@ -612,8 +628,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     });
   };
 
-  const getSchedulePosition = (day) => {
-    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const getSchedulePosition = (day, month = currentMonth, year = currentYear) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const current = new Date(dateStr);
 
     for (const schedule of schedules) {
@@ -670,18 +686,23 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // Deals of the month shown, keyed by day number (deal.date is date-only),
   // each with its chip label resolved once: the other party — venue/promoter
   // on an artist's (or their agent's) calendar, the artist otherwise.
-  const dealsByDay = useMemo(() => {
-    const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-`;
+  // Keyed by `YYYY-MM` so the desktop's second month can be read from the same
+  // pass; `dealsFor` hands back the { day: [...] } map for one month.
+  const dealsByMonth = useMemo(() => {
     const map = {};
     deals.forEach((deal) => {
       const iso = String(deal.date || '').slice(0, 10);
-      if (!iso.startsWith(prefix)) return;
+      if (iso.length < 10) return;
       const day = Number(iso.slice(8, 10));
       const [mine, other] = isArtistSideForDeal(deal, profile) ? [deal.venue, deal.artist] : [deal.artist, deal.venue];
-      (map[day] = map[day] || []).push({ deal, label: mine?.name || other?.name || '?' });
+      const byDay = (map[iso.slice(0, 7)] = map[iso.slice(0, 7)] || {});
+      (byDay[day] = byDay[day] || []).push({ deal, label: mine?.name || other?.name || '?' });
     });
     return map;
-  }, [deals, currentYear, currentMonth, profile]);
+  }, [deals, profile]);
+
+  const dealsFor = (month = currentMonth, year = currentYear) =>
+    dealsByMonth[`${year}-${String(month + 1).padStart(2, '0')}`] || {};
 
   // A chip on the grid opens that booking's card in the list below.
   const openDealFromGrid = (dealId) => {
@@ -689,10 +710,13 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     requestAnimationFrame(() => document.getElementById(`cal-event-${dealId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
   };
 
-  const renderCalendarDays = () => {
+  const renderCalendarDays = (month = currentMonth, year = currentYear) => {
     const days = [];
     const weekDays = t('dateFormat.weekLetters').split(',');
     const weekShort = t('dateFormat.weekShort').split(',');
+    const monthDays = getDaysInMonth(month, year);
+    const monthFirstDay = getFirstDayOfMonth(month, year);
+    const monthDeals = dealsFor(month, year);
 
     // Render weekday headers
     weekDays.forEach((day, index) => {
@@ -705,19 +729,20 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     });
     
     // Empty cells for days before month starts
-    for (let i = 0; i < firstDayOfMonth; i++) {
+    for (let i = 0; i < monthFirstDay; i++) {
       days.push(
         <div key={`empty-${i}`} className="calendar-day empty"></div>
       );
     }
-    
+
     // Render days of month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+    for (let day = 1; day <= monthDays; day++) {
+      const dateKey = `${year}-${month + 1}-${day}`;
       const isSelected = selectedDates.has(dateKey);
-      const schedulePos = getSchedulePosition(day);
-      const dayDeals = dealsByDay[day] || [];
-      const isToday = todayDate.getFullYear() === currentYear && todayDate.getMonth() === currentMonth && todayDate.getDate() === day;
+      const schedulePos = getSchedulePosition(day, month, year);
+      const dayDeals = monthDeals[day] || [];
+      const isToday = todayDate.getFullYear() === year && todayDate.getMonth() === month && todayDate.getDate() === day;
+      const isFocused = focusedDay && focusedDay.day === day && focusedDay.month === month && focusedDay.year === year;
 
       let scheduleClasses = '';
       if (schedulePos.hasSchedule) {
@@ -735,9 +760,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       days.push(
         <div
           key={`day-${day}`}
-          className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}`}
-          data-weekday={new Date(currentYear, currentMonth, day).getDay()}
+          className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}${isFocused ? ' is-focused' : ''}`}
+          data-weekday={new Date(year, month, day).getDay()}
           data-day={day}
+          data-month={month}
+          data-year={year}
           /* A tap fires touchstart, touchend AND the compatibility mouse events
              (mousedown, mouseup, click) — five in total. With a click handler
              as well that was three toggles per tap, which only looked right
@@ -748,21 +775,23 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           onMouseDown={(e) => {
             if (afterTouch()) return;
             e.preventDefault();
-            handleDateMouseDown(day);
+            handleDateMouseDown(day, month, year);
           }}
-          onMouseEnter={() => { if (!afterTouch()) handleDateMouseEnter(day); }}
+          onMouseEnter={() => { if (!afterTouch()) handleDateMouseEnter(day, month, year); }}
           onMouseUp={() => { if (!afterTouch()) handleDateMouseUp(); }}
           onTouchStart={(e) => {
             touchedAt.current = Date.now();
             e.preventDefault();
-            handleDateMouseDown(day);
+            handleDateMouseDown(day, month, year);
           }}
           onTouchMove={(e) => {
             e.preventDefault();
             // Get the element under the touch point
             const touch = e.touches[0];
             const cell = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.calendar-day[data-day]');
-            if (cell) handleDateMouseEnter(Number(cell.dataset.day));
+            // A drag can cross into the desktop's second month, so take the
+            // month off the cell rather than assuming the one on screen.
+            if (cell) handleDateMouseEnter(Number(cell.dataset.day), Number(cell.dataset.month), Number(cell.dataset.year));
           }}
           onTouchEnd={() => { touchedAt.current = Date.now(); handleDateMouseUp(); }}
           style={{ userSelect: 'none', WebkitUserSelect: 'none', cursor: 'pointer' }}
@@ -795,9 +824,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             // carries a segment; the destination is written once per week
             // row (at the trip start, and again on Sundays for multi-week
             // trips), with a plane marking the departure day.
-            const weekday = new Date(currentYear, currentMonth, day).getDay();
+            const weekday = new Date(year, month, day).getDay();
             const isTripStart = schedulePos.isSingle || schedulePos.isStart;
-            const showLabel = isTripStart || weekday === 0;
+            // Narrower cells on the desktop's two-month grid, so the city also
+            // repeats at the start of each month, not only each week row.
+            const showLabel = isTripStart || weekday === 0 || day === 1;
             return (
               <div className={`schedule-label ${showLabel ? 'has-city' : ''}`}>
                 {showLabel && (
@@ -807,7 +838,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                         <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
                       </svg>
                     )}
-                    <span className="schedule-city">{getLocationDisplayText(schedulePos.schedule)}</span>
+                    <span className="schedule-city" title={getLocationDisplayText(schedulePos.schedule)}>{getLocationDisplayText(schedulePos.schedule)}</span>
                   </>
                 )}
               </div>
@@ -819,6 +850,212 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     
     return days;
   };
+
+  /* ---- Desktop v3: two months side by side, settings and travel in a rail ----
+     Everything below is read only by the `nativeDesktop` branch of the render;
+     the phone keeps the single-month, stacked-sections layout untouched. */
+
+  // The two months on screen, and the counts across both of them.
+  const monthsShown = [monthAt(0), monthAt(1)];
+  const twoMonthSummary = (() => {
+    const prefixes = monthsShown.map(({ month, year }) => `${year}-${month + 1}-`);
+    let free = 0;
+    selectedDates.forEach((key) => { if (prefixes.some((p) => String(key).startsWith(p))) free += 1; });
+    const gigs = monthsShown.reduce(
+      (n, { month, year }) => n + Object.values(dealsFor(month, year)).reduce((m, list) => m + list.length, 0), 0);
+    // A trip counts once if any of its nights fall inside the window.
+    const windowStart = new Date(monthsShown[0].year, monthsShown[0].month, 1);
+    const windowEnd = new Date(monthsShown[1].year, monthsShown[1].month + 1, 0);
+    const trips = schedules.filter((s) => new Date(s.startDate) <= windowEnd && new Date(s.endDate) >= windowStart).length;
+    return { free, gigs, trips };
+  })();
+
+  // What the rail says about the day you last clicked.
+  const focusedInfo = (() => {
+    if (!focusedDay) return null;
+    const { day, month, year } = focusedDay;
+    const key = `${year}-${month + 1}-${day}`;
+    return {
+      key,
+      isFree: selectedDates.has(key),
+      label: new Date(year, month, day).toLocaleDateString(t('dateFormat.locale'), {
+        weekday: 'short', day: 'numeric', month: 'short',
+      }),
+      schedule: getSchedulePosition(day, month, year).schedule || null,
+      deals: dealsFor(month, year)[day] || [],
+    };
+  })();
+
+  const toggleFocusedDay = () => {
+    if (!focusedInfo) return;
+    const next = new Set(selectedDates);
+    if (focusedInfo.isFree) next.delete(focusedInfo.key); else next.add(focusedInfo.key);
+    setSelectedDates(next);
+    setShouldSave(true);
+  };
+
+  const travelSection = (
+      <div className="travel-schedules-section">
+        <div className="travel-schedules-header">
+          <h3>{t('calendar.travelSchedules')}</h3>
+          <button className="btn btn-primary btn-sm" onClick={openNewScheduleModal}>
+            {t('calendar.addSchedule')}
+          </button>
+        </div>
+
+        {schedules.length === 0 ? (
+      <div className="no-schedules">
+        <p>{t('calendar.noSchedulesYet')}</p>
+        <button
+          className="add-travel-schedule-btn"
+          onClick={openNewScheduleModal}
+        >
+          + ADD TRAVEL SCHEDULE
+        </button>
+      </div>
+    ) : (
+      <div className="travel-schedules-list">
+        {schedules.map((schedule) => (
+          <div key={schedule.id} className="travel-schedule-item">
+            <div className="schedule-location">
+              {getLocationLabel(schedule)}
+            </div>
+            <div className="schedule-bottom-row">
+              {formatDate(schedule.startDate)} - {formatDate(schedule.endDate)}
+              <button className="icon-btn-edit" onClick={() => handleEditSchedule(schedule)} title={t('calendar.editSchedule')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button className="icon-btn-delete" onClick={() => handleRemoveSchedule(schedule.id)} title={t('calendar.deleteSchedule')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 6h18"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
+        </div>
+      )}
+      </div>
+  );
+
+  const visibilitySection = (
+    <div className="dashboard-section">
+      <h3>{t('calendar.visibilityTitle')}</h3>
+      <div className="flex gap-2">
+        {['EVERYONE', 'CONNECTED_ONLY'].map((value) => {
+          const active = (profile?.calendarVisibility || 'EVERYONE') === value;
+          const selectable = canSelectVisibility(value);
+          return (
+            <button
+              key={value}
+              type="button"
+              disabled={!selectable || visibilitySaving}
+              onClick={() => handleVisibilityChange(value)}
+              className={`flex-1 px-3 py-2.5 rounded-xl border text-xs font-tech uppercase tracking-[0.08em] transition-colors ${
+                active
+                  ? 'border-infrared/60 text-infrared bg-infrared/10'
+                  : 'border-white/10 text-white/50 bg-transparent hover:bg-white/5'
+              } ${selectable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+            >
+              {value === 'EVERYONE' ? t('calendar.visibilityEveryone') : t('calendar.visibilityConnected')}
+            </button>
+          );
+        })}
+      </div>
+      <small className="block mt-2 text-[11px] text-white/40">
+        {canEditVisibility ? t('calendar.visibilityHint') : t('calendar.visibilityYearlyNote')}
+      </small>
+    </div>
+  );
+
+  const calendarLegend = (
+    <div className="calendar-legend">
+      <div className="legend-item">
+        <span className="legend-dot available"></span>
+        <span>{t('calendar.available')}</span>
+      </div>
+      <div className="legend-item">
+        <span className="legend-dot has-location"></span>
+        <span>{t('calendar.scheduled')}</span>
+      </div>
+    </div>
+  );
+
+  const desktopCalendarCard = (
+    <div className="calendar-inline-wrapper d3-cal-wrap">
+      <div className="calendar-header-inline">
+        <button className="calendar-nav-btn" onClick={goToPreviousMonth} aria-label={t('common.back')}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M12 16L6 10L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <div className="calendar-month-info">
+          <h4>
+            {monthsShown[0].year === monthsShown[1].year
+              ? `${monthNames[monthsShown[0].month]} – ${monthNames[monthsShown[1].month]} ${monthsShown[1].year}`
+              : `${monthNames[monthsShown[0].month]} ${monthsShown[0].year} – ${monthNames[monthsShown[1].month]} ${monthsShown[1].year}`}
+          </h4>
+          <p className="calendar-instructions">{t('calendar.markInstructions')}</p>
+        </div>
+        <button className="calendar-nav-btn" onClick={goToNextMonth} aria-label={t('common.next')}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10L10 16L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(-90 10 10)"/>
+          </svg>
+        </button>
+      </div>
+      <div className="d3-cal-months">
+        {monthsShown.map(({ month, year }) => (
+          <div className="d3-cal-month" key={`${year}-${month}`}>
+            <p className="d3-cal-mname">{monthNames[month]}{monthsShown[0].year !== monthsShown[1].year ? ` ${year}` : ''}</p>
+            <div className="calendar-grid-inline">{renderCalendarDays(month, year)}</div>
+          </div>
+        ))}
+      </div>
+      {calendarLegend}
+    </div>
+  );
+
+  const desktopDayPanel = (
+    <div className="d3-cal-card">
+      <p className="d3-cal-lbl">{t('desktop.calSelected')}</p>
+      {!focusedInfo ? (
+        <p className="d3-cal-empty">{t('desktop.calPickDay')}</p>
+      ) : (
+        <>
+          <p className="d3-cal-day">{focusedInfo.label}</p>
+          <div className="d3-cal-chips">
+            {focusedInfo.isFree && <span className="d3-cal-chip is-free">{t('calendar.available')}</span>}
+            {focusedInfo.schedule && (
+              <span className="d3-cal-chip is-travel">✈ {getLocationDisplayText(focusedInfo.schedule)}</span>
+            )}
+            {focusedInfo.deals.map(({ deal, label }) => (
+              <span key={deal.id} className="d3-cal-chip is-gig">{label}</span>
+            ))}
+            {!focusedInfo.isFree && !focusedInfo.schedule && focusedInfo.deals.length === 0 && (
+              <span className="d3-cal-chip">{t('desktop.calNothingPlanned')}</span>
+            )}
+          </div>
+          <button type="button" className="d3-cal-mark" onClick={toggleFocusedDay}>
+            {focusedInfo.isFree ? t('desktop.calMarkBusy') : t('desktop.calMarkFree')}
+          </button>
+        </>
+      )}
+    </div>
+  );
+
+  const desktopSummaryPanel = (
+    <div className="d3-cal-card">
+      <p className="d3-cal-lbl">{t('desktop.calSummary')}</p>
+      <div className="d3-cal-stat"><span>{t('desktop.calNightsFree')}</span><b>{twoMonthSummary.free}</b></div>
+      <div className="d3-cal-stat"><span>{t('desktop.calGigs')}</span><b>{twoMonthSummary.gigs}</b></div>
+      <div className="d3-cal-stat"><span>{t('desktop.calTrips')}</span><b>{twoMonthSummary.trips}</b></div>
+    </div>
+  );
 
   return (
     <div className={`screen active calendar-screen ${embedded ? 'calendar-embedded' : ''}`}>
@@ -832,39 +1069,13 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         </div>
       )}
 
-      <div className="calendar-content" style={embedded ? { padding: '0' } : {}}>
+      <div className={`calendar-content${nativeDesktop ? ' d3-cal' : ''}`} style={embedded ? { padding: '0' } : {}}>
         {/* Calendar privacy — who sees availability + travel schedule.
             Restricting to connections-only is the Yearly perk; reopening to
-            everyone stays available at any tier (no lapsed-profile trap). */}
-        {profile?.role === 'ARTIST' && (
-          <div className="dashboard-section">
-            <h3>{t('calendar.visibilityTitle')}</h3>
-            <div className="flex gap-2">
-              {['EVERYONE', 'CONNECTED_ONLY'].map((value) => {
-                const active = (profile?.calendarVisibility || 'EVERYONE') === value;
-                const selectable = canSelectVisibility(value);
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    disabled={!selectable || visibilitySaving}
-                    onClick={() => handleVisibilityChange(value)}
-                    className={`flex-1 px-3 py-2.5 rounded-xl border text-xs font-tech uppercase tracking-[0.08em] transition-colors ${
-                      active
-                        ? 'border-infrared/60 text-infrared bg-infrared/10'
-                        : 'border-white/10 text-white/50 bg-transparent hover:bg-white/5'
-                    } ${selectable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
-                  >
-                    {value === 'EVERYONE' ? t('calendar.visibilityEveryone') : t('calendar.visibilityConnected')}
-                  </button>
-                );
-              })}
-            </div>
-            <small className="block mt-2 text-[11px] text-white/40">
-              {canEditVisibility ? t('calendar.visibilityHint') : t('calendar.visibilityYearlyNote')}
-            </small>
-          </div>
-        )}
+            everyone stays available at any tier (no lapsed-profile trap).
+            Desktop v3 shows this in the rail instead; it is a once-a-year
+            setting and does not deserve the top of the page. */}
+        {!nativeDesktop && profile?.role === 'ARTIST' && visibilitySection}
 
         {/* Schedules Display - Conditional based on role */}
         {isPromoterOrVenue ? (
@@ -883,6 +1094,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   {t('calendar.seeMatches')} →
                 </button>
               )}
+              {nativeDesktop ? desktopCalendarCard : (
               <div className="calendar-inline-wrapper">
                 <div className="calendar-header-inline">
                   <button className="calendar-nav-btn" onClick={goToPreviousMonth}>
@@ -916,6 +1128,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   </div>
                 </div>
               </div>
+              )}
             </div>
 
             {/* Upcoming Events Section */}
@@ -1054,6 +1267,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   {t('calendar.seeMatches')} →
                 </button>
               )}
+              {nativeDesktop ? desktopCalendarCard : (
               <div className="calendar-inline-wrapper">
                 <div className="calendar-header-inline">
                   <button className="calendar-nav-btn" onClick={goToPreviousMonth}>
@@ -1087,54 +1301,12 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   </div>
                 </div>
               </div>
-
-              {/* Travel Schedules inside Calendar View section */}
-              <div className="travel-schedules-section">
-                <div className="travel-schedules-header">
-                  <h3>{t('calendar.travelSchedules')}</h3>
-                  <button className="btn btn-primary btn-sm" onClick={openNewScheduleModal}>
-                    {t('calendar.addSchedule')}
-                  </button>
-                </div>
-
-                {schedules.length === 0 ? (
-              <div className="no-schedules">
-                <p>{t('calendar.noSchedulesYet')}</p>
-                <button
-                  className="add-travel-schedule-btn"
-                  onClick={openNewScheduleModal}
-                >
-                  + ADD TRAVEL SCHEDULE
-                </button>
-              </div>
-            ) : (
-              <div className="travel-schedules-list">
-                {schedules.map((schedule) => (
-                  <div key={schedule.id} className="travel-schedule-item">
-                    <div className="schedule-location">
-                      {getLocationLabel(schedule)}
-                    </div>
-                    <div className="schedule-bottom-row">
-                      {formatDate(schedule.startDate)} - {formatDate(schedule.endDate)}
-                      <button className="icon-btn-edit" onClick={() => handleEditSchedule(schedule)} title={t('calendar.editSchedule')}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                      </button>
-                      <button className="icon-btn-delete" onClick={() => handleRemoveSchedule(schedule.id)} title={t('calendar.deleteSchedule')}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 6h18"/>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-                          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                </div>
               )}
-              </div>
+
+              {/* Travel Schedules inside Calendar View section.
+                  Desktop v3 lifts this into the rail beside the grid, so a
+                  trip and the nights it covers are visible together. */}
+              {!nativeDesktop && travelSection}
             </div>
 
             {/* Upcoming Events — same data the promoter/venue dashboard shows,
@@ -1180,6 +1352,17 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
               )}
             </div>
           </>
+        )}
+
+        {/* Desktop v3 rail: the day you clicked, the two-month totals, travel,
+            and the visibility setting — everything that is not the grid. */}
+        {nativeDesktop && (
+          <aside className="d3-cal-rail">
+            {desktopDayPanel}
+            {desktopSummaryPanel}
+            {!isPromoterOrVenue && travelSection}
+            {profile?.role === 'ARTIST' && visibilitySection}
+          </aside>
         )}
       </div>
 
