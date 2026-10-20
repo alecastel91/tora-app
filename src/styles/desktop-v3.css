@@ -1535,9 +1535,9 @@
      rather than stretching a single month across the whole pane. */
   html.desktop-v3 .d3-mat-months {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 232px);
+    grid-template-columns: repeat(auto-fit, 310px);
     justify-content: start;
-    gap: 22px;
+    gap: 26px;
   }
   html.desktop-v3 .d3-mini-name {
     margin: 0 0 8px;
@@ -1551,25 +1551,25 @@
   html.desktop-v3 .d3-mini-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 3px;
+    gap: 4px;
   }
   html.desktop-v3 .d3-mini-grid i {
     aspect-ratio: 1;
+    font-size: 12.5px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.035);
     font-style: normal;
-    font-size: 10.5px;
     color: rgba(255, 255, 255, 0.3);
     font-variant-numeric: tabular-nums;
   }
   html.desktop-v3 .d3-mini-grid i.is-dow {
     aspect-ratio: auto;
-    height: 15px;
+    height: 18px;
     background: none;
-    font-size: 8.5px;
+    font-size: 9.5px;
     letter-spacing: 0.06em;
     color: rgba(255, 255, 255, 0.28);
   }
@@ -1620,6 +1620,25 @@
   html.desktop-v3 .d3-mat-note { margin: 10px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.6); }
   html.desktop-v3 .d3-mat-actions { display: flex; gap: 10px; margin-top: 20px; }
   html.desktop-v3 .d3-mat-actions .btn { flex: 1; }
+
+  /* Whether you already know this person, so the control below reads as a
+     consequence rather than a guess. */
+  html.desktop-v3 .d3-mat-rel {
+    align-self: flex-start;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(67, 233, 123, 0.12);
+    color: #7BF0A4;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  html.desktop-v3 .d3-mat-rel.is-liked { background: rgba(255, 51, 102, 0.14); color: #FF9DB5; }
+  html.desktop-v3 .d3-mat-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  html.desktop-v3 .d3-mat-tags .d3-mat-count { margin-top: 0; }
+  html.desktop-v3 .d3-mat-row > .d3-mat-rel { margin-top: 5px; }
+  html.desktop-v3 .d3-mat-loc .d3-mat-rel { margin-right: 8px; vertical-align: 1px; }
 
   /* The matches canvas is wider than the single reading column the other
      sub-tabs use, because it holds two panes. */

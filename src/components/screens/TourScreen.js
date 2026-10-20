@@ -404,6 +404,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   }, [viewingProfile, calendarMatches]);
   const [selectedTourArtist, setSelectedTourArtist] = useState(null);
   const [selectedTour, setSelectedTour] = useState(null);
+  // An offer opened from Matches has no tour behind it, so it carries its own
+  // country. Without this the modal would prefill whichever tour was last
+  // opened in this session.
+  const [offerCountry, setOfferCountry] = useState(null);
   const [showEditTourModal, setShowEditTourModal] = useState(false);
   const [showMyProposalModal, setShowMyProposalModal] = useState(false);
   const [myProposalData, setMyProposalData] = useState(null);
@@ -718,6 +722,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // A venue or promoter does not travel — it opens dates. Same list, two
   // headings, so neither role is described in the other's language.
   const opensDates = (role) => ['VENUE', 'PROMOTER'].includes(String(role || '').toUpperCase());
+  // Only a promoter or venue books an artist, and only an artist is booked.
+  const canOffer = (prof) => opensDates(user?.role) && String(prof?.role || '').toUpperCase() === 'ARTIST';
   const feedGroups = [
     { key: 'available', label: t('desktop.matAlsoAvailable'), items: feedByProfile.filter((g) => opensDates(g.profile.role)) },
     { key: 'travelling', label: t('desktop.matAlsoTravelling'), items: feedByProfile.filter((g) => !opensDates(g.profile.role)) },
@@ -806,6 +812,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           {match.profile.role} · {match.profile.location}
           {match.forArtist ? ` · ${match.forArtist.name}` : ''}
         </span>
+        {connectedUsers.has(match.profile.id) && (
+          <span className="d3-mat-rel">{t('tour.feedConnected')}</span>
+        )}
         {strip.length > 0 && (
           <span className="d3-mat-strip" aria-hidden>
             {strip.map((on, j) => <i key={j} className={on ? 'is-both' : ''} />)}
@@ -830,9 +839,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           {group.profile.role} · {where} · {starts[0]}
           {ends[ends.length - 1] !== starts[0] ? ` → ${ends[ends.length - 1]}` : ''}
         </span>
-        {group.items.length > 1 && (
-          <span className="d3-mat-count">{t('desktop.matRanges', { n: group.items.length })}</span>
-        )}
+        <span className="d3-mat-tags">
+          {group.items.length > 1 && (
+            <span className="d3-mat-count">{t('desktop.matRanges', { n: group.items.length })}</span>
+          )}
+          {connectedUsers.has(group.profile.id)
+            ? <span className="d3-mat-rel">{t('tour.feedConnected')}</span>
+            : group.liked ? <span className="d3-mat-rel is-liked">{t('tour.feedLiked')}</span> : null}
+        </span>
       </button>
     );
   };
@@ -867,6 +881,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <span className={`role-badge ${(prof.role || '').toLowerCase()}`}>{prof.role}</span>
             </div>
             <p className="d3-mat-loc">
+              {isConnected ? <span className="d3-mat-rel">{t('tour.feedConnected')}</span> : null}
               {prof.location}
               {/* Real field, filled in by the venue — absent on most profiles today. */}
               {prof.venueCapacity ? ` · ${t('profile.capacity')} ${Number(prof.venueCapacity).toLocaleString()}` : ''}
@@ -900,15 +915,29 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         )}
 
         <div className="d3-mat-actions">
+          {/* A promoter or venue looking at an artist is here to book them, so
+              the offer leads and the relationship control follows it. Everyone
+              else gets Message when connected and Connect when not — messaging
+              is connection-gated, so a lead you have no relationship with can
+              only be connected to. */}
+          {canOffer(prof) && (
+            <button className="btn btn-primary" onClick={() => {
+              setSelectedTourArtist(prof);
+              setOfferCountry(prof.country || null);
+              setShowMakeOfferModal(true);
+            }}>
+              {t('tour.makeAnOffer')}
+            </button>
+          )}
           {isConnected ? (
-            <button className="btn btn-message"
+            <button className={`btn ${canOffer(prof) ? '' : 'btn-message'}`}
               onClick={() => handleMessage(prof, pickedMatch.kind === 'match'
                 ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
                 : '')}>
               {t('search.message')}
             </button>
           ) : (
-            <button className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
+            <button className={`btn ${isRequested ? 'btn-disabled' : canOffer(prof) ? '' : 'btn-primary'}`}
               onClick={() => handleConnect(prof)} disabled={isRequested}>
               {isRequested ? t('search.requested') : t('search.connect')}
             </button>
@@ -2581,12 +2610,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         onClose={() => {
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);
+          setOfferCountry(null);
         }}
         recipientProfile={selectedTourArtist}
-        preferCountry={selectedTour?.country || null}
+        preferCountry={offerCountry || selectedTour?.country || null}
         onSuccess={() => {
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);
+          setOfferCountry(null);
           // Navigate to Messages tab to see the offer
           onNavigateToMessages();
         }}
