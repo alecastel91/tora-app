@@ -8800,6 +8800,12 @@ textarea.form-textarea:focus {
 .booking-compact-view .party-info {
   flex: 1;
   min-width: 0;
+  /* .booking-date-badge is absolutely positioned flush to this column's right
+     edge (34px wide, z-index 1), so without reserved space a long status line
+     wraps straight underneath it and loses characters — "…with CIRCUIT TOKYO"
+     rendered as "…with CIRCU[IT]". Reserve the badge plus a gutter so no row
+     in this column can ever run under it, whatever the copy says. */
+  padding-right: 42px;
 }
 
 .party-name-role {
