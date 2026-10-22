@@ -141,8 +141,11 @@ function App() {
     setActiveTab(tab);
     setMountedTabs((prev) => (prev.includes(tab) ? prev : [...prev, tab]));
     // Activation checklist: "explore Tour Kickstart" completes on first visit.
-    // Keyed by the ACTIVE PROFILE id — the same key the checklist reads.
+    // Recorded on the server per profile (so it holds on every device) and in
+    // localStorage keyed by the ACTIVE PROFILE id as the instant signal — the
+    // same key the checklist reads — until the next /auth/me refresh.
     if (tab === 'tour' && user?.id) {
+      if (!user.tourVisitedAt) apiService.markTourVisited(user.id).catch(() => {});
       localStorage.setItem(`tora:visited-tour:${user.id}`, '1');
       // The Profile tab stays mounted while the member is on Tour, so the
       // checklist would not re-read storage — tell it.

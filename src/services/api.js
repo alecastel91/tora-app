@@ -590,6 +590,16 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Activation checklist: this profile has opened the Tour tab (first visit only, server-side).
+  async markTourVisited(profileId) {
+    const response = await fetch(`${API_URL}/auth/visited-tour`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ profileId }),
+    });
+    return this.handleResponse(response);
+  }
+
   async setPushPrefs(prefs) {
     const response = await fetch(`${API_URL}/push/prefs`, {
       method: 'PUT',

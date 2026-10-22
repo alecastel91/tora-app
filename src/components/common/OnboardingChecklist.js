@@ -101,7 +101,9 @@ const OnboardingChecklist = () => {
     ...(isPremiumViewer(user)
       ? [{
           key: 'exploreTours',
-          done: visitedTour,
+          // Server flag first (holds across devices); localStorage is only the
+          // same-session signal before the next /auth/me refresh.
+          done: !!user.tourVisitedAt || visitedTour,
           go: goKickstart,
         }]
       : []),
