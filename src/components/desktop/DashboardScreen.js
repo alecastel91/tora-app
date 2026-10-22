@@ -90,10 +90,17 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
   // Deals change under us (the other side signs, pays): the same channel
   // BookingsScreen listens on. Threads refresh on the visible-tab poll.
   useEffect(() => (user?.id ? subscribeToDeals(user.id, load) : undefined), [user?.id, load]);
+  // The poll is a safety net behind the broadcasts, and — as AppContext's own
+  // poll already does — it only casts while someone is looking: this is the
+  // landing screen for every desktop session now, and a dashboard left open
+  // in a background tab would otherwise fire three requests a minute all
+  // night. Catch up once on return so pausing never leaves stale data.
   useEffect(() => {
     if (!isActive) return undefined;
-    const id = setInterval(load, 60000);
-    return () => clearInterval(id);
+    const tick = () => { if (document.visibilityState === 'visible') load(); };
+    const id = setInterval(tick, 60000);
+    document.addEventListener('visibilitychange', tick);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick); };
   }, [isActive, load]);
 
   const today = useMemo(startOfToday, [data.deals]); // one Date per data change, so the memos below hold

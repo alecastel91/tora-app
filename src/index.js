@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import * as Sentry from '@sentry/react';
-import './utils/desktopV2'; // side effect: stamp the desktop-v2 class on <html> before any stylesheet
+import './utils/desktopV2'; // side effect: stamp the desktop layout classes on <html> before any stylesheet
 import './styles/index.css';
 import './services/install'; // side effect: capture beforeinstallprompt before it fires
 import App from './App';

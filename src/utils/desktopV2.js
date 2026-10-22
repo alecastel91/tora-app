@@ -25,12 +25,9 @@ const KEY = 'tora-desktop-layout'; // 'v1' | 'v2' | 'v3'; absent = DEFAULT_LEVEL
 const LEVELS = ['v1', 'v2', 'v3'];
 const DESKTOP_MQ = '(min-width: 1024px)';
 
-/* The desktop someone gets when they have expressed no preference. Moved to
-   'v3' on 2026-10-22: the desktop-native layout is now what TORA ships.
-   'v1' remains a stored value in its own right because it is the rollback —
-   an opt-out that merely cleared the key would be silently undone here on the
-   very next load, exactly when it is needed. `?desktop=off` sets it, and a
-   stored choice always beats this default, so nobody who opted out is moved. */
+/* What a visitor with no stored choice gets (v3 since 2026-10-22). A stored
+   choice always wins, which is why the opt-out stores 'v1' rather than
+   clearing the key: a cleared key would be silently re-promoted here. */
 const DEFAULT_LEVEL = 'v3';
 
 export const isDesktopV2 = () => document.documentElement.classList.contains('desktop-v2');
