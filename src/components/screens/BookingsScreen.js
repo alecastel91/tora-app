@@ -9,6 +9,7 @@ import WorkflowTimeline from '../common/WorkflowTimeline';
 import AddContractModal from '../common/AddContractModal';
 import SignContractModal from '../common/SignContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
+import IssueInvoiceModal from '../common/IssueInvoiceModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
@@ -110,6 +111,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const [showContractModal, setShowContractModal] = useState(false);
   const [showAddContractModal, setShowAddContractModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [invoiceDeal, setInvoiceDeal] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showDepositAgain, setShowDepositAgain] = useState(false); // reveal the deposit block for a further instalment
   const [selectedDealForWorkflow, setSelectedDealForWorkflow] = useState(null);
@@ -1361,6 +1363,18 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   </button>
                 )}
 
+                {/* Invoice — artist side issues it in their own style once the
+                    booking is agreed (deposit, balance or full). */}
+                {['ACCEPTED', 'COMPLETED'].includes(deal.status) && isArtistSideForDeal(deal, currentUser) && (
+                  <button className="btn btn-outline" onClick={() => setInvoiceDeal(deal)}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <path d="M14 2v6h6M8 13h8M8 17h5"></path>
+                    </svg>
+                    {deal.sharedDocuments?.invoices?.length ? t('invoices.issueAnother') : t('invoices.issueButton')}
+                  </button>
+                )}
+
                 {/* Documents recap — show what's been shared / skipped /
                     pending for this booking. Visible to both sides. Shared
                     categories are clickable and open the document in the
@@ -2139,6 +2153,14 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           </div>
         </div></OverlayPortal>
       )}
+
+      <IssueInvoiceModal
+        isOpen={!!invoiceDeal}
+        deal={invoiceDeal}
+        currentUser={currentUser}
+        onClose={() => setInvoiceDeal(null)}
+        onIssued={(updatedDeal) => { if (updatedDeal?.id) setDeals((prev) => prev.map((d) => (d.id === updatedDeal.id ? { ...d, ...updatedDeal } : d))); }}
+      />
 
       <ShareDocumentsModal
         isOpen={showDocumentModal && !!selectedDealForWorkflow}

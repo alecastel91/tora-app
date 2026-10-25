@@ -7,6 +7,7 @@ import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import { roleLabel } from '../../utils/roles';
 import PrivacyNote from '../common/PrivacyNote';
+import InvoiceSetupSection from '../common/InvoiceSetupSection';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
@@ -914,6 +915,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         {renderDocCategory('technicalRider', <SlidersIcon />, t('manage.technicalRider'), t('manage.technicalRiderNote'))}
         {renderDocCategory('hospitalityRider', <SlidersIcon />, t('manage.hospitalityRider'), t('manage.hospitalityRiderNote'))}
         {renderDocCategory('contracts', <FileTextIcon />, t('manage.contracts'), t('manage.contractsNote'))}
+        <InvoiceSetupSection profile={user} />
       </div>
     );
   };
