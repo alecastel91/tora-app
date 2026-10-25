@@ -4,6 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
 import { FileTextIcon } from '../../utils/icons';
+import { isYearlyViewer } from '../../utils/subscription';
 
 /**
  * Profile → Manage → Documents → Invoices.
@@ -29,6 +30,7 @@ const InvoiceSetupSection = ({ profile }) => {
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const profileId = profile?.id;
+  const yearly = isYearlyViewer(profile);
 
   useEffect(() => {
     if (!profileId) return;
@@ -73,12 +75,12 @@ const InvoiceSetupSection = ({ profile }) => {
       <p className="form-hint" style={{ marginTop: 0 }}>{t('invoices.setupIntro')}</p>
       <input ref={fileRef} type="file" accept="application/pdf" multiple style={{ display: 'none' }} onChange={onFiles} />
       <div className="flex flex-wrap gap-2 mb-3">
-        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => fileRef.current?.click()}>
+        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => { if (!yearly) { window.dispatchEvent(new CustomEvent('tora:open-premium')); return; } fileRef.current?.click(); }} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>
           {busy ? '…' : saved ? t('invoices.relearn') : t('invoices.uploadExamples')}
         </button>
         {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft({ language: 'en', title: 'Invoice', numberPattern: '{YYYY}-{SEQ:4}', nextSequence: '1', taxMode: 'none', currencyDefault: 'EUR' })}>{t('invoices.startBlank')}</button>}
       </div>
-      <p className="form-hint">{t('invoices.privacy')}</p>
+      <p className="form-hint">{!yearly && <>{t('aiFeatures.yearlyOnly')} </>}{t('invoices.privacy')}</p>
 
       {draft && (
         <div className="invoice-form">

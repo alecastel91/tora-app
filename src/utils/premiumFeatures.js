@@ -21,6 +21,8 @@ export function premiumFeatureRows(user, t) {
     bookerSide && { key: 'artistTravelAlerts', free: NO, monthly: NO, yearly: CHECK },
     { key: 'calendarPrivacy', free: NO, monthly: NO, yearly: CHECK },
     artistSide && { key: 'feePrivacy', free: NO, monthly: NO, yearly: CHECK },
+    artistSide && { key: 'aiInvoices', free: NO, monthly: NO, yearly: CHECK },
+    artistSide && { key: 'aiContracts', free: NO, monthly: NO, yearly: CHECK },
     { key: 'messaging', free: CHECK, monthly: CHECK, yearly: CHECK },
     { key: 'prioritySearch', free: NO, monthly: NO, yearly: CHECK },
     { key: 'sendLikes', free: '2 x day', monthly: '5 x day', yearly: t('premium.unlimited') },

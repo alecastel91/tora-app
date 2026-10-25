@@ -4,6 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
 import { FileTextIcon } from '../../utils/icons';
+import { isYearlyViewer } from '../../utils/subscription';
 
 /**
  * Profile → Manage → Documents → Contract template.
@@ -19,6 +20,7 @@ const ContractTemplateSection = ({ profile }) => {
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const profileId = profile?.id;
+  const yearly = isYearlyViewer(profile);
 
   useEffect(() => {
     if (!profileId) return;
@@ -61,10 +63,10 @@ const ContractTemplateSection = ({ profile }) => {
       <p className="form-hint" style={{ marginTop: 0 }}>{t('contracts.setupIntro')}</p>
       <input ref={fileRef} type="file" accept="application/pdf" multiple style={{ display: 'none' }} onChange={onFiles} />
       <div className="flex flex-wrap gap-2 mb-3">
-        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? '…' : saved ? t('contracts.relearn') : t('contracts.uploadExamples')}</button>
+        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => { if (!yearly) { window.dispatchEvent(new CustomEvent('tora:open-premium')); return; } fileRef.current?.click(); }} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>{busy ? '…' : saved ? t('contracts.relearn') : t('contracts.uploadExamples')}</button>
         {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft({ language: 'en', title: 'Performance Agreement', sections: [{ heading: '', body: '' }], signatureBlock: 'For {{artist}}: ____________  Date: ______\nFor {{booker}}: ____________  Date: ______', notes: '' })}>{t('invoices.startBlank')}</button>}
       </div>
-      <p className="form-hint">{t('contracts.privacy')} {t('contracts.notLegalAdvice')}</p>
+      <p className="form-hint">{!yearly && <>{t('aiFeatures.yearlyOnly')} </>}{t('contracts.privacy')} {t('contracts.notLegalAdvice')}</p>
 
       {draft && (
         <div className="invoice-form">

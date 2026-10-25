@@ -177,6 +177,10 @@ const en = {
     continueToSign: "Continue to sign",
   },
 
+  aiFeatures: {
+    yearlyOnly: "Reading your past documents with AI is a Yearly feature. You can still fill in the form by hand.",
+  },
+
   connect: {
     selectAgent: 'Select Agent',
     withAgent: 'Connect with Agent',
@@ -635,6 +639,8 @@ const en = {
     notConfigured: "Payments are being set up — check back shortly.",
     preview: 'Preview',
     feePrivacy: 'Tour Fee Privacy',
+    aiInvoices: "AI invoices in your style",
+    aiContracts: "AI contract drafts in your words",
     title: 'TORA Premium',
     comparePlans: 'Compare Plans',
     feature: 'Feature',
@@ -681,6 +687,8 @@ const en = {
       artistTravelAlerts: 'Every artist you like becomes an alert: when they announce travel or tour dates near your city, you\'re notified — so you can reach out before anyone else.',
       calendarPrivacy: 'Decide exactly who can see your availability and travel plans — everyone, only your connections, or no one.',
       feePrivacy: 'Keep your booking fees private. Only the people you\'re actively negotiating with ever see your numbers.',
+      aiInvoices: "Upload a few of your past invoices once; TORA then issues deposit and balance invoices for every booking in exactly your layout, numbering and wording.",
+      aiContracts: "Upload a few of your past contracts once; TORA drafts each new booking's contract from your own clauses, editable in place or by asking for a change in words.",
       messaging: 'Direct messaging with any connection: negotiate deals, share documents and confirm details in one thread.',
       prioritySearch: 'Your profile ranks higher in search results, so the right people find you first.',
       sendLikes: 'A like signals interest in a profile. Free members get 2 a day; premium removes the limit.',

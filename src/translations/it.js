@@ -177,6 +177,10 @@ const it = {
     continueToSign: "Continua alla firma",
   },
 
+  aiFeatures: {
+    yearlyOnly: "La lettura dei tuoi documenti passati con l'IA è una funzione del piano Annuale. Puoi comunque compilare il modulo a mano.",
+  },
+
   connect: {
     selectAgent: 'Seleziona agente',
     withAgent: "Collegati con l'agente",
@@ -635,6 +639,8 @@ const it = {
     notConfigured: "I pagamenti sono in fase di configurazione — riprova a breve.",
     preview: 'Anteprima',
     feePrivacy: 'Privacy del cachet del tour',
+    aiInvoices: "Fatture con IA nel tuo stile",
+    aiContracts: "Bozze di contratto con IA con le tue parole",
     title: 'TORA Premium',
     comparePlans: 'Confronta i piani',
     feature: 'Funzione',
@@ -737,6 +743,8 @@ const it = {
       artistTravelAlerts: 'Ogni artista a cui metti like diventa un avviso: quando annuncia date di viaggio o tour vicino alla tua città ricevi una notifica, così puoi contattarlo prima di tutti.',
       calendarPrivacy: 'Decidi esattamente chi può vedere la tua disponibilità e i tuoi programmi di viaggio: tutti, solo i tuoi contatti o nessuno.',
       feePrivacy: 'Mantieni privati i tuoi compensi. Solo le persone con cui stai attivamente negoziando vedono le tue cifre.',
+      aiInvoices: "Carica qualche fattura passata una sola volta; TORA emette poi le fatture di acconto e saldo di ogni booking con il tuo stesso layout, numerazione e wording.",
+      aiContracts: "Carica qualche contratto passato una sola volta; TORA redige il contratto di ogni nuovo booking dalle tue clausole, modificabile direttamente o chiedendo una modifica a parole.",
       messaging: 'Messaggistica diretta con qualsiasi contatto: negozia accordi, condividi documenti e conferma i dettagli in un\'unica conversazione.',
       prioritySearch: 'Il tuo profilo si posiziona più in alto nei risultati di ricerca, così le persone giuste ti trovano per prime.',
       sendLikes: 'Un like segnala interesse per un profilo. I membri gratuiti ne hanno 2 al giorno; Premium elimina il limite.',

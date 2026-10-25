@@ -177,6 +177,10 @@ const es = {
     continueToSign: "Continuar para firmar",
   },
 
+  aiFeatures: {
+    yearlyOnly: "Leer tus documentos anteriores con IA es una función del plan Anual. Puedes rellenar el formulario a mano igualmente.",
+  },
+
   connect: {
     selectAgent: 'Seleccionar agente',
     withAgent: 'Conectar con el agente',
@@ -635,6 +639,8 @@ const es = {
     notConfigured: "Los pagos se están configurando: vuelve en un momento.",
     preview: 'Vista previa',
     feePrivacy: 'Privacidad del caché de gira',
+    aiInvoices: "Facturas con IA en tu estilo",
+    aiContracts: "Borradores de contrato con IA en tus palabras",
     title: 'TORA Premium',
     comparePlans: 'Comparar planes',
     feature: 'Función',
@@ -737,6 +743,8 @@ const es = {
       artistTravelAlerts: 'Cada artista que te gusta se convierte en un aviso: cuando anuncie fechas de viaje o gira cerca de tu ciudad, recibirás una notificación para contactarlo antes que nadie.',
       calendarPrivacy: 'Decide exactamente quién puede ver tu disponibilidad y tus planes de viaje: todos, solo tus contactos o nadie.',
       feePrivacy: 'Mantén privados tus honorarios de contratación. Solo las personas con las que estás negociando activamente ven tus cifras.',
+      aiInvoices: "Sube unas cuantas facturas anteriores una sola vez; TORA emite después las facturas de anticipo y saldo de cada booking con tu mismo diseño, numeración y redacción.",
+      aiContracts: "Sube unos cuantos contratos anteriores una sola vez; TORA redacta el contrato de cada nuevo booking con tus propias cláusulas, editable directamente o pidiendo un cambio con palabras.",
       messaging: 'Mensajería directa con cualquier contacto: negocia acuerdos, comparte documentos y confirma detalles en un mismo hilo.',
       prioritySearch: 'Tu perfil aparece más arriba en los resultados de búsqueda, para que las personas adecuadas te encuentren primero.',
       sendLikes: 'Un like indica interés en un perfil. Los miembros gratuitos reciben 2 al día; Premium elimina el límite.',

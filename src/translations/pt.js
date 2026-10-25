@@ -177,6 +177,10 @@ const pt = {
     continueToSign: "Continuar para assinar",
   },
 
+  aiFeatures: {
+    yearlyOnly: "Ler os seus documentos antigos com IA é uma função do plano Anual. Você ainda pode preencher o formulário manualmente.",
+  },
+
   connect: {
     selectAgent: 'Selecionar agente',
     withAgent: 'Ligar-me ao agente',
@@ -635,6 +639,8 @@ const pt = {
     notConfigured: "Os pagamentos estão sendo configurados — volte em breve.",
     preview: 'Pré-visualização',
     feePrivacy: 'Privacidade do cachê da tour',
+    aiInvoices: "Faturas com IA no seu estilo",
+    aiContracts: "Rascunhos de contrato com IA nas suas palavras",
     title: 'TORA Premium',
     comparePlans: 'Comparar planos',
     feature: 'Funcionalidade',
@@ -737,6 +743,8 @@ const pt = {
       artistTravelAlerts: 'Cada artista que você curte vira um alerta: quando ele anunciar datas de viagem ou tour perto da sua cidade, você recebe uma notificação — para contatá-lo antes de todos.',
       calendarPrivacy: 'Decide exatamente quem pode ver a sua disponibilidade e os seus planos de viagem — todos, apenas os seus contatos, ou ninguém.',
       feePrivacy: 'Mantém os seus cachês privados. Só as pessoas com quem está a negociar ativamente veem os seus valores.',
+      aiInvoices: "Envie algumas faturas antigas uma única vez; o TORA passa a emitir as faturas de sinal e saldo de cada booking com o seu layout, numeração e redação.",
+      aiContracts: "Envie alguns contratos antigos uma única vez; o TORA redige o contrato de cada novo booking a partir das suas próprias cláusulas, editável na hora ou pedindo uma alteração por escrito.",
       messaging: 'Mensagens diretas com qualquer contato: negoceia acordos, compartilha documentos e confirme detalhes numa única conversa.',
       prioritySearch: 'O seu perfil aparece mais acima nos resultados de pesquisa, para que as pessoas certas te encontrem primeiro.',
       sendLikes: 'Um like sinaliza interesse num perfil. Os membros gratuitos têm 2 por dia; o Premium remove o limite.',

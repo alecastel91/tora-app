@@ -177,6 +177,10 @@ const fr = {
     continueToSign: "Continuer vers la signature",
   },
 
+  aiFeatures: {
+    yearlyOnly: "La lecture de vos anciens documents par l'IA est une fonction de l'offre Annuelle. Vous pouvez toujours remplir le formulaire à la main.",
+  },
+
   connect: {
     selectAgent: 'Choisir un agent',
     withAgent: "Se connecter avec l'agent",
@@ -635,6 +639,8 @@ const fr = {
     notConfigured: "Les paiements sont en cours de configuration — revenez bientôt.",
     preview: 'Aperçu',
     feePrivacy: 'Confidentialité du cachet de tournée',
+    aiInvoices: "Factures IA dans votre style",
+    aiContracts: "Brouillons de contrat IA dans vos mots",
     title: 'TORA Premium',
     comparePlans: 'Comparer les offres',
     feature: 'Fonctionnalité',
@@ -737,6 +743,8 @@ const fr = {
       artistTravelAlerts: 'Chaque artiste que vous aimez devient une alerte : quand il annonce des dates de voyage ou de tournée près de votre ville, vous êtes averti — pour le contacter avant tout le monde.',
       calendarPrivacy: 'Décidez exactement qui peut voir vos disponibilités et vos projets de voyage : tout le monde, seulement vos contacts, ou personne.',
       feePrivacy: 'Gardez vos cachets privés. Seules les personnes avec qui vous négociez activement voient vos chiffres.',
+      aiInvoices: "Importez quelques anciennes factures une seule fois ; TORA émet ensuite les factures d'acompte et de solde de chaque booking avec votre mise en page, votre numérotation et vos formulations.",
+      aiContracts: "Importez quelques anciens contrats une seule fois ; TORA rédige le contrat de chaque nouveau booking à partir de vos propres clauses, modifiable directement ou en demandant un changement en toutes lettres.",
       messaging: 'Messagerie directe avec n\'importe quel contact : négociez des accords, partagez des documents et confirmez les détails dans un seul fil.',
       prioritySearch: 'Votre profil est mieux classé dans les résultats de recherche, pour que les bonnes personnes vous trouvent en premier.',
       sendLikes: 'Un like signale de l\'intérêt pour un profil. Les membres gratuits en ont 2 par jour ; Premium supprime la limite.',

@@ -1535,6 +1535,23 @@ function App() {
                   </div>
                 )}
 
+                {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
+                  <>
+                    <div className="features-table-row">
+                      <FeatureName k="aiInvoices" />
+                      <div className="tier-value">—</div>
+                      <div className="tier-value">—</div>
+                      <div className="tier-value tier-value-highlight">✓</div>
+                    </div>
+                    <div className="features-table-row">
+                      <FeatureName k="aiContracts" />
+                      <div className="tier-value">—</div>
+                      <div className="tier-value">—</div>
+                      <div className="tier-value tier-value-highlight">✓</div>
+                    </div>
+                  </>
+                )}
+
                 <div className="features-table-row">
                   <FeatureName k="messaging" />
                   <div className="tier-value">✓</div>

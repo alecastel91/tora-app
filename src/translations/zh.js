@@ -177,6 +177,10 @@ const zh = {
     continueToSign: "继续签署",
   },
 
+  aiFeatures: {
+    yearlyOnly: "用 AI 读取过去的文件是年度方案功能。你仍可手动填写表单。",
+  },
+
   connect: {
     selectAgent: '选择经纪人',
     withAgent: '与经纪人建立联系',
@@ -635,6 +639,8 @@ const zh = {
     notConfigured: "支付功能正在设置中，请稍后再试。",
     preview: '预览',
     feePrivacy: '巡演费用保密',
+    aiInvoices: "AI 发票（你的样式）",
+    aiContracts: "AI 合同草稿（你的措辞）",
     title: 'TORA 高级版',
     comparePlans: '套餐对比',
     feature: '功能',
@@ -737,6 +743,8 @@ const zh = {
       artistTravelAlerts: '你点赞的每位艺人都会成为提醒：当他们公布你所在城市附近的出行或巡演日期时，你会收到通知，抢先联系。',
       calendarPrivacy: '精确决定谁能看到你的档期和行程——所有人、仅限你的人脉，或无人可见。',
       feePrivacy: '让你的预订费用保密。只有正在与你洽谈的人才能看到你的数字。',
+      aiInvoices: "上传几张过去的发票一次，TORA 之后会按你的版式、编号和措辞为每个演出开具定金和尾款发票。",
+      aiContracts: "上传几份过去的合同一次，TORA 会用你自己的条款为每个新演出起草合同，可直接编辑或用文字请求修改。",
       messaging: '与任何人脉直接消息：洽谈合作、共享文件、在同一会话中确认细节。',
       prioritySearch: '你的资料在搜索结果中排名更靠前，让合适的人先找到你。',
       sendLikes: '点赞表示对某个资料感兴趣。免费会员每天2次；高级会员取消限制。',
