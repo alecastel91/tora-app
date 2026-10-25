@@ -64,9 +64,12 @@ const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3 }
           </span>
         ) : null}
       </span>
-      <span className={`block mt-1.5 font-medium text-white truncate ${variant === 'scroll' ? 'text-[11px]' : 'text-xs'}`}>
+      <span className={`block mt-1.5 font-medium truncate ${p.dormant ? 'text-white/45' : 'text-white'} ${variant === 'scroll' ? 'text-[11px]' : 'text-xs'}`}>
         {p.name}
       </span>
+      {/* Owner-only flag from GET /profiles/:id: this agent's representation
+          is inactive on their free plan (others never see the link at all). */}
+      {p.dormant && <span className="block text-[9px] uppercase tracking-[0.15em] text-white/40">{t('agentPlan.dormant')}</span>}
     </button>
   );
 

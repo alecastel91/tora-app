@@ -513,7 +513,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     };
 
     fetchCalendarMatches();
-  }, [user?.id, user?.role, user?.subscriptionTier, user?.availableDates?.length, user?.representingArtists?.length, activeTab, isActive]);
+  // freeActiveArtistId / agentSeats: a free agent's active artist (or plan) changing swaps the matching sources.
+  }, [user?.id, user?.role, user?.subscriptionTier, user?.agentSeats, user?.freeActiveArtistId, user?.availableDates?.length, user?.representingArtists?.length, activeTab, isActive]);
 
   // Fetch tours when Kickstart tab is active
   useEffect(() => {
