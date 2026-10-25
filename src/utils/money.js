@@ -32,8 +32,8 @@ export const MEMBER_PRICES = {
 // (2026-10-26). Mirrors tora-backend/src/config/pricing.js AGENT.
 export const AGENT_PRICES = {
   EUR: { monthly: 49, yearly: 490 },
-  JPY: { monthly: 7980, yearly: 79800 },
-  USD: { monthly: 54.90, yearly: 549 },
+  JPY: { monthly: 8580, yearly: 85800 },
+  USD: { monthly: 56.90, yearly: 569 },
 };
 
 // One-off extras, major units.
