@@ -1600,6 +1600,18 @@ const zh = {
     dissolve: '解散经纪公司',
     dissolveConfirm: '解散 {{agency}}？所有成员从下次续费起回到单独费率。',
     agentProfileRequired: '请先添加经纪人档案再加入经纪公司。',
+    badgeMeta: "{{n}} 位经纪人",
+    teamTitle: "{{agency}} 在 TORA",
+    teamSummary: "{{n}} 位经纪人 · 代理 {{total}} 位艺人",
+    teamMember: "你是 {{agency}} 的成员。",
+    teamRequestHint: "你的工作邮箱已在 {{domain}} 验证，可以申请加入。每个申请都由经纪公司管理员审批。",
+    blocker: {
+      ORG_WORK_EMAIL_REQUIRED: "申请加入前，请先在经纪人档案中验证你的工作邮箱。经纪公司只接受同一邮箱域名同事的申请。",
+      ORG_AGENCY_UNVERIFIED: "{{agency}} 仅通过邀请添加经纪人。",
+      ORG_DOMAIN_MISMATCH: "只有已验证 {{domain}} 邮箱的经纪人才能申请加入 {{agency}}。请向管理员索取邀请。",
+      ORG_REQUESTED: "你加入 {{agency}} 的申请正在等待审批。",
+      ORG_PENDING: "你已属于某家经纪公司，或有待处理的申请。",
+    },
   },
 
   manage: {

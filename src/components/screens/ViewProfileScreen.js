@@ -32,6 +32,7 @@ import { networkSectionsForRole } from '../../utils/networkSections';
 import { RA_LOGO_WHITE } from '../../utils/brandAssets';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import ProfilePage from '../desktop/ProfilePage';
+import AgencyBadge from '../common/AgencyBadge';
 
 // 1234 -> '1.2K', matching the own-profile stats row.
 const fmtStat = (n) => {
@@ -613,8 +614,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               {profile.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" channel={profile.verifyChannel} />}
             </h2>
           </div>
-          {profile.role === 'AGENT' && profile.agencyName && (
-            <p className="text-center text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p>
+          {profile.role === 'AGENT' && (
+            <AgencyBadge
+              profileId={profile.id}
+              fallback={profile.agencyName ? <p className="text-center text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p> : null}
+            />
           )}
           <p className="profile-location"><LocationIcon />{profile.location}</p>
           <div className="profile-role-centered">

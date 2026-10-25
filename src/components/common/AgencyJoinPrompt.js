@@ -9,6 +9,8 @@ import { showToast } from '../../utils/toast';
  * to an agent whose domain or agency name matches an existing agency. Names
  * nobody — agency name, how many agents, how many artists — and never
  * targets anyone from the client: the request is recomputed server-side.
+ * The Join button only appears once both sides have verified the same work
+ * domain (anti-spam); otherwise the prompt says what is missing.
  */
 const AgencyJoinPrompt = ({ userId }) => {
   const { t } = useLanguage();
@@ -37,8 +39,11 @@ const AgencyJoinPrompt = ({ userId }) => {
       <p className="agency-prompt-body">{t('agency.promptBody', { agency: s.name })}</p>
       <p className="agency-prompt-meta">{t('agency.promptMembers', { n: s.memberCount, total: s.artistTotal })}{s.matchedDomain ? ` · ${t('agency.promptDomain', { domain: s.matchedDomain })}` : ''}</p>
       <p className="agency-prompt-meta">{t('agency.timing')}</p>
+      {!s.canRequest && s.requestBlocker && (
+        <p className="agency-prompt-meta">{t(`agency.blocker.${s.requestBlocker}`, { agency: s.name, domain: (s.agencyDomains || []).join(', ') })}</p>
+      )}
       <div className="flex gap-2 mt-3">
-        <button className="btn btn-primary btn-sm" disabled={busy} onClick={join}>{t('agency.join', { agency: s.name })}</button>
+        {s.canRequest && <button className="btn btn-primary btn-sm" disabled={busy} onClick={join}>{t('agency.join', { agency: s.name })}</button>}
         <button className="btn btn-outline btn-sm" onClick={dismiss}>{t('agency.notNow')}</button>
       </div>
     </div>

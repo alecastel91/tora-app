@@ -14,6 +14,7 @@ import RepresentationSection from '../common/RepresentationSection';
 import HighlightsList from '../common/HighlightsList';
 import OnboardingChecklist from '../common/OnboardingChecklist';
 import AgencyJoinPrompt from '../common/AgencyJoinPrompt';
+import AgencyBadge from '../common/AgencyBadge';
 
 /* Desktop v3 — your own profile, designed for the desk. ProfileScreen keeps
    every fetch, flow, sub-screen and modal and hands this component its state
@@ -85,6 +86,7 @@ const OwnProfilePage = ({
               <span className="truncate">{user?.name || t('profile.yourName')}</span>
               {!unverified && <VerifiedBadge size={18} channel={user?.verifyChannel} />}
             </h1>
+            {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" />}
             <p className="m-0 mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-white/60">
               <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${roleTone}`}>{roleLabel(role || 'ARTIST', t)}</span>
               <span className="inline-flex items-center gap-1 [&>svg]:h-3.5 [&>svg]:w-3.5"><LocationIcon />{user?.location || t('profile.addLocation')}</span>

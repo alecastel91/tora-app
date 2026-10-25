@@ -1600,6 +1600,18 @@ const ko = {
     dissolve: '에이전시 해산',
     dissolveConfirm: '{{agency}}를 해산하시겠습니까? 모든 멤버가 다음 갱신부터 단독 요금으로 돌아갑니다.',
     agentProfileRequired: '에이전시에 참여하려면 에이전트 프로필을 추가하세요.',
+    badgeMeta: "에이전트 {{n}}명",
+    teamTitle: "TORA의 {{agency}}",
+    teamSummary: "에이전트 {{n}}명 · 아티스트 {{total}}명 대행",
+    teamMember: "{{agency}}의 멤버입니다.",
+    teamRequestHint: "{{domain}} 업무용 이메일이 인증되어 가입을 요청할 수 있습니다. 모든 요청은 에이전시 관리자가 승인합니다.",
+    blocker: {
+      ORG_WORK_EMAIL_REQUIRED: "가입을 요청하려면 먼저 에이전트 프로필에서 업무용 이메일을 인증하세요. 에이전시는 같은 이메일 도메인의 동료 요청만 받습니다.",
+      ORG_AGENCY_UNVERIFIED: "{{agency}}는 초대로만 에이전트를 추가합니다.",
+      ORG_DOMAIN_MISMATCH: "{{domain}} 이메일을 인증한 에이전트만 {{agency}} 가입을 요청할 수 있습니다. 관리자에게 초대를 요청하세요.",
+      ORG_REQUESTED: "{{agency}} 가입 요청이 승인을 기다리고 있습니다.",
+      ORG_PENDING: "이미 다른 에이전시에 소속되어 있거나 대기 중인 요청이 있습니다.",
+    },
   },
 
   manage: {

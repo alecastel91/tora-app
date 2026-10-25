@@ -16,6 +16,7 @@ import RepresentationSection from '../common/RepresentationSection';
 import HighlightsList from '../common/HighlightsList';
 import LockOverlay from '../common/LockOverlay';
 import SafetyMenu from '../common/SafetyMenu';
+import AgencyBadge from '../common/AgencyBadge';
 
 /* Desktop v3 profile page — designed for a desk, not the phone page split
    into columns. ViewProfileScreen keeps every fetch, flow and modal and hands
@@ -91,7 +92,13 @@ const ProfilePage = ({
                 <span className="truncate">{profile.name}</span>
                 {profile.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} channel={profile.verifyChannel} />}
               </h1>
-              {role === 'AGENT' && profile.agencyName && <p className="m-0 mt-0.5 text-[13px] text-white/50">{profile.agencyName}</p>}
+              {role === 'AGENT' && (
+                <AgencyBadge
+                  profileId={profile.id}
+                  align="left"
+                  fallback={profile.agencyName ? <p className="m-0 mt-0.5 text-[13px] text-white/50">{profile.agencyName}</p> : null}
+                />
+              )}
               <p className="m-0 mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-white/60">
                 <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${roleChipClass(role)}`}>
                   {roleLabel(role, t)}

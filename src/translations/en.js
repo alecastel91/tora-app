@@ -1612,6 +1612,18 @@ const en = {
     dissolve: 'Dissolve agency',
     dissolveConfirm: 'Dissolve {{agency}}? Every member goes back to the solo rate from their next renewal.',
     agentProfileRequired: 'Add an agent profile to join an agency.',
+    badgeMeta: "{{n}} agent(s)",
+    teamTitle: "{{agency}} on TORA",
+    teamSummary: "{{n}} agent(s) · {{total}} artists represented",
+    teamMember: "You are a member of {{agency}}.",
+    teamRequestHint: "Your work email is verified at {{domain}}, so you can ask to join. An agency admin approves every request.",
+    blocker: {
+      ORG_WORK_EMAIL_REQUIRED: "To ask to join, first verify your work email on your agent profile. Agencies only accept requests from colleagues at their own email domain.",
+      ORG_AGENCY_UNVERIFIED: "{{agency}} adds agents by invitation only.",
+      ORG_DOMAIN_MISMATCH: "Only agents with a verified email at {{domain}} can ask to join {{agency}}. Ask an admin for an invitation instead.",
+      ORG_REQUESTED: "Your request to join {{agency}} is waiting for approval.",
+      ORG_PENDING: "You already belong to an agency or have a request pending with one.",
+    },
   },
 
   manage: {

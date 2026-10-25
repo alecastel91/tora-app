@@ -442,8 +442,13 @@ class ApiService {
     const response = await fetch(`${API_URL}/organisations/invites/${memberId}/${accept ? 'accept' : 'decline'}`, { method: 'POST', headers: this.getHeaders() });
     return this.handleResponse(response);
   }
-  async requestToJoinOrganisation() {
-    const response = await fetch(`${API_URL}/organisations/requests`, { method: 'POST', headers: this.getHeaders() });
+  // organisationId: the agency on a profile card; omitted = the server's own suggestion.
+  async requestToJoinOrganisation(organisationId) {
+    const response = await fetch(`${API_URL}/organisations/requests`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(organisationId ? { organisationId } : {}) });
+    return this.handleResponse(response);
+  }
+  async getAgencyOfProfile(profileId) {
+    const response = await fetch(`${API_URL}/organisations/of/${profileId}`, { headers: this.getHeaders() });
     return this.handleResponse(response);
   }
   async withdrawOrganisationRequest() {

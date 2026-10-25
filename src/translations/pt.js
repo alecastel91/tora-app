@@ -1600,6 +1600,18 @@ const pt = {
     dissolve: 'Dissolver agência',
     dissolveConfirm: 'Dissolver a {{agency}}? Todos os membros voltam à tarifa individual a partir da próxima renovação.',
     agentProfileRequired: 'Adicione um perfil de agente para entrar em uma agência.',
+    badgeMeta: "{{n}} agente(s)",
+    teamTitle: "{{agency}} no TORA",
+    teamSummary: "{{n}} agente(s) · {{total}} artistas representados",
+    teamMember: "Você é membro da {{agency}}.",
+    teamRequestHint: "Seu e-mail de trabalho está verificado em {{domain}}, então você pode pedir para entrar. Um administrador da agência aprova cada pedido.",
+    blocker: {
+      ORG_WORK_EMAIL_REQUIRED: "Para pedir para entrar, verifique primeiro seu e-mail de trabalho no perfil de agente. As agências só aceitam pedidos de colegas com o mesmo domínio de e-mail.",
+      ORG_AGENCY_UNVERIFIED: "A {{agency}} só adiciona agentes por convite.",
+      ORG_DOMAIN_MISMATCH: "Só agentes com e-mail verificado em {{domain}} podem pedir para entrar na {{agency}}. Peça um convite a um administrador.",
+      ORG_REQUESTED: "Seu pedido para entrar na {{agency}} está aguardando aprovação.",
+      ORG_PENDING: "Você já faz parte de uma agência ou tem um pedido pendente.",
+    },
   },
 
   manage: {

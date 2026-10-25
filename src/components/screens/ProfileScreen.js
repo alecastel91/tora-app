@@ -36,6 +36,7 @@ import { raProfileUrl } from '../../utils/urls';
 import { networkSectionsForRole } from '../../utils/networkSections';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import OwnProfilePage from '../desktop/OwnProfilePage';
+import AgencyBadge from '../common/AgencyBadge';
 
 // --- Obsidian Neon redesign helpers (glassmorphism + crimson neon) ---
 const GridIcon = () => (
@@ -583,6 +584,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           {user?.name || t('profile.yourName')}
           {user?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" channel={user?.verifyChannel} />}
         </h2>
+        {user?.role === 'AGENT' && <AgencyBadge profileId={user?.id} />}
         <p className="flex items-center justify-center gap-1.5 text-[13px] text-white/60 mb-2 font-tech [&>svg]:w-3.5 [&>svg]:h-3.5">
           <LocationIcon />{user?.location || t('profile.addLocation')}
         </p>

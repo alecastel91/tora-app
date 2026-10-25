@@ -1600,6 +1600,18 @@ const ja = {
     dissolve: 'エージェンシーを解散',
     dissolveConfirm: '{{agency}}を解散しますか？全メンバーが次回更新から単独料金に戻ります。',
     agentProfileRequired: 'エージェンシーに参加するにはエージェントプロフィールを追加してください。',
+    badgeMeta: "エージェント{{n}}名",
+    teamTitle: "TORA上の{{agency}}",
+    teamSummary: "エージェント{{n}}名 · 所属アーティスト{{total}}組",
+    teamMember: "あなたは{{agency}}のメンバーです。",
+    teamRequestHint: "{{domain}}の勤務先メールが認証済みのため、参加をリクエストできます。リクエストはすべてエージェンシーの管理者が承認します。",
+    blocker: {
+      ORG_WORK_EMAIL_REQUIRED: "参加をリクエストするには、まずエージェントプロフィールで勤務先メールを認証してください。エージェンシーは同じメールドメインの同僚からのリクエストのみ受け付けます。",
+      ORG_AGENCY_UNVERIFIED: "{{agency}}は招待制でのみエージェントを追加しています。",
+      ORG_DOMAIN_MISMATCH: "{{agency}}に参加をリクエストできるのは、{{domain}}のメールを認証したエージェントのみです。管理者に招待を依頼してください。",
+      ORG_REQUESTED: "{{agency}}への参加リクエストは承認待ちです。",
+      ORG_PENDING: "すでに別のエージェンシーに所属しているか、リクエストが保留中です。",
+    },
   },
 
   manage: {
