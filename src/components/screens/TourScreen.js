@@ -19,7 +19,7 @@ import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
-import { counterpartRoles, matchDatesFor, normalizeDate } from '../../utils/calendarMatch';
+import { counterpartRoles, normalizeDate } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import TourBoard from '../desktop/TourBoard';
@@ -476,51 +476,29 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         return;
       }
 
-      // Resolve the "source" profiles whose availability drives the matching.
-      let sources = [];
-      if (isAgent) {
-        const ids = roster.map(rosterEntryId).filter(Boolean);
-        if (ids.length === 0) { setCalendarMatches([]); return; }
-        const artistProfiles = await Promise.all(
-          ids.map((id) => apiService.getProfile(id).catch(() => null))
-        );
-        sources = artistProfiles.filter((p) => p && (p.availableDates || []).length > 0);
-      } else if ((user.availableDates || []).length > 0) {
-        sources = [user];
+      // Agents with no roster, or anyone with no open dates, have nothing to
+      // match on — skip the round trip.
+      if (isAgent ? roster.length === 0 : (user.availableDates || []).length === 0) {
+        setCalendarMatches([]);
+        return;
       }
-
-      if (sources.length === 0) { setCalendarMatches([]); return; }
 
       setLoadingMatches(true);
       try {
-        const response = await apiService.searchProfiles({});
-        const allProfiles = response.profiles || [];
-
-        const matches = [];
-        for (const source of sources) {
-          for (const profile of allProfiles) {
-            if (profile.id === source.id || profile.id === user.id) continue;
-            // Counterpart roles, shared genre, shared open dates on which the
-            // artist is actually in the counterpart's country (utils/calendarMatch).
-            const overlappingDates = matchDatesFor(source, profile);
-            if (overlappingDates.length > 0) {
-              matches.push({
-                profile,
-                dates: formatMatchDates(overlappingDates),
-                matchCount: overlappingDates.length,
-                rawDates: overlappingDates,
-                // Both sides' open dates, so the desktop can draw the overlap
-                // itself — the matching already had them in hand.
-                sourceDates: source.availableDates || [],
-                sourceGenres: source.genres || [],
-                // Agent view: which represented artist this match is for.
-                forArtist: isAgent ? { id: source.id, name: source.name } : null,
-              });
-            }
-          }
-        }
-
-        matches.sort((a, b) => b.matchCount - a.matchCount);
+        // Computed server-side over the whole network (utils/calendarMatch
+        // rule): one search page only ever covered the newest 100 profiles.
+        // An agent's matches come per roster artist, tagged with forArtist.
+        const response = await apiService.getCalendarMatches(user.id);
+        const matches = (response.matches || []).map((m) => ({
+          profile: m.profile,
+          dates: formatMatchDates(m.dates),
+          matchCount: m.dates.length,
+          rawDates: m.dates,
+          // Both sides' open dates, so the desktop can draw the overlap itself.
+          sourceDates: m.sourceDates || [],
+          sourceGenres: m.sourceGenres || [],
+          forArtist: m.forArtist || null,
+        }));
         setCalendarMatches(matches);
       } catch (error) {
         console.error('Error fetching calendar matches:', error);
@@ -578,7 +556,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const formatMatchDates = (dates) => {
     if (dates.length === 0) return '';
 
-    // matchDatesFor already returns normalized 'YYYY-MM-DD' strings.
+    // The server's matchDatesFor already returns normalized 'YYYY-MM-DD' strings.
     const sortedDates = [...dates].sort();
 
     // Group consecutive dates

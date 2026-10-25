@@ -226,6 +226,11 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Tour > Calendar Matches over the whole network (server-side rule).
+  async getCalendarMatches(profileId) {
+    const response = await fetch(`${API_URL}/profiles/calendar-matches?profileId=${encodeURIComponent(profileId)}`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
   async getTravelFeed(profileId, page = 0, filters = {}) {
     const params = new URLSearchParams({ profileId, page: String(page) });
     if (filters.roles?.length) params.set('roles', filters.roles.join(','));
