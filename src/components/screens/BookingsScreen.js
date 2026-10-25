@@ -10,6 +10,7 @@ import AddContractModal from '../common/AddContractModal';
 import SignContractModal from '../common/SignContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import IssueInvoiceModal from '../common/IssueInvoiceModal';
+import DraftContractModal from '../common/DraftContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
@@ -112,6 +113,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const [showAddContractModal, setShowAddContractModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [invoiceDeal, setInvoiceDeal] = useState(null);
+  const [draftContractDeal, setDraftContractDeal] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showDepositAgain, setShowDepositAgain] = useState(false); // reveal the deposit block for a further instalment
   const [selectedDealForWorkflow, setSelectedDealForWorkflow] = useState(null);
@@ -1121,6 +1123,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                         <polyline points="10 9 9 9 8 9"></polyline>
                       </svg>
                       {t('chat.sendContract')}
+                    </button>
+                    {/* Draft from the member's own template, then the same sign-and-send step. */}
+                    <button className="btn btn-outline" disabled={actionBusy} onClick={() => setDraftContractDeal(deal)}>
+                      {t('contracts.draftButton')}
                     </button>
                     <button
                       className="btn btn-skip"
@@ -2153,6 +2159,17 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           </div>
         </div></OverlayPortal>
       )}
+
+      <DraftContractModal
+        isOpen={!!draftContractDeal}
+        deal={draftContractDeal}
+        currentUser={currentUser}
+        onClose={() => setDraftContractDeal(null)}
+        onReady={(documentData) => {
+          // Same shape AddContractModal hands over: the sign-and-send modal takes it from here.
+          setPendingContractToSign({ documentData, deal: draftContractDeal });
+        }}
+      />
 
       <IssueInvoiceModal
         isOpen={!!invoiceDeal}

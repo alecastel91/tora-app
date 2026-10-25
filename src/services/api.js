@@ -510,6 +510,35 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // ---- Contract templates in the member's own words ----
+  async getContractTemplate(profileId) {
+    const response = await fetch(`${API_URL}/contract-templates/${profileId}`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async learnContractTemplate(profileId, files) {
+    const form = new FormData();
+    for (const f of files) form.append('contracts', f);
+    const { 'Content-Type': _ct, ...headers } = this.getHeaders();
+    const response = await fetch(`${API_URL}/contract-templates/${profileId}/learn`, { method: 'POST', headers, body: form });
+    return this.handleResponse(response);
+  }
+  async saveContractTemplate(profileId, template) {
+    const response = await fetch(`${API_URL}/contract-templates/${profileId}`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ template }) });
+    return this.handleResponse(response);
+  }
+  async draftContract(profileId, dealId) {
+    const response = await fetch(`${API_URL}/contract-templates/draft`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId }) });
+    return this.handleResponse(response);
+  }
+  async editContractDraft(profileId, dealId, sections, instruction) {
+    const response = await fetch(`${API_URL}/contract-templates/draft/edit`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, sections, instruction }) });
+    return this.handleResponse(response);
+  }
+  async renderContractDraft(profileId, dealId, { sections, title, signatureBlock, saveToTemplate }) {
+    const response = await fetch(`${API_URL}/contract-templates/draft/render`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, sections, title, signatureBlock, saveToTemplate }) });
+    return this.handleResponse(response);
+  }
+
   // ---- Calendar feed + external calendar imports ----
   async getCalendarSettings(profileId) {
     const response = await fetch(`${API_URL}/calendar/${profileId}`, { headers: this.getHeaders() });
