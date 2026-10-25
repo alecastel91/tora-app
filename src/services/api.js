@@ -482,6 +482,60 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // ---- Invoices in the member's own style ----
+  async getInvoiceProfile(profileId) {
+    const response = await fetch(`${API_URL}/invoices/profile/${profileId}`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async learnInvoiceProfile(profileId, files) {
+    const form = new FormData();
+    for (const f of files) form.append('invoices', f);
+    const { 'Content-Type': _ct, ...headers } = this.getHeaders();
+    const response = await fetch(`${API_URL}/invoices/profile/${profileId}/learn`, { method: 'POST', headers, body: form });
+    return this.handleResponse(response);
+  }
+  async saveInvoiceProfile(profileId, profile) {
+    const response = await fetch(`${API_URL}/invoices/profile/${profileId}`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ profile }) });
+    return this.handleResponse(response);
+  }
+  /** Returns { blobUrl, number, amount, currency } for an in-app preview. */
+  async previewInvoice(body) {
+    const response = await fetch(`${API_URL}/invoices/preview`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body) });
+    if (!response.ok) return this.handleResponse(response);
+    const blob = await response.blob();
+    return { blobUrl: URL.createObjectURL(blob), number: response.headers.get('X-Invoice-Number'), amount: Number(response.headers.get('X-Invoice-Amount')), currency: response.headers.get('X-Invoice-Currency') };
+  }
+  async issueInvoice(body) {
+    const response = await fetch(`${API_URL}/invoices/issue`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body) });
+    return this.handleResponse(response);
+  }
+
+  // ---- Calendar feed + external calendar imports ----
+  async getCalendarSettings(profileId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async enableCalendarFeed(profileId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/feed`, { method: 'POST', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async disableCalendarFeed(profileId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/feed`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async addCalendarImport(profileId, url, label) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/imports`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ url, label }) });
+    return this.handleResponse(response);
+  }
+  async removeCalendarImport(profileId, importId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/imports/${importId}`, { method: 'DELETE', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  async syncCalendarImports(profileId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/imports/sync`, { method: 'POST', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
   async getBlocks() {
     const response = await fetch(`${API_URL}/blocks`, { headers: this.getHeaders() });
     return this.handleResponse(response);
