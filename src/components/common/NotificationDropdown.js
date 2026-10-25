@@ -57,6 +57,8 @@ const TYPE_TO_TAB = {
   POST_COMMENTED: 'news',
 };
 
+const isAgencyNotification = (notif) => String(notif?.type || '').startsWith('ORG_');
+
 const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) => {
   const { t, language } = useLanguage();
   const { notifications } = useAppContext();
@@ -76,6 +78,13 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
   };
 
   const handleNotificationClick = (notif) => {
+    // Agency notifications (invite, request, approved, member left, dissolved)
+    // land on Settings → Agency, where the matching action lives.
+    if (isAgencyNotification(notif)) {
+      window.dispatchEvent(new CustomEvent('tora:open-settings', { detail: { section: 'agency' } }));
+      if (onClose) onClose();
+      return;
+    }
     const tab = TYPE_TO_TAB[notif.type];
     if (tab && onSwitchTab) {
       onSwitchTab(tab);
@@ -101,7 +110,7 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
       <div className="notifications-list">
         {notifications && notifications.length > 0 ? (
           notifications.map((notif) => {
-            const routable = !!TYPE_TO_TAB[notif.type];
+            const routable = !!TYPE_TO_TAB[notif.type] || isAgencyNotification(notif);
             return (
               <div
                 key={notif.id}

@@ -754,6 +754,36 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
+  // Open Settings at a named section. Fired by agency notifications in the
+  // bell, and by push taps, which arrive as /?settings=agency. The section is
+  // scrolled into view once Settings has rendered it.
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    const open = (section) => {
+      goSettings();
+      if (!section) return;
+      let tries = 0;
+      const seek = () => {
+        const el = document.querySelector(`.${section}-section`);
+        if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        else if (tries++ < 20) setTimeout(seek, 100);
+      };
+      setTimeout(seek, 50);
+    };
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('settings');
+    if (fromUrl) {
+      open(fromUrl.replace(/[^a-z-]/g, ''));
+      params.delete('settings');
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''));
+    }
+    const onOpen = (e) => open(e.detail?.section);
+    window.addEventListener('tora:open-settings', onOpen);
+    return () => window.removeEventListener('tora:open-settings', onOpen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   const handleSelectPlan = (plan, detail = null) => {
     setSelectedPlan(plan);
     setPlanDetail(detail);
