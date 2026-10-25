@@ -32,7 +32,7 @@ const Row = ({ label, value, highlight, onExplain }) => {
 
 const PremiumPlans = ({
   user, money, memberPrice, currency, hasMonthly, hasYearly,
-  onAgencyPlan, canLeaveAgency, onMembership, onSelectPlan, onExplain,
+  onAgentPlan, onMembership, onSelectPlan, onExplain,
 }) => {
   const { t } = useLanguage();
   const rows = premiumFeatureRows(user, t);
@@ -40,18 +40,18 @@ const PremiumPlans = ({
   const perMonth = t('agentSeat.perMonth');
 
   const cta = (plan) => {
-    // Free first: an agency-covered member is on the agency's plan, not Free,
-    // so this column offers nothing — switching to a membership means monthly
-    // or yearly, and routing 'free' into onSelectPlan opened monthly checkout.
+    // Free first: a profile covered by the account's Agent plan is not on
+    // Free, so this column offers nothing — switching to a membership means
+    // monthly or yearly, and routing 'free' into onSelectPlan opened checkout.
     if (plan === 'free') {
-      if (onAgencyPlan) return <div className="h-[38px]" />;
+      if (onAgentPlan) return <div className="h-[38px]" />;
       return isFree
         ? <button className="btn btn-outline w-full" disabled>{t('premium.currentPlan')}</button>
         : <div className="h-[38px]" />;
     }
-    if (onAgencyPlan) {
+    if (onAgentPlan) {
       return (
-        <button className={`btn ${plan === 'yearly' ? 'btn-primary' : 'btn-outline'} w-full`} disabled={!canLeaveAgency} onClick={() => onSelectPlan(plan)}>
+        <button className={`btn ${plan === 'yearly' ? 'btn-primary' : 'btn-outline'} w-full`} onClick={() => onSelectPlan(plan)}>
           {t('premium.switchToMembership')}
         </button>
       );
@@ -78,9 +78,7 @@ const PremiumPlans = ({
 
   return (
     <div className="d3-plans">
-      {onAgencyPlan && (
-        <p className="d3-plans-note">{t('premium.coveredByAgency')}{canLeaveAgency ? '' : ` ${t('premium.switchBlockedRoster')}`}</p>
-      )}
+      {onAgentPlan && <p className="d3-plans-note">{t('premium.coveredByAgency')}</p>}
       {onMembership && <p className="d3-plans-note">{t('premium.coversAllProfiles')}</p>}
 
       <div className="d3-plans-grid">

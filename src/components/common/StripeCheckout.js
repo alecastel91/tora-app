@@ -147,7 +147,7 @@ const PaymentForm = ({ mode, subscriptionId, paymentIntentId, profileId, coupon,
  * Embedded subscription checkout. On mount it creates the subscription and
  * mounts the Payment Element with the returned client secret.
  */
-const StripeCheckout = ({ profileId, interval, seats, extraItem, confirmFirst = false, onSuccess, onQuote }) => {
+const StripeCheckout = ({ profileId, interval, extraItem, confirmFirst = false, onSuccess, onQuote }) => {
   const { t } = useLanguage();
   // A plan CHANGE must not run on mount: when nothing is due, the backend
   // applies it in the same call that quotes it, so the member would have
@@ -160,7 +160,7 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, confirmFirst = 
   // double-invoke, or a language switch can't create duplicates/orphans.
   const startedKeyRef = useRef(null);
 
-  const startKey = `${profileId}|${interval}|${seats}|${extraItem}`;
+  const startKey = `${profileId}|${interval}|${extraItem}`;
   useEffect(() => {
     if (!stripePromise) { setState({ error: t('premium.notConfigured') }); return undefined; }
     // Deliberately NO cancelled flag: under StrictMode the effect runs, is
@@ -182,7 +182,7 @@ const StripeCheckout = ({ profileId, interval, seats, extraItem, confirmFirst = 
   const begin = (billingAddress) => {
     const start = extraItem
       ? apiService.purchaseExtra({ profileId, item: extraItem })
-      : apiService.startSubscription({ profileId, interval, seats, billingAddress });
+      : apiService.startSubscription({ profileId, interval, billingAddress });
     start
       .then((res) => {
         setState({ ...res });

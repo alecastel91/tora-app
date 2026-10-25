@@ -8,13 +8,13 @@ import SearchArtistsModal from '../common/SearchArtistsModal';
 import AgentUpgradeModal from '../common/AgentUpgradeModal';
 import { dummyProfiles } from '../../data/profiles';
 import apiService from '../../services/api';
-import { rosterUsage } from '../../utils/agentTiers';
+import { rosterUsage, isDormantArtist } from '../../utils/agentTiers';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const { t } = useLanguage();
-  const { user, reloadProfileData } = useAppContext();
+  const { user, reloadProfileData, updateUser } = useAppContext();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [viewingProfile, setViewingProfile] = useState(null);
   const [fullProfileData, setFullProfileData] = useState(null);
@@ -35,6 +35,26 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   const [removingArtistId, setRemovingArtistId] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const usage = rosterUsage(user);
+  const [switchingId, setSwitchingId] = useState(null);
+
+  // Free plan: one artist stays active; the agent picks which (once every 30 days).
+  const makeActive = async (artist) => {
+    const artistId = artist.profileId || artist.id;
+    if (switchingId) return;
+    if (!(await appConfirm(t('agentPlan.switchConfirm', { name: artist.name }), { confirmLabel: t('agentPlan.makeActive') }))) return;
+    setSwitchingId(artistId);
+    try {
+      const r = await apiService.setFreeActiveArtist(user.id, artistId);
+      updateUser({ ...user, freeActiveArtistId: r.freeActiveArtistId, freeActiveArtistChangedAt: r.freeActiveArtistChangedAt });
+    } catch (e) {
+      const next = e.response?.data?.nextSwitchAt;
+      appAlert(next
+        ? t('agentPlan.switchTooSoon', { date: new Date(next).toLocaleDateString() })
+        : (e.message || t('common.error')));
+    } finally {
+      setSwitchingId(null);
+    }
+  };
   // Pink dot on Manage CTA when the represented artist has pending action
   // items (same pattern as ProfileScreen — fetch per-artist in one burst).
   const [artistActionsMap, setArtistActionsMap] = useState({});
@@ -218,26 +238,13 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       </div>
 
       {usage.cap !== Infinity && (
-        <div className={`flex items-center justify-between gap-3 mx-4 mt-4 mb-3 px-4 py-3 rounded-2xl border
-                        ${usage.atLimit ? 'border-infrared/30 bg-infrared/[0.06]' : 'border-white/10 bg-[#0a0a0e]'}`}>
-          <div className="min-w-0 flex items-baseline gap-2">
-            <span className={`text-[9px] font-semibold uppercase tracking-[0.2em] font-tech
-                             ${usage.atLimit ? 'text-infrared/70' : 'text-white/30'}`}>{t('roster.roster')}</span>
-            <span className={`text-sm font-medium ${usage.atLimit ? 'text-infrared' : 'text-white'}`}>
-              {usage.current}/{usage.cap}
-              <span className={`font-normal ${usage.atLimit ? 'text-infrared/80' : 'text-white/50'}`}>
-                {usage.atLimit && (usage.cap === 0
-                  ? ' — ' + t('roster.pickPlanSuffix')
-                  : ' — ' + t('roster.upgradeSuffix'))}
-              </span>
-            </span>
+        <div className="flex items-center justify-between gap-3 mx-4 mt-4 mb-3 px-4 py-3 rounded-2xl border border-white/10 bg-[#0a0a0e]">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-white">{t('agentPlan.freeName')}</div>
+            <div className="text-xs text-white/50 mt-0.5">{usage.dormant ? t('agentPlan.freeStatus', { n: usage.dormant }) : t('agentPlan.freeIncludes')}</div>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowUpgradeModal(true)}
-            className="btn btn-outline btn-sm shrink-0"
-          >
-            {usage.cap === 0 ? t('roster.choosePlan') : t('roster.upgrade')}
+          <button type="button" onClick={() => setShowUpgradeModal(true)} className="btn btn-outline btn-sm shrink-0">
+            {t('agentPlan.choose')}
           </button>
         </div>
       )}
@@ -245,8 +252,10 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       <div className="represented-artists-content">
         {representedArtists.length > 0 ? (
           <div className="artists-list">
-            {representedArtists.map((artist) => (
-              <div key={artist.profileId || artist.id} className="artist-card-row">
+            {representedArtists.map((artist) => {
+              const dormant = isDormantArtist(user, artist.profileId || artist.id);
+              return (
+              <div key={artist.profileId || artist.id} className={`artist-card-row${dormant ? ' is-dormant' : ''}`}>
                 {/* Tapping the card body opens the artist profile; Manage and
                     Delete stay as their own controls. Removing the VIEW button
                     frees the space that was squeezing the name/location. */}
@@ -267,11 +276,22 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                   <div className="artist-card-content">
                     <div className="artist-row-info">
                       <div className="artist-name-inline">{artist.name}</div>
-                      <div className="artist-location-inline">{artist.location}</div>
+                      <div className="artist-location-inline">
+                        {dormant ? <span className="artist-dormant-chip" title={t('agentPlan.dormantHint')}>{t('agentPlan.dormant')}</span> : artist.location}
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="artist-row-actions">
+                  {dormant ? (
+                  <button
+                    className="btn btn-outline btn-sm"
+                    disabled={!!switchingId}
+                    onClick={() => makeActive(artist)}
+                  >
+                    {switchingId === (artist.profileId || artist.id) ? '...' : t('agentPlan.makeActive')}
+                  </button>
+                  ) : (
                   <button
                     className="btn btn-primary btn-sm"
                     onClick={() => handleManageArtist(artist)}
@@ -294,6 +314,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                       />
                     )}
                   </button>
+                  )}
                   <button
                     className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#111117] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
                     aria-label={`Remove ${artist.name}`}
@@ -304,7 +325,8 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="empty-state">
@@ -315,17 +337,10 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                 <circle cx="18" cy="16" r="3" />
               </svg>
             </div>
-            <h2>{usage.cap === 0 ? t('roster.pickPlanToStart') : t('roster.noArtistsYet')}</h2>
-            <p>
-              {usage.cap === 0
-                ? t('roster.agentPlansIntro')
-                : t('roster.startBuilding')}
-            </p>
-            <button
-              className="btn btn-primary"
-              onClick={() => usage.cap === 0 ? setShowUpgradeModal(true) : setShowSearchModal(true)}
-            >
-              {usage.cap === 0 ? t('roster.seePlans') : <><AddIcon /> {t('roster.addFirstArtist')}</>}
+            <h2>{t('roster.noArtistsYet')}</h2>
+            <p>{t('roster.startBuilding')}</p>
+            <button className="btn btn-primary" onClick={() => setShowSearchModal(true)}>
+              <AddIcon /> {t('roster.addFirstArtist')}
             </button>
           </div>
         )}
@@ -343,7 +358,6 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
       <AgentUpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        rosterCount={representedArtists.length}
       />
     </div>
   );

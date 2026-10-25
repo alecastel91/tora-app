@@ -3,49 +3,12 @@ import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
-import { AGENT_BANDS, seatPriceAt, formatMoney, normalizeCurrency } from '../../utils/money';
-
 /**
- * Settings → Agency. Agents of one agency link up so each pays their OWN
- * seats at the band of the agency's TOTAL artist count. One explanation,
- * one ladder, one timing rule — shown here in full, repeated in short on
- * the checkout and the Premium screen.
+ * Settings → Agency. Agents of one agency link up to appear as one team on
+ * every member's profile. Since 2026-10-26 an agency never changes a price:
+ * every agent pays the same flat Agent plan.
  */
-export const AgencyLadder = ({ currency }) => {
-  const { t } = useLanguage();
-  const cur = normalizeCurrency(currency);
-  let prev = 0;
-  return (
-    <table className="agency-ladder">
-      <caption>{t('agency.ladderTitle')}</caption>
-      <tbody>
-        {AGENT_BANDS.map((b, i) => {
-          const label = b.upTo === Infinity ? t('agency.ladderRowLast', { n: prev + 1 }) : t('agency.ladderRow', { range: `${prev + 1}–${b.upTo}` });
-          prev = b.upTo;
-          return (
-            <tr key={i}>
-              <td>{label}</td>
-              <td className="agency-ladder-price">{formatMoney(seatPriceAt(cur, i), cur)}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-};
-
-export const AgencyFacts = () => {
-  const { t } = useLanguage();
-  return (
-    <ul className="agency-facts">
-      <li>{t('agency.fact1')}</li>
-      <li>{t('agency.fact2')}</li>
-      <li>{t('agency.fact3')}</li>
-    </ul>
-  );
-};
-
-const AgencySection = ({ currency, onChange }) => {
+const AgencySection = ({ onChange }) => {
   const { t } = useLanguage();
   const [data, setData] = useState(null);
   const [email, setEmail] = useState('');
@@ -65,8 +28,6 @@ const AgencySection = ({ currency, onChange }) => {
 
   if (!data) return null;
   const { organisation: org, invite, request, suggestion, hasAgentProfile } = data;
-  const cur = normalizeCurrency(currency || org?.ratePerSeat?.currency);
-  const rate = org ? formatMoney(org.ratePerSeat.monthly, org.ratePerSeat.currency) : null;
 
   return (
     <div className="settings-section agency-section">
@@ -104,8 +65,7 @@ const AgencySection = ({ currency, onChange }) => {
 
       {org && (
         <>
-          <p className="m-0 text-sm text-white">{t('agency.summary', { agency: org.name, total: org.artistTotal, rate })}</p>
-          <p className="form-hint">{t('agency.timing')}</p>
+          <p className="m-0 text-sm text-white">{t('agency.summary', { agency: org.name, total: org.artistTotal })}</p>
           <ul className="agency-members">
             {org.members.map((m) => (
               <li key={m.memberId} className="agency-member">
@@ -167,9 +127,6 @@ const AgencySection = ({ currency, onChange }) => {
           </div>
         </div>
       )}
-
-      <AgencyLadder currency={cur} />
-      <AgencyFacts />
 
       {org && (
         <div className="mt-4 flex flex-wrap gap-2">

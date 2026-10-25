@@ -1,15 +1,15 @@
 import React from 'react';
 import OverlayPortal from './OverlayPortal';
-import AgentSeatPricing from './AgentSeatPricing';
+import AgentPlanCard from './AgentPlanCard';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAppContext } from '../../contexts/AppContext';
 
-// Shown when a free agent hits their roster cap. Presents the per-seat
-// pricing (no fixed tiers) and routes to the subscription flow on the
-// Premium screen via a global event App.js listens for.
-const AgentUpgradeModal = ({ isOpen, onClose, rosterCount = 0 }) => {
+// Shown when a free agent tries to add a second artist. Presents the Agent
+// plan and routes to checkout on the Premium screen via the global
+// `tora:open-premium` event App.js listens for.
+const AgentUpgradeModal = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { billingCurrency } = useAppContext();
+  const { billingCurrency, user } = useAppContext();
   if (!isOpen) return null;
   return (
     <OverlayPortal><div className="delete-modal-overlay" onClick={onClose}>
@@ -19,10 +19,10 @@ const AgentUpgradeModal = ({ isOpen, onClose, rosterCount = 0 }) => {
         style={{ maxWidth: '560px', width: '95%' }}
       >
         <div className="delete-modal-content">
-          <AgentSeatPricing
-            rosterCount={rosterCount}
+          <AgentPlanCard
+            profile={user}
             currency={billingCurrency}
-            onSubscribe={() => {
+            onSelectPlan={() => {
               onClose();
               window.dispatchEvent(new CustomEvent('tora:open-premium'));
             }}

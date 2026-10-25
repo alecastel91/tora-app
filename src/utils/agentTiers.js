@@ -1,41 +1,46 @@
-// Agent billing — frontend mirror of tora-backend/src/config/pricing.js +
-// utils/agentTiers.js. Agents pay PER SEAT (per represented artist), FLAT by
-// band: every artist is billed at the rate the count reaches — your own roster
-// solo, the agency's total in an agency. The free plan covers
-// AGENT_FREE_ARTISTS; paid agents are capped by the seats they bought.
-// See AgentSeatPricing for the band table.
+// Agent roster rules — frontend mirror of tora-backend/src/utils/agentTiers.js.
+// The Agent plan (one flat price, see utils/money AGENT_PRICES) covers
+// unlimited artists. Without it, AGENT_FREE_ARTISTS artists stay ACTIVE and
+// the rest of the roster is DORMANT: listed for the agent, greyed, hidden as
+// representation from everyone else, until they subscribe again.
 
-// Free agents can represent this many artists before a subscription is needed.
 export const AGENT_FREE_ARTISTS = 1;
 
 // Mirrors prisma BillingInterval enum.
 export const BILLING_INTERVAL = { MONTHLY: 'MONTHLY', YEARLY: 'YEARLY' };
 
-// A paid agent is one on an active member subscription — roster is uncapped.
+const PAID = ['MONTHLY', 'YEARLY'];
+const notExpired = (p) => !p?.subscriptionEndDate || new Date(p.subscriptionEndDate) > new Date();
+
+// `agentSeats` is a legacy column name, now the plan marker: 1 = the account
+// pays the Agent plan, 0 = it pays a member plan (which never unlocks an agent
+// roster), null = no Stripe plan (complimentary tiers count as the Agent plan).
 export function isPaidAgent(profile) {
-  return ['MONTHLY', 'YEARLY'].includes(profile?.subscriptionTier);
+  return PAID.includes(profile?.subscriptionTier) && notExpired(profile) && profile?.agentSeats !== 0;
 }
 
-function rosterCount(profile) {
-  return Array.isArray(profile?.representingArtists) ? profile.representingArtists.length : 0;
-}
+export const rosterEntryIds = (profile) => (Array.isArray(profile?.representingArtists) ? profile.representingArtists : [])
+  .map((e) => e?.profileId || e?.id).filter(Boolean);
 
-// Seat model: a paid agent's cap = purchased seats (profile.agentSeats). Free
-// agents get AGENT_FREE_ARTISTS. Legacy paid agents without a stored seat count
-// fall back to their current roster so they're never retroactively over-cap.
 export function getAgentRosterCap(profile) {
-  // Admin-operated (beta persona) agents represent every tester the ladder
-  // points at them — never capped. Policy here, not a seeded seat count.
   if (profile?.isAdminOperated) return Infinity;
-  if (!isPaidAgent(profile)) return AGENT_FREE_ARTISTS;
-  const seats = Number(profile?.agentSeats);
-  if (Number.isFinite(seats) && seats > 0) return seats;
-  return Math.max(rosterCount(profile), AGENT_FREE_ARTISTS);
+  return isPaidAgent(profile) ? Infinity : AGENT_FREE_ARTISTS;
+}
+
+/** Roster artists the agent can act for now: all on the plan, else the chosen one (or the first). */
+export function activeRosterIds(profile) {
+  const ids = rosterEntryIds(profile);
+  if (getAgentRosterCap(profile) === Infinity) return ids;
+  const chosen = profile?.freeActiveArtistId;
+  return chosen && ids.includes(chosen) ? [chosen] : ids.slice(0, AGENT_FREE_ARTISTS);
+}
+
+export function isDormantArtist(profile, artistId) {
+  return rosterEntryIds(profile).includes(artistId) && !activeRosterIds(profile).includes(artistId);
 }
 
 export function rosterUsage(profile) {
   const cap = getAgentRosterCap(profile);
-  const current = rosterCount(profile);
-  return { current, cap, atLimit: cap !== Infinity && current >= cap };
+  const current = rosterEntryIds(profile).length;
+  return { current, cap, atLimit: cap !== Infinity && current >= cap, dormant: Math.max(0, current - activeRosterIds(profile).length) };
 }
-

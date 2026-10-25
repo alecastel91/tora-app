@@ -19,6 +19,7 @@ import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
 import { rosterEntryId } from '../../utils/representation';
+import { activeRosterIds } from '../../utils/agentTiers';
 import { counterpartRoles, normalizeDate } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
 import { useNativeDesktop } from '../../utils/desktopV2';
@@ -130,7 +131,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // 'all'), `calendarArtistId` for Calendar (never 'all').
   const [artistFilter, setArtistFilter] = useState('all');
   const isAgent = user?.role === 'AGENT';
-  const roster = isAgent ? (Array.isArray(user?.representingArtists) ? user.representingArtists : []) : [];
+  // Dormant artists (free agent plan) can't be acted for, so the Tour tab
+  // only offers the active ones.
+  const activeIds = isAgent ? activeRosterIds(user) : [];
+  const roster = isAgent ? (Array.isArray(user?.representingArtists) ? user.representingArtists : []).filter((a) => activeIds.includes(rosterEntryId(a))) : [];
   const inRoster = roster.some((a) => rosterEntryId(a) === artistFilter);
   const selectedArtistId = inRoster ? artistFilter : 'all';
   const calendarArtistId = inRoster ? artistFilter : (roster[0] ? rosterEntryId(roster[0]) : null);

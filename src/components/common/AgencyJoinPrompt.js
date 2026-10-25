@@ -38,7 +38,6 @@ const AgencyJoinPrompt = ({ userId }) => {
       <p className="agency-prompt-title">{t('agency.promptTitle', { agency: s.name })}</p>
       <p className="agency-prompt-body">{t('agency.promptBody', { agency: s.name })}</p>
       <p className="agency-prompt-meta">{t('agency.promptMembers', { n: s.memberCount, total: s.artistTotal })}{s.matchedDomain ? ` · ${t('agency.promptDomain', { domain: s.matchedDomain })}` : ''}</p>
-      <p className="agency-prompt-meta">{t('agency.timing')}</p>
       {!s.canRequest && s.requestBlocker && (
         <p className="agency-prompt-meta">{t(`agency.blocker.${s.requestBlocker}`, { agency: s.name, domain: (s.agencyDomains || []).join(', ') })}</p>
       )}

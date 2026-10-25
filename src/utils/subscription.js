@@ -3,7 +3,7 @@ import { isPaidAgent } from './agentTiers';
 /**
  * Premium gate shared by feature surfaces. Personal roles unlock via
  * subscriptionTier (TRIAL only while it hasn't expired); agents unlock via
- * an active member subscription (their roster is billed per seat).
+ * the Agent plan, or a member plan on the same account.
  */
 /**
  * Admin-operated (comp) profiles are seeded as YEARLY so feature gates open
@@ -26,8 +26,8 @@ export function isPremiumViewer(user) {
 
 /**
  * Yearly-exclusive features (tour fee privacy, calendar privacy, travel
- * alerts, priority placement). Agents qualify via any active paid member
- * subscription — their pricing axis is the per-seat roster, not the tier.
+ * alerts, priority placement). Agents qualify via the Agent plan, monthly
+ * or yearly.
  * Mirrors backend utils/subscription.js#isYearlyTier.
  */
 export function isYearlyViewer(user) {
@@ -37,15 +37,14 @@ export function isYearlyViewer(user) {
 }
 
 /**
- * One Stripe plan per account. 'agency' = seats live on the agent profile;
- * 'membership' = a paid, non-comp profile with no seats; null = nothing paid
+ * One Stripe plan per account. 'agent' = the Agent plan (marker 1 on the agent
+ * profile); 'membership' = a paid, non-comp member plan; null = nothing paid
  * (gifted tiers have no Stripe subscription and report null too).
  */
 export function accountPlan(profiles = [], accountUser) {
   const agentProfile = profiles.find((p) => p.role === 'AGENT') || null;
-  const agencyRoster = agentProfile?.representingArtists?.length || 0;
-  if (!accountUser?.hasStripeSubscription) return { kind: null, agencyRoster };
-  if (agentProfile?.agentSeats) return { kind: 'agency', agencyRoster };
+  if (!accountUser?.hasStripeSubscription) return { kind: null };
+  if (agentProfile && agentProfile.agentSeats > 0) return { kind: 'agent' };
   const paid = profiles.some((p) => !isCompAccount(p) && ['MONTHLY', 'YEARLY'].includes(p.subscriptionTier));
-  return { kind: paid ? 'membership' : null, agencyRoster };
+  return { kind: paid ? 'membership' : null };
 }

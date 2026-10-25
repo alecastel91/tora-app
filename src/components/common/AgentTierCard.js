@@ -1,50 +1,27 @@
 import React from 'react';
-import { isPaidAgent, rosterUsage, AGENT_FREE_ARTISTS } from '../../utils/agentTiers';
+import { isPaidAgent, rosterUsage } from '../../utils/agentTiers';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-// Settings summary card for AGENT profiles. Reflects the per-seat model:
-// a free plan covers AGENT_FREE_ARTISTS; a paid subscription is unlimited and
-// billed by roster size (see AgentSeatPricing for the band table).
+// Settings summary card for AGENT profiles: which plan runs, how many artists,
+// and — on the free plan — how many are inactive until the Agent plan.
+// `plan` is the account's Stripe plan kind (utils/subscription accountPlan).
 const AgentTierCard = ({ profile, plan, onManage }) => {
   const { t } = useLanguage();
-  const paid = isPaidAgent(profile);
+  const onAgentPlan = isPaidAgent(profile) && plan !== 'membership';
   const usage = rosterUsage(profile);
-  const interval = profile?.subscriptionTier === 'YEARLY' ? t('agentSeat.perYear') : t('agentSeat.perMonth');
-
-  // Covered by the account's membership: paid tier, no seats — one included artist.
-  const coveredByMembership = paid && plan === 'membership';
-  const title = coveredByMembership ? t('agentSeatCard.coveredByMembership') : paid ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan');
-  const priceLine = paid && !coveredByMembership
-    ? t('agentSeatCard.billedRoster', { n: usage.current, interval })
-    : t('agentSeatCard.freeIncludes', { n: AGENT_FREE_ARTISTS });
+  const title = onAgentPlan ? t('agentPlan.name') : plan === 'membership' ? t('agentPlan.coveredTitle') : t('agentPlan.freeName');
+  const line = onAgentPlan ? t('agentPlan.paidStatus', { n: usage.current }) : usage.dormant ? t('agentPlan.freeStatus', { n: usage.dormant }) : t('agentPlan.freeIncludes');
 
   return (
-    <div style={{
-      padding: '14px 16px',
-      borderRadius: '12px',
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.08)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: '#fff' }}>{title}</div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginTop: '2px' }}>{priceLine}</div>
+          <div className="text-[15px] font-semibold text-white">{title}</div>
+          <div className="mt-0.5 text-xs text-white/55">{line}</div>
         </div>
         <button className="btn btn-primary btn-sm" onClick={onManage}>
-          {paid ? t('agentSeatCard.manage') : t('agentSeatCard.choosePlan')}
+          {onAgentPlan ? t('agentPlan.manage') : t('agentPlan.choose')}
         </button>
-      </div>
-      <div style={{
-        marginTop: '12px',
-        padding: '10px 12px',
-        borderRadius: '8px',
-        background: usage.atLimit ? 'rgba(255,51,102,0.08)' : 'rgba(255,255,255,0.02)',
-        border: `1px solid ${usage.atLimit ? 'rgba(255,51,102,0.3)' : 'rgba(255,255,255,0.06)'}`,
-        fontSize: '13px',
-        color: usage.atLimit ? '#FF3366' : 'rgba(255,255,255,0.75)',
-      }}>
-        <strong>{t('agentSeatCard.roster')}: {usage.current}/{usage.cap === Infinity ? '∞' : usage.cap}</strong>
-        {usage.atLimit && ` — ${t('agentSeatCard.subscribeToAdd')}`}
       </div>
     </div>
   );

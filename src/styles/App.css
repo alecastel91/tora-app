@@ -13423,3 +13423,7 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .agency-team-count { font-size: 12px; color: rgba(255, 255, 255, 0.6); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .agency-team-footer { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .agency-team-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: rgba(255, 255, 255, 0.6); text-align: center; }
+
+/* Free agent plan: dormant roster artists (greyed, still listed for the agent) */
+.artist-card-row.is-dormant .artist-card-main { opacity: 0.45; }
+.artist-dormant-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.6); font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }

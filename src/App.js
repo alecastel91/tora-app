@@ -15,12 +15,11 @@ import SignupScreen from './components/screens/SignupScreen';
 import ForgotPasswordScreen from './components/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './components/screens/ResetPasswordScreen';
 import Modal from './components/common/Modal';
-import AgentSeatPricing from './components/common/AgentSeatPricing';
+import AgentPlanCard from './components/common/AgentPlanCard';
 import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
-import { rosterUsage } from './utils/agentTiers';
 import { billingTier, accountPlan } from './utils/subscription';
-import { formatMoney, MEMBER_PRICES, EXTRA_PRICES, normalizeCurrency, yearlyPerMonth } from './utils/money';
+import { formatMoney, MEMBER_PRICES, AGENT_PRICES, EXTRA_PRICES, normalizeCurrency, yearlyPerMonth } from './utils/money';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
 import apiService from './services/api';
@@ -254,9 +253,6 @@ function App() {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showSubscription, setShowSubscription] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  // Agent per-seat detail ({ seats, amount, priceLabel, perMonthLabel }) so the
-  // summary shows the roster-based price instead of the personal-tier default.
-  const [planDetail, setPlanDetail] = useState(null);
   // Real charge quoted by the backend once checkout mounts — on plan changes
   // this is the prorated difference, not the headline plan price.
   const [checkoutQuote, setCheckoutQuote] = useState(null);
@@ -324,14 +320,6 @@ function App() {
   };
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
   const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles } = useAppContext();
-  // The agency this account's agent profile belongs to (null = solo). Loaded
-  // for agents; drives the agency rate on the Premium screen and checkout.
-  const [organisation, setOrganisation] = useState(null);
-  useEffect(() => {
-    if (!user?.id || !userProfiles?.some((p) => p.role === 'AGENT')) { setOrganisation(null); return; }
-    apiService.getOrganisation().then((d) => setOrganisation(d.organisation || null)).catch(() => setOrganisation(null));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, userProfiles?.length]);
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
   // after t/setShowPremium so the [t] dependency isn't read before init.
@@ -721,6 +709,9 @@ function App() {
   useEffect(() => { setBillingCurrency(cur); }, [cur, setBillingCurrency]);
   const money = (n) => formatMoney(n, cur);
   const memberPrice = MEMBER_PRICES[cur];
+  // The price the active profile subscribes to: the flat Agent plan on an
+  // agent profile, the membership everywhere else.
+  const planPrice = user?.role === 'AGENT' ? AGENT_PRICES[cur] : memberPrice;
   const refreshBillingInfo = useCallback(() => {
     if (!user?.id || !['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier)) { setBillingInfo(null); return; }
     apiService.getBillingStatus(user.id).then(setBillingInfo).catch(() => setBillingInfo(null));
@@ -784,9 +775,8 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleSelectPlan = (plan, detail = null) => {
+  const handleSelectPlan = (plan) => {
     setSelectedPlan(plan);
-    setPlanDetail(detail);
     setCheckoutQuote(null);
     // Keep the Premium screen mounted underneath so closing the checkout
     // returns there (not to the profile page).
@@ -800,7 +790,6 @@ function App() {
     if (subscriptionStep === 'success') { handleSubscriptionComplete(); return; }
     setShowSubscription(false);
     setSelectedPlan(null);
-    setPlanDetail(null);
   };
 
   // A feature-table label that reveals a plain-language explainer when tapped.
@@ -822,7 +811,6 @@ function App() {
     setShowPremium(false);
     setSubscriptionStep('payment');
     setSelectedPlan(null);
-    setPlanDetail(null);
     // Here you would update the user's premium status
   };
 
@@ -1048,7 +1036,7 @@ function App() {
                       {t('premium.manageBilling')}
                     </button>
                   )}
-                  <AgencySection currency={accountUser?.billingCurrency} onChange={setOrganisation} />
+                  <AgencySection />
                 </>
               ) : (
                 <>
@@ -1425,14 +1413,11 @@ function App() {
 
         {/* Premium Upgrade Screen */}
         {showPremium && (() => {
-          // Billing view: a comp (admin-operated) account is shown the public
-          // prices — see billingTier. Paid agents keep their real seats/plan.
-          const paidAgent = user?.role === 'AGENT' && billingTier(user) !== 'FREE';
-          // One plan per account covers every profile on it. The agency plan
-          // is the one that carries seats; a membership covers an agent
-          // profile with its one included artist.
-          const { kind: planKind, agencyRoster } = accountPlan(userProfiles, accountUser);
-          const onAgencyPlan = planKind === 'agency';
+          // One plan per account covers every profile on it. The Agent plan
+          // also covers the person's member profiles; a membership covers an
+          // agent profile with one active artist.
+          const { kind: planKind } = accountPlan(userProfiles, accountUser);
+          const onAgentPlan = planKind === 'agent';
           const onMembership = planKind === 'membership';
           return (
           <div className="screen active premium-screen">
@@ -1468,8 +1453,7 @@ function App() {
                 currency={cur}
                 hasMonthly={billingTier(user) === 'MONTHLY'}
                 hasYearly={billingTier(user) === 'YEARLY'}
-                onAgencyPlan={onAgencyPlan}
-                canLeaveAgency={agencyRoster <= 1}
+                onAgentPlan={onAgentPlan}
                 onMembership={onMembership}
                 onSelectPlan={handleSelectPlan}
                 onExplain={setInfoFeature}
@@ -1596,38 +1580,7 @@ function App() {
             
             {user?.role === 'AGENT' ? (
               <div style={{ marginTop: '24px' }}>
-                {/* Current status: seats used / purchased + which plan is active */}
-                {(() => {
-                  const usage = rosterUsage(user);
-                  const capLabel = usage.cap === Infinity ? '∞' : usage.cap;
-                  const pct = usage.cap === Infinity ? 100 : Math.min(100, Math.round((usage.current / Math.max(usage.cap, 1)) * 100));
-                  return (
-                    <div className="agent-status-banner">
-                      <div className="agent-status-main">
-                        <div className="agent-status-roster">
-                          <span className="agent-status-count">{usage.current} / {capLabel}</span>
-                          <span className="agent-status-label">{t('agentSeat.seatsUsed')}</span>
-                        </div>
-                        <div className="agent-status-bar"><span style={{ width: `${pct}%` }} /></div>
-                      </div>
-                      <span className={`agent-status-plan${paidAgent ? ' is-paid' : ''}`}>
-                        {paidAgent ? t('agentSeatCard.perSeatPlan') : t('agentSeatCard.freePlan')}
-                      </span>
-                    </div>
-                  );
-                })()}
-                {onMembership && (
-                  <p className="premium-note" style={{ marginTop: 0 }}>{t('premium.membershipCoversAgent')}</p>
-                )}
-                <AgentSeatPricing
-                  rosterCount={user?.representingArtists?.length || 0}
-                  currentSeats={paidAgent ? (user?.agentSeats || 0) : 0}
-                  isPaid={paidAgent}
-                  currentInterval={user?.subscriptionTier === 'YEARLY' ? 'year' : 'month'}
-                  currency={cur}
-                  agency={organisation?.status === 'ACTIVE' ? { name: organisation.name, band: organisation.band, total: organisation.artistTotal } : null}
-                  onSubscribe={(interval, detail) => handleSelectPlan(interval === 'year' ? 'yearly' : 'monthly', detail)}
-                />
+                <AgentPlanCard profile={user} currency={cur} planKind={planKind} onSelectPlan={handleSelectPlan} />
               </div>
             ) : (() => {
               // Reflect the current plan: a Monthly subscriber sees Monthly as
@@ -1635,20 +1588,15 @@ function App() {
               // is already at the top; FREE/TRIAL sees both as choices.
               const hasMonthly = billingTier(user) === 'MONTHLY';
               const hasYearly = billingTier(user) === 'YEARLY';
-              // Covered by the account's agency plan: the cards become a way
-              // back to a plain membership, open only once the roster is down
-              // to the one included artist (seats would otherwise be lost).
-              const canLeaveAgency = agencyRoster <= 1;
-              const memberCta = (plan, label) => (onAgencyPlan
-                ? <button className={plan === 'yearly' ? 'btn btn-primary' : 'btn btn-outline'} disabled={!canLeaveAgency} onClick={() => handleSelectPlan(plan)}>{t('premium.switchToMembership')}</button>
+              // Covered by the account's Agent plan: the cards become a way back
+              // to a plain membership (the agent profile then keeps one active
+              // artist; the rest go dormant, nothing is removed).
+              const memberCta = (plan, label) => (onAgentPlan
+                ? <button className={plan === 'yearly' ? 'btn btn-primary' : 'btn btn-outline'} onClick={() => handleSelectPlan(plan)}>{t('premium.switchToMembership')}</button>
                 : label);
               return (
               <>
-                {onAgencyPlan && (
-                  <p className="premium-note" style={{ marginTop: 0 }}>
-                    {t('premium.coveredByAgency')}{canLeaveAgency ? '' : ` ${t('premium.switchBlockedRoster')}`}
-                  </p>
-                )}
+                {onAgentPlan && <p className="premium-note" style={{ marginTop: 0 }}>{t('premium.coveredByAgency')}</p>}
                 {onMembership && <p className="premium-note" style={{ marginTop: 0 }}>{t('premium.coversAllProfiles')}</p>}
                 <div className="premium-pricing">
                   {/* Monthly always leads — the first price on the page is
@@ -1726,19 +1674,16 @@ function App() {
         >
           <div className="subscription-content">
             {subscriptionStep === 'payment' && (() => {
-              // Agents subscribe on the per-seat scale (planDetail carries the
-              // configured roster price); everyone else on the personal tier.
+              // Agents subscribe to the flat Agent plan; everyone else to the
+              // membership (planPrice picks by the active profile's role).
               const isYearly = selectedPlan === 'yearly';
               // Already paying → this is a modification of a running
               // subscription: prorated, and it must wait for a click.
               const isPlanChange = ['MONTHLY', 'YEARLY'].includes(billingTier(user));
               const cycleWord = isYearly ? t('agentSeat.perYear') : t('agentSeat.perMonth');
-              const priceLabel = planDetail?.priceLabel || money(isYearly ? memberPrice.yearly : memberPrice.monthly);
-              const perMonthEq = planDetail ? planDetail.perMonthLabel : money(yearlyPerMonth(memberPrice.yearly));
-              const planName = planDetail
-                ? `${planDetail.seats} ${t('agentSeat.artists')}`
-                : t('premium.title');
-              const addedSeats = planDetail?.added || 0;
+              const priceLabel = money(isYearly ? planPrice.yearly : planPrice.monthly);
+              const perMonthEq = money(yearlyPerMonth(planPrice.yearly));
+              const planName = user?.role === 'AGENT' ? t('agentPlan.name') : t('premium.title');
               return (
               <>
                 <div className="subscription-summary">
@@ -1754,21 +1699,6 @@ function App() {
                       <em>/{cycleWord}</em>
                     </div>
                   </div>
-                  {addedSeats > 0 && (
-                    <div className="summary-breakdown">
-                      <div className="summary-breakdown-row">
-                        <span>{t('premium.inPlanSeats', { n: planDetail.currentSeats })}</span>
-                        <span>{planDetail.currentPriceLabel}/{cycleWord}</span>
-                      </div>
-                      <div className="summary-breakdown-row is-add">
-                        <span>{t('premium.addingSeatsRow', { n: addedSeats })}</span>
-                        {/* A seat change can lower the total (a smaller roster
-                            can leave a cheaper band), so the sign is computed,
-                            never assumed — this is the 12条の6 screen. */}
-                        <span>{(planDetail.addedDelta ?? 0) < 0 ? '−' : '+'}{planDetail.addedPriceLabel}/{cycleWord}</span>
-                      </div>
-                    </div>
-                  )}
                   {isYearly && perMonthEq && (
                     <div className="summary-saving">
                       <span className="summary-saving-badge">{t('premium.yearlySaveBadge')}</span>
@@ -1807,9 +1737,7 @@ function App() {
                       the price and period (above), when payment is taken, and how
                       to cancel — in the same words as the tokushōhō page. */}
                   <ul className="summary-terms">
-                    {user?.role === 'AGENT' && (organisation?.status === 'ACTIVE'
-                      ? <li className="summary-terms-agency">{t('agency.checkoutMember', { total: organisation.artistTotal })}</li>
-                      : <li className="summary-terms-agency">{t('agency.checkoutNudge')} <button type="button" className="summary-terms-link" onClick={() => { setShowSubscription(false); goSettings(); }}>{t('agency.linkUpFirst')}</button></li>)}
+                    {user?.role === 'AGENT' && <li className="summary-terms-agency">{t('agentPlan.checkoutLine')}</li>}
                     <li>{t(isPlanChange ? 'premium.changeTiming' : 'premium.paymentTiming')}</li>
                     <li>{t('premium.cancelTerms')}</li>
                     <li className="summary-terms-legal">
@@ -1829,7 +1757,6 @@ function App() {
                   <StripeCheckout
                     profileId={user?.id}
                     interval={isYearly ? 'year' : 'month'}
-                    seats={planDetail?.seats}
                     confirmFirst={isPlanChange}
                     onQuote={setCheckoutQuote}
                     onSuccess={async () => {

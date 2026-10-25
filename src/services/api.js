@@ -452,6 +452,11 @@ class ApiService {
     const response = await fetch(`${API_URL}/organisations/requests`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(organisationId ? { organisationId } : {}) });
     return this.handleResponse(response);
   }
+  // Free agent plan: choose the one roster artist that stays active.
+  async setFreeActiveArtist(agentProfileId, artistProfileId) {
+    const response = await fetch(`${API_URL}/profiles/${agentProfileId}/free-active-artist`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ artistProfileId }) });
+    return this.handleResponse(response);
+  }
   async getAgencyOfProfile(profileId) {
     const response = await fetch(`${API_URL}/organisations/of/${profileId}`, { headers: this.getHeaders() });
     return this.handleResponse(response);
@@ -512,11 +517,11 @@ class ApiService {
   }
 
   // ---- Billing (Stripe) ----
-  async startSubscription({ profileId, interval, seats, billingAddress }) {
+  async startSubscription({ profileId, interval, billingAddress }) {
     const response = await fetch(`${API_URL}/billing/subscribe`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ profileId, interval, seats, billingAddress }),
+      body: JSON.stringify({ profileId, interval, billingAddress }),
     });
     return this.handleResponse(response);
   }
