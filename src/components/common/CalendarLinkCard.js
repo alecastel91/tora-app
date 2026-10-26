@@ -7,9 +7,9 @@ import useBusyAction from '../../hooks/useBusyAction';
 
 /**
  * The subscribe link for this profile's TORA calendar (Google / Apple /
- * Outlook): create, copy private or public, reset, turn off. One component,
- * shown in Settings → Calendar sync and on the Tour → Calendar page, so the
- * two never drift. For an agent the link covers every active roster artist,
+ * Outlook): create, copy private or public, reset, turn off. Shown on the
+ * Tour → Calendar page (phone and desktop rail). For an agent the link
+ * covers every active roster artist,
  * so it always belongs to the viewer's own profile, never to a roster artist.
  *
  * `settings` is the `{ data, reload }` from useCalendarSettings, owned by the
@@ -22,7 +22,7 @@ const CalendarLinkCard = ({ profileId, settings, isAgent = false, compact = fals
   const copy = async (text) => { if (await copyText(text)) showToast('calendarSync.copied'); };
 
   if (!profileId || !data) return null;
-  const intro = <p className="form-hint" style={{ marginTop: 0 }}>{isAgent ? t('calendarSync.introAgent') : t('calendarSync.intro')}</p>;
+  const intro = <p className="form-hint calendar-link-intro">{isAgent ? t('calendarSync.introAgent') : t('calendarSync.intro')}</p>;
 
   return (
     <div className="calendar-link-card">

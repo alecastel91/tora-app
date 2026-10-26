@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import CalendarLinkCard from './CalendarLinkCard';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
 import useBusyAction from '../../hooks/useBusyAction';
 
 /**
- * Settings → Calendar sync.
- *  - A private subscribe link (Google / Apple / Outlook) with everything,
- *    and a public one that shows only Booked / Available — the owner copies
- *    whichever they want to hand out. Reset kills the old links.
- *  - "Your calendars": paste the private .ics address of a personal calendar;
- *    TORA reads only the busy days (never titles) and closes those open dates.
- * One load of /calendar/:id serves both halves.
+ * Settings → Calendar sync — "Your calendars": paste the private .ics address
+ * of a personal calendar; TORA reads only the busy days (never titles) and
+ * closes those open dates. The subscribe LINK (TORA → their calendar app)
+ * lives on the Tour → Calendar page only (CalendarLinkCard).
  */
 const CalendarSyncSection = ({ profile }) => {
   const { t } = useLanguage();
@@ -27,11 +23,7 @@ const CalendarSyncSection = ({ profile }) => {
 
   return (
     <div className="settings-section calendar-sync-section">
-      <h3>{t('calendarSync.title')}</h3>
-      {/* The link itself is the shared card (also on Tour → Calendar). */}
-      <CalendarLinkCard profileId={profileId} settings={settings} isAgent={profile.role === 'AGENT'} />
-
-      <h4 className="calendar-sync-sub">{t('calendarSync.importsTitle')}</h4>
+      <h3>{t('calendarSync.importsTitle')}</h3>
       <p className="form-hint" style={{ marginTop: 0 }}>{t('calendarSync.importsIntro')}</p>
       {data.imports.length > 0 && (
         <ul className="calendar-imports">

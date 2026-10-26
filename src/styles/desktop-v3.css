@@ -1214,7 +1214,10 @@
     align-items: start;
   }
   /* The grid and the bookings list stack down the left; only the rail
-     crosses to the right, spanning however many rows the left produces. */
+     crosses to the right, spanning however many rows the left produces.
+     The rail scrolls WITH the page (not sticky): with travel, visibility
+     and the calendar link it is taller than the viewport, and a sticky rail
+     that tall hides its own bottom until the left column runs out. */
   html.desktop-v3 .d3-cal > * { grid-column: 1; min-width: 0; }
   html.desktop-v3 .d3-cal > .d3-cal-rail {
     grid-column: 2;
@@ -1222,8 +1225,6 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    position: sticky;
-    top: calc(var(--d2-top) + 16px);
   }
   html.desktop-v3 .d3-cal > .dashboard-section { margin: 0; }
   html.desktop-v3 .d3-cal > .dashboard-section + .dashboard-section { margin-top: 20px; }
