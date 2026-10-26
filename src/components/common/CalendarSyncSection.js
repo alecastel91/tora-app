@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
@@ -21,10 +21,11 @@ const CalendarSyncSection = ({ profile }) => {
   const [label, setLabel] = useState('');
   const profileId = profile?.id;
 
+  // The link card loads /calendar/:id on mount and reports it via onData;
+  // this section only re-reads after one of ITS own actions (imports).
   const load = async () => {
     try { setData(await apiService.getCalendarSettings(profileId)); } catch { setData({ enabled: false, imports: [] }); }
   };
-  useEffect(() => { if (profileId) load(); }, [profileId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const run = async (fn, toastKey) => {
     if (busy) return;

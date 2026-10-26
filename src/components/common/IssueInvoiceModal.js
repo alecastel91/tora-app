@@ -35,7 +35,10 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
     setAmount(''); setNumber(''); setPreview(null); setNeedsSetup(false);
   }, [isOpen, deal?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Free the PDF blob when the preview changes, when the modal closes (it
+  // stays mounted with isOpen=false), and on unmount.
   useEffect(() => () => { if (preview?.blobUrl) URL.revokeObjectURL(preview.blobUrl); }, [preview]);
+  useEffect(() => { if (!isOpen && preview?.blobUrl) { URL.revokeObjectURL(preview.blobUrl); setPreview(null); } }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isOpen || !deal) return null;
 
@@ -46,7 +49,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
     setBusy(true);
     try {
       const p = await apiService.previewInvoice(body());
-      setPreview(p);
+      setPreview({ ...p, number: p.number ? decodeURIComponent(p.number) : p.number });
     } catch (e) {
       if (e.code === 'INVOICE_PROFILE_MISSING') setNeedsSetup(true);
       else appAlert(e.message || t('common.error'));
