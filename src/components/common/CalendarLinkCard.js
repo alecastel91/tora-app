@@ -47,6 +47,11 @@ const CalendarLinkCard = ({ profileId, settings, isAgent = false, compact = fals
             </div>
             <button className="btn btn-outline btn-sm" onClick={() => copy(data.publicUrl)}>{t('calendarSync.copy')}</button>
           </div>
+          <label className="settings-toggle mt-2">
+            <input type="checkbox" checked={!!data.showAvailable} disabled={busy} onChange={(e) => run(() => apiService.setCalendarFeedOptions(profileId, { showAvailable: e.target.checked }))} />
+            <span>{t('calendarSync.includeAvailable')}</span>
+          </label>
+          <p className="form-hint" style={{ marginTop: 2 }}>{t('calendarSync.includeAvailableHint')}</p>
           {!compact && <p className="form-hint">{t('calendarSync.howToAdd')}</p>}
           <div className="flex flex-wrap gap-2 mt-2">
             <button className="btn btn-outline btn-sm" disabled={busy} onClick={async () => {

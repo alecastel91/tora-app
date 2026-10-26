@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import useCalendarSettings from '../../hooks/useCalendarSettings';
 import useBusyAction from '../../hooks/useBusyAction';
 
 /**
- * Settings → Calendar sync — "Your calendars": paste the private .ics address
- * of a personal calendar; TORA reads only the busy days (never titles) and
- * closes those open dates. The subscribe LINK (TORA → their calendar app)
- * lives on the Tour → Calendar page only (CalendarLinkCard).
+ * "Your calendars" on the Calendar page: paste the private .ics address of a
+ * personal calendar (Google / Apple / Outlook) and its events appear on the
+ * TORA calendar as they are — owner-only. All-day events close the open dates
+ * they cover; a timed event does not. Up to three calendars.
+ *
+ * `settings` is the `{ data, reload }` from useCalendarSettings, owned by the
+ * screen; `onChanged` fires after any change so the grid re-reads its events.
  */
-const CalendarSyncSection = ({ profile }) => {
+const CalendarImportsCard = ({ profileId, settings, onChanged }) => {
   const { t } = useLanguage();
-  const profileId = profile?.id;
-  const settings = useCalendarSettings(profileId);
-  const [busy, run] = useBusyAction(settings.reload);
+  const [busy, run] = useBusyAction(async () => { await settings.reload(); if (onChanged) onChanged(); });
   const [url, setUrl] = useState('');
   const [label, setLabel] = useState('');
 
@@ -22,8 +22,8 @@ const CalendarSyncSection = ({ profile }) => {
   if (!profileId || !data) return null;
 
   return (
-    <div className="settings-section calendar-sync-section">
-      <h3>{t('calendarSync.importsTitle')}</h3>
+    <div className="calendar-imports-card">
+      <h4 className="calendar-sync-sub">{t('calendarSync.importsTitle')}</h4>
       <p className="form-hint" style={{ marginTop: 0 }}>{t('calendarSync.importsIntro')}</p>
       {data.imports.length > 0 && (
         <ul className="calendar-imports">
@@ -34,7 +34,7 @@ const CalendarSyncSection = ({ profile }) => {
                 <small>
                   {i.lastError
                     ? <span className="text-infrared">{t('calendarSync.lastError', { error: i.lastError })}</span>
-                    : t('calendarSync.lastSync', { n: i.busyCount, when: i.lastSyncAt ? new Date(i.lastSyncAt).toLocaleString() : '—' })}
+                    : t('calendarSync.lastSync', { n: i.eventCount, when: i.lastSyncAt ? new Date(i.lastSyncAt).toLocaleString() : '—' })}
                 </small>
               </div>
               <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => run(() => apiService.removeCalendarImport(profileId, i.id))}>{t('calendarSync.remove')}</button>
@@ -48,7 +48,7 @@ const CalendarSyncSection = ({ profile }) => {
           <div className="flex gap-2">
             <input type="text" className="form-input flex-1" placeholder={t('calendarSync.labelPlaceholder')} value={label} onChange={(e) => setLabel(e.target.value)} maxLength={60} />
             <button className="btn btn-primary" disabled={busy || !/^(https?|webcal):\/\/\S+/i.test(url.trim())} onClick={() => run(async () => { await apiService.addCalendarImport(profileId, url.trim(), label.trim()); setUrl(''); setLabel(''); }, { toast: 'calendarSync.connected' })}>
-              {t('calendarSync.connect')}
+              {busy ? '…' : t('calendarSync.connect')}
             </button>
           </div>
           <p className="form-hint">{t('calendarSync.whereToFind')}</p>
@@ -61,4 +61,4 @@ const CalendarSyncSection = ({ profile }) => {
   );
 };
 
-export default CalendarSyncSection;
+export default CalendarImportsCard;

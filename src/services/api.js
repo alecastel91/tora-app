@@ -566,6 +566,16 @@ class ApiService {
     const response = await fetch(`${API_URL}/calendar/${profileId}/imports/sync`, { method: 'POST', headers: this.getHeaders() });
     return this.handleResponse(response);
   }
+  /** Open dates in the private subscribe link on/off. */
+  async setCalendarFeedOptions(profileId, { showAvailable }) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/feed`, { method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify({ showAvailable }) });
+    return this.handleResponse(response);
+  }
+  /** The owner's imported events touching [from, to] (YYYY-MM-DD, inclusive). */
+  async getCalendarEvents(profileId, from, to) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/events?from=${from}&to=${to}`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
 
   async getBlocks() {
     const response = await fetch(`${API_URL}/blocks`, { headers: this.getHeaders() });

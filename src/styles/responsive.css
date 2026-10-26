@@ -401,6 +401,9 @@
     cursor: pointer;
   }
   .calendar-day-chip:hover { background: rgba(255, 51, 102, 0.35); }
+  /* The member's own calendar: grey, read-only, never a TORA action. */
+  .calendar-day-chip.is-external { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.75); cursor: default; }
+  .calendar-day-chip.is-external:hover { background: rgba(255, 255, 255, 0.12); }
   .calendar-day-chip.is-pending {
     background: rgba(255, 193, 7, 0.14);
     box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.45);

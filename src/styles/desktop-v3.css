@@ -1229,52 +1229,25 @@
   html.desktop-v3 .d3-cal > .dashboard-section { margin: 0; }
   html.desktop-v3 .d3-cal > .dashboard-section + .dashboard-section { margin-top: 20px; }
 
-  /* ---- the two month grids ---- */
-  html.desktop-v3 .d3-cal-months {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-  }
-  html.desktop-v3 .d3-cal-mname {
-    margin: 0 0 7px;
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.45);
-  }
-  /* Half the width per cell, so the Outlook-style density from
-     responsive.css has to come down with it. */
+  /* ---- the month grid: one month, full width, so every day can show what
+     is on it (bookings, the member's own calendar, trips) ---- */
+  html.desktop-v3 .d3-cal-months { display: block; }
   /* A fixed height, not a minimum: a day with a booking on it must not make
-     its whole week taller. Anything that does not fit is clipped, and the
+     its whole week taller. Three chips fit; anything beyond is "+n", and the
      chip already truncates with an ellipsis and names itself on hover. */
   html.desktop-v3 .d3-cal-months .calendar-grid-inline .calendar-day {
-    height: 68px;
+    height: 112px;
     min-height: 0;
-    padding: 4px 4px 15px;
+    padding: 6px 6px 18px;
     overflow: hidden;
   }
-  html.desktop-v3 .d3-cal-months .calendar-day-events { min-height: 0; overflow: hidden; }
-  html.desktop-v3 .d3-cal-months .calendar-day-num { font-size: 11px; padding: 2px 5px; }
-  html.desktop-v3 .d3-cal-months .calendar-day-events { gap: 2px; margin-top: 3px; }
-  html.desktop-v3 .d3-cal-months .calendar-day-chip { font-size: 9px; padding: 2px 4px; border-radius: 4px; }
-  html.desktop-v3 .d3-cal-months .calendar-day-more { font-size: 9px; padding-left: 4px; }
-  html.desktop-v3 .d3-cal-months .calendar-grid-inline .calendar-weekday { padding: 7px 0; font-size: 9px; }
-  /* The destination stays legible on the narrower cell: it is the point of
-     the ribbon, so it truncates rather than disappearing (full text on hover). */
-  html.desktop-v3 .d3-cal-months .calendar-grid-inline .schedule-label {
-    height: 14px;
-    font-size: 8.5px;
-    padding: 0 4px;
-    gap: 3px;
-  }
-  html.desktop-v3 .d3-cal-months .schedule-city {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  html.desktop-v3 .d3-cal-months .schedule-plane { width: 8px; height: 8px; flex: 0 0 auto; }
+  html.desktop-v3 .d3-cal-months .calendar-day-events { min-height: 0; overflow: hidden; gap: 3px; margin-top: 5px; }
+  html.desktop-v3 .d3-cal-months .calendar-day-num { font-size: 12px; padding: 3px 6px; }
+  html.desktop-v3 .d3-cal-months .calendar-day-chip { font-size: 10.5px; padding: 3px 6px; border-radius: 5px; }
+  html.desktop-v3 .d3-cal-months .calendar-day-more { font-size: 10px; padding-left: 6px; }
+  html.desktop-v3 .d3-cal-months .calendar-grid-inline .calendar-weekday { padding: 8px 0; font-size: 10px; }
+  html.desktop-v3 .d3-cal-months .schedule-city { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  html.desktop-v3 .d3-cal-today { margin-left: 8px; }
 
   /* The day the rail is describing. */
   html.desktop-v3 .calendar-grid-inline .calendar-day.is-focused {
@@ -1325,6 +1298,7 @@
   html.desktop-v3 .d3-cal-chip.is-free { background: rgba(67, 233, 123, 0.14); color: #7BF0A4; }
   html.desktop-v3 .d3-cal-chip.is-travel { background: rgba(255, 184, 0, 0.12); color: #E6B85C; }
   html.desktop-v3 .d3-cal-chip.is-gig { background: rgba(255, 51, 102, 0.16); color: #FF7A9C; }
+  html.desktop-v3 .d3-cal-chip.is-external { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.75); }
 
   /* Free is green everywhere else on this screen; the control that sets it
      is green too, rather than borrowing the infrared used for actions. */

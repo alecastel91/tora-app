@@ -16,7 +16,6 @@ import ForgotPasswordScreen from './components/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './components/screens/ResetPasswordScreen';
 import Modal from './components/common/Modal';
 import AgentPlanCard from './components/common/AgentPlanCard';
-import CalendarSyncSection from './components/common/CalendarSyncSection';
 import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
 import { billingTier, accountPlan } from './utils/subscription';
@@ -1220,8 +1219,6 @@ function App() {
                 </div>
               </div>
             </div>
-
-            <CalendarSyncSection profile={user} />
 
             <BlockedMembers />
 

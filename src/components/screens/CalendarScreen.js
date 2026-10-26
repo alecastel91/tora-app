@@ -12,7 +12,9 @@ import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import CalendarLinkCard from '../common/CalendarLinkCard';
+import CalendarImportsCard from '../common/CalendarImportsCard';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
+import useExternalEvents from '../../hooks/useExternalEvents';
 
 /**
  * Own availability + travel schedule. With `targetProfile` (an agent editing a
@@ -176,6 +178,10 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   const todayDate = new Date();
   const [currentMonth, setCurrentMonth] = useState(todayDate.getMonth());
   const [currentYear, setCurrentYear] = useState(todayDate.getFullYear());
+  // The viewer's own imported calendar events for the month on screen
+  // (owner-only); bumped after an import is added, removed or refreshed.
+  const [eventsVersion, setEventsVersion] = useState(0);
+  const externalByDay = useExternalEvents(!preview && user?.id ? user.id : null, currentYear, currentMonth, eventsVersion);
   
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
@@ -185,8 +191,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     return new Date(year, month, 1).getDay();
   };
   
-  // Desktop v3 shows two months side by side and a rail beside them. The phone
-  // keeps one month and the stacked sections below it.
+  // Desktop v3 shows one wide month and a rail beside it. The phone keeps one
+  // month and the stacked sections below it.
   const nativeDesktop = useNativeDesktop();
   // The month at `offset` months after the one being shown, as {month, year}.
   const monthAt = (offset) => {
@@ -757,15 +763,17 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         }
       }
 
-      // Cells are a fixed height so the grid never reflows around its content.
-      // The two-month desktop grid has room for one chip and a count; the
-      // phone's taller cells keep two.
-      const chipLimit = nativeDesktop ? 1 : 2;
+      // Cells are a fixed height so the grid never reflows around its content:
+      // three chips and a count on the desktop's wide month, two on the phone.
+      const chipLimit = nativeDesktop ? 3 : 2;
+      const dayExternal = externalByDay[dateKey] || [];
+      const extraCount = Math.max(0, dayDeals.length + dayExternal.length - chipLimit);
+      const externalShown = dayExternal.slice(0, Math.max(0, chipLimit - dayDeals.length));
 
       days.push(
         <div
           key={`day-${day}`}
-          className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}${isFocused ? ' is-focused' : ''}`}
+          className={`calendar-day ${isSelected ? 'available' : ''} ${scheduleClasses}${isToday ? ' is-today' : ''}${dayDeals.length ? ' has-gig' : ''}${dayExternal.length ? ' has-external' : ''}${isFocused ? ' is-focused' : ''}`}
           data-weekday={new Date(year, month, day).getDay()}
           data-day={day}
           data-month={month}
@@ -805,7 +813,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           {/* Gig marker: the has-gig class draws a dot on phones; on desktop
               the chips render inside the cell instead. A chip must not start
               a drag-select or toggle the day, on mouse or touch. */}
-          {dayDeals.length > 0 && (
+          {(dayDeals.length > 0 || dayExternal.length > 0) && (
             <div className="calendar-day-events">
               {dayDeals.slice(0, chipLimit).map(({ deal, label }) => (
                 <button
@@ -821,7 +829,22 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   {label}
                 </button>
               ))}
-              {dayDeals.length > chipLimit && <span className="calendar-day-more">+{dayDeals.length - chipLimit}</span>}
+              {/* Events from the viewer's own calendar: grey, read-only; a click
+                  focuses the day in the rail without toggling it. */}
+              {externalShown.map((e) => (
+                <span
+                  key={e.id}
+                  className="calendar-day-chip is-external"
+                  title={`${e.startTime ? `${e.startTime} ` : ''}${e.summary || t('calendarSync.unnamedEvent')}${e.location ? ` · ${e.location}` : ''}`}
+                  onMouseDown={(ev) => ev.stopPropagation()}
+                  onTouchStart={(ev) => ev.stopPropagation()}
+                  onTouchEnd={(ev) => ev.stopPropagation()}
+                  onClick={(ev) => { ev.stopPropagation(); setFocusedDay({ day, month, year }); }}
+                >
+                  {e.startTime ? `${e.startTime} ` : ''}{e.summary || t('calendarSync.unnamedEvent')}
+                </span>
+              ))}
+              {extraCount > 0 && <span className="calendar-day-more">+{extraCount}</span>}
             </div>
           )}
           {schedulePos.hasSchedule && (() => {
@@ -856,13 +879,13 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     return days;
   };
 
-  /* ---- Desktop v3: two months side by side, settings and travel in a rail ----
+  /* ---- Desktop v3: one wide month, settings and travel in a rail ----
      Everything below is read only by the `nativeDesktop` branch of the render;
      the phone keeps the single-month, stacked-sections layout untouched. */
 
-  // The two months on screen, and the counts across both of them.
-  const monthsShown = [monthAt(0), monthAt(1)];
-  const twoMonthSummary = (() => {
+  // The month on screen and its counts.
+  const monthsShown = [monthAt(0)];
+  const monthSummary = (() => {
     const prefixes = monthsShown.map(({ month, year }) => `${year}-${month + 1}-`);
     let free = 0;
     selectedDates.forEach((key) => { if (prefixes.some((p) => String(key).startsWith(p))) free += 1; });
@@ -870,7 +893,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       (n, { month, year }) => n + Object.values(dealsFor(month, year)).reduce((m, list) => m + list.length, 0), 0);
     // A trip counts once if any of its nights fall inside the window.
     const windowStart = new Date(monthsShown[0].year, monthsShown[0].month, 1);
-    const windowEnd = new Date(monthsShown[1].year, monthsShown[1].month + 1, 0);
+    const last = monthsShown[monthsShown.length - 1];
+    const windowEnd = new Date(last.year, last.month + 1, 0);
     const trips = schedules.filter((s) => new Date(s.startDate) <= windowEnd && new Date(s.endDate) >= windowStart).length;
     return { free, gigs, trips };
   })();
@@ -888,6 +912,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       }),
       schedule: getSchedulePosition(day, month, year).schedule || null,
       deals: dealsFor(month, year)[day] || [],
+      external: externalByDay[key] || [],
     };
   })();
 
@@ -978,13 +1003,15 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     </div>
   );
 
-  // Subscribe link for the VIEWER's own TORA calendar (an agent's covers the
-  // whole active roster), so it stays the user's even while editing an
-  // artist's dates. Hidden in the free-tier preview.
-  const linkSection = !preview && user?.id ? (
-    <div className="dashboard-section">
+  // Calendars: the subscribe link for the VIEWER's own TORA calendar (an
+  // agent's covers the whole active roster) and the external calendars they
+  // read into TORA — both the user's own, even while editing an artist's
+  // dates. Hidden in the free-tier preview.
+  const calendarsSection = !preview && user?.id ? (
+    <div className="dashboard-section calendars-section">
       <h3>{t('calendarSync.title')}</h3>
       <CalendarLinkCard profileId={user.id} settings={calendarSettings} isAgent={user.role === 'AGENT'} compact />
+      <CalendarImportsCard profileId={user.id} settings={calendarSettings} onChanged={() => setEventsVersion((v) => v + 1)} />
     </div>
   ) : null;
 
@@ -998,6 +1025,10 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         <span className="legend-dot has-location"></span>
         <span>{t('calendar.scheduled')}</span>
       </div>
+      <div className="legend-item">
+        <span className="legend-dot is-external"></span>
+        <span>{t('calendarSync.external')}</span>
+      </div>
     </div>
   );
 
@@ -1010,13 +1041,12 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           </svg>
         </button>
         <div className="calendar-month-info">
-          <h4>
-            {monthsShown[0].year === monthsShown[1].year
-              ? `${monthNames[monthsShown[0].month]} – ${monthNames[monthsShown[1].month]} ${monthsShown[1].year}`
-              : `${monthNames[monthsShown[0].month]} ${monthsShown[0].year} – ${monthNames[monthsShown[1].month]} ${monthsShown[1].year}`}
-          </h4>
+          <h4>{monthNames[currentMonth]} {currentYear}</h4>
           <p className="calendar-instructions">{t('calendar.markInstructions')}</p>
         </div>
+        {(currentMonth !== todayDate.getMonth() || currentYear !== todayDate.getFullYear()) && (
+          <button type="button" className="btn btn-outline btn-sm d3-cal-today" onClick={goToToday}>{t('calendarSync.today')}</button>
+        )}
         <button className="calendar-nav-btn" onClick={goToNextMonth} aria-label={t('common.next')}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M4 10L10 16L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(-90 10 10)"/>
@@ -1024,12 +1054,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         </button>
       </div>
       <div className="d3-cal-months">
-        {monthsShown.map(({ month, year }) => (
-          <div className="d3-cal-month" key={`${year}-${month}`}>
-            <p className="d3-cal-mname">{monthNames[month]}{monthsShown[0].year !== monthsShown[1].year ? ` ${year}` : ''}</p>
-            <div className="calendar-grid-inline">{renderCalendarDays(month, year)}</div>
-          </div>
-        ))}
+        <div className="calendar-grid-inline">{renderCalendarDays(currentMonth, currentYear)}</div>
       </div>
       {calendarLegend}
     </div>
@@ -1051,7 +1076,12 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             {focusedInfo.deals.map(({ deal, label }) => (
               <span key={deal.id} className="d3-cal-chip is-gig">{label}</span>
             ))}
-            {!focusedInfo.isFree && !focusedInfo.schedule && focusedInfo.deals.length === 0 && (
+            {focusedInfo.external.map((e) => (
+              <span key={e.id} className="d3-cal-chip is-external" title={e.location || undefined}>
+                {e.startTime ? `${e.startTime}${e.endTime ? `–${e.endTime}` : ''} ` : ''}{e.summary || t('calendarSync.unnamedEvent')}
+              </span>
+            ))}
+            {!focusedInfo.isFree && !focusedInfo.schedule && focusedInfo.deals.length === 0 && focusedInfo.external.length === 0 && (
               <span className="d3-cal-chip">{t('desktop.calNothingPlanned')}</span>
             )}
           </div>
@@ -1068,9 +1098,9 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   const desktopSummaryPanel = (
     <div className="d3-cal-card">
       <p className="d3-cal-lbl">{t('desktop.calSummary')}</p>
-      <div className="d3-cal-stat"><span>{t('desktop.calNightsFree')}</span><b>{twoMonthSummary.free}</b></div>
-      <div className="d3-cal-stat"><span>{t('desktop.calGigs')}</span><b>{twoMonthSummary.gigs}</b></div>
-      <div className="d3-cal-stat"><span>{t('desktop.calTrips')}</span><b>{twoMonthSummary.trips}</b></div>
+      <div className="d3-cal-stat"><span>{t('desktop.calNightsFree')}</span><b>{monthSummary.free}</b></div>
+      <div className="d3-cal-stat"><span>{t('desktop.calGigs')}</span><b>{monthSummary.gigs}</b></div>
+      <div className="d3-cal-stat"><span>{t('desktop.calTrips')}</span><b>{monthSummary.trips}</b></div>
     </div>
   );
 
@@ -1093,7 +1123,6 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             Desktop v3 shows this in the rail instead; it is a once-a-year
             setting and does not deserve the top of the page. */}
         {!nativeDesktop && profile?.role === 'ARTIST' && visibilitySection}
-        {!nativeDesktop && linkSection}
 
         {/* Schedules Display - Conditional based on role */}
         {isPromoterOrVenue ? (
@@ -1372,15 +1401,18 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           </>
         )}
 
-        {/* Desktop v3 rail: the day you clicked, the two-month totals, travel,
-            and the visibility setting — everything that is not the grid. */}
+        {/* Phone: the calendars (subscribe link + imported calendars) after everything else. */}
+        {!nativeDesktop && calendarsSection}
+
+        {/* Desktop v3 rail: the day you clicked, the month's totals, travel,
+            the visibility setting and the calendars — everything that is not the grid. */}
         {nativeDesktop && (
           <aside className="d3-cal-rail">
             {desktopDayPanel}
             {desktopSummaryPanel}
             {!isPromoterOrVenue && travelSection}
             {profile?.role === 'ARTIST' && visibilitySection}
-            {linkSection}
+            {calendarsSection}
           </aside>
         )}
       </div>
