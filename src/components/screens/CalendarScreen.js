@@ -11,6 +11,7 @@ import { clampDateRange } from '../../utils/dates';
 import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
+import CalendarLinkCard from '../common/CalendarLinkCard';
 
 /**
  * Own availability + travel schedule. With `targetProfile` (an agent editing a
@@ -975,6 +976,16 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     </div>
   );
 
+  // Subscribe link for the VIEWER's own TORA calendar (an agent's covers the
+  // whole active roster), so it stays the user's even while editing an
+  // artist's dates. Hidden in the free-tier preview.
+  const linkSection = !preview && user?.id ? (
+    <div className="dashboard-section">
+      <h3>{t('calendarSync.title')}</h3>
+      <CalendarLinkCard profileId={user.id} isAgent={user.role === 'AGENT'} compact />
+    </div>
+  ) : null;
+
   const calendarLegend = (
     <div className="calendar-legend">
       <div className="legend-item">
@@ -1080,6 +1091,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             Desktop v3 shows this in the rail instead; it is a once-a-year
             setting and does not deserve the top of the page. */}
         {!nativeDesktop && profile?.role === 'ARTIST' && visibilitySection}
+        {!nativeDesktop && linkSection}
 
         {/* Schedules Display - Conditional based on role */}
         {isPromoterOrVenue ? (
@@ -1366,6 +1378,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             {desktopSummaryPanel}
             {!isPromoterOrVenue && travelSection}
             {profile?.role === 'ARTIST' && visibilitySection}
+            {linkSection}
           </aside>
         )}
       </div>

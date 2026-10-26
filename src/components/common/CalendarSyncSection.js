@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { appAlert, appConfirm } from '../../utils/dialogs';
+import { appAlert } from '../../utils/dialogs';
+import CalendarLinkCard from './CalendarLinkCard';
 import { showToast } from '../../utils/toast';
 
 /**
@@ -30,9 +31,6 @@ const CalendarSyncSection = ({ profile }) => {
     setBusy(true);
     try { await fn(); if (toastKey) showToast(toastKey); await load(); } catch (e) { appAlert(e.message || t('common.error')); } finally { setBusy(false); }
   };
-  const copy = async (text, key) => {
-    try { await navigator.clipboard.writeText(text); showToast(key); } catch { appAlert(text); }
-  };
 
   if (!profileId || !data) return null;
   const isAgent = profile.role === 'AGENT';
@@ -40,39 +38,8 @@ const CalendarSyncSection = ({ profile }) => {
   return (
     <div className="settings-section calendar-sync-section">
       <h3>{t('calendarSync.title')}</h3>
-      <p className="form-hint" style={{ marginTop: 0 }}>{isAgent ? t('calendarSync.introAgent') : t('calendarSync.intro')}</p>
-
-      {!data.enabled ? (
-        <button className="btn btn-primary" disabled={busy} onClick={() => run(() => apiService.enableCalendarFeed(profileId), 'calendarSync.linkCreated')}>
-          {t('calendarSync.enable')}
-        </button>
-      ) : (
-        <>
-          <div className="calendar-link-row">
-            <div className="calendar-link-who">
-              <strong>{t('calendarSync.privateLink')}</strong>
-              <small>{t('calendarSync.privateHint')}</small>
-            </div>
-            <button className="btn btn-outline btn-sm" onClick={() => copy(data.privateUrl, 'calendarSync.copied')}>{t('calendarSync.copy')}</button>
-          </div>
-          <div className="calendar-link-row">
-            <div className="calendar-link-who">
-              <strong>{t('calendarSync.publicLink')}</strong>
-              <small>{t('calendarSync.publicHint')}</small>
-            </div>
-            <button className="btn btn-outline btn-sm" onClick={() => copy(data.publicUrl, 'calendarSync.copied')}>{t('calendarSync.copy')}</button>
-          </div>
-          <p className="form-hint">{t('calendarSync.howToAdd')}</p>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <button className="btn btn-outline btn-sm" disabled={busy} onClick={async () => {
-              if (await appConfirm(t('calendarSync.resetConfirm'), { confirmLabel: t('calendarSync.reset'), danger: true })) run(() => apiService.enableCalendarFeed(profileId), 'calendarSync.linkCreated');
-            }}>{t('calendarSync.reset')}</button>
-            <button className="btn btn-outline btn-sm" disabled={busy} onClick={async () => {
-              if (await appConfirm(t('calendarSync.disableConfirm'), { confirmLabel: t('calendarSync.disable'), danger: true })) run(() => apiService.disableCalendarFeed(profileId));
-            }}>{t('calendarSync.disable')}</button>
-          </div>
-        </>
-      )}
+      {/* The link itself is the shared card (also on Tour → Calendar). */}
+      <CalendarLinkCard profileId={profileId} isAgent={isAgent} onData={setData} />
 
       <h4 className="calendar-sync-sub">{t('calendarSync.importsTitle')}</h4>
       <p className="form-hint" style={{ marginTop: 0 }}>{t('calendarSync.importsIntro')}</p>
