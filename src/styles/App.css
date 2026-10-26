@@ -13448,6 +13448,17 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 /* Calendars on Tour → Calendar: the subscribe link card + imported calendars */
 .calendar-link-intro { margin: 0 0 14px; }
 .calendars-section .calendar-link-card + .calendar-imports-card { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.calendar-review-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255, 51, 102, 0.35); background: rgba(255, 51, 102, 0.08); }
+.calendar-review-card .btn { flex: 0 0 auto; }
+.calendar-review-modal { max-width: 620px; width: 95%; }
+.calendar-review-item { padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 8px; }
+.calendar-review-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.calendar-review-head strong { display: block; font-size: 14px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-review-head small, .calendar-review-read { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.calendar-review-kind { display: flex; gap: 6px; flex: 0 0 auto; }
+.calendar-review-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.calendar-review-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.calendar-day-chip.is-external-gig { background: rgba(255, 51, 102, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 51, 102, 0.45); color: #fff; }
 .calendar-imports-card .calendar-sync-sub { margin-top: 0; }
 .calendar-link-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
 .calendar-link-who { display: flex; flex-direction: column; min-width: 0; }

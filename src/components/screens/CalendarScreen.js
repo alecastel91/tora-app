@@ -13,6 +13,8 @@ import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import CalendarLinkCard from '../common/CalendarLinkCard';
 import CalendarImportsCard from '../common/CalendarImportsCard';
+import CalendarReviewSheet from '../common/CalendarReviewSheet';
+import { openPremium } from '../../utils/subscription';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
 import useExternalEvents from '../../hooks/useExternalEvents';
 
@@ -181,7 +183,33 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // The viewer's own imported calendar events for the month on screen
   // (owner-only); bumped after an import is added, removed or refreshed.
   const [eventsVersion, setEventsVersion] = useState(0);
-  const externalByDay = useExternalEvents(!preview && user?.id ? user.id : null, currentYear, currentMonth, eventsVersion);
+  const ownerId = !preview && user?.id ? user.id : null;
+  const externalByDay = useExternalEvents(ownerId, currentYear, currentMonth, eventsVersion);
+  // What TORA recognised in those events and still waits for a decision.
+  const [review, setReview] = useState(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [recognising, setRecognising] = useState(false);
+  useEffect(() => {
+    if (!ownerId) { setReview(null); return; }
+    let cancelled = false;
+    apiService.getCalendarReview(ownerId).then((r) => { if (!cancelled) setReview(r); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [ownerId, eventsVersion]);
+  const recogniseNow = async () => {
+    if (recognising) return;
+    setRecognising(true);
+    try { await apiService.classifyCalendar(ownerId); setEventsVersion((v) => v + 1); } catch (e) { appAlert(e.message || t('common.error')); } finally { setRecognising(false); }
+  };
+  // A decision came back with the target profile's new dates and trips: if
+  // that is the calendar on screen, mirror it at once (and into the context).
+  const onReviewDecided = ({ target }) => {
+    if (target && profile?.id === target.id) {
+      setSelectedDates(new Set(target.availableDates || []));
+      setSchedules(target.travelSchedule || []);
+      applyUpdate({ ...profile, availableDates: target.availableDates || [], travelSchedule: target.travelSchedule || [] });
+    }
+    setEventsVersion((v) => v + 1);
+  };
   
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
@@ -766,7 +794,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       // Cells are a fixed height so the grid never reflows around its content:
       // three chips and a count on the desktop's wide month, two on the phone.
       const chipLimit = nativeDesktop ? 3 : 2;
-      const dayExternal = externalByDay[dateKey] || [];
+      const dayExternal = (externalByDay[dateKey] || []).filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED'));
       const extraCount = Math.max(0, dayDeals.length + dayExternal.length - chipLimit);
       const externalShown = dayExternal.slice(0, Math.max(0, chipLimit - dayDeals.length));
 
@@ -834,7 +862,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
               {externalShown.map((e) => (
                 <span
                   key={e.id}
-                  className="calendar-day-chip is-external"
+                  className={`calendar-day-chip is-external${e.kind === 'GIG' && e.status === 'CONFIRMED' ? ' is-external-gig' : ''}`}
                   title={`${e.startTime ? `${e.startTime} ` : ''}${e.summary || t('calendarSync.unnamedEvent')}${e.location ? ` · ${e.location}` : ''}`}
                   onMouseDown={(ev) => ev.stopPropagation()}
                   onTouchStart={(ev) => ev.stopPropagation()}
@@ -890,7 +918,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     let free = 0;
     selectedDates.forEach((key) => { if (prefixes.some((p) => String(key).startsWith(p))) free += 1; });
     const gigs = monthsShown.reduce(
-      (n, { month, year }) => n + Object.values(dealsFor(month, year)).reduce((m, list) => m + list.length, 0), 0);
+      (n, { month, year }) => n + Object.values(dealsFor(month, year)).reduce((m, list) => m + list.length, 0), 0)
+      + new Set(Object.values(externalByDay).flat().filter((e) => e.kind === 'GIG' && e.status === 'CONFIRMED').map((e) => e.id)).size;
     // A trip counts once if any of its nights fall inside the window.
     const windowStart = new Date(monthsShown[0].year, monthsShown[0].month, 1);
     const last = monthsShown[monthsShown.length - 1];
@@ -1007,11 +1036,43 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // agent's covers the whole active roster) and the external calendars they
   // read into TORA — both the user's own, even while editing an artist's
   // dates. Hidden in the free-tier preview.
+  const reviewCounts = review ? {
+    gigs: review.items.filter((i) => i.kind === 'GIG').length,
+    trips: review.items.filter((i) => i.kind === 'TRAVEL').length,
+  } : null;
+  const hasImports = (calendarSettings.data?.imports || []).length > 0;
+  // "Found in your calendar": shown once a calendar is connected. Yearly
+  // members get the recognition; others see what it would do.
+  const reviewCard = ownerId && review && hasImports ? (
+    <div className="calendar-review-card">
+      {review.items.length > 0 ? (
+        <>
+          <p className="m-0 text-sm text-white">{t('calendarSync.foundLine', { gigs: reviewCounts.gigs, trips: reviewCounts.trips })}</p>
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setReviewOpen(true)}>{t('calendarSync.reviewButton')}</button>
+        </>
+      ) : !review.yearly ? (
+        <>
+          <p className="form-hint m-0">{t('calendarSync.recogniseTeaser')}</p>
+          <button type="button" className="btn btn-outline btn-sm" onClick={openPremium}>{t('aiFeatures.yearlyOnly')}</button>
+        </>
+      ) : review.unread > 0 ? (
+        <>
+          <p className="form-hint m-0">{t('calendarSync.unreadLine', { n: review.unread })}</p>
+          <button type="button" className="btn btn-outline btn-sm" disabled={recognising} onClick={recogniseNow}>{recognising ? '…' : t('calendarSync.recogniseNow')}</button>
+        </>
+      ) : (
+        <p className="form-hint m-0">{t('calendarSync.nothingToReview')}</p>
+      )}
+    </div>
+  ) : null;
+
   const calendarsSection = !preview && user?.id ? (
     <div className="dashboard-section calendars-section">
       <h3>{t('calendarSync.title')}</h3>
+      {reviewCard}
       <CalendarLinkCard profileId={user.id} settings={calendarSettings} isAgent={user.role === 'AGENT'} compact />
       <CalendarImportsCard profileId={user.id} settings={calendarSettings} onChanged={() => setEventsVersion((v) => v + 1)} />
+      <CalendarReviewSheet isOpen={reviewOpen} profileId={user.id} review={review} onClose={() => setReviewOpen(false)} onDecided={onReviewDecided} />
     </div>
   ) : null;
 
@@ -1076,8 +1137,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             {focusedInfo.deals.map(({ deal, label }) => (
               <span key={deal.id} className="d3-cal-chip is-gig">{label}</span>
             ))}
-            {focusedInfo.external.map((e) => (
-              <span key={e.id} className="d3-cal-chip is-external" title={e.location || undefined}>
+            {focusedInfo.external.filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED')).map((e) => (
+              <span key={e.id} className={`d3-cal-chip ${e.kind === 'GIG' && e.status === 'CONFIRMED' ? 'is-gig' : 'is-external'}`} title={e.location || undefined}>
                 {e.startTime ? `${e.startTime}${e.endTime ? `–${e.endTime}` : ''} ` : ''}{e.summary || t('calendarSync.unnamedEvent')}
               </span>
             ))}

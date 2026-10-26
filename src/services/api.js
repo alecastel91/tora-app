@@ -571,6 +571,21 @@ class ApiService {
     const response = await fetch(`${API_URL}/calendar/${profileId}/feed`, { method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify({ showAvailable }) });
     return this.handleResponse(response);
   }
+  /** Recognised gigs / trips waiting for a decision (+ unread count, roster for agents). */
+  async getCalendarReview(profileId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/review`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  /** Read the unread events now (Yearly). */
+  async classifyCalendar(profileId) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/review/classify`, { method: 'POST', headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+  /** { action: 'confirm'|'dismiss', kind?, artistProfileId?, city?, country?, venue? } → { event, target }. */
+  async decideCalendarEvent(profileId, eventId, body) {
+    const response = await fetch(`${API_URL}/calendar/${profileId}/events/${eventId}`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body) });
+    return this.handleResponse(response);
+  }
   /** The owner's imported events touching [from, to] (YYYY-MM-DD, inclusive). */
   async getCalendarEvents(profileId, from, to) {
     const response = await fetch(`${API_URL}/calendar/${profileId}/events?from=${from}&to=${to}`, { headers: this.getHeaders() });
