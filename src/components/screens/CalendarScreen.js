@@ -12,6 +12,7 @@ import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import CalendarLinkCard from '../common/CalendarLinkCard';
+import useCalendarSettings from '../../hooks/useCalendarSettings';
 
 /**
  * Own availability + travel schedule. With `targetProfile` (an agent editing a
@@ -22,6 +23,7 @@ import CalendarLinkCard from '../common/CalendarLinkCard';
 const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, targetProfile = null, preview = false }) => {
   const { t } = useLanguage();
   const { user, updateUser } = useAppContext();
+  const calendarSettings = useCalendarSettings(!preview && user?.id ? user.id : null);
   // A target (agent editing a represented artist) is owned here: the parent
   // hands in { id, name, role } and this screen loads and keeps the fresh row.
   // Remounted per artist (key) by the parent, so no cross-artist bleed.
@@ -982,7 +984,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   const linkSection = !preview && user?.id ? (
     <div className="dashboard-section">
       <h3>{t('calendarSync.title')}</h3>
-      <CalendarLinkCard profileId={user.id} isAgent={user.role === 'AGENT'} compact />
+      <CalendarLinkCard profileId={user.id} settings={calendarSettings} isAgent={user.role === 'AGENT'} compact />
     </div>
   ) : null;
 

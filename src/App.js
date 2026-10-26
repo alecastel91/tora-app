@@ -20,6 +20,7 @@ import CalendarSyncSection from './components/common/CalendarSyncSection';
 import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
 import { billingTier, accountPlan } from './utils/subscription';
+import { premiumFeatureRows } from './utils/premiumFeatures';
 import { formatMoney, MEMBER_PRICES, AGENT_PRICES, EXTRA_PRICES, normalizeCurrency, yearlyPerMonth } from './utils/money';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAppContext } from './contexts/AppContext';
@@ -807,6 +808,19 @@ function App() {
     </button>
   );
 
+  // One comparison row from utils/premiumFeatures (the desktop plan columns
+  // read the same data): true = ✓, false = —, a string is shown as is.
+  const cell = (v) => (v === true ? '✓' : v === false ? '—' : v);
+  const FeatureRow = ({ row, style }) => (
+    <div className="features-table-row" style={style}>
+      <FeatureName k={row.key} />
+      <div className="tier-value">{cell(row.free)}</div>
+      <div className="tier-value">{cell(row.monthly)}</div>
+      <div className="tier-value tier-value-highlight">{cell(row.yearly)}</div>
+    </div>
+  );
+  const featureRows = premiumFeatureRows(user, t);
+
   const handleSubscriptionComplete = () => {
     setShowSubscription(false);
     setShowPremium(false);
@@ -1473,111 +1487,7 @@ function App() {
                   <div className="tier-col tier-col-highlight">{t('premium.yearly')}</div>
                 </div>
 
-                <div className="features-table-row">
-                  <FeatureName k="searchVisibility" />
-                  <div className="tier-value">{t('premium.usersCity')}</div>
-                  <div className="tier-value">Global</div>
-                  <div className="tier-value tier-value-highlight">Global</div>
-                </div>
-
-                <div className="features-table-row">
-                  <FeatureName k="professionalDashboard" />
-                  <div className="tier-value">{t('premium.preview')}</div>
-                  <div className="tier-value">✓</div>
-                  <div className="tier-value tier-value-highlight">✓</div>
-                </div>
-
-                {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
-                  <div className="features-table-row">
-                    <FeatureName k="updateTravelSchedule" />
-                    <div className="tier-value">—</div>
-                    <div className="tier-value">✓</div>
-                    <div className="tier-value tier-value-highlight">✓</div>
-                  </div>
-                )}
-
-                <div className="features-table-row">
-                  <FeatureName k="calendarMatching" />
-                  <div className="tier-value">—</div>
-                  <div className="tier-value">✓</div>
-                  <div className="tier-value tier-value-highlight">✓</div>
-                </div>
-
-                <div className="features-table-row">
-                  <FeatureName k="tourKickstarter" />
-                  <div className="tier-value">—</div>
-                  <div className="tier-value">✓</div>
-                  <div className="tier-value tier-value-highlight">✓</div>
-                </div>
-
-                {(user?.role === 'PROMOTER' || user?.role === 'VENUE') && (
-                  <div className="features-table-row">
-                    <FeatureName k="artistTravelAlerts" />
-                    <div className="tier-value">—</div>
-                    <div className="tier-value">—</div>
-                    <div className="tier-value tier-value-highlight">✓</div>
-                  </div>
-                )}
-
-                <div className="features-table-row">
-                  <FeatureName k="calendarPrivacy" />
-                  <div className="tier-value">—</div>
-                  <div className="tier-value">—</div>
-                  <div className="tier-value tier-value-highlight">✓</div>
-                </div>
-
-                {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
-                  <div className="features-table-row">
-                    <FeatureName k="feePrivacy" />
-                    <div className="tier-value">—</div>
-                    <div className="tier-value">—</div>
-                    <div className="tier-value tier-value-highlight">✓</div>
-                  </div>
-                )}
-
-                {(user?.role === 'ARTIST' || user?.role === 'AGENT') && (
-                  <>
-                    <div className="features-table-row">
-                      <FeatureName k="aiInvoices" />
-                      <div className="tier-value">—</div>
-                      <div className="tier-value">—</div>
-                      <div className="tier-value tier-value-highlight">✓</div>
-                    </div>
-                    <div className="features-table-row">
-                      <FeatureName k="aiContracts" />
-                      <div className="tier-value">—</div>
-                      <div className="tier-value">—</div>
-                      <div className="tier-value tier-value-highlight">✓</div>
-                    </div>
-                  </>
-                )}
-
-                <div className="features-table-row">
-                  <FeatureName k="messaging" />
-                  <div className="tier-value">✓</div>
-                  <div className="tier-value">✓</div>
-                  <div className="tier-value tier-value-highlight">✓</div>
-                </div>
-
-                <div className="features-table-row">
-                  <FeatureName k="prioritySearch" />
-                  <div className="tier-value">—</div>
-                  <div className="tier-value">—</div>
-                  <div className="tier-value tier-value-highlight">✓</div>
-                </div>
-
-                <div className="features-table-row">
-                  <FeatureName k="sendLikes" />
-                  <div className="tier-value">2 x day</div>
-                  <div className="tier-value">5 x day</div>
-                  <div className="tier-value tier-value-highlight">Unlimited</div>
-                </div>
-                <div className="features-table-row">
-                  <FeatureName k="sendOffers" />
-                  <div className="tier-value">{t('premium.perMonth', { n: 3 })}</div>
-                  <div className="tier-value tier-value-highlight">{t('premium.unlimited')}</div>
-                  <div className="tier-value tier-value-highlight">{t('premium.unlimited')}</div>
-                </div>
+                {featureRows.filter((r) => r.key !== 'connectionRequests').map((r) => <FeatureRow key={r.key} row={r} />)}
               </div>
 
               <div className="premium-extras-note">
@@ -1585,12 +1495,7 @@ function App() {
               </div>
 
               <div className="features-table" style={{ marginTop: '0' }}>
-                <div className="features-table-row" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                  <FeatureName k="connectionRequests" />
-                  <div className="tier-value">3 x month</div>
-                  <div className="tier-value">10 x month</div>
-                  <div className="tier-value tier-value-highlight">Unlimited</div>
-                </div>
+                <FeatureRow row={featureRows.find((r) => r.key === 'connectionRequests')} style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }} />
               </div>
 
               <div className="premium-extras-note">

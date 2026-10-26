@@ -1,7 +1,6 @@
 // The Premium comparison, as data: one row per feature with its value on each
-// plan. The phone's table in App.js still spells these rows out in JSX; the
-// desktop plan columns (components/desktop/PremiumPlans) read them from here.
-// Keep the two in step — values are the product's limits, not copy.
+// plan. Both the phone table (App.js) and the desktop plan columns
+// (components/desktop/PremiumPlans) render from here.
 //
 // value: true = included, false = not included, string = a t() key or literal.
 

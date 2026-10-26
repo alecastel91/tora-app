@@ -13,9 +13,12 @@ class ApiService {
 
   // Set authorization header
   getHeaders() {
-    const headers = {
-      'Content-Type': 'application/json'
-    };
+    return { 'Content-Type': 'application/json', ...this.getAuthHeaders() };
+  }
+
+  /** Authorization only — for multipart bodies, where the browser sets Content-Type (with the boundary). */
+  getAuthHeaders() {
+    const headers = {};
 
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
@@ -488,10 +491,13 @@ class ApiService {
     return this.handleResponse(response);
   }
   async learnInvoiceProfile(profileId, files) {
+    return this.postPdfs(`/invoices/profile/${profileId}/learn`, 'invoices', files);
+  }
+  /** Upload past PDFs for one of the AI readers. */
+  async postPdfs(path, field, files) {
     const form = new FormData();
-    for (const f of files) form.append('invoices', f);
-    const { 'Content-Type': _ct, ...headers } = this.getHeaders();
-    const response = await fetch(`${API_URL}/invoices/profile/${profileId}/learn`, { method: 'POST', headers, body: form });
+    for (const f of files) form.append(field, f);
+    const response = await fetch(`${API_URL}${path}`, { method: 'POST', headers: this.getAuthHeaders(), body: form });
     return this.handleResponse(response);
   }
   async saveInvoiceProfile(profileId, profile) {
@@ -516,11 +522,7 @@ class ApiService {
     return this.handleResponse(response);
   }
   async learnContractTemplate(profileId, files) {
-    const form = new FormData();
-    for (const f of files) form.append('contracts', f);
-    const { 'Content-Type': _ct, ...headers } = this.getHeaders();
-    const response = await fetch(`${API_URL}/contract-templates/${profileId}/learn`, { method: 'POST', headers, body: form });
-    return this.handleResponse(response);
+    return this.postPdfs(`/contract-templates/${profileId}/learn`, 'contracts', files);
   }
   async saveContractTemplate(profileId, template) {
     const response = await fetch(`${API_URL}/contract-templates/${profileId}`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ template }) });

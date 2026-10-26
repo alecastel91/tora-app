@@ -10,6 +10,9 @@ import { isPaidAgent } from './agentTiers';
  * for them, but they never pay. Billing surfaces (Premium page, seat picker)
  * read the tier through here so a comp account is shown the public prices.
  */
+/** Open the Premium screen from anywhere (App.js listens for this event). */
+export const openPremium = () => window.dispatchEvent(new CustomEvent('tora:open-premium'));
+
 export const isCompAccount = (user) => !!user?.isAdminOperated;
 export const billingTier = (user) => (isCompAccount(user) ? 'FREE' : (user?.subscriptionTier || 'FREE'));
 

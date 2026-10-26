@@ -31,3 +31,12 @@ export function appConfirm(message, opts = {}) {
   }
   return pushDialog({ type: 'confirm', message, ...opts });
 }
+
+/**
+ * Copy text to the clipboard. Resolves true when it worked; when the
+ * clipboard is unavailable (http dev host, old WebView) shows the text in an
+ * alert so it can still be copied by hand.
+ */
+export async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch { appAlert(text); return false; }
+}

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { appAlert, appConfirm } from '../../utils/dialogs';
+import { appConfirm, copyText } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
+import useBusyAction from '../../hooks/useBusyAction';
 
 /**
  * The subscribe link for this profile's TORA calendar (Google / Apple /
@@ -11,40 +12,25 @@ import { showToast } from '../../utils/toast';
  * two never drift. For an agent the link covers every active roster artist,
  * so it always belongs to the viewer's own profile, never to a roster artist.
  *
- * `onData(data)` reports the loaded settings (imports etc.) to a parent that
- * renders more than the link; `compact` drops the how-to paragraph.
+ * `settings` is the `{ data, reload }` from useCalendarSettings, owned by the
+ * screen; `compact` drops the how-to paragraph.
  */
-const CalendarLinkCard = ({ profileId, isAgent = false, compact = false, onData = null }) => {
+const CalendarLinkCard = ({ profileId, settings, isAgent = false, compact = false }) => {
   const { t } = useLanguage();
-  const [data, setData] = useState(null);
-  const [busy, setBusy] = useState(false);
-
-  const load = async () => {
-    try { const d = await apiService.getCalendarSettings(profileId); setData(d); if (onData) onData(d); } catch { setData({ enabled: false, imports: [] }); }
-  };
-  useEffect(() => { if (profileId) load(); }, [profileId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const run = async (fn, toastKey) => {
-    if (busy) return;
-    setBusy(true);
-    try { await fn(); if (toastKey) showToast(toastKey); await load(); } catch (e) { appAlert(e.message || t('common.error')); } finally { setBusy(false); }
-  };
-  const copy = async (text) => {
-    try { await navigator.clipboard.writeText(text); showToast('calendarSync.copied'); } catch { appAlert(text); }
-  };
+  const { data, reload } = settings;
+  const [busy, run] = useBusyAction(reload);
+  const copy = async (text) => { if (await copyText(text)) showToast('calendarSync.copied'); };
 
   if (!profileId || !data) return null;
+  const intro = <p className="form-hint" style={{ marginTop: 0 }}>{isAgent ? t('calendarSync.introAgent') : t('calendarSync.intro')}</p>;
 
   return (
     <div className="calendar-link-card">
-      {!compact && <p className="form-hint" style={{ marginTop: 0 }}>{isAgent ? t('calendarSync.introAgent') : t('calendarSync.intro')}</p>}
+      {(!compact || !data.enabled) && intro}
       {!data.enabled ? (
-        <>
-          {compact && <p className="form-hint" style={{ marginTop: 0 }}>{isAgent ? t('calendarSync.introAgent') : t('calendarSync.intro')}</p>}
-          <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => run(() => apiService.enableCalendarFeed(profileId), 'calendarSync.linkCreated')}>
-            {t('calendarSync.enable')}
-          </button>
-        </>
+        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => run(() => apiService.enableCalendarFeed(profileId), { toast: 'calendarSync.linkCreated' })}>
+          {t('calendarSync.enable')}
+        </button>
       ) : (
         <>
           <div className="calendar-link-row">
@@ -64,7 +50,7 @@ const CalendarLinkCard = ({ profileId, isAgent = false, compact = false, onData 
           {!compact && <p className="form-hint">{t('calendarSync.howToAdd')}</p>}
           <div className="flex flex-wrap gap-2 mt-2">
             <button className="btn btn-outline btn-sm" disabled={busy} onClick={async () => {
-              if (await appConfirm(t('calendarSync.resetConfirm'), { confirmLabel: t('calendarSync.reset'), danger: true })) run(() => apiService.enableCalendarFeed(profileId), 'calendarSync.linkCreated');
+              if (await appConfirm(t('calendarSync.resetConfirm'), { confirmLabel: t('calendarSync.reset'), danger: true })) run(() => apiService.enableCalendarFeed(profileId), { toast: 'calendarSync.linkCreated' });
             }}>{t('calendarSync.reset')}</button>
             <button className="btn btn-outline btn-sm" disabled={busy} onClick={async () => {
               if (await appConfirm(t('calendarSync.disableConfirm'), { confirmLabel: t('calendarSync.disable'), danger: true })) run(() => apiService.disableCalendarFeed(profileId));

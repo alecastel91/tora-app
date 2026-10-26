@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import OverlayPortal from './OverlayPortal';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { appAlert } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
-import { formatMoney } from '../../utils/money';
+import { formatFee } from '../../utils/dealStatus';
+import useBusyAction from '../../hooks/useBusyAction';
+
+// The deal's own currency, whatever it is (money.js formats only the three
+// billing currencies TORA charges in).
+const dealMoney = (n, cur) => `${formatFee(n)} ${cur}`;
 
 /**
  * Issue an invoice for an accepted booking, in the member's own style
@@ -20,8 +24,10 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   const [number, setNumber] = useState('');
   const [send, setSend] = useState(true);
   const [preview, setPreview] = useState(null); // { blobUrl, number, amount, currency }
-  const [busy, setBusy] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [busy, run] = useBusyAction();
+  // The booking card points to the setup page instead of showing an error.
+  const orSetup = (e) => { if (e.code !== 'INVOICE_PROFILE_MISSING') return false; setNeedsSetup(true); return true; };
 
   const pay = deal?.payment || {};
   const paid = Number(pay.depositAmount) || 0;
@@ -44,31 +50,17 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
 
   const body = () => ({ profileId: currentUser.id, dealId: deal.id, kind, ...(amount !== '' ? { amount: Number(amount) } : {}), ...(number.trim() ? { number: number.trim() } : {}) });
 
-  const doPreview = async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      const p = await apiService.previewInvoice(body());
-      setPreview({ ...p, number: p.number ? decodeURIComponent(p.number) : p.number });
-    } catch (e) {
-      if (e.code === 'INVOICE_PROFILE_MISSING') setNeedsSetup(true);
-      else appAlert(e.message || t('common.error'));
-    } finally { setBusy(false); }
-  };
+  const doPreview = () => run(async () => {
+    const p = await apiService.previewInvoice(body());
+    setPreview({ ...p, number: p.number ? decodeURIComponent(p.number) : p.number });
+  }, { onError: orSetup });
 
-  const doIssue = async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      const r = await apiService.issueInvoice({ ...body(), send });
-      showToast(r.emailed ? 'invoices.issuedAndSent' : 'invoices.issued');
-      if (onIssued) onIssued(r.deal);
-      onClose();
-    } catch (e) {
-      if (e.code === 'INVOICE_PROFILE_MISSING') setNeedsSetup(true);
-      else appAlert(e.message || t('common.error'));
-    } finally { setBusy(false); }
-  };
+  const doIssue = () => run(async () => {
+    const r = await apiService.issueInvoice({ ...body(), send });
+    showToast(r.emailed ? 'invoices.issuedAndSent' : 'invoices.issued');
+    if (onIssued) onIssued(r.deal);
+    onClose();
+  }, { onError: orSetup });
 
   return (
     <OverlayPortal>
@@ -76,7 +68,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
         <div className="delete-modal invoice-modal" onClick={(e) => e.stopPropagation()}>
           <div className="delete-modal-content">
             <h2 className="modal-title">{t('invoices.issueTitle')}</h2>
-            <p className="form-hint" style={{ marginTop: 0 }}>{deal.eventName || deal.venueName} · {t('invoices.feeLine', { fee: formatMoney(fee, currency) })}{paid > 0 ? ` · ${t('invoices.paidSoFar', { paid: formatMoney(paid, currency) })}` : ''}</p>
+            <p className="form-hint" style={{ marginTop: 0 }}>{deal.eventName || deal.venueName} · {t('invoices.feeLine', { fee: dealMoney(fee, currency) })}{paid > 0 ? ` · ${t('invoices.paidSoFar', { paid: dealMoney(paid, currency) })}` : ''}</p>
 
             {needsSetup ? (
               <div className="agency-card">
@@ -101,7 +93,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
                 {preview?.blobUrl && (
                   <div className="invoice-preview">
                     <iframe title="invoice preview" src={preview.blobUrl} />
-                    <p className="form-hint">{t('invoices.previewLine', { number: preview.number, amount: formatMoney(preview.amount, preview.currency || currency) })}</p>
+                    <p className="form-hint">{t('invoices.previewLine', { number: preview.number, amount: dealMoney(preview.amount, preview.currency || currency) })}</p>
                   </div>
                 )}
 

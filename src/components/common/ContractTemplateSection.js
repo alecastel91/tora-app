@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { appAlert, appConfirm } from '../../utils/dialogs';
-import { showToast } from '../../utils/toast';
+import { appConfirm } from '../../utils/dialogs';
 import { FileTextIcon } from '../../utils/icons';
-import { isYearlyViewer } from '../../utils/subscription';
+import { isYearlyViewer, openPremium } from '../../utils/subscription';
+import useLearnedDocument from '../../hooks/useLearnedDocument';
 
 /**
  * Profile → Manage → Documents → Contract template.
@@ -12,50 +12,25 @@ import { isYearlyViewer } from '../../utils/subscription';
  * template with {{placeholders}} for the deal values. Review every section,
  * edit, save. New bookings are then drafted from it on the booking card.
  */
+const BLANK = { language: 'en', title: 'Performance Agreement', sections: [{ heading: '', body: '' }], signatureBlock: 'For {{artist}}: ____________  Date: ______\nFor {{booker}}: ____________  Date: ______', notes: '' };
+const API = { get: (id) => apiService.getContractTemplate(id), learn: (id, files) => apiService.learnContractTemplate(id, files), save: (id, draft) => apiService.saveContractTemplate(id, draft) };
+
 const ContractTemplateSection = ({ profile }) => {
   const { t } = useLanguage();
-  const [saved, setSaved] = useState(null);
-  const [draft, setDraft] = useState(null);
   const [placeholders, setPlaceholders] = useState([]);
-  const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const profileId = profile?.id;
   const yearly = isYearlyViewer(profile);
-
-  useEffect(() => {
-    if (!profileId) return;
-    apiService.getContractTemplate(profileId).then((d) => { setSaved(d.template); setDraft(d.template); setPlaceholders(d.placeholders || []); }).catch(() => {});
-  }, [profileId]);
+  const { saved, draft, setDraft, busy, dirty, onFiles, save } = useLearnedDocument({
+    profileId, api: API, pick: (r) => r.template, maxFiles: 5, toasts: { learned: 'contracts.learned', saved: 'contracts.saved' },
+    onLoaded: (r) => setPlaceholders(r.placeholders || []),
+  });
 
   if (!profileId) return null;
-
-  const onFiles = async (e) => {
-    const files = [...(e.target.files || [])].slice(0, 5);
-    e.target.value = '';
-    if (!files.length) return;
-    if (files.some((f) => f.type !== 'application/pdf' || f.size > 10 * 1024 * 1024)) { appAlert(t('invoices.pdfOnly')); return; }
-    setBusy(true);
-    try {
-      const r = await apiService.learnContractTemplate(profileId, files);
-      setDraft(r.template);
-      showToast('contracts.learned');
-    } catch (err) { appAlert(err.message || t('common.error')); } finally { setBusy(false); }
-  };
-
-  const save = async () => {
-    if (busy || !draft) return;
-    setBusy(true);
-    try {
-      const r = await apiService.saveContractTemplate(profileId, draft);
-      setSaved(r.template); setDraft(r.template);
-      showToast('contracts.saved');
-    } catch (err) { appAlert(err.message || t('common.error')); } finally { setBusy(false); }
-  };
 
   const setSection = (i, patch) => setDraft((d) => ({ ...d, sections: d.sections.map((s, j) => (j === i ? { ...s, ...patch } : s)) }));
   const removeSection = async (i) => { if (await appConfirm(t('contracts.removeClauseConfirm'), { confirmLabel: t('contracts.removeClause'), danger: true })) setDraft((d) => ({ ...d, sections: d.sections.filter((_, j) => j !== i) })); };
   const addSection = () => setDraft((d) => ({ ...d, sections: [...(d.sections || []), { heading: '', body: '' }] }));
-  const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
 
   return (
     <div className="dashboard-section contract-template">
@@ -63,8 +38,8 @@ const ContractTemplateSection = ({ profile }) => {
       <p className="form-hint" style={{ marginTop: 0 }}>{t('contracts.setupIntro')}</p>
       <input ref={fileRef} type="file" accept="application/pdf" multiple style={{ display: 'none' }} onChange={onFiles} />
       <div className="flex flex-wrap gap-2 mb-3">
-        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => { if (!yearly) { window.dispatchEvent(new CustomEvent('tora:open-premium')); return; } fileRef.current?.click(); }} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>{busy ? '…' : saved ? t('contracts.relearn') : t('contracts.uploadExamples')}</button>
-        {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft({ language: 'en', title: 'Performance Agreement', sections: [{ heading: '', body: '' }], signatureBlock: 'For {{artist}}: ____________  Date: ______\nFor {{booker}}: ____________  Date: ______', notes: '' })}>{t('invoices.startBlank')}</button>}
+        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => (yearly ? fileRef.current?.click() : openPremium())} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>{busy ? '…' : saved ? t('contracts.relearn') : t('contracts.uploadExamples')}</button>
+        {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft(BLANK)}>{t('invoices.startBlank')}</button>}
       </div>
       <p className="form-hint">{!yearly && <>{t('aiFeatures.yearlyOnly')} </>}{t('contracts.privacy')} {t('contracts.notLegalAdvice')}</p>
 

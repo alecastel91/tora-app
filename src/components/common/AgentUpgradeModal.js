@@ -1,4 +1,5 @@
 import React from 'react';
+import { openPremium } from '../../utils/subscription';
 import OverlayPortal from './OverlayPortal';
 import AgentPlanCard from './AgentPlanCard';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -24,7 +25,7 @@ const AgentUpgradeModal = ({ isOpen, onClose }) => {
             currency={billingCurrency}
             onSelectPlan={() => {
               onClose();
-              window.dispatchEvent(new CustomEvent('tora:open-premium'));
+              openPremium();
             }}
           />
         </div>

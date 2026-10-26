@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { appAlert } from '../../utils/dialogs';
-import { showToast } from '../../utils/toast';
 import { FileTextIcon } from '../../utils/icons';
-import { isYearlyViewer } from '../../utils/subscription';
+import { isYearlyViewer, openPremium } from '../../utils/subscription';
+import useLearnedDocument from '../../hooks/useLearnedDocument';
 
 /**
  * Profile → Manage → Documents → Invoices.
@@ -22,50 +21,20 @@ const FIELD_GROUPS = [
 ];
 const MULTILINE = new Set(['issuerAddress', 'paymentTerms', 'bankDetails', 'footerNote']);
 const TAX_MODES = ['none', 'added', 'included', 'reverse_charge'];
+const BLANK = { language: 'en', title: 'Invoice', numberPattern: '{YYYY}-{SEQ:4}', nextSequence: '1', taxMode: 'none', currencyDefault: 'EUR' };
+const API = { get: (id) => apiService.getInvoiceProfile(id), learn: (id, files) => apiService.learnInvoiceProfile(id, files), save: (id, draft) => apiService.saveInvoiceProfile(id, draft) };
 
 const InvoiceSetupSection = ({ profile }) => {
   const { t } = useLanguage();
-  const [saved, setSaved] = useState(null);
-  const [draft, setDraft] = useState(null);
-  const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
   const profileId = profile?.id;
   const yearly = isYearlyViewer(profile);
-
-  useEffect(() => {
-    if (!profileId) return;
-    apiService.getInvoiceProfile(profileId).then((d) => { setSaved(d.profile); setDraft(d.profile); }).catch(() => {});
-  }, [profileId]);
+  const { saved, draft, setDraft, busy, dirty, onFiles, save } = useLearnedDocument({
+    profileId, api: API, pick: (r) => r.profile, maxFiles: 3, toasts: { learned: 'invoices.learned', saved: 'invoices.saved' },
+  });
 
   if (!profileId) return null;
-
-  const onFiles = async (e) => {
-    const files = [...(e.target.files || [])].slice(0, 3);
-    e.target.value = '';
-    if (!files.length) return;
-    if (files.some((f) => f.type !== 'application/pdf' || f.size > 10 * 1024 * 1024)) { appAlert(t('invoices.pdfOnly')); return; }
-    setBusy(true);
-    try {
-      const r = await apiService.learnInvoiceProfile(profileId, files);
-      setDraft(r.profile);
-      showToast('invoices.learned');
-    } catch (err) {
-      appAlert(err.message || t('common.error'));
-    } finally { setBusy(false); }
-  };
-
-  const save = async () => {
-    if (busy || !draft) return;
-    setBusy(true);
-    try {
-      const r = await apiService.saveInvoiceProfile(profileId, draft);
-      setSaved(r.profile); setDraft(r.profile);
-      showToast('invoices.saved');
-    } catch (err) { appAlert(err.message || t('common.error')); } finally { setBusy(false); }
-  };
-
   const set = (k, v) => setDraft((d) => ({ ...d, [k]: v }));
-  const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
 
   return (
     <div className="dashboard-section invoice-setup">
@@ -75,10 +44,10 @@ const InvoiceSetupSection = ({ profile }) => {
       <p className="form-hint" style={{ marginTop: 0 }}>{t('invoices.setupIntro')}</p>
       <input ref={fileRef} type="file" accept="application/pdf" multiple style={{ display: 'none' }} onChange={onFiles} />
       <div className="flex flex-wrap gap-2 mb-3">
-        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => { if (!yearly) { window.dispatchEvent(new CustomEvent('tora:open-premium')); return; } fileRef.current?.click(); }} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>
+        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => (yearly ? fileRef.current?.click() : openPremium())} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>
           {busy ? '…' : saved ? t('invoices.relearn') : t('invoices.uploadExamples')}
         </button>
-        {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft({ language: 'en', title: 'Invoice', numberPattern: '{YYYY}-{SEQ:4}', nextSequence: '1', taxMode: 'none', currencyDefault: 'EUR' })}>{t('invoices.startBlank')}</button>}
+        {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft(BLANK)}>{t('invoices.startBlank')}</button>}
       </div>
       <p className="form-hint">{!yearly && <>{t('aiFeatures.yearlyOnly')} </>}{t('invoices.privacy')}</p>
 

@@ -3,6 +3,7 @@ import OverlayPortal from './OverlayPortal';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
+import useBusyAction from '../../hooks/useBusyAction';
 
 /**
  * Draft a contract for an accepted booking from the member's template.
@@ -18,8 +19,8 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
   const [changed, setChanged] = useState([]);
   const [summary, setSummary] = useState('');
   const [saveToTemplate, setSaveToTemplate] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [busy, run] = useBusyAction();
 
   useEffect(() => {
     if (!isOpen || !deal?.id || !currentUser?.id) return;
@@ -35,25 +36,17 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
 
   const setSection = (i, patch) => { setDraft((d) => ({ ...d, sections: d.sections.map((s, j) => (j === i ? { ...s, ...patch } : s)) })); setChanged((c) => c.filter((n) => n !== i)); };
 
-  const applyInstruction = async () => {
-    if (busy || !instruction.trim() || !draft) return;
-    setBusy(true);
-    try {
-      const r = await apiService.editContractDraft(currentUser.id, deal.id, draft.sections, instruction.trim());
-      setDraft((d) => ({ ...d, sections: r.sections }));
-      setChanged(r.changed || []); setSummary(r.summary || ''); setInstruction('');
-    } catch (e) { appAlert(e.message || t('common.error')); } finally { setBusy(false); }
-  };
+  const applyInstruction = () => instruction.trim() && draft && run(async () => {
+    const r = await apiService.editContractDraft(currentUser.id, deal.id, draft.sections, instruction.trim());
+    setDraft((d) => ({ ...d, sections: r.sections }));
+    setChanged(r.changed || []); setSummary(r.summary || ''); setInstruction('');
+  });
 
-  const continueToSign = async () => {
-    if (busy || !draft) return;
-    setBusy(true);
-    try {
-      const r = await apiService.renderContractDraft(currentUser.id, deal.id, { sections: draft.sections, title: draft.title, signatureBlock: draft.signatureBlock, saveToTemplate });
-      onReady({ id: r.documentId, title: r.documentTitle, url: r.documentUrl, type: 'generated' });
-      onClose();
-    } catch (e) { appAlert(e.message || t('common.error')); } finally { setBusy(false); }
-  };
+  const continueToSign = () => draft && run(async () => {
+    const r = await apiService.renderContractDraft(currentUser.id, deal.id, { sections: draft.sections, title: draft.title, signatureBlock: draft.signatureBlock, saveToTemplate });
+    onReady({ id: r.documentId, title: r.documentTitle, url: r.documentUrl, type: 'generated' });
+    onClose();
+  });
 
   return (
     <OverlayPortal>
