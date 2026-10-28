@@ -7,7 +7,7 @@ import useBusyAction from '../../hooks/useBusyAction';
 
 /**
  * The subscribe link for this profile's TORA calendar (Google / Apple /
- * Outlook): create, copy private or public, reset, turn off. Lives on the
+ * Outlook): create, copy, reset, turn off. Lives on the
  * "Calendar link & sync" page. For an agent the link covers every active
  * roster artist, so it always belongs to the viewer's own profile.
  *
@@ -32,23 +32,11 @@ const CalendarLinkCard = ({ profileId, settings }) => {
         <>
           <div className="calendar-link-row">
             <div className="calendar-link-who">
-              <strong>{t('calendarSync.privateLink')}</strong>
-              <small>{t('calendarSync.privateHint')}</small>
+              <strong>{t('calendarSync.linkLabel')}</strong>
+              <small>{t('calendarSync.linkHint')}</small>
             </div>
             <button className="btn btn-outline btn-sm" onClick={() => copy(data.privateUrl)}>{t('calendarSync.copy')}</button>
           </div>
-          <div className="calendar-link-row">
-            <div className="calendar-link-who">
-              <strong>{t('calendarSync.publicLink')}</strong>
-              <small>{t('calendarSync.publicHint')}</small>
-            </div>
-            <button className="btn btn-outline btn-sm" onClick={() => copy(data.publicUrl)}>{t('calendarSync.copy')}</button>
-          </div>
-          <label className="settings-toggle mt-2">
-            <input type="checkbox" checked={!!data.showAvailable} disabled={busy} onChange={(e) => run(() => apiService.setCalendarFeedOptions(profileId, { showAvailable: e.target.checked }))} />
-            <span>{t('calendarSync.includeAvailable')}</span>
-          </label>
-          <p className="form-hint" style={{ marginTop: 2 }}>{t('calendarSync.includeAvailableHint')}</p>
           <div className="flex flex-wrap gap-2 mt-2">
             <button className="btn btn-outline btn-sm" disabled={busy} onClick={async () => {
               if (await appConfirm(t('calendarSync.resetConfirm'), { confirmLabel: t('calendarSync.reset'), danger: true })) run(() => apiService.enableCalendarFeed(profileId), { toast: 'calendarSync.linkCreated' });

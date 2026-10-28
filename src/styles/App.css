@@ -13450,6 +13450,7 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .calendar-sync-sheet { position: fixed; inset: 0; z-index: 1200; background: var(--bg-black, #0a0a0a); overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .calendar-sync-body { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
 .calendar-sync-lead { margin: 0; font-size: 13.5px; }
+.calendar-sync-body .dashboard-section > h3 { color: var(--primary-pink); font-size: 15px; letter-spacing: 0.02em; margin-bottom: 8px; }
 .calendar-sync-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .help-details { margin-top: 12px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px 12px; }
 .help-details summary { cursor: pointer; font-size: 13px; color: #fff; list-style: none; display: flex; align-items: center; gap: 8px; }

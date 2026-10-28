@@ -1375,6 +1375,7 @@
   html.desktop-v3 .d3-cal-rail .no-schedules { padding: 6px 0; }
   html.desktop-v3 .d3-cal-rail .no-schedules p { font-size: 12px; }
   /* Two uppercase labels will not sit side by side in a rail this wide. */
+  html.desktop-v3 .d3-cal-rail .dashboard-section > h3 + * { margin-top: 12px; }
   html.desktop-v3 .d3-cal-rail .dashboard-section .flex.gap-2 { flex-direction: column; }
   html.desktop-v3 .d3-cal-rail .dashboard-section .flex.gap-2 > button { padding: 7px 10px; font-size: 10px; }
   /* A long travel list must not push the visibility card off the rail. */
