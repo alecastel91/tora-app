@@ -11,10 +11,8 @@ import { clampDateRange } from '../../utils/dates';
 import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
-import CalendarLinkCard from '../common/CalendarLinkCard';
-import CalendarImportsCard from '../common/CalendarImportsCard';
+import CalendarSyncScreen from '../common/CalendarSyncScreen';
 import CalendarReviewSheet from '../common/CalendarReviewSheet';
-import { openPremium } from '../../utils/subscription';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
 import useExternalEvents from '../../hooks/useExternalEvents';
 
@@ -188,6 +186,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // What TORA recognised in those events and still waits for a decision.
   const [review, setReview] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [syncOpen, setSyncOpen] = useState(false);
   const [recognising, setRecognising] = useState(false);
   useEffect(() => {
     if (!ownerId) { setReview(null); return; }
@@ -728,9 +727,13 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       const iso = String(deal.date || '').slice(0, 10);
       if (iso.length < 10) return;
       const day = Number(iso.slice(8, 10));
-      const [mine, other] = isArtistSideForDeal(deal, profile) ? [deal.venue, deal.artist] : [deal.artist, deal.venue];
+      // The artist reads WHERE they play (event · venue), never the promoter's
+      // name; the booker reads WHO plays (artist · event).
+      const label = isArtistSideForDeal(deal, profile)
+        ? [deal.eventName, deal.venueName || deal.venue?.name].filter(Boolean).join(' · ') || deal.venue?.name || '?'
+        : [deal.artist?.name, deal.eventName].filter(Boolean).join(' · ') || '?';
       const byDay = (map[iso.slice(0, 7)] = map[iso.slice(0, 7)] || {});
-      (byDay[day] = byDay[day] || []).push({ deal, label: mine?.name || other?.name || '?' });
+      (byDay[day] = byDay[day] || []).push({ deal, label });
     });
     return map;
   }, [deals, profile]);
@@ -1040,39 +1043,34 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     gigs: review.items.filter((i) => i.kind === 'GIG').length,
     trips: review.items.filter((i) => i.kind === 'TRAVEL').length,
   } : null;
-  const hasImports = (calendarSettings.data?.imports || []).length > 0;
-  // "Found in your calendar": shown once a calendar is connected. Yearly
-  // members get the recognition; others see what it would do.
-  const reviewCard = ownerId && review && hasImports ? (
-    <div className="calendar-review-card">
-      {review.items.length > 0 ? (
-        <>
-          <p className="m-0 text-sm text-white">{t('calendarSync.foundLine', { gigs: reviewCounts.gigs, trips: reviewCounts.trips })}</p>
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => setReviewOpen(true)}>{t('calendarSync.reviewButton')}</button>
-        </>
-      ) : !review.yearly ? (
-        <>
-          <p className="form-hint m-0">{t('calendarSync.recogniseTeaser')}</p>
-          <button type="button" className="btn btn-outline btn-sm" onClick={openPremium}>{t('aiFeatures.yearlyOnly')}</button>
-        </>
-      ) : review.unread > 0 ? (
-        <>
-          <p className="form-hint m-0">{t('calendarSync.unreadLine', { n: review.unread })}</p>
-          <button type="button" className="btn btn-outline btn-sm" disabled={recognising} onClick={recogniseNow}>{recognising ? '…' : t('calendarSync.recogniseNow')}</button>
-        </>
-      ) : (
-        <p className="form-hint m-0">{t('calendarSync.nothingToReview')}</p>
-      )}
-    </div>
-  ) : null;
-
-  const calendarsSection = !preview && user?.id ? (
+  const syncData = calendarSettings.data;
+  // Calendars: one line of status and one button to the "Calendar link &
+  // sync" page; the only thing that stays on this page is what needs a
+  // decision ("Found in your calendar … Review"). Hidden in the free preview.
+  const calendarsSection = ownerId ? (
     <div className="dashboard-section calendars-section">
       <h3>{t('calendarSync.title')}</h3>
-      {reviewCard}
-      <CalendarLinkCard profileId={user.id} settings={calendarSettings} isAgent={user.role === 'AGENT'} compact />
-      <CalendarImportsCard profileId={user.id} settings={calendarSettings} onChanged={() => setEventsVersion((v) => v + 1)} />
-      <CalendarReviewSheet isOpen={reviewOpen} profileId={user.id} review={review} onClose={() => setReviewOpen(false)} onDecided={onReviewDecided} />
+      {review && review.items.length > 0 && (
+        <div className="calendar-review-card">
+          <p className="m-0 text-sm text-white">{t('calendarSync.foundLine', { gigs: reviewCounts.gigs, trips: reviewCounts.trips })}</p>
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setReviewOpen(true)}>{t('calendarSync.reviewButton')}</button>
+        </div>
+      )}
+      <div className="calendar-sync-summary">
+        <p className="form-hint m-0">
+          {syncData
+            ? t('calendarSync.statusLine', { link: t(syncData.enabled ? 'calendarSync.statusOn' : 'calendarSync.statusOff'), n: (syncData.imports || []).length })
+            : '…'}
+        </p>
+        <button type="button" className="btn btn-outline btn-sm" onClick={() => setSyncOpen(true)}>{t('calendarSync.openSync')}</button>
+      </div>
+      <CalendarSyncScreen
+        isOpen={syncOpen} onClose={() => setSyncOpen(false)}
+        profileId={ownerId} isAgent={user.role === 'AGENT'} settings={calendarSettings} review={review}
+        recognising={recognising} onRecognise={recogniseNow} onOpenReview={() => setReviewOpen(true)}
+        onEventsChanged={() => setEventsVersion((v) => v + 1)}
+      />
+      <CalendarReviewSheet isOpen={reviewOpen} profileId={ownerId} review={review} onClose={() => setReviewOpen(false)} onDecided={onReviewDecided} />
     </div>
   ) : null;
 

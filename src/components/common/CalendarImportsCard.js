@@ -4,10 +4,9 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import useBusyAction from '../../hooks/useBusyAction';
 
 /**
- * "Your calendars" on the Calendar page: paste the private .ics address of a
- * personal calendar (Google / Apple / Outlook) and its events appear on the
- * TORA calendar as they are — owner-only. All-day events close the open dates
- * they cover; a timed event does not. Up to three calendars.
+ * Imported calendars, on the "Calendar link & sync" page: paste the private
+ * .ics address of a personal calendar (Google / Apple / Outlook) and its
+ * events appear on the TORA calendar as they are — owner-only. Up to three.
  *
  * `settings` is the `{ data, reload }` from useCalendarSettings, owned by the
  * screen; `onChanged` fires after any change so the grid re-reads its events.
@@ -23,8 +22,6 @@ const CalendarImportsCard = ({ profileId, settings, onChanged }) => {
 
   return (
     <div className="calendar-imports-card">
-      <h4 className="calendar-sync-sub">{t('calendarSync.importsTitle')}</h4>
-      <p className="form-hint" style={{ marginTop: 0 }}>{t('calendarSync.importsIntro')}</p>
       {data.imports.length > 0 && (
         <ul className="calendar-imports">
           {data.imports.map((i) => (
@@ -51,7 +48,6 @@ const CalendarImportsCard = ({ profileId, settings, onChanged }) => {
               {busy ? '…' : t('calendarSync.connect')}
             </button>
           </div>
-          <p className="form-hint">{t('calendarSync.whereToFind')}</p>
         </div>
       )}
       {data.imports.length > 0 && (

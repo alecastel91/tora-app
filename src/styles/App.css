@@ -13447,7 +13447,18 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 
 /* Calendars on Tour → Calendar: the subscribe link card + imported calendars */
 .calendar-link-intro { margin: 0 0 14px; }
-.calendars-section .calendar-link-card + .calendar-imports-card { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.calendar-sync-sheet { position: fixed; inset: 0; z-index: 1200; background: var(--bg-black, #0a0a0a); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.calendar-sync-body { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
+.calendar-sync-lead { margin: 0; font-size: 13.5px; }
+.calendar-sync-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.help-details { margin-top: 12px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px 12px; }
+.help-details summary { cursor: pointer; font-size: 13px; color: #fff; list-style: none; display: flex; align-items: center; gap: 8px; }
+.help-details summary::-webkit-details-marker { display: none; }
+.help-details summary::before { content: '?'; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3); font-size: 11px; color: rgba(255, 255, 255, 0.7); flex: 0 0 auto; }
+.help-details[open] summary::before { content: '–'; }
+.help-details ol, .help-details p { margin: 8px 0 0; padding-left: 18px; font-size: 12.5px; line-height: 1.55; color: rgba(255, 255, 255, 0.65); }
+.help-details p { padding-left: 0; }
+.help-details li + li { margin-top: 4px; }
 .calendar-review-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255, 51, 102, 0.35); background: rgba(255, 51, 102, 0.08); }
 .calendar-review-card .btn { flex: 0 0 auto; }
 .calendar-review-modal { max-width: 620px; width: 95%; }
