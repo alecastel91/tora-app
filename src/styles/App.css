@@ -13491,6 +13491,11 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .invoice-form-group { display: flex; flex-direction: column; gap: 6px; }
 .invoice-field .form-label { margin-bottom: 2px; }
 .invoice-setup .form-hint { line-height: 1.5; }
+/* Saved-setup status above the long form: where it is used, or not saved yet */
+.learned-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; margin: 4px 0 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.45; }
+.learned-status.is-saved { background: rgba(67, 233, 123, 0.08); border: 1px solid rgba(67, 233, 123, 0.3); color: #9ff2bd; }
+.learned-status.is-unsaved { background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.35); color: #ffd666; }
+.learned-status .btn { flex-shrink: 0; }
 
 /* Contract templates: clauses in the setup section and the draft modal */
 .contract-draft-modal { max-width: 640px; width: 95%; }

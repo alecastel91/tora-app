@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { showToast } from '../../utils/toast';
 import { formatFee } from '../../utils/dealStatus';
 import useBusyAction from '../../hooks/useBusyAction';
+import { appAlert } from '../../utils/dialogs';
 
 // The deal's own currency, whatever it is (money.js formats only the three
 // billing currencies TORA charges in).
@@ -25,6 +26,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   const [send, setSend] = useState(true);
   const [preview, setPreview] = useState(null); // { blobUrl, number, amount, currency }
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [building, setBuilding] = useState(false);
   const [busy, run] = useBusyAction();
   // The booking card points to the setup page instead of showing an error.
   const orSetup = (e) => { if (e.code !== 'INVOICE_PROFILE_MISSING') return false; setNeedsSetup(true); return true; };
@@ -35,11 +37,27 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   const defaults = { deposit: Math.round(fee * 50) / 100, final: Math.max(0, fee - paid), full: fee };
   const currency = deal?.currency || 'EUR';
 
+  const body = () => ({ profileId: currentUser.id, dealId: deal.id, kind, ...(amount !== '' ? { amount: Number(amount) } : {}), ...(number.trim() ? { number: number.trim() } : {}) });
+
   useEffect(() => {
     if (!isOpen) return;
     setKind(paid > 0 ? 'final' : 'deposit');
     setAmount(''); setNumber(''); setPreview(null); setNeedsSetup(false);
   }, [isOpen, deal?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Open straight onto the invoice as it will look, in the member's style,
+  // and rebuild it when the kind changes (amount / number edits wait for
+  // "Update preview" so typing doesn't fire a request per keystroke).
+  useEffect(() => {
+    if (!isOpen || !deal?.id || !currentUser?.id) return;
+    let cancelled = false;
+    setPreview(null); setBuilding(true);
+    apiService.previewInvoice({ profileId: currentUser.id, dealId: deal.id, kind })
+      .then((p) => { if (!cancelled) setPreview({ ...p, number: p.number ? decodeURIComponent(p.number) : p.number }); })
+      .catch((e) => { if (!cancelled && !orSetup(e)) appAlert(e.message || t('common.error')); })
+      .finally(() => { if (!cancelled) setBuilding(false); });
+    return () => { cancelled = true; };
+  }, [isOpen, deal?.id, kind]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Free the PDF blob when the preview changes, when the modal closes (it
   // stays mounted with isOpen=false), and on unmount.
@@ -47,8 +65,6 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   useEffect(() => { if (!isOpen && preview?.blobUrl) { URL.revokeObjectURL(preview.blobUrl); setPreview(null); } }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isOpen || !deal) return null;
-
-  const body = () => ({ profileId: currentUser.id, dealId: deal.id, kind, ...(amount !== '' ? { amount: Number(amount) } : {}), ...(number.trim() ? { number: number.trim() } : {}) });
 
   const doPreview = () => run(async () => {
     const p = await apiService.previewInvoice(body());
@@ -79,7 +95,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
               <>
                 <div className="invoice-kind-row">
                   {['deposit', 'final', 'full'].map((k) => (
-                    <button key={k} type="button" className={`btn btn-sm ${kind === k ? 'btn-primary' : 'btn-outline'}`} onClick={() => { setKind(k); setPreview(null); }}>
+                    <button key={k} type="button" className={`btn btn-sm ${kind === k ? 'btn-primary' : 'btn-outline'}`} onClick={() => { if (k === kind) return; setKind(k); setAmount(''); setNumber(''); }}>
                       {t(`invoices.kind.${k}`)}
                     </button>
                   ))}
@@ -90,6 +106,8 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
                 <input type="text" className="form-input" placeholder={preview?.number || t('invoices.numberAuto')} value={number} onChange={(e) => { setNumber(e.target.value); setPreview(null); }} maxLength={40} />
                 <p className="form-hint">{t('invoices.numberHint')}</p>
 
+                <p className="form-hint">{t('invoices.styleLine')}</p>
+                {building && <p className="form-hint">{t('invoices.building')}</p>}
                 {preview?.blobUrl && (
                   <div className="invoice-preview">
                     <iframe title="invoice preview" src={preview.blobUrl} />
@@ -106,7 +124,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
           </div>
           <div className="delete-modal-actions">
             <button className="btn btn-outline" onClick={onClose}>{t('common.close')}</button>
-            {!needsSetup && !preview && <button className="btn btn-primary" disabled={busy} onClick={doPreview}>{busy ? '…' : t('invoices.preview')}</button>}
+            {!needsSetup && !preview && !building && <button className="btn btn-primary" disabled={busy} onClick={doPreview}>{busy ? '…' : t('invoices.updatePreview')}</button>}
             {!needsSetup && preview && <button className="btn btn-primary" disabled={busy} onClick={doIssue}>{busy ? '…' : t('invoices.issue')}</button>}
           </div>
         </div>

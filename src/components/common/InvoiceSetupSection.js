@@ -50,6 +50,14 @@ const InvoiceSetupSection = ({ profile }) => {
         {!draft && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setDraft(BLANK)}>{t('invoices.startBlank')}</button>}
       </div>
       <p className="form-hint">{!yearly && <>{t('aiFeatures.yearlyOnly')} </>}{t('invoices.privacy')}</p>
+      {/* Where the saved setup is used, or that it is not saved yet — the
+          form is long and its Save button sits at the very bottom. */}
+      {draft && (dirty ? (
+        <div className="learned-status is-unsaved">
+          <span>{t('invoices.unsaved')}</span>
+          <button className="btn btn-primary btn-sm" disabled={busy} onClick={save}>{t('invoices.save')}</button>
+        </div>
+      ) : saved && <div className="learned-status is-saved">{t('invoices.inUse')}</div>)}
 
       {draft && (
         <div className="invoice-form">
