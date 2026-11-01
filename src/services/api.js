@@ -485,6 +485,35 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // ---- Document templates (invoices / contracts in the member's own files) ----
+  /** POST multipart `files` + fields; returns parsed JSON. */
+  async postForm(path, { files = [], ...fields }) {
+    const form = new FormData();
+    for (const f of files) form.append('files', f);
+    for (const [k, v] of Object.entries(fields)) if (v !== undefined && v !== null) form.append(k, v);
+    const response = await fetch(`${API_URL}${path}`, { method: 'POST', headers: this.getAuthHeaders(), body: form });
+    return this.handleResponse(response);
+  }
+  /** A PDF response as a blob URL for an in-app preview. */
+  async pdfBlob(path, body) {
+    const response = await fetch(`${API_URL}${path}`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body || {}) });
+    if (!response.ok) return this.handleResponse(response);
+    return URL.createObjectURL(await response.blob());
+  }
+  templatesApi(base) {
+    return {
+      list: (profileId) => fetch(`${API_URL}${base(profileId)}`, { headers: this.getHeaders() }).then((r) => this.handleResponse(r)),
+      add: (profileId, { files, kind, name }) => this.postForm(`${base(profileId)}/templates`, { files, kind, name }),
+      update: (profileId, id, body) => fetch(`${API_URL}${base(profileId)}/templates/${id}`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify(body) }).then((r) => this.handleResponse(r)),
+      remove: (profileId, id) => fetch(`${API_URL}${base(profileId)}/templates/${id}`, { method: 'DELETE', headers: this.getHeaders() }).then((r) => this.handleResponse(r)),
+      setDefault: (profileId, id) => fetch(`${API_URL}${base(profileId)}/templates/${id}/default`, { method: 'POST', headers: this.getHeaders() }).then((r) => this.handleResponse(r)),
+      sample: (profileId, id) => this.pdfBlob(`${base(profileId)}/templates/${id}/sample`),
+      fileUrl: (profileId, id) => `${API_URL}${base(profileId)}/templates/${id}/file`,
+    };
+  }
+  get invoiceTemplates() { return this._invoiceTemplates ||= this.templatesApi((id) => `/invoices/profile/${id}`); }
+  get contractTemplates() { return this._contractTemplates ||= this.templatesApi((id) => `/contract-templates/${id}`); }
+
   // ---- Invoices in the member's own style ----
   async getInvoiceProfile(profileId) {
     const response = await fetch(`${API_URL}/invoices/profile/${profileId}`, { headers: this.getHeaders() });
@@ -528,16 +557,20 @@ class ApiService {
     const response = await fetch(`${API_URL}/contract-templates/${profileId}`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ template }) });
     return this.handleResponse(response);
   }
-  async draftContract(profileId, dealId) {
-    const response = await fetch(`${API_URL}/contract-templates/draft`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId }) });
+  async draftContract(profileId, dealId, templateId) {
+    const response = await fetch(`${API_URL}/contract-templates/draft`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, templateId }) });
     return this.handleResponse(response);
   }
-  async editContractDraft(profileId, dealId, sections, instruction) {
-    const response = await fetch(`${API_URL}/contract-templates/draft/edit`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, sections, instruction }) });
+  /** `change` = { sections, instruction } for a clause draft, { paragraphs, instruction } for a Word one. */
+  async editContractDraft(profileId, dealId, change, templateId) {
+    const response = await fetch(`${API_URL}/contract-templates/draft/edit`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, templateId, ...change }) });
     return this.handleResponse(response);
   }
-  async renderContractDraft(profileId, dealId, { sections, title, signatureBlock, saveToTemplate }) {
-    const response = await fetch(`${API_URL}/contract-templates/draft/render`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, sections, title, signatureBlock, saveToTemplate }) });
+  /** Stores the PDF and returns { documentId, documentUrl, documentTitle } — or, with preview: true, a blob URL of the PDF. */
+  async renderContractDraft(profileId, dealId, { preview, ...draft }, templateId) {
+    const body = { profileId, dealId, templateId, ...draft };
+    if (preview) return this.pdfBlob('/contract-templates/draft/render', { ...body, preview: true });
+    const response = await fetch(`${API_URL}/contract-templates/draft/render`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body) });
     return this.handleResponse(response);
   }
 

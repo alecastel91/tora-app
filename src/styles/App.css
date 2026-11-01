@@ -13497,6 +13497,31 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .learned-status.is-unsaved { background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.35); color: #ffd666; }
 .learned-status .btn { flex-shrink: 0; }
 
+/* Document templates (invoices / contracts): kinds, cards, blanks */
+.template-kind { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; white-space: nowrap; }
+.template-kind.is-docx { background: rgba(67, 233, 123, 0.14); color: #7ff0a6; border: 1px solid rgba(67, 233, 123, 0.35); }
+.template-kind.is-pdf { background: rgba(102, 126, 234, 0.16); color: #aab6ff; border: 1px solid rgba(102, 126, 234, 0.4); }
+.template-kind.is-basic { background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.16); }
+.template-kinds { list-style: none; padding: 0; margin: 6px 0 10px; display: flex; flex-direction: column; gap: 6px; }
+.template-kinds li { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.45; color: rgba(255, 255, 255, 0.72); }
+.template-kinds li .template-kind { margin-top: 1px; flex-shrink: 0; }
+.template-kinds li.is-off { opacity: 0.55; }
+.template-list { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 8px; }
+.template-card { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); display: flex; flex-direction: column; gap: 8px; }
+.template-card.is-default { border-color: rgba(255, 51, 102, 0.45); }
+.template-card-head { display: flex; flex-direction: column; gap: 2px; }
+.template-card-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.template-default-chip { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #ff3366; border: 1px solid rgba(255, 51, 102, 0.5); border-radius: 999px; padding: 1px 7px; }
+.template-notes { margin: 0; white-space: pre-line; }
+.template-card-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.template-card-actions .template-delete { color: #ff7a7a; border-color: rgba(255, 122, 122, 0.35); }
+.template-details { border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px; }
+.template-blanks { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
+.template-sample { margin-top: 12px; }
+.template-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.contract-fields { display: flex; flex-direction: column; gap: 4px; max-height: 40vh; overflow-y: auto; padding-right: 2px; }
+.contract-changed-chip { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #ffd666; }
+
 /* Contract templates: clauses in the setup section and the draft modal */
 .contract-draft-modal { max-width: 640px; width: 95%; }
 .contract-draft-clauses { display: flex; flex-direction: column; gap: 10px; max-height: 46vh; overflow-y: auto; padding-right: 2px; }
