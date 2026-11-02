@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { getCurrencySymbol } from '../../utils/currencies';
-import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
+import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
 import RevenueChart from '../common/RevenueChart';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
@@ -915,8 +915,9 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         {renderDocCategory('pressKit', <ImageIcon />, t('manage.pressKit'), t('manage.pressKitNote'))}
         {renderDocCategory('technicalRider', <SlidersIcon />, t('manage.technicalRider'), t('manage.technicalRiderNote'))}
         {renderDocCategory('hospitalityRider', <SlidersIcon />, t('manage.hospitalityRider'), t('manage.hospitalityRiderNote'))}
-        {/* Finished contract files are no longer listed here: contracts come from
-            Contract templates below (the stored files still feed the send-contract picker). */}
+        {/* Contracts come from Contract templates below; finished files uploaded
+            before that still show here until deleted (they feed the send-contract picker). */}
+        {documents.contracts?.length > 0 && renderDocCategory('contracts', <FileTextIcon />, t('manage.contracts'), t('manage.contractsNote'))}
         <InvoiceSetupSection profile={user} />
         <ContractTemplateSection profile={user} />
       </div>

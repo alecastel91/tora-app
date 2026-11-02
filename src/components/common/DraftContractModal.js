@@ -4,7 +4,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer, openPremium } from '../../utils/subscription';
 import useBusyAction from '../../hooks/useBusyAction';
-import { TemplateKindBadge } from './TemplatesSection';
+import usePdfPreview from '../../hooks/usePdfPreview';
+import { TemplatePicker } from './TemplatesSection';
 import DocModal, { previewPaneVisible } from './DocModal';
 
 /**
@@ -32,21 +33,14 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
   const [saveToTemplate, setSaveToTemplate] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
   const [error, setError] = useState('');             // why the draft could not be built
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [stale, setStale] = useState(false);       // the form changed since the PDF was built
-  const [building, setBuilding] = useState(false);
-  const [viewing, setViewing] = useState(false);   // the preview PDF open full-screen
   const [showText, setShowText] = useState(false);
   const [busy, run] = useBusyAction();
-  // Every edit bumps this; a build that started before the last edit comes
-  // back already stale instead of showing a PDF for the previous text.
-  const editSeq = useRef(0);
+  const preview = usePdfPreview();
+  const { markStale } = preview;
   const latest = useRef({});                       // what the form holds now, for builds started earlier
   latest.current = { draft, edits, saveToTemplate, kind, templateId };
 
-  const dropPreview = () => { setViewing(false); setStale(false); setPreviewUrl((u) => { if (u) URL.revokeObjectURL(u); return null; }); };
-  const markStale = () => { editSeq.current += 1; setStale(true); };
-  const reset = () => { setDraft(null); setKind(null); setEdits({}); setChanged([]); setSummary(''); setInstruction(''); setSaveToTemplate(false); setShowText(false); dropPreview(); };
+  const reset = () => { setDraft(null); setKind(null); setEdits({}); setChanged([]); setSummary(''); setInstruction(''); setSaveToTemplate(false); setShowText(false); preview.drop(); };
 
   useEffect(() => {
     if (!isOpen || !deal?.id || !currentUser?.id) return;
@@ -63,7 +57,7 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
     let cancelled = false;
     reset(); setError('');
     apiService.draftContract(currentUser.id, deal.id, templateId)
-      .then((r) => { if (cancelled) return; setKind(r.kind); setDraft(r.draft); editSeq.current += 1; })
+      .then((r) => { if (cancelled) return; setKind(r.kind); setDraft(r.draft); })
       .catch((e) => { if (cancelled) return; if (e.code === 'CONTRACT_TEMPLATE_MISSING') setNeedsSetup(true); else if (e.code === 'TEMPLATE_NOT_FOUND') dropGone(); else setError(e.message || t('common.error')); });
     return () => { cancelled = true; };
   }, [isOpen, deal?.id, templateId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -76,7 +70,7 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
     buildPreview();
   }, [loadedFor]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { if (!isOpen) dropPreview(); }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!isOpen) preview.drop(); }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The chosen template was deleted elsewhere: fall back to the next one.
   const dropGone = () => { const left = templates.filter((x) => x.id !== templateId); setTemplates(left); setTemplateId(left[0]?.id || null); if (!left.length) setNeedsSetup(true); return true; };
@@ -88,19 +82,17 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
 
   // Builds the PDF from whatever the form holds now; the form stays usable
   // meanwhile, and an edit made during the build leaves the result stale.
+  // Resolves true when the PDF is on screen (a template switch mid-build
+  // discards the result via preview.drop()).
   const buildPreview = async () => {
     const cur = latest.current;
-    if (!cur.draft) return;
-    const at = editSeq.current;
-    setBuilding(true);
+    if (!cur.draft) return false;
     try {
-      const url = await apiService.renderContractDraft(currentUser.id, deal.id, { ...payloadFor(cur), preview: true }, cur.templateId);
-      if (latest.current.templateId !== cur.templateId || !latest.current.draft) { URL.revokeObjectURL(url); return; }
-      setPreviewUrl((u) => { if (u) URL.revokeObjectURL(u); return url; });
-      setStale(editSeq.current !== at);
+      return await preview.build(async () => ({ url: await apiService.renderContractDraft(currentUser.id, deal.id, { ...payloadFor(cur), preview: true }, cur.templateId) }));
     } catch (e) {
       if (!orPremium(e)) appAlert(e.message || t('common.error'));
-    } finally { setBuilding(false); }
+      return false;
+    }
   };
 
   if (!isOpen || !deal) return null;
@@ -133,7 +125,7 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
   };
 
   // Mobile: build and open full-screen in one tap.
-  const doPreview = async () => { await buildPreview(); if (!previewPaneVisible()) setViewing(true); };
+  const doPreview = async () => { if (await buildPreview() && !previewPaneVisible()) preview.setViewing(true); };
 
   const continueToSign = () => draft && run(async () => {
     const r = await apiService.renderContractDraft(currentUser.id, deal.id, payloadFor(latest.current), templateId);
@@ -141,20 +133,19 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
     onClose();
   }, { onError: orPremium });
 
-  const selected = templates.find((x) => x.id === templateId);
-
   return (
     <DocModal
       className="contract-draft-modal"
       title={t('contracts.draftTitle')}
       subtitle={deal.eventName || deal.venueName}
       onClose={onClose}
-      preview={draft && !needsSetup ? { url: previewUrl, title: draft.title || '', building, stale, onRefresh: buildPreview, viewing, setViewing, refreshLabel: t('contracts.preview') } : null}
+      preview={draft && !needsSetup ? { url: preview.url, title: draft.title || '', building: preview.building, stale: preview.stale, onRefresh: buildPreview, viewing: preview.viewing, setViewing: preview.setViewing, refreshLabel: t('contracts.preview') } : null}
       actions={(
         <>
           <button className="btn btn-outline" onClick={onClose}>{t('common.close')}</button>
-          {draft && !needsSetup && (!previewUrl || stale) && <button className="btn btn-outline" disabled={busy || building} onClick={doPreview}>{busy || building ? '…' : t('contracts.preview')}</button>}
-          {draft && !needsSetup && <button className="btn btn-primary" disabled={busy || building} onClick={continueToSign}>{busy ? '…' : t('contracts.continueToSign')}</button>}
+          {/* Once a PDF is up, the pane's own pill / button is the one way to rebuild it. */}
+          {draft && !needsSetup && !preview.url && <button className="btn btn-outline" disabled={busy || preview.building} onClick={doPreview}>{busy || preview.building ? '…' : t('contracts.preview')}</button>}
+          {draft && !needsSetup && <button className="btn btn-primary" disabled={busy || preview.building} onClick={continueToSign}>{busy ? '…' : t('contracts.continueToSign')}</button>}
         </>
       )}
     >
@@ -165,15 +156,7 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
         </div>
       ) : (
         <>
-          <label className="form-label">{t('templates.choose')}</label>
-          {templates.length > 1 ? (
-            <div className="invoice-kind-row">
-              {templates.map((x) => (
-                <button key={x.id} type="button" className={`btn btn-sm ${templateId === x.id ? 'btn-primary' : 'btn-outline'}`} onClick={() => setTemplateId(x.id)}>{x.name}</button>
-              ))}
-            </div>
-          ) : selected && <p className="template-line mb-3"><strong className="text-white text-sm">{selected.name}</strong><TemplateKindBadge kind={selected.kind} /></p>}
-          {templates.length > 1 && selected && <p className="template-line mb-3 -mt-1"><TemplateKindBadge kind={selected.kind} /></p>}
+          <TemplatePicker templates={templates} templateId={templateId} onPick={setTemplateId} />
 
           {!draft ? (
             <p className="form-hint">{error || t('common.loading')}</p>

@@ -13,6 +13,33 @@ export const TemplateKindBadge = ({ kind }) => {
   return <span className={`template-kind is-${kind}`}>{t(`templates.kind.${kind}`)}</span>;
 };
 
+/**
+ * Which template a booking document is made from: chips when there is a
+ * choice, the name alone when there is one, the kind pill either way.
+ */
+export const TemplatePicker = ({ templates, templateId, onPick }) => {
+  const { t } = useLanguage();
+  const selected = templates.find((x) => x.id === templateId);
+  return (
+    <>
+      <label className="form-label">{t('templates.choose')}</label>
+      {templates.length > 1 && (
+        <div className="invoice-kind-row">
+          {templates.map((x) => (
+            <button key={x.id} type="button" className={`btn btn-sm ${templateId === x.id ? 'btn-primary' : 'btn-outline'}`} onClick={() => { if (x.id !== templateId) onPick(x.id); }}>{x.name}</button>
+          ))}
+        </div>
+      )}
+      {selected && (
+        <p className={`template-line mb-3${templates.length > 1 ? ' -mt-1' : ''}`}>
+          {templates.length === 1 && <strong className="text-white text-sm">{selected.name}</strong>}
+          <TemplateKindBadge kind={selected.kind} />
+        </p>
+      )}
+    </>
+  );
+};
+
 /** The "i" sheet: what a template is, the three kinds, where it is used, privacy, limit. */
 const TemplatesGuide = ({ ns, wordOff, onClose }) => {
   const { t } = useLanguage();

@@ -28,10 +28,12 @@ const usePaneVisible = () => {
  * dimmed, under an "Update preview" pill. Mobile: the pane is hidden and a
  * single button opens the same PDF full-screen.
  *
- * props: url (blob URL or null), title, building, stale, onRefresh,
- * viewing / setViewing (full-screen state owned by the caller), emptyText.
+ * props: url (blob URL or null), title (shown above the PDF), fileName (the
+ * download name in the full-screen viewer; defaults to title), building,
+ * stale, onRefresh, viewing / setViewing (full-screen state owned by the
+ * caller), emptyText.
  */
-export const DocPreviewPane = ({ url, title, building, stale, onRefresh, viewing, setViewing, refreshLabel, emptyText }) => {
+export const DocPreviewPane = ({ url, title, fileName, building, stale, onRefresh, viewing, setViewing, refreshLabel, emptyText }) => {
   const { t } = useLanguage();
   const refresh = refreshLabel || t('invoices.updatePreview');
   const paneOn = usePaneVisible();
@@ -67,7 +69,7 @@ export const DocPreviewPane = ({ url, title, building, stale, onRefresh, viewing
         {url && !building && stale && <button type="button" className="btn btn-outline btn-sm" onClick={onRefresh}>{refresh}</button>}
         {title && !building && <span className="form-hint m-0">{title}</span>}
       </div>
-      {viewing && url && <PdfViewerModal url={url} title={title} onClose={() => setViewing(false)} />}
+      {viewing && url && <PdfViewerModal url={url} title={fileName || title} onClose={() => setViewing(false)} />}
     </>
   );
 };
