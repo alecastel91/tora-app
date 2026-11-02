@@ -265,6 +265,8 @@ const es = {
   },
 
   templates: {
+    guideTitle: "Cómo funcionan las plantillas",
+    openPreview: "Abrir vista previa",
     kind: {
       docx: "Word · idéntico",
       pdf: "PDF · tu diseño",
@@ -1905,7 +1907,7 @@ const es = {
     technicalRiderNote: 'Añade plano de escenario, requisitos de sonido e iluminación, lista de equipo',
     hospitalityRiderNote: 'Añade requisitos de alojamiento, comidas, transporte y camerino',
     contracts: 'Contratos',
-    contractsNote: 'Añade plantillas de contrato. Se pueden personalizar por reserva.',
+    contractsNote: "Contratos ya listos para adjuntar a una reserva tal cual. Para que se rellenen con los datos de la reserva, usa Plantillas de contrato.",
     manageTitle: 'Gestionar {{name}}',
     profile: 'Perfil',
     dashboard: 'Panel',
@@ -1985,7 +1987,7 @@ const es = {
     pressKitNote: 'Añade fotos de prensa, bio, EPK o muestras de música',
     technicalRiderNote: 'Añade plano de escenario, requisitos de sonido e iluminación, lista de equipo',
     hospitalityRiderNote: 'Añade requisitos de alojamiento, comidas, transporte y camerino',
-    contractsNote: 'Añade plantillas de contrato. Se pueden personalizar por reserva.',
+    contractsNote: "Contratos ya listos para adjuntar a una reserva tal cual. Para que se rellenen con los datos de la reserva, usa Plantillas de contrato.",
     addCategory: 'Añadir {{title}}',
     add: 'Añadir',
     viewFile: 'Ver archivo',

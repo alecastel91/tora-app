@@ -265,6 +265,8 @@ const it = {
   },
 
   templates: {
+    guideTitle: "Come funzionano i modelli",
+    openPreview: "Apri anteprima",
     kind: {
       docx: "Word · identico",
       pdf: "PDF · il tuo layout",
@@ -1905,7 +1907,7 @@ const it = {
     technicalRiderNote: 'Aggiungi stage plot, requisiti audio e luci, lista attrezzatura',
     hospitalityRiderNote: 'Aggiungi requisiti per alloggio, pasti, trasporti, camerino',
     contracts: 'Contratti',
-    contractsNote: 'Aggiungi modelli di contratto. Possono essere personalizzati per ogni booking.',
+    contractsNote: "Contratti pronti da allegare a un booking così come sono. Per averli compilati con i dati del booking, usa Modelli di contratto.",
     manageTitle: 'Gestisci {{name}}',
     profile: 'Profilo',
     dashboard: 'Dashboard',
@@ -1985,7 +1987,7 @@ const it = {
     pressKitNote: 'Aggiungi foto stampa, bio, EPK o demo musicali',
     technicalRiderNote: 'Aggiungi stage plot, requisiti audio e luci, lista attrezzatura',
     hospitalityRiderNote: 'Aggiungi requisiti per alloggio, pasti, trasporti, camerino',
-    contractsNote: 'Aggiungi modelli di contratto. Possono essere personalizzati per ogni booking.',
+    contractsNote: "Contratti pronti da allegare a un booking così come sono. Per averli compilati con i dati del booking, usa Modelli di contratto.",
     addCategory: 'Aggiungi {{title}}',
     add: 'Aggiungi',
     viewFile: 'Vedi file',

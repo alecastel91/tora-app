@@ -265,6 +265,8 @@ const zh = {
   },
 
   templates: {
+    guideTitle: "模板如何运作",
+    openPreview: "打开预览",
     kind: {
       docx: "Word · 完全一致",
       pdf: "PDF · 你的版式",
@@ -1905,7 +1907,7 @@ const zh = {
     technicalRiderNote: '添加舞台图、音响灯光需求、设备清单',
     hospitalityRiderNote: '添加住宿、餐饮、交通、化妆间需求',
     contracts: '合同',
-    contractsNote: '添加合同模板。可按预订单独定制。',
+    contractsNote: "可直接附加到预订的完整合同文件。要根据预订自动填写合同，请使用“合同模板”。",
     manageTitle: '管理{{name}}',
     profile: '档案',
     dashboard: '仪表盘',
@@ -1985,7 +1987,7 @@ const zh = {
     pressKitNote: '添加宣传照、简介、EPK或音乐样本',
     technicalRiderNote: '添加舞台图、音响灯光需求、设备清单',
     hospitalityRiderNote: '添加住宿、餐饮、交通、化妆间需求',
-    contractsNote: '添加合同模板。可按预订单独定制。',
+    contractsNote: "可直接附加到预订的完整合同文件。要根据预订自动填写合同，请使用“合同模板”。",
     addCategory: '添加{{title}}',
     add: '添加',
     viewFile: '查看文件',

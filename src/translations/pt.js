@@ -265,6 +265,8 @@ const pt = {
   },
 
   templates: {
+    guideTitle: "Como funcionam os modelos",
+    openPreview: "Abrir pré-visualização",
     kind: {
       docx: "Word · idêntico",
       pdf: "PDF · seu layout",
@@ -1905,7 +1907,7 @@ const pt = {
     technicalRiderNote: 'Adicione stage plot, requisitos de som e luz, lista de equipamento',
     hospitalityRiderNote: 'Adicione requisitos de alojamento, refeições, transporte e camarim',
     contracts: 'Contratos',
-    contractsNote: 'Adicione modelos de contrato. Podem ser personalizados por reserva.',
+    contractsNote: "Contratos prontos para anexar a uma reserva tal como estão. Para que sejam preenchidos com os dados da reserva, use Modelos de contrato.",
     manageTitle: 'Gerenciar {{name}}',
     profile: 'Perfil',
     dashboard: 'Painel',
@@ -1985,7 +1987,7 @@ const pt = {
     pressKitNote: 'Adicione fotos de imprensa, bio, EPK ou amostras de música',
     technicalRiderNote: 'Adicione stage plot, requisitos de som e luz, lista de equipamento',
     hospitalityRiderNote: 'Adicione requisitos de alojamento, refeições, transporte e camarim',
-    contractsNote: 'Adicione modelos de contrato. Podem ser personalizados por reserva.',
+    contractsNote: "Contratos prontos para anexar a uma reserva tal como estão. Para que sejam preenchidos com os dados da reserva, use Modelos de contrato.",
     addCategory: 'Adicionar {{title}}',
     add: 'Adicionar',
     viewFile: 'Ver arquivo',

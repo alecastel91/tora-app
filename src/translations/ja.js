@@ -265,6 +265,8 @@ const ja = {
   },
 
   templates: {
+    guideTitle: "テンプレートの仕組み",
+    openPreview: "プレビューを開く",
     kind: {
       docx: "Word・完全一致",
       pdf: "PDF・あなたのレイアウト",
@@ -1905,7 +1907,7 @@ const ja = {
     technicalRiderNote: 'ステージ図、音響・照明の要件、機材リストを追加',
     hospitalityRiderNote: '宿泊、食事、移動、楽屋の要件を追加',
     contracts: '契約書',
-    contractsNote: '契約書テンプレートを追加。予約ごとにカスタマイズできます。',
+    contractsNote: "そのまま添付できる完成済みの契約書ファイル。ブッキングの内容を自動で入れるには「契約書テンプレート」を使ってください。",
     manageTitle: '{{name}}を管理',
     profile: 'プロフィール',
     dashboard: 'ダッシュボード',
@@ -1985,7 +1987,7 @@ const ja = {
     pressKitNote: 'プレス写真、バイオ、EPK、音源サンプルなどを追加',
     technicalRiderNote: 'ステージ図、音響・照明の要件、機材リストを追加',
     hospitalityRiderNote: '宿泊、食事、移動、楽屋の要件を追加',
-    contractsNote: '契約書テンプレートを追加。予約ごとにカスタマイズできます。',
+    contractsNote: "そのまま添付できる完成済みの契約書ファイル。ブッキングの内容を自動で入れるには「契約書テンプレート」を使ってください。",
     addCategory: '{{title}}を追加',
     add: '追加',
     viewFile: 'ファイルを見る',

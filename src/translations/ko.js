@@ -265,6 +265,8 @@ const ko = {
   },
 
   templates: {
+    guideTitle: "템플릿 작동 방식",
+    openPreview: "미리보기 열기",
     kind: {
       docx: "Word · 동일",
       pdf: "PDF · 내 레이아웃",
@@ -1905,7 +1907,7 @@ const ko = {
     technicalRiderNote: '스테이지 플롯, 음향·조명 요구사항, 장비 목록 추가',
     hospitalityRiderNote: '숙박, 식사, 이동, 대기실 요구사항 추가',
     contracts: '계약서',
-    contractsNote: '계약서 템플릿을 추가하세요. 부킹별로 맞춤 설정할 수 있습니다.',
+    contractsNote: "부킹에 그대로 첨부할 완성된 계약서 파일입니다. 부킹 내용을 자동으로 채우려면 계약서 템플릿을 사용하세요.",
     manageTitle: '{{name}} 관리',
     profile: '프로필',
     dashboard: '대시보드',
@@ -1985,7 +1987,7 @@ const ko = {
     pressKitNote: '프레스 사진, 바이오, EPK, 음원 샘플 추가',
     technicalRiderNote: '스테이지 플롯, 음향·조명 요구사항, 장비 목록 추가',
     hospitalityRiderNote: '숙박, 식사, 이동, 대기실 요구사항 추가',
-    contractsNote: '계약서 템플릿을 추가하세요. 부킹별로 맞춤 설정할 수 있습니다.',
+    contractsNote: "부킹에 그대로 첨부할 완성된 계약서 파일입니다. 부킹 내용을 자동으로 채우려면 계약서 템플릿을 사용하세요.",
     addCategory: '{{title}} 추가',
     add: '추가',
     viewFile: '파일 보기',

@@ -265,6 +265,8 @@ const fr = {
   },
 
   templates: {
+    guideTitle: "Comment fonctionnent les modèles",
+    openPreview: "Ouvrir l'aperçu",
     kind: {
       docx: "Word · identique",
       pdf: "PDF · votre mise en page",
@@ -1905,7 +1907,7 @@ const fr = {
     technicalRiderNote: 'Ajoutez plan de scène, exigences son + lumière, liste du matériel',
     hospitalityRiderNote: 'Ajoutez exigences d\'hébergement, repas, transport, loge',
     contracts: 'Contrats',
-    contractsNote: 'Ajoutez des modèles de contrat. Personnalisables par réservation.',
+    contractsNote: "Contrats prêts à joindre tels quels à une réservation. Pour qu'ils soient remplis avec les données de la réservation, utilisez Modèles de contrat.",
     manageTitle: 'Gérer {{name}}',
     profile: 'Profil',
     dashboard: 'Tableau de bord',
@@ -1985,7 +1987,7 @@ const fr = {
     pressKitNote: 'Ajoutez photos presse, bio, EPK ou extraits musicaux',
     technicalRiderNote: 'Ajoutez plan de scène, exigences son + lumière, liste du matériel',
     hospitalityRiderNote: 'Ajoutez exigences d\'hébergement, repas, transport, loge',
-    contractsNote: 'Ajoutez des modèles de contrat. Personnalisables par réservation.',
+    contractsNote: "Contrats prêts à joindre tels quels à une réservation. Pour qu'ils soient remplis avec les données de la réservation, utilisez Modèles de contrat.",
     addCategory: 'Ajouter {{title}}',
     add: 'Ajouter',
     viewFile: 'Voir le fichier',

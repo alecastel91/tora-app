@@ -3,8 +3,10 @@ import OverlayPortal from './OverlayPortal';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
+import { isYearlyViewer, openPremium } from '../../utils/subscription';
 import useBusyAction from '../../hooks/useBusyAction';
 import { TemplateKindBadge } from './TemplatesSection';
+import PdfViewerModal from './PdfViewerModal';
 
 /**
  * Draft a contract for an accepted booking from one of the member's
@@ -28,37 +30,44 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
   const [instruction, setInstruction] = useState('');
   const [saveToTemplate, setSaveToTemplate] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
+  const [error, setError] = useState('');             // why the draft could not be built
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [viewing, setViewing] = useState(false);   // the preview PDF open full-screen
   const [showText, setShowText] = useState(false);
   const [busy, run] = useBusyAction();
 
   const reset = () => { setDraft(null); setKind(null); setEdits({}); setChanged([]); setSummary(''); setInstruction(''); setSaveToTemplate(false); setShowText(false); dropPreview(); };
-  const dropPreview = () => setPreviewUrl((u) => { if (u) URL.revokeObjectURL(u); return null; });
+  const dropPreview = () => { setViewing(false); setPreviewUrl((u) => { if (u) URL.revokeObjectURL(u); return null; }); };
 
   useEffect(() => {
     if (!isOpen || !deal?.id || !currentUser?.id) return;
     let cancelled = false;
-    reset(); setNeedsSetup(false); setTemplates([]); setTemplateId(null);
+    reset(); setNeedsSetup(false); setError(''); setTemplates([]); setTemplateId(null);
     apiService.contractTemplates.list(currentUser.id)
       .then((r) => { if (cancelled) return; setTemplates(r.templates || []); if (!r.templates?.length) setNeedsSetup(true); else setTemplateId(r.defaultId || r.templates[0].id); })
-      .catch(() => { if (!cancelled) setNeedsSetup(true); });
+      .catch((e) => { if (!cancelled) setError(e.message || t('common.error')); });
     return () => { cancelled = true; };
   }, [isOpen, deal?.id, currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isOpen || !deal?.id || !currentUser?.id || !templateId) return;
     let cancelled = false;
-    reset();
+    reset(); setError('');
     apiService.draftContract(currentUser.id, deal.id, templateId)
       .then((r) => { if (!cancelled) { setKind(r.kind); setDraft(r.draft); } })
-      .catch((e) => { if (cancelled) return; if (e.code === 'CONTRACT_TEMPLATE_MISSING') setNeedsSetup(true); else appAlert(e.message || t('common.error')); });
+      .catch((e) => { if (cancelled) return; if (e.code === 'CONTRACT_TEMPLATE_MISSING') setNeedsSetup(true); else if (e.code === 'TEMPLATE_NOT_FOUND') dropGone(); else setError(e.message || t('common.error')); });
     return () => { cancelled = true; };
   }, [isOpen, deal?.id, templateId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { if (!isOpen) dropPreview(); }, [isOpen]);
 
+  // The chosen template was deleted elsewhere: fall back to the next one.
+  const dropGone = () => { const left = templates.filter((x) => x.id !== templateId); setTemplates(left); setTemplateId(left[0]?.id || null); if (!left.length) setNeedsSetup(true); return true; };
+
   if (!isOpen || !deal) return null;
   const isWord = kind === 'docx';
+  const yearly = isYearlyViewer(currentUser);
+  const orPremium = (e) => { if (e.code === 'TEMPLATE_NOT_FOUND') return dropGone(); if (e.code !== 'YEARLY_REQUIRED') return false; openPremium(); return true; };
 
   // ---- clause drafts
   const setSection = (i, patch) => { setDraft((d) => ({ ...d, sections: d.sections.map((s, j) => (j === i ? { ...s, ...patch } : s)) })); setChanged((c) => c.filter((n) => n !== i)); dropPreview(); };
@@ -86,20 +95,20 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
         setChanged(r.changed || []);
       }
       setSummary(r.summary || ''); setInstruction(''); dropPreview();
-    });
+    }, { onError: orPremium });
   };
 
   const doPreview = () => draft && run(async () => {
     dropPreview();
     const url = await apiService.renderContractDraft(currentUser.id, deal.id, { ...payload(), preview: true }, templateId);
-    setPreviewUrl(url);
-  });
+    setPreviewUrl(url); setViewing(true);
+  }, { onError: orPremium });
 
   const continueToSign = () => draft && run(async () => {
     const r = await apiService.renderContractDraft(currentUser.id, deal.id, payload(), templateId);
     onReady({ id: r.documentId, title: r.documentTitle, url: r.documentUrl, type: 'generated' });
     onClose();
-  });
+  }, { onError: orPremium });
 
   const selected = templates.find((x) => x.id === templateId);
 
@@ -131,7 +140,7 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
                 {selected && <p className="form-hint template-line"><TemplateKindBadge kind={selected.kind} /> {t(`contracts.kindExplain.${selected.kind}`)}</p>}
 
                 {!draft ? (
-                  <p className="form-hint">{t('common.loading')}</p>
+                  <p className="form-hint">{error || t('common.loading')}</p>
                 ) : isWord ? (
                   <>
                     <h4 className="calendar-sync-sub">{t('contracts.fieldsTitle')}</h4>
@@ -181,13 +190,13 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
                 {draft && (
                   <>
                     {summary && <p className="form-hint">{summary}</p>}
-                    <div className="invoice-field">
+                    {yearly && <div className="invoice-field">
                       <label className="form-label">{t('contracts.askForChange')}</label>
                       <div className="flex gap-2">
                         <input type="text" className="form-input flex-1" placeholder={t('contracts.askPlaceholder')} value={instruction} onChange={(e) => setInstruction(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') applyInstruction(); }} />
                         <button type="button" className="btn btn-outline" disabled={busy || !instruction.trim()} onClick={applyInstruction}>{busy ? '…' : t('contracts.apply')}</button>
                       </div>
-                    </div>
+                    </div>}
                     {!isWord && (
                       <label className="settings-toggle mt-2">
                         <input type="checkbox" checked={saveToTemplate} onChange={(e) => setSaveToTemplate(e.target.checked)} />
@@ -195,11 +204,8 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
                       </label>
                     )}
                     {isWord && <p className="form-hint">{t('contracts.docxEditHint')}</p>}
-                    {previewUrl && (
-                      <div className="invoice-preview">
-                        <iframe title="contract preview" src={previewUrl} />
-                      </div>
-                    )}
+                    {previewUrl && <button type="button" className="btn btn-outline btn-sm self-start" onClick={() => setViewing(true)}>{t('templates.openPreview')}</button>}
+                    {viewing && previewUrl && <PdfViewerModal url={previewUrl} title={draft.title || t('contracts.draftTitle')} onClose={() => setViewing(false)} />}
                     <p className="form-hint">{t('contracts.notLegalAdvice')}</p>
                   </>
                 )}

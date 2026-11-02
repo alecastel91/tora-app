@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import OverlayPortal from './OverlayPortal';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -7,6 +7,7 @@ import { formatFee } from '../../utils/dealStatus';
 import useBusyAction from '../../hooks/useBusyAction';
 import { appAlert } from '../../utils/dialogs';
 import { TemplateKindBadge } from './TemplatesSection';
+import PdfViewerModal from './PdfViewerModal';
 
 // The deal's own currency, whatever it is (money.js formats only the three
 // billing currencies TORA charges in).
@@ -28,11 +29,23 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   const [preview, setPreview] = useState(null); // { blobUrl, number, amount, currency }
   const [needsSetup, setNeedsSetup] = useState(false);
   const [building, setBuilding] = useState(false);
+  const [viewing, setViewing] = useState(false); // the preview PDF open full-screen
+  const [loadError, setLoadError] = useState(false);
+  // Typing an amount / number after the auto-preview started must not let
+  // that older preview land: it would show a PDF for the default amount.
+  const previewSeq = useRef(0);
+  const invalidate = () => { previewSeq.current += 1; setPreview(null); };
   const [templates, setTemplates] = useState([]);
   const [templateId, setTemplateId] = useState(null);
   const [busy, run] = useBusyAction();
   // The booking card points to the setup page instead of showing an error.
-  const orSetup = (e) => { if (e.code !== 'INVOICE_PROFILE_MISSING') return false; setNeedsSetup(true); return true; };
+  const orSetup = (e) => {
+    if (e.code === 'TEMPLATE_NOT_FOUND') return dropGone();
+    if (e.code !== 'INVOICE_PROFILE_MISSING') return false;
+    setNeedsSetup(true); return true;
+  };
+  // The chosen template was deleted elsewhere: fall back to the next one.
+  const dropGone = () => { const left = templates.filter((x) => x.id !== templateId); setTemplates(left); setTemplateId(left[0]?.id || null); if (!left.length) setNeedsSetup(true); return true; };
 
   const pay = deal?.payment || {};
   const paid = Number(pay.depositAmount) || 0;
@@ -44,11 +57,11 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   useEffect(() => {
     if (!isOpen || !currentUser?.id) return;
     setKind(paid > 0 ? 'final' : 'deposit');
-    setAmount(''); setNumber(''); setPreview(null); setNeedsSetup(false); setTemplateId(null); setTemplates([]);
+    setAmount(''); setNumber(''); setPreview(null); setNeedsSetup(false); setLoadError(false); setTemplateId(null); setTemplates([]);
     let cancelled = false;
     apiService.invoiceTemplates.list(currentUser.id)
       .then((r) => { if (cancelled) return; setTemplates(r.templates || []); if (!r.templates?.length) setNeedsSetup(true); else setTemplateId(r.defaultId || r.templates[0].id); })
-      .catch(() => { if (!cancelled) setNeedsSetup(true); });
+      .catch(() => { if (!cancelled) setLoadError(true); });
     return () => { cancelled = true; };
   }, [isOpen, deal?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -58,9 +71,10 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   useEffect(() => {
     if (!isOpen || !deal?.id || !currentUser?.id || !templateId) return;
     let cancelled = false;
+    const seq = ++previewSeq.current;
     setPreview(null); setBuilding(true);
     apiService.previewInvoice({ profileId: currentUser.id, dealId: deal.id, kind, templateId })
-      .then((p) => { if (!cancelled) setPreview({ ...p, number: p.number ? decodeURIComponent(p.number) : p.number }); })
+      .then((p) => { if (!cancelled && seq === previewSeq.current) setPreview({ ...p, number: p.number ? decodeURIComponent(p.number) : p.number }); })
       .catch((e) => { if (!cancelled && !orSetup(e)) appAlert(e.message || t('common.error')); })
       .finally(() => { if (!cancelled) setBuilding(false); });
     return () => { cancelled = true; };
@@ -95,7 +109,9 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
             <h2 className="modal-title">{t('invoices.issueTitle')}</h2>
             <p className="form-hint" style={{ marginTop: 0 }}>{deal.eventName || deal.venueName} · {t('invoices.feeLine', { fee: dealMoney(fee, currency) })}{paid > 0 ? ` · ${t('invoices.paidSoFar', { paid: dealMoney(paid, currency) })}` : ''}</p>
 
-            {needsSetup ? (
+            {loadError ? (
+              <p className="form-hint">{t('common.error')}</p>
+            ) : needsSetup ? (
               <div className="agency-card">
                 <p className="m-0 text-sm text-white">{t('invoices.setupFirst')}</p>
                 <p className="form-hint">{t('invoices.setupWhere')}</p>
@@ -121,18 +137,19 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
                   ))}
                 </div>
                 <label className="form-label">{t('invoices.amount')} ({currency})</label>
-                <input type="number" min="0" step="0.01" className="form-input" placeholder={String(defaults[kind])} value={amount} onChange={(e) => { setAmount(e.target.value); setPreview(null); }} />
+                <input type="number" min="0" step="0.01" className="form-input" placeholder={String(defaults[kind])} value={amount} onChange={(e) => { setAmount(e.target.value); invalidate(); }} />
                 <label className="form-label">{t('invoices.number')}</label>
-                <input type="text" className="form-input" placeholder={preview?.number || t('invoices.numberAuto')} value={number} onChange={(e) => { setNumber(e.target.value); setPreview(null); }} maxLength={40} />
+                <input type="text" className="form-input" placeholder={preview?.number || t('invoices.numberAuto')} value={number} onChange={(e) => { setNumber(e.target.value); invalidate(); }} maxLength={40} />
                 <p className="form-hint">{t('invoices.numberHint')}</p>
 
                 {building && <p className="form-hint">{t('invoices.building')}</p>}
                 {preview?.blobUrl && (
                   <div className="invoice-preview">
-                    <iframe title="invoice preview" src={preview.blobUrl} />
+                    <button type="button" className="btn btn-outline btn-sm" onClick={() => setViewing(true)}>{t('templates.openPreview')}</button>
                     <p className="form-hint">{t('invoices.previewLine', { number: preview.number, amount: dealMoney(preview.amount, preview.currency || currency) })}</p>
                   </div>
                 )}
+                {viewing && preview?.blobUrl && <PdfViewerModal url={preview.blobUrl} title={preview.number} onClose={() => setViewing(false)} />}
 
                 <label className="settings-toggle mt-2">
                   <input type="checkbox" checked={send} onChange={(e) => setSend(e.target.checked)} />

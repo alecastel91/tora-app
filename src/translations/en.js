@@ -265,6 +265,8 @@ const en = {
   },
 
   templates: {
+    guideTitle: "How templates work",
+    openPreview: "Open preview",
     kind: {
       docx: "Word · identical",
       pdf: "PDF · your layout",
@@ -1917,7 +1919,7 @@ const en = {
     technicalRiderNote: 'Add stage plot, sound + lighting requirements, equipment list',
     hospitalityRiderNote: 'Add accommodation, meals, transport, dressing room requirements',
     contracts: 'Contracts',
-    contractsNote: 'Add contract templates. These can be customized per booking.',
+    contractsNote: "Finished contract files to attach to a booking as they are. To have contracts filled in from your bookings, use Contract templates.",
     manageTitle: 'Manage {{name}}',
     profile: 'Profile',
     dashboard: 'Dashboard',
@@ -1997,7 +1999,7 @@ const en = {
     pressKitNote: 'Add press photos, bio, EPK, or music samples',
     technicalRiderNote: 'Add stage plot, sound + lighting requirements, equipment list',
     hospitalityRiderNote: 'Add accommodation, meals, transport, dressing room requirements',
-    contractsNote: 'Add contract templates. These can be customized per booking.',
+    contractsNote: "Finished contract files to attach to a booking as they are. To have contracts filled in from your bookings, use Contract templates.",
     addCategory: 'Add {{title}}',
     add: 'Add',
     viewFile: 'View file',

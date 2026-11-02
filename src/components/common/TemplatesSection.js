@@ -1,4 +1,6 @@
 import React, { useRef, useState } from 'react';
+import OverlayPortal from './OverlayPortal';
+import PdfViewerModal from './PdfViewerModal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isYearlyViewer, openPremium } from '../../utils/subscription';
@@ -11,11 +13,39 @@ export const TemplateKindBadge = ({ kind }) => {
   return <span className={`template-kind is-${kind}`}>{t(`templates.kind.${kind}`)}</span>;
 };
 
+/** The "i" sheet: what a template is, the three kinds, where it is used, privacy, limit. */
+const TemplatesGuide = ({ ns, wordOff, onClose }) => {
+  const { t } = useLanguage();
+  return (
+    <OverlayPortal>
+      <div className="message-modal-overlay" onClick={onClose}>
+        <div className="message-modal-bottom template-guide" onClick={(e) => e.stopPropagation()}>
+          <h2 className="message-modal-title">{t('templates.guideTitle')}</h2>
+          <p className="form-hint">{t(`${ns}.setupIntro`)}</p>
+          <ul className="template-kinds">
+            {KINDS.map((k) => (
+              <li key={k} className={k === 'docx' && wordOff ? 'is-off' : ''}>
+                <TemplateKindBadge kind={k} />
+                <span>{k === 'docx' && wordOff ? t('templates.wordUnavailable') : t(`${ns}.kindExplain.${k}`)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="form-hint">{t(`${ns}.statusInUse`)}</p>
+          <p className="form-hint">{t('templates.limit')}</p>
+          <p className="form-hint">{t(`${ns}.privacy`)}</p>
+          <button className="btn btn-primary w-full mt-2" onClick={onClose}>{t('common.close')}</button>
+        </div>
+      </div>
+    </OverlayPortal>
+  );
+};
+
 /**
  * One list of document templates (invoices or contracts) under
  * Profile → Manage → Documents: add from a Word / PDF file or start with the
  * basic layout, then per template: sample preview, details (an editor the
- * caller renders), make default, delete.
+ * caller renders), make default, delete. The explanations live behind the
+ * "i" button so the section itself stays a short list.
  *
  * props: ns ('invoices' | 'contracts') for the copy, store = useDocumentTemplates(),
  * profile, renderDetails(template, { save, busy }) → the editor.
@@ -24,25 +54,29 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
   const { t } = useLanguage();
   const fileRef = useRef(null);
   const [open, setOpen] = useState(null);      // template id with details open
-  const [sampleUrl, setSampleUrl] = useState(null);
+  const [guide, setGuide] = useState(false);
+  const [sample, setSample] = useState(null);  // { url, name }
   const yearly = isYearlyViewer(profile);
-  const { templates, defaultId, converter, loading, busy } = store;
+  const { templates, defaultId, converter, loading, error, busy } = store;
+  const MAX = 8;
+  const full = templates.length >= MAX;
+  const wordOff = converter?.docx === false;
   const canUpload = () => (yearly ? fileRef.current?.click() : openPremium());
 
   const onFiles = async (e) => {
-    const files = [...(e.target.files || [])].slice(0, 1);
+    const file = e.target.files?.[0];
     e.target.value = '';
-    if (!files.length) return;
-    const ok = (f) => /\.(pdf|docx)$/i.test(f.name) && f.size <= 10 * 1024 * 1024;
-    if (!files.every(ok)) return appAlert(t(`${ns}.fileOnly`));
-    const added = await store.add(files, 'file');
+    if (!file) return;
+    if (!/\.(pdf|docx)$/i.test(file.name) || file.size > 10 * 1024 * 1024) return appAlert(t(`${ns}.fileOnly`));
+    if (wordOff && /\.docx$/i.test(file.name)) return appAlert(t('templates.wordUnavailable'));
+    const added = await store.add([file], 'file');
     if (added) setOpen(added.id);
   };
-  const showSample = async (id) => {
-    if (sampleUrl) URL.revokeObjectURL(sampleUrl);
-    setSampleUrl(null);
-    const url = await store.sample(id);
-    if (url) setSampleUrl(url);
+  const closeSample = () => setSample((s) => { if (s) URL.revokeObjectURL(s.url); return null; });
+  const showSample = async (tpl) => {
+    closeSample();
+    const url = await store.sample(tpl.id);
+    if (url) setSample({ url, name: tpl.name });
   };
   const remove = async (tpl) => {
     if (await appConfirm(t('templates.deleteConfirm', { name: tpl.name }), { confirmLabel: t('templates.delete'), danger: true })) {
@@ -53,32 +87,15 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
 
   return (
     <div className={`dashboard-section templates-section templates-${ns}`}>
-      <div className="section-header"><h3>{icon} {t(`${ns}.setupTitle`)}</h3></div>
-      <p className="form-hint" style={{ marginTop: 0 }}>{t(`${ns}.setupIntro`)}</p>
-
-      {!loading && (
-        <div className={`learned-status ${templates.length ? 'is-saved' : 'is-unsaved'}`}>
-          <span>{templates.length ? t(`${ns}.statusInUse`) : t(`${ns}.statusNone`)}</span>
-        </div>
-      )}
-
-      <input ref={fileRef} type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }} onChange={onFiles} />
-      <div className="flex flex-wrap gap-2 mb-2">
-        <button className="btn btn-primary btn-sm" disabled={!!busy} onClick={canUpload} title={yearly ? undefined : t('aiFeatures.yearlyOnly')}>
-          {busy === 'reading' ? t(`${ns}.reading`) : t(`${ns}.uploadButton`)}
-        </button>
-        <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => store.add([], 'blank')}>{t(`${ns}.blankButton`)}</button>
+      <div className="section-header">
+        <h3>{icon} {t(`${ns}.setupTitle`)}</h3>
+        <button type="button" className="template-info-btn" aria-label={t('templates.guideTitle')} title={t('templates.guideTitle')} onClick={() => setGuide(true)}>i</button>
       </div>
-      <ul className="template-kinds">
-        {KINDS.map((k) => (
-          <li key={k} className={k === 'docx' && converter?.docx === false ? 'is-off' : ''}>
-            <TemplateKindBadge kind={k} />
-            <span>{k === 'docx' && converter?.docx === false ? t('templates.wordUnavailable') : t(`${ns}.kindExplain.${k}`)}</span>
-          </li>
-        ))}
-      </ul>
-      <p className="form-hint">{!yearly && <>{t('aiFeatures.yearlyOnly')} </>}{t(`${ns}.privacy`)}</p>
+      {!yearly && <p className="form-hint mt-0">{t('aiFeatures.yearlyOnly')}</p>}
+      {wordOff && <p className="form-hint mt-0">{t('templates.wordUnavailable')}</p>}
 
+      {error && <p className="form-hint mt-0">{t('common.error')} <button type="button" className="btn btn-outline btn-sm" onClick={store.reload}>{t('common.retry')}</button></p>}
+      {!loading && !error && templates.length === 0 && <p className="form-hint mt-0">{t(`${ns}.statusNone`)}</p>}
       {templates.length > 0 && (
         <div className="template-list">
           {templates.map((tpl) => {
@@ -86,23 +103,21 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
             const isOpen = open === tpl.id;
             return (
               <div key={tpl.id} className={`template-card${isDefault ? ' is-default' : ''}`}>
-                <div className="template-card-head">
-                  <div className="template-card-title">
-                    <strong>{tpl.name}</strong>
-                    <TemplateKindBadge kind={tpl.kind} />
-                    {isDefault && <span className="template-default-chip">{t('templates.default')}</span>}
-                  </div>
-                  {tpl.file?.originalName && <span className="form-hint m-0">{tpl.file.originalName}</span>}
+                <div className="template-card-title">
+                  <strong>{tpl.name}</strong>
+                  <TemplateKindBadge kind={tpl.kind} />
+                  {isDefault && <span className="template-default-chip">{t('templates.default')}</span>}
                 </div>
-                {tpl.notes && <p className="form-hint template-notes"><b>{t('templates.notes')}:</b> {tpl.notes}</p>}
                 <div className="template-card-actions">
-                  <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => showSample(tpl.id)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
+                  <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => showSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
                   <button className="btn btn-outline btn-sm" onClick={() => setOpen(isOpen ? null : tpl.id)}>{isOpen ? t('templates.hideDetails') : t('templates.details')}</button>
-                  {!isDefault && templates.length > 1 && <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => store.makeDefault(tpl.id)}>{t('templates.makeDefault')}</button>}
+                  {!isDefault && <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => store.makeDefault(tpl.id)}>{t('templates.makeDefault')}</button>}
                   <button className="btn btn-outline btn-sm template-delete" disabled={!!busy} onClick={() => remove(tpl)}>{t('templates.delete')}</button>
                 </div>
                 {isOpen && (
                   <div className="template-details">
+                    {tpl.file?.originalName && <p className="form-hint mt-0">{tpl.file.originalName}</p>}
+                    {(tpl.notes || tpl.template?.notes) && <p className="form-hint template-notes"><b>{t('templates.notes')}:</b> {tpl.notes || tpl.template.notes}</p>}
                     {renderDetails(tpl, { save: (body) => store.update(tpl.id, body), busy: busy === tpl.id })}
                   </div>
                 )}
@@ -112,16 +127,17 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
         </div>
       )}
 
-      {sampleUrl && (
-        <div className="invoice-preview template-sample">
-          <div className="flex items-center justify-between mb-1">
-            <span className="form-hint m-0">{t('templates.sampleTitle')}</span>
-            <button className="btn btn-outline btn-sm" onClick={() => { URL.revokeObjectURL(sampleUrl); setSampleUrl(null); }}>{t('common.close')}</button>
-          </div>
-          <iframe title="template sample" src={sampleUrl} />
-        </div>
-      )}
-      <p className="form-hint">{t('templates.limit')}</p>
+      <input ref={fileRef} type="file" accept={wordOff ? '.pdf,application/pdf' : '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document'} style={{ display: 'none' }} onChange={onFiles} />
+      <div className="flex flex-wrap gap-2">
+        <button className="btn btn-primary btn-sm" disabled={!!busy || full} onClick={canUpload} title={full ? t('templates.limit') : yearly ? undefined : t('aiFeatures.yearlyOnly')}>
+          {busy === 'reading' ? t(`${ns}.reading`) : t(`${ns}.uploadButton`)}
+        </button>
+        <button className="btn btn-outline btn-sm" disabled={!!busy || full} onClick={() => store.add([], 'blank')} title={full ? t('templates.limit') : undefined}>{t(`${ns}.blankButton`)}</button>
+      </div>
+      {full && <p className="form-hint">{t('templates.limit')}</p>}
+
+      {guide && <TemplatesGuide ns={ns} wordOff={wordOff} onClose={() => setGuide(false)} />}
+      {sample && <PdfViewerModal url={sample.url} title={`${sample.name} · ${t('templates.sampleTitle')}`} onClose={closeSample} />}
     </div>
   );
 };

@@ -25,7 +25,6 @@ const ClausesEditor = ({ template, save, busy, placeholders }) => {
   return (
     <div className="invoice-form">
       <TemplateNameField value={name} onChange={setName} />
-      {draft.notes && <div className="agency-card"><p className="form-hint" style={{ margin: 0 }}>{t('templates.notes')}: {draft.notes}</p></div>}
       <div className="invoice-field">
         <label className="form-label">{t('contracts.title')}</label>
         <input type="text" className="form-input" value={draft.title || ''} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} />

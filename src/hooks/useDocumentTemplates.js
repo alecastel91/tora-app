@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { appAlert } from '../utils/dialogs';
 import { showToast } from '../utils/toast';
@@ -14,17 +14,20 @@ export default function useDocumentTemplates({ profileId, api, toasts }) {
   const [data, setData] = useState({ templates: [], defaultId: null, converter: { docx: true } });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null); // 'reading' | 'saving' | template id
+  const busyRef = useRef(null);            // same, readable inside a tap handler before React re-renders
+  const [error, setError] = useState(false); // the list could not be loaded (≠ no templates)
 
   const load = useCallback(() => {
     if (!profileId) return;
-    api.list(profileId).then((r) => setData({ ...r, templates: r.templates || [] })).catch(() => {}).finally(() => setLoading(false));
+    setError(false);
+    api.list(profileId).then((r) => setData({ ...r, templates: r.templates || [] })).catch(() => setError(true)).finally(() => setLoading(false));
   }, [profileId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(load, [load]);
 
   const act = async (label, fn) => {
-    if (busy) return null;
-    setBusy(label);
-    try { return await fn(); } catch (err) { appAlert(err.message || t('common.error')); return null; } finally { setBusy(null); }
+    if (busyRef.current) return null;
+    busyRef.current = label; setBusy(label);
+    try { return await fn(); } catch (err) { appAlert(err.message || t('common.error')); return null; } finally { busyRef.current = null; setBusy(null); }
   };
 
   /** Add from file(s) (kind 'file' or 'basic') or a blank basic layout (kind 'blank'). */
@@ -53,5 +56,5 @@ export default function useDocumentTemplates({ profileId, api, toasts }) {
   /** A PDF blob URL of the template filled with a sample booking. */
   const sample = (id) => act(id, () => api.sample(profileId, id));
 
-  return { ...data, loading, busy, reload: load, add, update, remove, makeDefault, sample };
+  return { ...data, loading, error, busy, reload: load, add, update, remove, makeDefault, sample };
 }
