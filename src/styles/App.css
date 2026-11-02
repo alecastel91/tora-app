@@ -13483,12 +13483,15 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .calendar-import-form { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
 
 /* Invoices: issue modal + setup section */
-.invoice-modal { max-width: 560px; width: 95%; }
-.invoice-kind-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 12px; }
-.invoice-preview { margin-top: 12px; }
-.invoice-preview { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
-.invoice-form { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.invoice-kind-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 14px; }
+.invoice-form { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .invoice-form-group { display: flex; flex-direction: column; gap: 6px; }
+.invoice-fields { display: flex; flex-direction: column; gap: 8px; }
+@media (min-width: 1024px) {
+  /* Desktop: short fields two across, multi-line ones full width */
+  .invoice-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+  .invoice-fields .invoice-field.is-wide { grid-column: 1 / -1; }
+}
 .invoice-field .form-label { margin-bottom: 2px; }
 .invoice-setup .form-hint { line-height: 1.5; }
 /* Saved-setup status above the long form: where it is used, or not saved yet */
@@ -13506,34 +13509,73 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .template-kinds li { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.45; color: rgba(255, 255, 255, 0.72); }
 .template-kinds li .template-kind { margin-top: 1px; flex-shrink: 0; }
 .template-kinds li.is-off { opacity: 0.55; }
-.template-list { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 8px; }
-.template-card { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); display: flex; flex-direction: column; gap: 8px; }
-.template-card.is-default { border-color: rgba(255, 51, 102, 0.45); }
-.template-card-head { display: flex; flex-direction: column; gap: 2px; }
+/* A row per template: name + kind + file on the left, quiet actions on the
+   right, the editor opening underneath across the full width. */
+.template-list { display: flex; flex-direction: column; margin: 2px 0 10px; }
+.template-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 11px 0; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.template-row:first-child { border-top: 0; padding-top: 4px; }
+.template-row-main { display: flex; flex-direction: column; gap: 4px; flex: 1 1 220px; min-width: 0; }
 .template-card-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.template-card-title strong { font-weight: 500; color: #fff; }
 .template-default-chip { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #ff3366; border: 1px solid rgba(255, 51, 102, 0.5); border-radius: 999px; padding: 1px 7px; }
+.template-row-sub { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 12px; color: rgba(255, 255, 255, 0.45); }
+.template-file { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.template-row-actions { display: flex; flex-wrap: wrap; gap: 2px; margin-left: auto; }
+.template-act { background: none; border: 0; border-radius: 8px; padding: 6px 10px; color: rgba(255, 255, 255, 0.72); font-family: inherit; font-size: 12.5px; font-weight: 500; line-height: 1.2; letter-spacing: 0.02em; cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+.template-act:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+.template-act.is-on { color: #fff; background: rgba(255, 255, 255, 0.09); }
+.template-act.is-danger { color: #ff8a8a; }
+.template-act.is-danger:hover { background: rgba(255, 122, 122, 0.12); }
+.template-act:disabled { opacity: 0.4; cursor: default; background: none; }
 .template-notes { margin: 0; white-space: pre-line; }
-.template-card-actions { display: flex; flex-wrap: wrap; gap: 6px; }
-.template-card-actions .template-delete { color: #ff7a7a; border-color: rgba(255, 122, 122, 0.35); }
-.template-details { border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px; }
+.template-details { flex-basis: 100%; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding: 12px 0 6px; margin-top: 4px; }
+.template-editor-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 8px; }
+.template-add-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .template-blanks { list-style: none; padding: 0; margin: 0 0 8px; display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; }
-.template-sample { margin-top: 12px; }
 .template-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .template-info-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.28); background: transparent; color: rgba(255, 255, 255, 0.75); font: italic 600 13px/1 Georgia, 'Times New Roman', serif; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .template-info-btn:hover { border-color: var(--primary-pink); color: var(--primary-pink); }
 .template-guide .template-kinds { margin: 10px 0 12px; gap: 10px; }
 .template-guide .form-hint { text-align: left; }
 .templates-section > .form-hint:first-of-type { margin-top: 0; }
-@media (min-width: 1024px) {
-  /* Desktop: each templates section is one full-width row with its cards side by side */
-  .template-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-  .template-card:has(.template-details) { grid-column: 1 / -1; }
-}
 .contract-fields { display: flex; flex-direction: column; gap: 4px; max-height: 40vh; overflow-y: auto; padding-right: 2px; }
+
+/* Document modals (issue an invoice, draft a contract): one column on
+   mobile with "Open preview"; on desktop the form on the left and the PDF
+   as it will be sent on the right, dimmed under an "Update preview" pill
+   once the form changes. */
+.doc-modal { max-width: 560px; width: 95%; display: flex; flex-direction: column; }
+.doc-modal-head { padding: 22px 24px 0; }
+.doc-modal-head .modal-title { margin: 0 0 4px; }
+/* mobile: the whole modal scrolls (overflow on .delete-modal), so nothing
+   may shrink — a shrunk body would let the form run under the action row */
+.doc-modal-body { display: flex; flex-direction: column; flex-shrink: 0; }
+.doc-form { display: flex; flex-direction: column; padding: 14px 24px 4px; }
+.doc-form > .form-label { margin-bottom: 6px; }
+.doc-preview { display: none; }
+.doc-preview-mobile { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; padding: 0 24px; }
+.doc-preview-mobile:empty { display: none; }
+.doc-preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; padding: 8px 10px 8px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 12.5px; color: rgba(255, 255, 255, 0.55); }
+.doc-preview-bar strong { color: #fff; font-weight: 500; }
+.doc-preview-body { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.doc-preview-pdf { flex: 1; min-height: 0; display: flex; flex-direction: column; transition: opacity 0.2s; }
+.doc-preview-body.is-stale .doc-preview-pdf { opacity: 0.4; }
+.doc-preview-empty { margin: auto; padding: 24px; max-width: 280px; text-align: center; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.4); }
+.doc-preview-stale { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 12px; padding: 6px 8px 6px 16px; border-radius: 999px; background: rgba(16, 16, 21, 0.96); border: 1px solid rgba(255, 51, 102, 0.5); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55); font-size: 12.5px; color: #fff; white-space: nowrap; }
+@media (min-width: 1024px) {
+  .delete-modal.doc-modal { max-width: 1120px; width: calc(100vw - 64px); height: min(860px, 92dvh); max-height: 92dvh; overflow: hidden; border-radius: 16px; }
+  html.desktop-v3 .delete-modal.doc-modal { max-width: 1120px; }
+  .doc-modal-body { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); flex: 1 1 auto; min-height: 0; }
+  .doc-form { overflow-y: auto; padding: 14px 24px 20px; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+  .doc-preview { display: flex; flex-direction: column; min-height: 0; background: #08080b; }
+  .doc-preview-mobile { display: none; }
+  .doc-modal .delete-modal-actions { border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 14px 24px; justify-content: flex-end; }
+  .doc-modal .delete-modal-actions .btn { flex: 0 0 auto; min-width: 140px; }
+  .doc-modal .contract-draft-clauses, .doc-modal .contract-fields { max-height: none; overflow: visible; padding-right: 0; }
+}
 .contract-changed-chip { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #ffd666; }
 
 /* Contract templates: clauses in the setup section and the draft modal */
-.contract-draft-modal { max-width: 640px; width: 95%; }
 .contract-draft-clauses { display: flex; flex-direction: column; gap: 10px; max-height: 46vh; overflow-y: auto; padding-right: 2px; }
 .contract-clause { display: flex; flex-direction: column; gap: 6px; padding: 8px 0 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
 .contract-clause.is-changed { background: rgba(255, 193, 7, 0.06); border-left: 2px solid rgba(255, 193, 7, 0.8); padding-left: 8px; }

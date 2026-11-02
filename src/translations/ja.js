@@ -266,6 +266,10 @@ const ja = {
 
   templates: {
     guideTitle: "テンプレートの仕組み",
+    openFull: "全画面で開く",
+    previewHint: "送付されるとおりのPDFがここに表示されます。",
+    building: "PDFを作成しています…",
+    staleHint: "内容が変更されました。",
     openPreview: "プレビューを開く",
     kind: {
       docx: "Word・完全一致",

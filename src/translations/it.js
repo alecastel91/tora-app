@@ -266,6 +266,10 @@ const it = {
 
   templates: {
     guideTitle: "Come funzionano i modelli",
+    openFull: "Apri a schermo intero",
+    previewHint: "Il PDF compare qui, così come verrà inviato.",
+    building: "Creazione del PDF…",
+    staleHint: "Il modulo è cambiato.",
     openPreview: "Apri anteprima",
     kind: {
       docx: "Word · identico",

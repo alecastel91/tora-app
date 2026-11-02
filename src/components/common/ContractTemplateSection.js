@@ -4,7 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { appConfirm } from '../../utils/dialogs';
 import { FileTextIcon } from '../../utils/icons';
 import useDocumentTemplates from '../../hooks/useDocumentTemplates';
-import TemplatesSection, { TemplateNameField } from './TemplatesSection';
+import TemplatesSection, { TemplateNameField, TemplateEditorActions } from './TemplatesSection';
 
 /**
  * Profile → Manage → Documents → Contract templates.
@@ -13,7 +13,7 @@ import TemplatesSection, { TemplateNameField } from './TemplatesSection';
  * again), or clauses on TORA's plain page. Details: the clauses (basic /
  * PDF) or the blanks TORA recognised (Word).
  */
-const ClausesEditor = ({ template, save, busy, placeholders }) => {
+const ClausesEditor = ({ template, save, busy, close, placeholders }) => {
   const { t } = useLanguage();
   const [name, setName] = useState(template.name);
   const [draft, setDraft] = useState(template.template || {});
@@ -24,35 +24,37 @@ const ClausesEditor = ({ template, save, busy, placeholders }) => {
   const addSection = () => setDraft((d) => ({ ...d, sections: [...(d.sections || []), { heading: '', body: '' }] }));
   return (
     <div className="invoice-form">
-      <TemplateNameField value={name} onChange={setName} />
-      <div className="invoice-field">
-        <label className="form-label">{t('contracts.title')}</label>
-        <input type="text" className="form-input" value={draft.title || ''} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} />
+      <div className="invoice-fields">
+        <TemplateNameField value={name} onChange={setName} />
+        <div className="invoice-field">
+          <label className="form-label">{t('contracts.title')}</label>
+          <input type="text" className="form-input" value={draft.title || ''} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} />
+        </div>
       </div>
       {(draft.sections || []).map((s, i) => (
         <div key={i} className="contract-clause">
           <div className="flex items-center gap-2">
             <span className="contract-clause-no">{i + 1}.</span>
             <input type="text" className="form-input flex-1" placeholder={t('contracts.headingPlaceholder')} value={s.heading} onChange={(e) => setSection(i, { heading: e.target.value })} />
-            <button type="button" className="btn btn-outline btn-sm" onClick={() => removeSection(i)} aria-label={t('contracts.removeClause')}>×</button>
+            <button type="button" className="template-act" onClick={() => removeSection(i)} aria-label={t('contracts.removeClause')}>×</button>
           </div>
-          <textarea className="form-input" rows={5} value={s.body} onChange={(e) => setSection(i, { body: e.target.value })} />
+          <textarea className="form-input" rows={4} value={s.body} onChange={(e) => setSection(i, { body: e.target.value })} />
         </div>
       ))}
-      <button type="button" className="btn btn-outline btn-sm self-start" onClick={addSection}>{t('contracts.addClause')}</button>
+      <button type="button" className="template-act self-start" onClick={addSection}>+ {t('contracts.addClause')}</button>
       <div className="invoice-field">
         <label className="form-label">{t('contracts.signatureBlock')}</label>
         <textarea className="form-input" rows={3} value={draft.signatureBlock || ''} onChange={(e) => setDraft((d) => ({ ...d, signatureBlock: e.target.value }))} />
       </div>
       <p className="form-hint">{t('contracts.placeholdersHint')} {placeholders.map((p) => `{{${p}}}`).join(' ')}</p>
       <p className="form-hint">{t('contracts.notLegalAdvice')}</p>
-      <button className="btn btn-primary" disabled={busy || !dirty} onClick={() => save({ name, template: draft })}>{busy ? '…' : t('templates.save')}</button>
+      <TemplateEditorActions dirty={dirty} busy={busy} onSave={() => save({ name, template: draft })} onClose={close} />
     </div>
   );
 };
 
 /** A Word template: what TORA will fill in, and how to change the wording. */
-const WordDetails = ({ template, save, busy }) => {
+const WordDetails = ({ template, save, busy, close }) => {
   const { t } = useLanguage();
   const [name, setName] = useState(template.name);
   useEffect(() => setName(template.name), [template.id, template.updatedAt]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -69,7 +71,7 @@ const WordDetails = ({ template, save, busy }) => {
       ) : <p className="form-hint">{t('contracts.blanksNone')}</p>}
       <p className="form-hint">{t('contracts.docxEditHint')}</p>
       <p className="form-hint">{t('contracts.notLegalAdvice')}</p>
-      <button className="btn btn-primary" disabled={busy || name === template.name} onClick={() => save({ name })}>{busy ? '…' : t('templates.save')}</button>
+      <TemplateEditorActions dirty={name !== template.name} busy={busy} onSave={() => save({ name })} onClose={close} />
     </div>
   );
 };
@@ -80,9 +82,9 @@ const ContractTemplateSection = ({ profile }) => {
   return (
     <TemplatesSection
       ns="contracts" icon={<FileTextIcon />} store={store} profile={profile}
-      renderDetails={(template, { save, busy }) => (template.kind === 'docx'
-        ? <WordDetails template={template} save={save} busy={busy} />
-        : <ClausesEditor template={template} save={save} busy={busy} placeholders={store.placeholders || []} />)}
+      renderDetails={(template, ctx) => (template.kind === 'docx'
+        ? <WordDetails template={template} {...ctx} />
+        : <ClausesEditor template={template} {...ctx} placeholders={store.placeholders || []} />)}
     />
   );
 };

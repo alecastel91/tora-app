@@ -40,15 +40,26 @@ const TemplatesGuide = ({ ns, wordOff, onClose }) => {
   );
 };
 
+/** Save / Hide details row at the end of every template editor. */
+export const TemplateEditorActions = ({ dirty, busy, onSave, onClose }) => {
+  const { t } = useLanguage();
+  return (
+    <div className="template-editor-actions">
+      <button type="button" className="template-act" onClick={onClose}>{t('templates.hideDetails')}</button>
+      <button type="button" className="btn btn-primary btn-sm" disabled={busy || !dirty} onClick={onSave}>{busy ? '…' : t('templates.save')}</button>
+    </div>
+  );
+};
+
 /**
  * One list of document templates (invoices or contracts) under
- * Profile → Manage → Documents: add from a Word / PDF file or start with the
- * basic layout, then per template: sample preview, details (an editor the
- * caller renders), make default, delete. The explanations live behind the
- * "i" button so the section itself stays a short list.
+ * Profile → Manage → Documents: a row per template (name, kind, file,
+ * default) with quiet actions — sample, details (an editor the caller
+ * renders, opened under the row), make default, delete — and the two ways
+ * to add one. The explanations live behind the "i" button.
  *
  * props: ns ('invoices' | 'contracts') for the copy, store = useDocumentTemplates(),
- * profile, renderDetails(template, { save, busy }) → the editor.
+ * profile, renderDetails(template, { save, busy, close }) → the editor.
  */
 const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
   const { t } = useLanguage();
@@ -102,23 +113,27 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
             const isDefault = tpl.id === defaultId;
             const isOpen = open === tpl.id;
             return (
-              <div key={tpl.id} className={`template-card${isDefault ? ' is-default' : ''}`}>
-                <div className="template-card-title">
-                  <strong>{tpl.name}</strong>
-                  <TemplateKindBadge kind={tpl.kind} />
-                  {isDefault && <span className="template-default-chip">{t('templates.default')}</span>}
+              <div key={tpl.id} className={`template-row${isDefault ? ' is-default' : ''}${isOpen ? ' is-open' : ''}`}>
+                <div className="template-row-main">
+                  <div className="template-card-title">
+                    <strong>{tpl.name}</strong>
+                    {isDefault && <span className="template-default-chip">{t('templates.default')}</span>}
+                  </div>
+                  <div className="template-row-sub">
+                    <TemplateKindBadge kind={tpl.kind} />
+                    {tpl.file?.originalName && <span className="template-file" title={tpl.file.originalName}>{tpl.file.originalName}</span>}
+                  </div>
                 </div>
-                <div className="template-card-actions">
-                  <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => showSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
-                  <button className="btn btn-outline btn-sm" onClick={() => setOpen(isOpen ? null : tpl.id)}>{isOpen ? t('templates.hideDetails') : t('templates.details')}</button>
-                  {!isDefault && <button className="btn btn-outline btn-sm" disabled={!!busy} onClick={() => store.makeDefault(tpl.id)}>{t('templates.makeDefault')}</button>}
-                  <button className="btn btn-outline btn-sm template-delete" disabled={!!busy} onClick={() => remove(tpl)}>{t('templates.delete')}</button>
+                <div className="template-row-actions">
+                  <button type="button" className="template-act" disabled={!!busy} onClick={() => showSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
+                  <button type="button" className={`template-act${isOpen ? ' is-on' : ''}`} onClick={() => setOpen(isOpen ? null : tpl.id)}>{isOpen ? t('templates.hideDetails') : t('templates.details')}</button>
+                  {!isDefault && <button type="button" className="template-act" disabled={!!busy} onClick={() => store.makeDefault(tpl.id)}>{t('templates.makeDefault')}</button>}
+                  <button type="button" className="template-act is-danger" disabled={!!busy} onClick={() => remove(tpl)}>{t('templates.delete')}</button>
                 </div>
                 {isOpen && (
                   <div className="template-details">
-                    {tpl.file?.originalName && <p className="form-hint mt-0">{tpl.file.originalName}</p>}
-                    {(tpl.notes || tpl.template?.notes) && <p className="form-hint template-notes"><b>{t('templates.notes')}:</b> {tpl.notes || tpl.template.notes}</p>}
-                    {renderDetails(tpl, { save: (body) => store.update(tpl.id, body), busy: busy === tpl.id })}
+                    {(tpl.notes || tpl.template?.notes) && <p className="form-hint template-notes mt-0"><b>{t('templates.notes')}:</b> {tpl.notes || tpl.template.notes}</p>}
+                    {renderDetails(tpl, { save: (body) => store.update(tpl.id, body), busy: busy === tpl.id, close: () => setOpen(null) })}
                   </div>
                 )}
               </div>
@@ -128,11 +143,11 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
       )}
 
       <input ref={fileRef} type="file" accept={wordOff ? '.pdf,application/pdf' : '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document'} style={{ display: 'none' }} onChange={onFiles} />
-      <div className="flex flex-wrap gap-2">
+      <div className="template-add-row">
         <button className="btn btn-primary btn-sm" disabled={!!busy || full} onClick={canUpload} title={full ? t('templates.limit') : yearly ? undefined : t('aiFeatures.yearlyOnly')}>
           {busy === 'reading' ? t(`${ns}.reading`) : t(`${ns}.uploadButton`)}
         </button>
-        <button className="btn btn-outline btn-sm" disabled={!!busy || full} onClick={() => store.add([], 'blank')} title={full ? t('templates.limit') : undefined}>{t(`${ns}.blankButton`)}</button>
+        <button type="button" className="template-act" disabled={!!busy || full} onClick={() => store.add([], 'blank')} title={full ? t('templates.limit') : undefined}>{t(`${ns}.blankButton`)}</button>
       </div>
       {full && <p className="form-hint">{t('templates.limit')}</p>}
 

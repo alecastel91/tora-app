@@ -266,6 +266,10 @@ const zh = {
 
   templates: {
     guideTitle: "模板如何运作",
+    openFull: "全屏打开",
+    previewHint: "PDF 会在这里显示，与发送时完全一致。",
+    building: "正在生成 PDF…",
+    staleHint: "内容已更改。",
     openPreview: "打开预览",
     kind: {
       docx: "Word · 完全一致",

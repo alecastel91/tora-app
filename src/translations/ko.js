@@ -266,6 +266,10 @@ const ko = {
 
   templates: {
     guideTitle: "템플릿 작동 방식",
+    openFull: "전체 화면으로 열기",
+    previewHint: "보내질 그대로의 PDF가 여기에 표시됩니다.",
+    building: "PDF를 만드는 중…",
+    staleHint: "내용이 변경되었습니다.",
     openPreview: "미리보기 열기",
     kind: {
       docx: "Word · 동일",

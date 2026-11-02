@@ -879,9 +879,10 @@
   html.desktop-v3 .d3-manage .dashboard-tab > .dashboard-section:not(.actions-required-section) { grid-column: 2; }
   html.desktop-v3 .d3-manage .actions-required-section .action-items { flex: 1; min-height: 0; overflow-y: auto; }
 
-  /* documents: categories two across */
-  /* Documents: the two template lists are full-width rows, cards side by side */
+  /* Documents: categories two across; the two template lists are full-width rows */
   html.desktop-v3 .d3-manage .artist-info-tab > .dashboard-section.templates-section { grid-column: 1 / -1; }
+  html.desktop-v3 .d3-manage .templates-section .template-row { padding: 12px 0; }
+  html.desktop-v3 .d3-manage .templates-section .template-add-row { margin-top: 8px; }
   html.desktop-v3 .d3-manage .artist-info-tab {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

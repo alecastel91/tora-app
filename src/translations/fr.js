@@ -266,6 +266,10 @@ const fr = {
 
   templates: {
     guideTitle: "Comment fonctionnent les modèles",
+    openFull: "Ouvrir en plein écran",
+    previewHint: "Le PDF apparaît ici, tel qu'il sera envoyé.",
+    building: "Création du PDF…",
+    staleHint: "Le formulaire a changé.",
     openPreview: "Ouvrir l'aperçu",
     kind: {
       docx: "Word · identique",

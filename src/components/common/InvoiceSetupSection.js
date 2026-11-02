@@ -3,7 +3,7 @@ import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { FileTextIcon } from '../../utils/icons';
 import useDocumentTemplates from '../../hooks/useDocumentTemplates';
-import TemplatesSection, { TemplateNameField } from './TemplatesSection';
+import TemplatesSection, { TemplateNameField, TemplateEditorActions } from './TemplatesSection';
 
 /**
  * Profile → Manage → Documents → Invoices.
@@ -28,7 +28,7 @@ const FILE_GROUPS = [
 const MULTILINE = new Set(['issuerAddress', 'paymentTerms', 'bankDetails', 'footerNote']);
 const TAX_MODES = ['none', 'added', 'included', 'reverse_charge'];
 
-const InvoiceTemplateDetails = ({ template, save, busy }) => {
+const InvoiceTemplateDetails = ({ template, save, busy, close }) => {
   const { t } = useLanguage();
   const [name, setName] = useState(template.name);
   const [draft, setDraft] = useState(template.profile || {});
@@ -43,24 +43,26 @@ const InvoiceTemplateDetails = ({ template, save, busy }) => {
       {groups.map((g) => (
         <div key={g.title} className="invoice-form-group">
           <h4 className="calendar-sync-sub">{t(`invoices.group.${g.title}`)}</h4>
-          {g.keys.map((k) => (
-            <div key={k} className="invoice-field">
-              <label className="form-label">{t(`invoices.field.${k}`)}</label>
-              {k === 'taxMode' ? (
-                <select className="form-input" value={draft[k] || 'none'} onChange={(e) => set(k, e.target.value)}>
-                  {TAX_MODES.map((m) => <option key={m} value={m}>{t(`invoices.taxMode.${m}`)}</option>)}
-                </select>
-              ) : MULTILINE.has(k) ? (
-                <textarea className="form-input" rows={3} value={draft[k] || ''} onChange={(e) => set(k, e.target.value)} />
-              ) : (
-                <input type="text" className="form-input" value={draft[k] || ''} onChange={(e) => set(k, e.target.value)} />
-              )}
-            </div>
-          ))}
+          <div className="invoice-fields">
+            {g.keys.map((k) => (
+              <div key={k} className={`invoice-field${MULTILINE.has(k) ? ' is-wide' : ''}`}>
+                <label className="form-label">{t(`invoices.field.${k}`)}</label>
+                {k === 'taxMode' ? (
+                  <select className="form-input" value={draft[k] || 'none'} onChange={(e) => set(k, e.target.value)}>
+                    {TAX_MODES.map((m) => <option key={m} value={m}>{t(`invoices.taxMode.${m}`)}</option>)}
+                  </select>
+                ) : MULTILINE.has(k) ? (
+                  <textarea className="form-input" rows={3} value={draft[k] || ''} onChange={(e) => set(k, e.target.value)} />
+                ) : (
+                  <input type="text" className="form-input" value={draft[k] || ''} onChange={(e) => set(k, e.target.value)} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       ))}
       <p className="form-hint">{t('invoices.numberPatternHint')}</p>
-      <button className="btn btn-primary" disabled={busy || !dirty} onClick={() => save({ name, profile: draft })}>{busy ? '…' : t('templates.save')}</button>
+      <TemplateEditorActions dirty={dirty} busy={busy} onSave={() => save({ name, profile: draft })} onClose={close} />
     </div>
   );
 };
@@ -71,7 +73,7 @@ const InvoiceSetupSection = ({ profile }) => {
   return (
     <TemplatesSection
       ns="invoices" icon={<FileTextIcon />} store={store} profile={profile}
-      renderDetails={(template, { save, busy }) => <InvoiceTemplateDetails template={template} save={save} busy={busy} />}
+      renderDetails={(template, ctx) => <InvoiceTemplateDetails template={template} {...ctx} />}
     />
   );
 };

@@ -266,6 +266,10 @@ const es = {
 
   templates: {
     guideTitle: "Cómo funcionan las plantillas",
+    openFull: "Abrir a pantalla completa",
+    previewHint: "El PDF aparece aquí, tal como se enviará.",
+    building: "Generando el PDF…",
+    staleHint: "El formulario ha cambiado.",
     openPreview: "Abrir vista previa",
     kind: {
       docx: "Word · idéntico",

@@ -266,6 +266,10 @@ const en = {
 
   templates: {
     guideTitle: "How templates work",
+    openFull: "Open full screen",
+    previewHint: "The PDF appears here, as it will be sent.",
+    building: "Building the PDF…",
+    staleHint: "The form changed.",
     openPreview: "Open preview",
     kind: {
       docx: "Word · identical",
