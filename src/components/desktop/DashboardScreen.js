@@ -9,7 +9,7 @@ import { formatEventDate, formatTimestamp } from '../../utils/dates';
 import { roleLabel } from '../../utils/roles';
 import { Avatar } from './primitives';
 import InviteFriendsSection from '../common/InviteFriendsSection';
-import useExternalEvents from '../../hooks/useExternalEvents';
+import { useExternalEventsRange } from '../../hooks/useExternalEvents';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { HandshakeIcon, MessageIcon, CalendarCheckIcon, BookingsIcon } from '../../utils/icons';
 import {
@@ -115,16 +115,14 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
 
   // Next 14 days: availability (profile), gigs (confirmed deals), travel, and
   // the events imported from the member's own calendar — the same ones the
-  // Tour calendar shows, so the two never disagree. The window can straddle a
-  // month, hence two month fetches (the hook is per month).
-  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-  const extThis = useExternalEvents(user?.id, today.getFullYear(), today.getMonth());
-  const extNext = useExternalEvents(user?.id, nextMonth.getFullYear(), nextMonth.getMonth());
+  // Tour calendar shows (one range request; refetched when a calendar screen
+  // announces a change).
+  const windowEnd = useMemo(() => { const d = new Date(today); d.setDate(d.getDate() + 13); return d; }, [today]);
+  const external = useExternalEventsRange(user?.id, dayKey(today), dayKey(windowEnd));
   const days = useMemo(() => {
     const available = new Set(user?.availableDates || []);
     const gigDays = new Set(upcoming.map(dealDayKey));
     const trips = user?.travelSchedule || [];
-    const external = { ...extThis, ...extNext };
     return Array.from({ length: 14 }, (_, i) => {
       const d = new Date(today); d.setDate(d.getDate() + i);
       const key = dayKey(d);
@@ -140,7 +138,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
         imported: imported.filter((e) => !(e.kind === 'GIG' && e.status === 'CONFIRMED')),
       };
     });
-  }, [user?.availableDates, user?.travelSchedule, upcoming, today, extThis, extNext]);
+  }, [user?.availableDates, user?.travelSchedule, upcoming, today, external]);
 
   const openDeal = (dealId) => {
     onSwitchTab('bookings');

@@ -15,7 +15,7 @@ import CalendarSyncScreen from '../common/CalendarSyncScreen';
 import CalendarReviewSheet from '../common/CalendarReviewSheet';
 import CalendarDaySheet from '../common/CalendarDaySheet';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
-import useExternalEvents from '../../hooks/useExternalEvents';
+import useExternalEvents, { announceEventsChanged } from '../../hooks/useExternalEvents';
 
 /**
  * Own availability + travel schedule. With `targetProfile` (an agent editing a
@@ -184,7 +184,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // (owner-only); bumped after an import is added, removed or refreshed.
   const [eventsVersion, setEventsVersion] = useState(0);
   const ownerId = !preview && user?.id ? user.id : null;
-  const externalByDay = useExternalEvents(ownerId, currentYear, currentMonth, eventsVersion);
+  const externalByDay = useExternalEvents(ownerId, currentYear, currentMonth);
+  // Confirmed trips already live in the travel schedule (the bar on the grid): the grid, the rail and the day sheet all skip them.
+  const visibleExternal = (key) => (externalByDay[key] || []).filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED'));
+  // Something changed the imported events: the review list here and every open calendar (the dashboard's 14 days) refetch.
+  const eventsChanged = () => { setEventsVersion((v) => v + 1); announceEventsChanged(); };
   // What TORA recognised in those events and still waits for a decision.
   const [review, setReview] = useState(null);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -199,7 +203,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   const recogniseNow = async () => {
     if (recognising) return;
     setRecognising(true);
-    try { await apiService.classifyCalendar(ownerId); setEventsVersion((v) => v + 1); } catch (e) { appAlert(e.message || t('common.error')); } finally { setRecognising(false); }
+    try { await apiService.classifyCalendar(ownerId); eventsChanged(); } catch (e) { appAlert(e.message || t('common.error')); } finally { setRecognising(false); }
   };
   // A decision came back with the target profile's new dates and trips: if
   // that is the calendar on screen, mirror it at once (and into the context).
@@ -209,7 +213,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       setSchedules(target.travelSchedule || []);
       applyUpdate({ ...profile, availableDates: target.availableDates || [], travelSchedule: target.travelSchedule || [] });
     }
-    setEventsVersion((v) => v + 1);
+    eventsChanged();
   };
   
   const getDaysInMonth = (month, year) => {
@@ -744,7 +748,14 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     dealsByMonth[`${year}-${String(month + 1).padStart(2, '0')}`] || {};
 
   // A chip on the grid opens that booking's card in the list below.
+  // The list below holds the next ten bookings; a past or further-out one
+  // (reachable from the month grid) opens on the Bookings tab instead.
   const openDealFromGrid = (dealId) => {
+    if (!document.getElementById(`cal-event-${dealId}`)) {
+      window.dispatchEvent(new CustomEvent('tora:navigate-tab', { detail: { tab: 'bookings' } }));
+      setTimeout(() => window.dispatchEvent(new CustomEvent('tora:open-deal', { detail: { dealId } })), 60);
+      return;
+    }
     setExpandedDealId(dealId);
     requestAnimationFrame(() => document.getElementById(`cal-event-${dealId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
   };
@@ -799,7 +810,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       // Cells are a fixed height so the grid never reflows around its content:
       // three chips and a count on the desktop's wide month, two on the phone.
       const chipLimit = nativeDesktop ? 3 : 2;
-      const dayExternal = (externalByDay[dateKey] || []).filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED'));
+      const dayExternal = visibleExternal(dateKey);
       const extraCount = Math.max(0, dayDeals.length + dayExternal.length - chipLimit);
       const externalShown = dayExternal.slice(0, Math.max(0, chipLimit - dayDeals.length));
 
@@ -957,7 +968,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       }),
       schedule: getSchedulePosition(day, month, year).schedule || null,
       deals: dealsFor(month, year)[day] || [],
-      external: externalByDay[key] || [],
+      external: visibleExternal(key),
     };
   };
   const focusedInfo = dayInfo(focusedDay);
@@ -1084,17 +1095,9 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         isOpen={syncOpen} onClose={() => setSyncOpen(false)}
         profileId={ownerId} isAgent={user.role === 'AGENT'} settings={calendarSettings} review={review}
         recognising={recognising} onRecognise={recogniseNow} onOpenReview={() => setReviewOpen(true)}
-        onEventsChanged={() => setEventsVersion((v) => v + 1)}
+        onEventsChanged={eventsChanged}
       />
       <CalendarReviewSheet isOpen={reviewOpen} profileId={ownerId} review={review} onClose={() => setReviewOpen(false)} onDecided={onReviewDecided} />
-      {daySheetInfo && (
-        <CalendarDaySheet
-          info={daySheetInfo} locationText={getLocationDisplayText}
-          onClose={() => setDaySheet(null)}
-          onToggleFree={() => toggleDayFree(daySheetInfo)}
-          onOpenDeal={(id) => { setDaySheet(null); openDealFromGrid(id); }}
-        />
-      )}
     </div>
   ) : null;
 
@@ -1159,7 +1162,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
             {focusedInfo.deals.map(({ deal, label }) => (
               <span key={deal.id} className="d3-cal-chip is-gig">{label}</span>
             ))}
-            {focusedInfo.external.filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED')).map((e) => (
+            {focusedInfo.external.map((e) => (
               <span key={e.id} className={`d3-cal-chip ${e.kind === 'GIG' && e.status === 'CONFIRMED' ? 'is-gig' : 'is-external'}`} title={e.location || undefined}>
                 {e.startTime ? `${e.startTime}${e.endTime ? `–${e.endTime}` : ''} ` : ''}{e.summary || t('calendarSync.unnamedEvent')}
               </span>
@@ -1189,6 +1192,15 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
 
   return (
     <div className={`screen active calendar-screen ${embedded ? 'calendar-embedded' : ''}`}>
+      {/* Phone: the day sheet (also in the free preview, where the calendars section is not rendered). */}
+      {daySheetInfo && (
+        <CalendarDaySheet
+          info={daySheetInfo} locationText={getLocationDisplayText}
+          onClose={() => setDaySheet(null)}
+          onToggleFree={() => toggleDayFree(daySheetInfo)}
+          onOpenDeal={(id) => { setDaySheet(null); openDealFromGrid(id); }}
+        />
+      )}
       {!embedded && (
         <div className="calendar-header">
           <button className="back-btn" onClick={handleClose}>

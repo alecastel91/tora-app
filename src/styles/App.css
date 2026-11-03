@@ -13267,8 +13267,6 @@ textarea.form-textarea:focus {
   .calendar-grid-inline .calendar-day-chip.is-external-gig { background: rgba(255, 51, 102, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 51, 102, 0.45); color: #fff; }
   .calendar-grid-inline .calendar-day-chip.is-pending { background: rgba(255, 193, 7, 0.14); box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.45); }
   .calendar-grid-inline .calendar-day-more { font-size: 9px; color: rgba(255, 255, 255, 0.5); padding-left: 4px; }
-  /* "+N" opens the day's sheet. */
-  .calendar-grid-inline button.calendar-day-more.is-tappable { border: 0; background: transparent; text-align: left; padding: 1px 4px; font-family: 'Inter', sans-serif; font-weight: 600; color: rgba(255, 255, 255, 0.7); cursor: pointer; }
   .calendar-grid-inline .schedule-label { bottom: 0; left: 0; right: 0; height: 13px; font-size: 7px; padding: 0 4px; }
   .calendar-grid-inline .calendar-day.schedule-single .schedule-label { left: 2px; right: 2px; }
 }
@@ -13640,6 +13638,9 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 /* Invoice modal: the editable details block (bill-to, description, dates). */
 .invoice-details-toggle { align-self: flex-start; margin: 2px 0 8px; }
 .invoice-details .invoice-field.is-wide { grid-column: 1 / -1; }
+
+/* Phone calendar: "+N" on the month grid is a button that opens the day's sheet. */
+button.calendar-day-more.is-tappable { border: 0; background: transparent; text-align: left; padding: 1px 4px; font-family: 'Inter', sans-serif; font-weight: 600; color: rgba(255, 255, 255, 0.7); cursor: pointer; }
 
 /* Phone calendar: the day sheet (tap an event or "+N" on the month grid). */
 .day-sheet-date { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-white); margin: 4px 0 14px; text-align: center; text-wrap: balance; }

@@ -1,19 +1,26 @@
 import { useEffect, useState } from 'react';
 import apiService from '../services/api';
 
+/** Fired (window) after an import, a sync or a review decision changed the owner's events: every open calendar refetches. */
+export const EVENTS_CHANGED = 'tora:calendar-events-changed';
+export const announceEventsChanged = () => window.dispatchEvent(new CustomEvent(EVENTS_CHANGED));
+
 /**
- * The owner's imported calendar events for one month, as a map
- * 'YYYY-M-D' (the grid's key format) → [event…], multi-day events on every
- * day they cover. `version` bumps re-fetch after an import changed.
+ * The owner's imported calendar events between `from` and `to` (YYYY-MM-DD,
+ * inclusive), as a map 'YYYY-M-D' (the grids' key format) → [event…],
+ * multi-day events on every day they cover. Refetches on EVENTS_CHANGED.
  */
-export default function useExternalEvents(profileId, year, month, version = 0) {
+export function useExternalEventsRange(profileId, from, to) {
   const [byDay, setByDay] = useState({});
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setTick((n) => n + 1);
+    window.addEventListener(EVENTS_CHANGED, bump);
+    return () => window.removeEventListener(EVENTS_CHANGED, bump);
+  }, []);
   useEffect(() => {
     if (!profileId) { setByDay({}); return; }
     let cancelled = false;
-    const pad = (n) => String(n).padStart(2, '0');
-    const from = `${year}-${pad(month + 1)}-01`;
-    const to = `${year}-${pad(month + 1)}-${pad(new Date(year, month + 1, 0).getDate())}`;
     apiService.getCalendarEvents(profileId, from, to).then((r) => {
       if (cancelled) return;
       const map = {};
@@ -29,6 +36,12 @@ export default function useExternalEvents(profileId, year, month, version = 0) {
       setByDay(map);
     }).catch(() => { if (!cancelled) setByDay({}); });
     return () => { cancelled = true; };
-  }, [profileId, year, month, version]);
+  }, [profileId, from, to, tick]);
   return byDay;
+}
+
+const pad = (n) => String(n).padStart(2, '0');
+/** One month of it (the Tour calendar's grid). */
+export default function useExternalEvents(profileId, year, month) {
+  return useExternalEventsRange(profileId, `${year}-${pad(month + 1)}-01`, `${year}-${pad(month + 1)}-${pad(new Date(year, month + 1, 0).getDate())}`);
 }

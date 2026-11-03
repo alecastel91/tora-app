@@ -55,10 +55,12 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
   const currency = deal?.currency || 'EUR';
   const givenFields = () => Object.fromEntries(FIELD_KEYS.filter((k) => fields[k].trim()).map((k) => [k, fields[k].trim()]));
   const body = () => ({ profileId: currentUser.id, dealId: deal.id, kind, templateId, ...(amount !== '' ? { amount: Number(amount) } : {}), ...(number.trim() ? { number: number.trim() } : {}), fields: givenFields() });
-  // Changing the template or the kind starts the amount, number and details over.
+  // Changing the template starts the amount and number over; changing the
+  // kind also the due date (deposit and balance have their own deadlines).
+  // Bill-to, address and description are the member's corrections: kept.
   const startOver = () => { setAmount(''); setNumber(''); setFields(EMPTY_FIELDS); };
-  const pickTemplate = (id) => { setTemplateId(id); startOver(); };
-  const pickKind = (k) => { if (k !== kind) { setKind(k); startOver(); } };
+  const pickTemplate = (id) => { setTemplateId(id); setAmount(''); setNumber(''); };
+  const pickKind = (k) => { if (k !== kind) { setKind(k); setAmount(''); setNumber(''); setFields((f) => ({ ...f, dueDate: '' })); } };
   const setField = (k, v) => { setFields((f) => ({ ...f, [k]: v })); preview.markStale(); };
 
   useEffect(() => {
@@ -174,12 +176,13 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
                   <textarea className="form-input" rows={2} placeholder={m?.defaults?.description || ''} value={fields.description} onChange={(e) => setField('description', e.target.value)} maxLength={600} />
                 </div>
                 <div className="invoice-field">
-                  <label className="form-label">{t('invoices.fieldIssueDate')}</label>
+                  {/* A date input shows no placeholder: the booking's value sits in the label. */}
+                  <label className="form-label">{t('invoices.fieldIssueDate')}{m?.defaults?.issueDate && <span className="form-hint m-0"> · {m.defaults.issueDate}</span>}</label>
                   <input type="date" className="form-input" value={fields.issueDate} onChange={(e) => setField('issueDate', e.target.value)} />
                 </div>
                 <div className="invoice-field">
-                  <label className="form-label">{t('invoices.fieldDueDate')}</label>
-                  <input type="date" className="form-input" placeholder={m?.defaults?.dueDate || ''} value={fields.dueDate} onChange={(e) => setField('dueDate', e.target.value)} />
+                  <label className="form-label">{t('invoices.fieldDueDate')}{m?.defaults?.dueDate && <span className="form-hint m-0"> · {m.defaults.dueDate}</span>}</label>
+                  <input type="date" className="form-input" value={fields.dueDate} onChange={(e) => setField('dueDate', e.target.value)} />
                 </div>
               </div>
               <p className="form-hint">{t('invoices.detailsEmptyHint')}</p>
