@@ -126,13 +126,15 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
     return Array.from({ length: 14 }, (_, i) => {
       const d = new Date(today); d.setDate(d.getDate() + i);
       const key = dayKey(d);
+      // availableDates are written by the calendar grid as 'YYYY-M-D' (no padding).
+      const calKey = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
       // Confirmed trips already live in the travel schedule; the rest of the
       // imported events count here (the Tour calendar makes the same cut).
       const imported = (external[`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`] || []).filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED'));
       return {
         key,
         date: d,
-        available: available.has(key),
+        available: available.has(calKey),
         gig: gigDays.has(key) || imported.some((e) => e.kind === 'GIG' && e.status === 'CONFIRMED'),
         travel: trips.some((s) => s.startDate && s.endDate && s.startDate <= key && key <= s.endDate),
         imported: imported.filter((e) => !(e.kind === 'GIG' && e.status === 'CONFIRMED')),
@@ -260,13 +262,13 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
               {days.map((d, i) => (
                 <div
                   key={d.key}
-                  className={`rounded-md border px-1 py-1.5 text-center ${i === 0 ? 'border-infrared/50' : 'border-white/[0.06]'} ${d.available ? 'bg-[#43E97B]/10' : 'bg-white/[0.02]'}`}
+                  className={`rounded-md border px-1 py-1.5 text-center ${d.available ? 'border-[#43E97B]/45 bg-[#43E97B]/22' : i === 0 ? 'border-infrared/50 bg-white/[0.02]' : 'border-white/[0.06] bg-white/[0.02]'}`}
                   title={d.imported.length ? `${d.key}\n${d.imported.map((e) => `${e.startTime ? `${e.startTime} ` : ''}${e.summary || t('calendarSync.unnamedEvent')}`).join('\n')}` : d.key}
                 >
                   <span className="block text-[9px] uppercase text-white/35">
                     {d.date.toLocaleDateString(locale, { weekday: 'narrow' })}
                   </span>
-                  <span className="block text-[13px] font-medium text-white/90">{d.date.getDate()}</span>
+                  <span className={`block text-[13px] font-medium ${d.available ? 'text-[#43E97B]' : 'text-white/90'}`}>{d.date.getDate()}</span>
                   <span className="mt-1 flex h-1.5 items-center justify-center gap-0.5">
                     {d.gig && <span className="h-1.5 w-1.5 rounded-full bg-infrared" />}
                     {d.travel && <span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />}
@@ -276,7 +278,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
               ))}
             </div>
             <div className="mt-3 flex items-center gap-4 px-2 pb-1 text-[10.5px] text-white/45">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#43E97B]/40" />{t('calendar.available')}</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm border border-[#43E97B]/45 bg-[#43E97B]/22" />{t('calendar.available')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-infrared" />{t('desktop.legendGig')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />{t('desktop.legendTravel')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/45" />{t('desktop.legendImported')}</span>

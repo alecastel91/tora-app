@@ -14,7 +14,7 @@ import { isPremiumViewer } from '../../utils/subscription';
  */
 const OnboardingChecklist = () => {
   const { t } = useLanguage();
-  const { user, likedProfiles, connectedUsers } = useAppContext();
+  const { user, likedProfiles, connectedUsers, graphLoadedFor } = useAppContext();
   const collapseKey = user?.id ? `tora:checklist-collapsed:${user.id}` : null;
   const [collapsed, setCollapsed] = useState(() => !!(collapseKey && localStorage.getItem(collapseKey)));
 
@@ -30,7 +30,9 @@ const OnboardingChecklist = () => {
     return () => { window.removeEventListener('tora:visited-tour', sync); window.removeEventListener('storage', sync); };
   }, [visitedKey]);
 
-  if (!user?.id) return null;
+  // Not before this profile's likes and connections are in: right after a
+  // switch the graph is empty for a moment and the card would flash.
+  if (!user?.id || graphLoadedFor !== user.id) return null;
 
   // Land directly on the Tour Kickstart sub-tab (same intent flag ViewProfile
   // uses) — and count the visit immediately.

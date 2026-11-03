@@ -10,6 +10,7 @@ import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, ImageIc
 import Modal from '../common/Modal';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
+import { SharedTemplatesSection } from '../common/TemplatesSection';
 import { zones, countriesByZone, citiesByCountry, genresList, getZoneFromCountry } from '../../data/profiles';
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
@@ -732,7 +733,11 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         {renderDocCategory('pressKit', <ImageIcon />, t('manageArtist.pressKit'), t('manageArtist.pressKitNote'))}
         {renderDocCategory('technicalRider', <SlidersIcon />, t('manageArtist.technicalRider'), t('manageArtist.technicalRiderNote'))}
         {renderDocCategory('hospitalityRider', <SlidersIcon />, t('manageArtist.hospitalityRider'), t('manageArtist.hospitalityRiderNote'))}
-        {renderDocCategory('contracts', <FileTextIcon />, t('manageArtist.contracts'), t('manageArtist.contractsNote'))}
+        {/* Contracts come from the templates below; files uploaded before that stay until deleted. */}
+        {documents.contracts?.length > 0 && renderDocCategory('contracts', <FileTextIcon />, t('manageArtist.contracts'), t('manageArtist.contractsNote'))}
+        {/* The artist's own templates, as the agent may use them for this artist's bookings. */}
+        <SharedTemplatesSection ns="invoices" icon={<FileTextIcon />} api={apiService.invoiceTemplates} viewerId={user?.id} ownerId={artistProfile?.profileId || artistProfile?.id} ownerName={artistProfile?.name || ''} />
+        <SharedTemplatesSection ns="contracts" icon={<FileTextIcon />} api={apiService.contractTemplates} viewerId={user?.id} ownerId={artistProfile?.profileId || artistProfile?.id} ownerName={artistProfile?.name || ''} />
       </div>
     );
   };

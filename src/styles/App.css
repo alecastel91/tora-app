@@ -13665,3 +13665,6 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .day-sheet-empty { text-align: center; color: rgba(255, 255, 255, 0.45); font-size: 13px; padding: 10px 0 16px; }
 .day-sheet-actions { display: flex; gap: 8px; }
 .day-sheet-actions .btn { flex: 1; }
+
+/* Calendar: the quiet toggle under the travel list for trips already taken. */
+.past-schedules-toggle { align-self: flex-start; margin-top: 10px; }

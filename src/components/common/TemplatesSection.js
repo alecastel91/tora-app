@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import OverlayPortal from './OverlayPortal';
 import PdfViewerModal from './PdfViewerModal';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -51,6 +51,66 @@ export const TemplatePicker = ({ templates, templateId, onPick }) => {
         </p>
       )}
     </>
+  );
+};
+
+/** Rows for templates someone else owns: name, kind, file, and a sample preview — nothing to edit. */
+const SharedRows = ({ templates, busy, onSample }) => {
+  const { t } = useLanguage();
+  return (
+    <div className="template-list">
+      {templates.map((tpl) => (
+        <div key={tpl.id} className="template-row is-shared">
+          <div className="template-row-main">
+            <div className="template-card-title"><strong>{tpl.name}</strong></div>
+            <div className="template-row-sub">
+              <TemplateKindBadge kind={tpl.kind} />
+              {tpl.file?.originalName && <span className="template-file" title={tpl.file.originalName}>{tpl.file.originalName}</span>}
+            </div>
+          </div>
+          <div className="template-row-actions">
+            <button type="button" className="template-act" disabled={!!busy} onClick={() => onSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * One linked profile's templates as the viewer sees them (Manage artist →
+ * Documents: the artist's invoice / contract templates, read through the
+ * agent's own list). Preview only; the owner edits from their own tab.
+ */
+export const SharedTemplatesSection = ({ ns, icon, api, viewerId, ownerId, ownerName }) => {
+  const { t } = useLanguage();
+  const [templates, setTemplates] = useState(null); // null = loading
+  const [busy, setBusy] = useState(null);
+  const [sample, setSample] = useState(null);
+  useEffect(() => {
+    if (!viewerId || !ownerId) return undefined;
+    let cancelled = false;
+    setTemplates(null);
+    api.list(viewerId)
+      .then((r) => { if (!cancelled) setTemplates(((r.shared || []).find((g) => g.ownerId === ownerId) || {}).templates || []); })
+      .catch(() => { if (!cancelled) setTemplates([]); });
+    return () => { cancelled = true; };
+  }, [viewerId, ownerId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const closeSample = () => setSample((x) => { if (x) URL.revokeObjectURL(x.url); return null; });
+  const showSample = async (tpl) => {
+    if (busy) return;
+    closeSample(); setBusy(tpl.id);
+    try { setSample({ url: await api.sample(viewerId, tpl.id), name: tpl.name }); } catch (e) { appAlert(e.message || t('common.error')); } finally { setBusy(null); }
+  };
+  return (
+    <div className={`dashboard-section templates-section templates-${ns}`}>
+      <div className="section-header"><h3>{icon} {t(`${ns}.setupTitle`)}</h3></div>
+      {templates === null ? <p className="form-hint mt-0">{t('common.loading')}</p>
+        : templates.length === 0 ? <p className="form-hint mt-0">{t('templates.sharedNone', { name: ownerName })}</p>
+        : <SharedRows templates={templates} busy={busy} onSample={showSample} />}
+      {templates?.length > 0 && <p className="form-hint">{t('templates.sharedManagedBy', { name: ownerName })}</p>}
+      {sample && <PdfViewerModal url={sample.url} title={`${sample.name} · ${t('templates.sampleTitle')}`} onClose={closeSample} />}
+    </div>
   );
 };
 
@@ -187,22 +247,7 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
       {(store.shared || []).map((g) => (
         <div key={g.ownerId} className="template-shared-group">
           <p className="form-hint template-shared-title">{t('templates.sharedFrom', { name: g.ownerName })}</p>
-          <div className="template-list">
-            {g.templates.map((tpl) => (
-              <div key={tpl.id} className="template-row is-shared">
-                <div className="template-row-main">
-                  <div className="template-card-title"><strong>{tpl.name}</strong></div>
-                  <div className="template-row-sub">
-                    <TemplateKindBadge kind={tpl.kind} />
-                    {tpl.file?.originalName && <span className="template-file" title={tpl.file.originalName}>{tpl.file.originalName}</span>}
-                  </div>
-                </div>
-                <div className="template-row-actions">
-                  <button type="button" className="template-act" disabled={!!busy} onClick={() => showSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <SharedRows templates={g.templates} busy={busy} onSample={showSample} />
         </div>
       ))}
       {(store.shared || []).length > 0 && <p className="form-hint">{t('templates.sharedHint')}</p>}

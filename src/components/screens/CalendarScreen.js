@@ -76,7 +76,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // Every live deal of this calendar (any date). The month grid marks all
   // of them; the list below shows the next ten (derived, never a 2nd state).
   const [deals, setDeals] = useState([]);
-  const [daySheet, setDaySheet] = useState(null); // phone: { day, month, year } whose events are open in a sheet
+  const [daySheet, setDaySheet] = useState(null);
+  const [showPastSchedules, setShowPastSchedules] = useState(false); // phone: { day, month, year } whose events are open in a sheet
   const upcomingEvents = useMemo(() => {
     // deal.date is date-only (UTC midnight): compare the calendar day as a
     // string so a gig "today" never slips to yesterday west of UTC.
@@ -983,6 +984,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   };
   const toggleFocusedDay = () => toggleDayFree(focusedInfo);
 
+  // Past trips stay on the grid; the list shows what is ahead, with the
+  // past behind one quiet button.
+  const todayLocal = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
+  const pastSchedules = schedules.filter((sch) => String(sch.endDate || '').slice(0, 10) < todayLocal);
+  const listedSchedules = showPastSchedules ? schedules : schedules.filter((sch) => !pastSchedules.includes(sch));
   const travelSection = (
       <div className="travel-schedules-section">
         <div className="travel-schedules-header">
@@ -992,7 +998,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           </button>
         </div>
 
-        {schedules.length === 0 ? (
+        {listedSchedules.length === 0 && pastSchedules.length === 0 ? (
       <div className="no-schedules">
         <p>{t('calendar.noSchedulesYet')}</p>
         <button
@@ -1004,7 +1010,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       </div>
     ) : (
       <div className="travel-schedules-list">
-        {schedules.map((schedule) => (
+        {listedSchedules.map((schedule) => (
           <div key={schedule.id} className="travel-schedule-item">
             <div className="schedule-location">
               {getLocationLabel(schedule)}
@@ -1028,6 +1034,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           </div>
         ))}
         </div>
+      )}
+      {pastSchedules.length > 0 && (
+        <button type="button" className="template-act past-schedules-toggle" onClick={() => setShowPastSchedules((v) => !v)}>
+          {showPastSchedules ? t('calendar.hidePastSchedules') : t('calendar.pastSchedules', { n: pastSchedules.length })}
+        </button>
       )}
       </div>
   );

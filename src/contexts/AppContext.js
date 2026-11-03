@@ -28,6 +28,10 @@ export const AppProvider = ({ children }) => {
   // superseded it — otherwise an in-flight fetch for the old profile lands on
   // the new one's cards. Cleared-and-reset by switchProfile.
   const activeProfileIdRef = useRef(null);
+  // The profile whose graph (likes, connections…) has landed: readers that
+  // derive "done" from the graph (the onboarding checklist) wait for it so a
+  // profile switch never flashes an empty graph as "nothing done yet".
+  const [graphLoadedFor, setGraphLoadedFor] = useState(null);
   // Clear every per-profile graph Set/array in one place.
   const clearProfileGraph = () => {
     setLikedProfiles(new Set());
@@ -104,6 +108,7 @@ export const AppProvider = ({ children }) => {
         setReceivedRequests(new Set(data.receivedRequestIds || []));
         setLikerProfilesData(data.likerProfiles || []); // Store likers full profile objects
         setNotifications(data.notifications || []);
+        setGraphLoadedFor(userId);
 
         const endTime = performance.now();
         console.log(`✅ [AppContext] Profile data loaded in ${(endTime - startTime).toFixed(0)}ms`);
@@ -111,7 +116,7 @@ export const AppProvider = ({ children }) => {
         console.error('❌ [AppContext] Error loading profile data:', error);
         // Only reset if this is still the active profile — a superseded load's
         // error must not wipe the profile the user actually switched to.
-        if (activeProfileIdRef.current === userId) clearProfileGraph();
+        if (activeProfileIdRef.current === userId) { clearProfileGraph(); setGraphLoadedFor(userId); }
       } finally {
         setIsLoadingProfileData(false);
       }
@@ -718,6 +723,7 @@ export const AppProvider = ({ children }) => {
 
   const value = {
     user,
+    graphLoadedFor,
     updateUser,
     userProfiles,
     switchProfile,

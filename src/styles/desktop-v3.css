@@ -1218,9 +1218,11 @@
   html.desktop-v3 .calendar-content.d3-cal {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 292px;
-    gap: 20px;
+    column-gap: 20px;
+    row-gap: 0; /* the rail spans 99 rows; a row gap would add 99 blank gaps under the page */
     align-items: start;
   }
+  html.desktop-v3 .d3-cal > * + *:not(.d3-cal-rail) { margin-top: 20px; }
   /* The grid and the bookings list stack down the left; only the rail
      crosses to the right, spanning however many rows the left produces.
      The rail scrolls WITH the page (not sticky): with travel, visibility
@@ -1235,7 +1237,6 @@
     gap: 12px;
   }
   html.desktop-v3 .d3-cal > .dashboard-section { margin: 0; }
-  html.desktop-v3 .d3-cal > .dashboard-section + .dashboard-section { margin-top: 20px; }
 
   /* ---- the month grid: one month, full width, so every day can show what
      is on it (bookings, the member's own calendar, trips) ---- */
@@ -1377,7 +1378,7 @@
     color: rgba(255, 255, 255, 0.4);
   }
   html.desktop-v3 .d3-cal-rail .travel-schedules-header .btn { padding: 5px 10px; font-size: 10px; }
-  html.desktop-v3 .d3-cal-rail .travel-schedule-item { padding: 8px 0; }
+  html.desktop-v3 .d3-cal-rail .travel-schedule-item { padding: 9px 10px; }
   html.desktop-v3 .d3-cal-rail .schedule-location { font-size: 12px; }
   html.desktop-v3 .d3-cal-rail .schedule-bottom-row { font-size: 10.5px; }
   html.desktop-v3 .d3-cal-rail .no-schedules { padding: 6px 0; }
