@@ -1222,7 +1222,6 @@
     row-gap: 0; /* the rail spans 99 rows; a row gap would add 99 blank gaps under the page */
     align-items: start;
   }
-  html.desktop-v3 .d3-cal > * + *:not(.d3-cal-rail) { margin-top: 20px; }
   /* The grid and the bookings list stack down the left; only the rail
      crosses to the right, spanning however many rows the left produces.
      The rail scrolls WITH the page (not sticky): with travel, visibility
@@ -1237,6 +1236,9 @@
     gap: 12px;
   }
   html.desktop-v3 .d3-cal > .dashboard-section { margin: 0; }
+  /* Space between the stacked left-column blocks (after the reset above,
+     which would otherwise win on specificity). */
+  html.desktop-v3 .d3-cal > * + *:not(.d3-cal-rail) { margin-top: 28px; }
 
   /* ---- the month grid: one month, full width, so every day can show what
      is on it (bookings, the member's own calendar, trips) ---- */
