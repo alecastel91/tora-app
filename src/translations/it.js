@@ -1874,6 +1874,7 @@ const it = {
     document: 'Documento',
     costs: 'Costi',
     revenue: 'Ricavi',
+    bookingValue: 'Valore dei booking',
     thisYearBookings: 'Booking di quest\'anno',
     thisYearMetric: '{{label}} di quest\'anno',
     upcomingBookings: 'Booking in arrivo',

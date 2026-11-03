@@ -1874,6 +1874,7 @@ const pt = {
     document: 'Documento',
     costs: 'Custos',
     revenue: 'Receitas',
+    bookingValue: 'Valor das reservas',
     thisYearBookings: 'Reservas deste ano',
     thisYearMetric: '{{label}} deste ano',
     upcomingBookings: 'Próximas reservas',

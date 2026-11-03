@@ -47,7 +47,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const [thisYearGigs, setThisYearGigs] = useState(null);
   const [expectedRevenue, setExpectedRevenue] = useState(null);
   const [deals, setDeals] = useState([]);
-  const [actionItems, setActionItems] = useState([]);
+  const [actionItems, setActionItems] = useState(null); // null until loaded: never a false "nothing to do"
 
   // Documents state - different for different roles
   const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
@@ -99,17 +99,20 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
     apiService
       .getActionSummary(user.id)
       .then((res) => { if (!cancelled) setActionItems(res.items || []); })
-      .catch((err) => console.error('[ManageProfileScreen] action summary failed', err));
+      .catch((err) => {
+        console.error('[ManageProfileScreen] action summary failed', err);
+        if (!cancelled) setActionItems([]);
+      });
     return () => { cancelled = true; };
   }, [user?.id]);
 
   // Profile reach (views/likes/connections, 30d vs previous 30d)
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || user.role === 'AGENT') return; // not shown to agents
     apiService.getProfileReach(user.id)
       .then(setReach)
       .catch((err) => console.error('[ManageProfileScreen] reach fetch failed:', err));
-  }, [user?.id]);
+  }, [user?.id, user?.role]);
 
   // Sparkline scrubbing: tap/hover a day column to read its views count.
   const scrubSpark = (clientX) => {
@@ -161,11 +164,16 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         const response = await apiService.getDeals({ profileId: user.id });
         console.log('[ManageProfileScreen] Deals response:', response);
 
-        if (response && response.deals && response.deals.length > 0) {
-          setDeals(response.deals);
+        // An agent also receives the roster's other gigs with the fee hidden
+        // (calendar awareness only). Those are left out here, so an agent's
+        // booking counts and money describe the same bookings: the ones they run.
+        const countedDeals = (response?.deals || []).filter((deal) => !deal.limitedVisibility);
+
+        if (countedDeals.length > 0) {
+          setDeals(countedDeals);
 
           // Count upcoming gigs with PENDING, NEGOTIATING, or ACCEPTED status
-          const upcoming = response.deals.filter(deal => {
+          const upcoming = countedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const hasUpcomingDate = dealDate >= today;
             const hasActiveStatus = ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status);
@@ -174,7 +182,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           setUpcomingGigs(upcoming.length);
 
           // Calculate This Year Gigs: only completed or past accepted deals this year
-          const thisYearDeals = response.deals.filter(deal => {
+          const thisYearDeals = countedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isThisYear = dealDate >= yearStart && dealDate <= today;
             const isCompleted = deal.status === 'COMPLETED';
@@ -184,7 +192,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           setThisYearGigs(thisYearDeals.length);
 
           // Calculate YTD Revenue: sum all COMPLETED or past ACCEPTED deals from current year
-          const ytdDeals = response.deals.filter(deal => {
+          const ytdDeals = countedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isThisYear = dealDate >= yearStart && dealDate <= today;
             const isCompleted = deal.status === 'COMPLETED';
@@ -256,7 +264,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
           // Revenue events for the chart (converted once to the preferred currency)
           const startDate = new Date('2024-01-01');
-          const historicalDeals = response.deals.filter(deal => {
+          const historicalDeals = countedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isFrom2024 = dealDate >= startDate;
             const isCompleted = deal.status === 'COMPLETED';
@@ -508,7 +516,8 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   // is the metrics, chart, reach, top cities and who-viewed-you.
   const renderDashboardTab = ({ part } = { part: 'insights' }) => {
     const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
-    const revenueLabel = isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
+    // An agent's figures are their artists' fees, not the agent's own income.
+    const revenueLabel = user?.role === 'AGENT' ? t('manage.bookingValue') : isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
     const showActions = part === 'actions';
     const showInsights = part === 'insights';
 
@@ -550,9 +559,11 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
       {/* Actions Required Section */}
       {showActions && <div className="dashboard-section actions-required-section">
-        <h3><AlertIcon /> {t('manage.actionsRequired')} {actionItems.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
+        <h3><AlertIcon /> {t('manage.actionsRequired')} {actionItems?.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
         <div className="action-items">
-          {actionItems.length === 0 ? (
+          {actionItems === null ? (
+            <div className="action-empty">...</div>
+          ) : actionItems.length === 0 ? (
             <div className="action-empty">{t('manage.nothingNeedsAttention')}</div>
           ) : (
             actionItems.map((item) => {
@@ -966,7 +977,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           onClick={() => handleTabChange('actions')}
         >
           {t('manage.actionsRequired')}
-          {actionItems.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
+          {actionItems?.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
         </button>
         <button
           className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}

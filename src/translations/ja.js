@@ -1874,6 +1874,7 @@ const ja = {
     document: 'ドキュメント',
     costs: 'コスト',
     revenue: '収益',
+    bookingValue: 'ブッキング金額',
     thisYearBookings: '今年の予約',
     thisYearMetric: '今年の{{label}}',
     upcomingBookings: '今後の予約',

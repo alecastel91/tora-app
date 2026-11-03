@@ -1874,6 +1874,7 @@ const ko = {
     document: '문서',
     costs: '비용',
     revenue: '수익',
+    bookingValue: '부킹 금액',
     thisYearBookings: '올해 부킹',
     thisYearMetric: '올해 {{label}}',
     upcomingBookings: '예정된 부킹',

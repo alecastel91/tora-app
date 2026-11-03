@@ -1886,6 +1886,7 @@ const en = {
     document: 'Document',
     costs: 'Costs',
     revenue: 'Revenue',
+    bookingValue: 'Booking Value',
     thisYearBookings: 'This Year Bookings',
     thisYearMetric: 'This Year {{label}}',
     upcomingBookings: 'Upcoming Bookings',

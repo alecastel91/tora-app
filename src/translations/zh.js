@@ -1874,6 +1874,7 @@ const zh = {
     document: '文件',
     costs: '成本',
     revenue: '收入',
+    bookingValue: '预订金额',
     thisYearBookings: '今年预订',
     thisYearMetric: '今年{{label}}',
     upcomingBookings: '即将到来的预订',

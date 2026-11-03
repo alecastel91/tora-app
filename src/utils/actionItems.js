@@ -26,6 +26,10 @@ export function handleActionTarget(target, { onSwitchTab, onClose }) {
   if (target.screen === 'BookingsScreen') onSwitchTab('bookings');
   else if (target.screen === 'MessagesScreen') onSwitchTab('messages');
   onClose?.();
+  // Land on the booking itself, not just its tab. The delay lets the tab switch
+  // render first, so a not-yet-warmed Bookings tab still catches the event.
+  const dealId = target.params?.dealId;
+  if (dealId) setTimeout(() => window.dispatchEvent(new CustomEvent('tora:open-deal', { detail: { dealId } })), 60);
 }
 
 // The action-summary API sends English titles/labels; the templates are stable
