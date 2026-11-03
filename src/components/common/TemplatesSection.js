@@ -14,8 +14,21 @@ export const TemplateKindBadge = ({ kind }) => {
 };
 
 /**
+ * The templates a booking document can be made from: the member's own, then
+ * the ones their agent / artists share (`list.shared`, each marked with its
+ * owner). An agent issuing for one artist sees that artist's, not the whole
+ * roster's. → [{ ...template, shared?, ownerId?, ownerName? }]
+ */
+export const usableTemplates = (list, { viewer, artistId } = {}) => {
+  const own = list?.templates || [];
+  const groups = (list?.shared || []).filter((g) => !(viewer?.role === 'AGENT' && artistId && g.ownerId !== artistId));
+  return [...own, ...groups.flatMap((g) => g.templates.map((x) => ({ ...x, shared: true, ownerId: g.ownerId, ownerName: g.ownerName })))];
+};
+
+/**
  * Which template a booking document is made from: chips when there is a
- * choice, the name alone when there is one, the kind pill either way.
+ * choice, the name alone when there is one, the kind pill either way, and
+ * whose it is when it is shared.
  */
 export const TemplatePicker = ({ templates, templateId, onPick }) => {
   const { t } = useLanguage();
@@ -26,7 +39,7 @@ export const TemplatePicker = ({ templates, templateId, onPick }) => {
       {templates.length > 1 && (
         <div className="invoice-kind-row">
           {templates.map((x) => (
-            <button key={x.id} type="button" className={`btn btn-sm ${templateId === x.id ? 'btn-primary' : 'btn-outline'}`} onClick={() => { if (x.id !== templateId) onPick(x.id); }}>{x.name}</button>
+            <button key={x.id} type="button" className={`btn btn-sm ${templateId === x.id ? 'btn-primary' : 'btn-outline'}`} onClick={() => { if (x.id !== templateId) onPick(x.id); }}>{x.shared ? `${x.name} · ${x.ownerName}` : x.name}</button>
           ))}
         </div>
       )}
@@ -34,6 +47,7 @@ export const TemplatePicker = ({ templates, templateId, onPick }) => {
         <p className={`template-line mb-3${templates.length > 1 ? ' -mt-1' : ''}`}>
           {templates.length === 1 && <strong className="text-white text-sm">{selected.name}</strong>}
           <TemplateKindBadge kind={selected.kind} />
+          {selected.shared && <span className="form-hint m-0">{t('templates.sharedBy', { name: selected.ownerName })}</span>}
         </p>
       )}
     </>
@@ -83,7 +97,8 @@ export const TemplateEditorActions = ({ dirty, busy, onSave, onClose }) => {
  * Profile → Manage → Documents: a row per template (name, kind, file,
  * default) with quiet actions — sample, details (an editor the caller
  * renders, opened under the row), make default, delete — and the two ways
- * to add one. The explanations live behind the "i" button.
+ * to add one. Templates the member's agent / artists share follow, by
+ * owner, with a sample preview only. The explanations live behind the "i".
  *
  * props: ns ('invoices' | 'contracts') for the copy, store = useDocumentTemplates(),
  * profile, renderDetails(template, { save, busy, close }) → the editor.
@@ -168,6 +183,29 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
           })}
         </div>
       )}
+
+      {(store.shared || []).map((g) => (
+        <div key={g.ownerId} className="template-shared-group">
+          <p className="form-hint template-shared-title">{t('templates.sharedFrom', { name: g.ownerName })}</p>
+          <div className="template-list">
+            {g.templates.map((tpl) => (
+              <div key={tpl.id} className="template-row is-shared">
+                <div className="template-row-main">
+                  <div className="template-card-title"><strong>{tpl.name}</strong></div>
+                  <div className="template-row-sub">
+                    <TemplateKindBadge kind={tpl.kind} />
+                    {tpl.file?.originalName && <span className="template-file" title={tpl.file.originalName}>{tpl.file.originalName}</span>}
+                  </div>
+                </div>
+                <div className="template-row-actions">
+                  <button type="button" className="template-act" disabled={!!busy} onClick={() => showSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      {(store.shared || []).length > 0 && <p className="form-hint">{t('templates.sharedHint')}</p>}
 
       <input ref={fileRef} type="file" accept={wordOff ? '.pdf,application/pdf' : '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document'} style={{ display: 'none' }} onChange={onFiles} />
       <div className="template-add-row">

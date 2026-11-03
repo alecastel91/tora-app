@@ -910,6 +910,17 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
       );
     };
 
+    // An agent's own Documents: templates only (press kit and riders are the
+    // artists', managed from Manage artist); an artist's agents see these
+    // templates under "<agency>'s templates" and the artist sees theirs.
+    if (user?.role === 'AGENT') {
+      return (
+        <div className="artist-info-tab">
+          <InvoiceSetupSection profile={user} />
+          <ContractTemplateSection profile={user} />
+        </div>
+      );
+    }
     return (
       <div className="artist-info-tab">
         {renderDocCategory('pressKit', <ImageIcon />, t('manage.pressKit'), t('manage.pressKitNote'))}

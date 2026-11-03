@@ -100,9 +100,9 @@ const OwnProfilePage = ({
 
           <div className="d3-op-actions flex shrink-0 flex-wrap justify-end gap-2">
             <Action icon={<EditIcon />} label={t('profile.editProfile')} onClick={onEdit} primary />
-            {role === 'AGENT'
-              ? <Action icon={<ListIcon />} label={t('roster.title')} onClick={onRoster} />
-              : <Action icon={<GridIcon />} label={t('profile.manageLabel')} onClick={onManage} dot={ownHasActions} />}
+            {role === 'AGENT' && <Action icon={<ListIcon />} label={t('roster.title')} onClick={onRoster} />}
+            {/* Agents too: their own Manage holds the agency's invoice and contract templates. */}
+            <Action icon={<GridIcon />} label={t('profile.manageLabel')} onClick={onManage} dot={ownHasActions} />
             {role === 'ARTIST' && <Action icon={<HandshakeIcon />} label={t('profile.findAgentLabel')} onClick={onFindAgent} />}
             <Action
               icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}

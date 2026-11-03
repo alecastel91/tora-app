@@ -533,12 +533,14 @@ class ApiService {
     const response = await fetch(`${API_URL}/invoices/profile/${profileId}`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ profile }) });
     return this.handleResponse(response);
   }
-  /** Returns { blobUrl, number, amount, currency } for an in-app preview. */
+  /** Returns { blobUrl, number, amount, currency, defaults } for an in-app preview (defaults = what the booking says for the editable fields). */
   async previewInvoice(body) {
     const response = await fetch(`${API_URL}/invoices/preview`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body) });
     if (!response.ok) return this.handleResponse(response);
     const blob = await response.blob();
-    return { blobUrl: URL.createObjectURL(blob), number: response.headers.get('X-Invoice-Number'), amount: Number(response.headers.get('X-Invoice-Amount')), currency: response.headers.get('X-Invoice-Currency') };
+    let defaults = {};
+    try { defaults = JSON.parse(decodeURIComponent(response.headers.get('X-Invoice-Defaults') || '%7B%7D')); } catch { /* an older server: no defaults */ }
+    return { blobUrl: URL.createObjectURL(blob), number: response.headers.get('X-Invoice-Number'), amount: Number(response.headers.get('X-Invoice-Amount')), currency: response.headers.get('X-Invoice-Currency'), defaults };
   }
   async issueInvoice(body) {
     const response = await fetch(`${API_URL}/invoices/issue`, { method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body) });

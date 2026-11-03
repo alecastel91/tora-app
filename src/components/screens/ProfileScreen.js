@@ -697,11 +697,11 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       {/* ===== Actions (2x2 glass grid) ===== */}
       <div className="grid grid-cols-2 gap-2.5 mb-6">
         <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
-        {user?.role === 'AGENT' ? (
+        {user?.role === 'AGENT' && (
           <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => { closeSubScreens(); setShowRepresentedArtists(true); }} />
-        ) : (
-          <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         )}
+        {/* Agents too: their own Manage holds the agency's invoice and contract templates. */}
+        <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         {user?.role === 'ARTIST' && (
           <ActionCard icon={<HandshakeIcon />} label={t('profile.findAgentLabel')} onClick={() => { closeSubScreens(); setShowFindAgent(true); }} />
         )}

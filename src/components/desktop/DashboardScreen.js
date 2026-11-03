@@ -9,6 +9,7 @@ import { formatEventDate, formatTimestamp } from '../../utils/dates';
 import { roleLabel } from '../../utils/roles';
 import { Avatar } from './primitives';
 import InviteFriendsSection from '../common/InviteFriendsSection';
+import useExternalEvents from '../../hooks/useExternalEvents';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { HandshakeIcon, MessageIcon, CalendarCheckIcon, BookingsIcon } from '../../utils/icons';
 import {
@@ -112,23 +113,34 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
   const unread = useMemo(() => data.conversations.reduce((n, c) => n + (c.unreadCount || 0), 0), [data.conversations]);
   const yourMove = useMemo(() => data.actions.filter((a) => BOOKING_ACTIONS.has(a.type)).length, [data.actions]);
 
-  // Next 14 days: availability (profile), gigs (confirmed deals), travel.
+  // Next 14 days: availability (profile), gigs (confirmed deals), travel, and
+  // the events imported from the member's own calendar — the same ones the
+  // Tour calendar shows, so the two never disagree. The window can straddle a
+  // month, hence two month fetches (the hook is per month).
+  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  const extThis = useExternalEvents(user?.id, today.getFullYear(), today.getMonth());
+  const extNext = useExternalEvents(user?.id, nextMonth.getFullYear(), nextMonth.getMonth());
   const days = useMemo(() => {
     const available = new Set(user?.availableDates || []);
     const gigDays = new Set(upcoming.map(dealDayKey));
     const trips = user?.travelSchedule || [];
+    const external = { ...extThis, ...extNext };
     return Array.from({ length: 14 }, (_, i) => {
       const d = new Date(today); d.setDate(d.getDate() + i);
       const key = dayKey(d);
+      // Confirmed trips already live in the travel schedule; the rest of the
+      // imported events count here (the Tour calendar makes the same cut).
+      const imported = (external[`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`] || []).filter((e) => !(e.kind === 'TRAVEL' && e.status === 'CONFIRMED'));
       return {
         key,
         date: d,
         available: available.has(key),
-        gig: gigDays.has(key),
+        gig: gigDays.has(key) || imported.some((e) => e.kind === 'GIG' && e.status === 'CONFIRMED'),
         travel: trips.some((s) => s.startDate && s.endDate && s.startDate <= key && key <= s.endDate),
+        imported: imported.filter((e) => !(e.kind === 'GIG' && e.status === 'CONFIRMED')),
       };
     });
-  }, [user?.availableDates, user?.travelSchedule, upcoming, today]);
+  }, [user?.availableDates, user?.travelSchedule, upcoming, today, extThis, extNext]);
 
   const openDeal = (dealId) => {
     onSwitchTab('bookings');
@@ -251,7 +263,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
                 <div
                   key={d.key}
                   className={`rounded-md border px-1 py-1.5 text-center ${i === 0 ? 'border-infrared/50' : 'border-white/[0.06]'} ${d.available ? 'bg-[#43E97B]/10' : 'bg-white/[0.02]'}`}
-                  title={d.key}
+                  title={d.imported.length ? `${d.key}\n${d.imported.map((e) => `${e.startTime ? `${e.startTime} ` : ''}${e.summary || t('calendarSync.unnamedEvent')}`).join('\n')}` : d.key}
                 >
                   <span className="block text-[9px] uppercase text-white/35">
                     {d.date.toLocaleDateString(locale, { weekday: 'narrow' })}
@@ -260,6 +272,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
                   <span className="mt-1 flex h-1.5 items-center justify-center gap-0.5">
                     {d.gig && <span className="h-1.5 w-1.5 rounded-full bg-infrared" />}
                     {d.travel && <span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />}
+                    {d.imported.length > 0 && <span className="h-1.5 w-1.5 rounded-full bg-white/45" />}
                   </span>
                 </div>
               ))}
@@ -268,6 +281,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
               <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#43E97B]/40" />{t('calendar.available')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-infrared" />{t('desktop.legendGig')}</span>
               <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#FFC107]" />{t('desktop.legendTravel')}</span>
+              <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-white/45" />{t('desktop.legendImported')}</span>
             </div>
           </Panel>
 

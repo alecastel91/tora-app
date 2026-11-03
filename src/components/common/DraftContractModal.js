@@ -5,7 +5,7 @@ import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer, openPremium } from '../../utils/subscription';
 import useBusyAction from '../../hooks/useBusyAction';
 import usePdfPreview from '../../hooks/usePdfPreview';
-import { TemplatePicker } from './TemplatesSection';
+import { TemplatePicker, usableTemplates } from './TemplatesSection';
 import DocModal, { previewPaneVisible } from './DocModal';
 
 /**
@@ -47,7 +47,13 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
     let cancelled = false;
     reset(); setNeedsSetup(false); setError(''); setTemplates([]); setTemplateId(null);
     apiService.contractTemplates.list(currentUser.id)
-      .then((r) => { if (cancelled) return; setTemplates(r.templates || []); if (!r.templates?.length) setNeedsSetup(true); else setTemplateId(r.defaultId || r.templates[0].id); })
+      .then((r) => {
+        if (cancelled) return;
+        // Own templates, then the ones shared by the agent / the artist of this booking.
+        const list = usableTemplates(r, { viewer: currentUser, artistId: deal?.bookedArtistId || deal?.artistId });
+        setTemplates(list);
+        if (!list.length) setNeedsSetup(true); else setTemplateId(list.some((x) => x.id === r.defaultId) ? r.defaultId : list[0].id);
+      })
       .catch((e) => { if (!cancelled) setError(e.message || t('common.error')); });
     return () => { cancelled = true; };
   }, [isOpen, deal?.id, currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -216,7 +222,8 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
                   <button type="button" className="btn btn-outline" disabled={busy || !instruction.trim()} onClick={applyInstruction}>{busy ? '…' : t('contracts.apply')}</button>
                 </div>
               </div>}
-              {!isWord && (
+              {/* A shared template belongs to the agent / artist: only its owner's clauses change. */}
+              {!isWord && !templates.find((x) => x.id === templateId)?.shared && (
                 <label className="settings-toggle mt-2">
                   <input type="checkbox" checked={saveToTemplate} onChange={(e) => setSaveToTemplate(e.target.checked)} />
                   <span>{t('contracts.saveToTemplate')}</span>

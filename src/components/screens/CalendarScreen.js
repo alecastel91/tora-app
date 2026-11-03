@@ -13,6 +13,7 @@ import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import CalendarSyncScreen from '../common/CalendarSyncScreen';
 import CalendarReviewSheet from '../common/CalendarReviewSheet';
+import CalendarDaySheet from '../common/CalendarDaySheet';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
 import useExternalEvents from '../../hooks/useExternalEvents';
 
@@ -75,6 +76,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // Every live deal of this calendar (any date). The month grid marks all
   // of them; the list below shows the next ten (derived, never a 2nd state).
   const [deals, setDeals] = useState([]);
+  const [daySheet, setDaySheet] = useState(null); // phone: { day, month, year } whose events are open in a sheet
   const upcomingEvents = useMemo(() => {
     // deal.date is date-only (UTC midnight): compare the calendar day as a
     // string so a gig "today" never slips to yesterday west of UTC.
@@ -870,12 +872,22 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                   onMouseDown={(ev) => ev.stopPropagation()}
                   onTouchStart={(ev) => ev.stopPropagation()}
                   onTouchEnd={(ev) => ev.stopPropagation()}
-                  onClick={(ev) => { ev.stopPropagation(); setFocusedDay({ day, month, year }); }}
+                  onClick={(ev) => { ev.stopPropagation(); if (nativeDesktop) setFocusedDay({ day, month, year }); else setDaySheet({ day, month, year }); }}
                 >
                   {e.startTime ? `${e.startTime} ` : ''}{e.summary || t('calendarSync.unnamedEvent')}
                 </span>
               ))}
-              {extraCount > 0 && <span className="calendar-day-more">+{extraCount}</span>}
+              {/* Phone: "+N" opens the day's sheet (the desktop rail shows the day already). */}
+              {extraCount > 0 && (nativeDesktop ? <span className="calendar-day-more">+{extraCount}</span> : (
+                <button
+                  type="button"
+                  className="calendar-day-more is-tappable"
+                  onMouseDown={(ev) => ev.stopPropagation()}
+                  onTouchStart={(ev) => ev.stopPropagation()}
+                  onTouchEnd={(ev) => ev.stopPropagation()}
+                  onClick={(ev) => { ev.stopPropagation(); setDaySheet({ day, month, year }); }}
+                >+{extraCount}</button>
+              ))}
             </div>
           )}
           {schedulePos.hasSchedule && (() => {
@@ -931,10 +943,11 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     return { free, gigs, trips };
   })();
 
-  // What the rail says about the day you last clicked.
-  const focusedInfo = (() => {
-    if (!focusedDay) return null;
-    const { day, month, year } = focusedDay;
+  // Everything on one day: the desktop rail (last clicked day) and the phone
+  // sheet (tapped event or "+N") read the same shape.
+  const dayInfo = (at) => {
+    if (!at) return null;
+    const { day, month, year } = at;
     const key = `${year}-${month + 1}-${day}`;
     return {
       key,
@@ -946,15 +959,18 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       deals: dealsFor(month, year)[day] || [],
       external: externalByDay[key] || [],
     };
-  })();
+  };
+  const focusedInfo = dayInfo(focusedDay);
+  const daySheetInfo = nativeDesktop ? null : dayInfo(daySheet);
 
-  const toggleFocusedDay = () => {
-    if (!focusedInfo) return;
+  const toggleDayFree = (info) => {
+    if (!info) return;
     const next = new Set(selectedDates);
-    if (focusedInfo.isFree) next.delete(focusedInfo.key); else next.add(focusedInfo.key);
+    if (info.isFree) next.delete(info.key); else next.add(info.key);
     setSelectedDates(next);
     setShouldSave(true);
   };
+  const toggleFocusedDay = () => toggleDayFree(focusedInfo);
 
   const travelSection = (
       <div className="travel-schedules-section">
@@ -1071,6 +1087,14 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         onEventsChanged={() => setEventsVersion((v) => v + 1)}
       />
       <CalendarReviewSheet isOpen={reviewOpen} profileId={ownerId} review={review} onClose={() => setReviewOpen(false)} onDecided={onReviewDecided} />
+      {daySheetInfo && (
+        <CalendarDaySheet
+          info={daySheetInfo} locationText={getLocationDisplayText}
+          onClose={() => setDaySheet(null)}
+          onToggleFree={() => toggleDayFree(daySheetInfo)}
+          onOpenDeal={(id) => { setDaySheet(null); openDealFromGrid(id); }}
+        />
+      )}
     </div>
   ) : null;
 
