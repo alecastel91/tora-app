@@ -643,8 +643,10 @@ function App() {
       });
 
       // Update account user state
+      // Merge: the preferences response carries a subset of the account row,
+      // and dropping onboardedAt would re-open Getting Started.
       if (response.user) {
-        setAccountUser(response.user);
+        setAccountUser((u) => ({ ...u, ...response.user }));
       }
     } catch (error) {
       console.error('Failed to update currency preference:', error);
@@ -663,8 +665,10 @@ function App() {
       const response = await apiService.updateUserPreferences({
         marketingConsent: nextValue
       });
+      // Merge: the preferences response carries a subset of the account row,
+      // and dropping onboardedAt would re-open Getting Started.
       if (response.user) {
-        setAccountUser(response.user);
+        setAccountUser((u) => ({ ...u, ...response.user }));
       }
     } catch (error) {
       console.error('Failed to update marketing consent:', error);
