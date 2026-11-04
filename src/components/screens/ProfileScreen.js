@@ -584,7 +584,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           {user?.name || t('profile.yourName')}
           {user?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" channel={user?.verifyChannel} />}
         </h2>
-        {user?.role === 'AGENT' && <AgencyBadge profileId={user?.id} />}
+        {user?.role === 'AGENT' && <AgencyBadge profileId={user?.id} onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }} />}
         <p className="flex items-center justify-center gap-1.5 text-[13px] text-white/60 mb-2 font-tech [&>svg]:w-3.5 [&>svg]:h-3.5">
           <LocationIcon />{user?.location || t('profile.addLocation')}
         </p>
@@ -697,11 +697,10 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       {/* ===== Actions (2x2 glass grid) ===== */}
       <div className="grid grid-cols-2 gap-2.5 mb-6">
         <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
+        <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         {user?.role === 'AGENT' && (
           <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => { closeSubScreens(); setShowRepresentedArtists(true); }} />
         )}
-        {/* Agents too: their own Manage holds the agency's invoice and contract templates. */}
-        <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         {user?.role === 'ARTIST' && (
           <ActionCard icon={<HandshakeIcon />} label={t('profile.findAgentLabel')} onClick={() => { closeSubScreens(); setShowFindAgent(true); }} />
         )}

@@ -460,6 +460,10 @@ class ApiService {
     const response = await fetch(`${API_URL}/profiles/${agentProfileId}/free-active-artist`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ artistProfileId }) });
     return this.handleResponse(response);
   }
+  async getAgencyTeam(organisationId) {
+    const response = await fetch(`${API_URL}/organisations/${organisationId}/team`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
   async getAgencyOfProfile(profileId) {
     const response = await fetch(`${API_URL}/organisations/of/${profileId}`, { headers: this.getHeaders() });
     return this.handleResponse(response);

@@ -1,3 +1,4 @@
+import AgencyTeamSheet, { AgencySearchCard } from '../common/AgencyTeamSheet';
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import OverlayPortal from '../common/OverlayPortal';
 import { appAlert } from '../../utils/dialogs';
@@ -53,6 +54,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     genres: []
   });
   const [searchResults, setSearchResults] = useState([]);
+  const [agencyResults, setAgencyResults] = useState([]);
+  const [openAgencyId, setOpenAgencyId] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [viewingProfile, setViewingProfile] = useState(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
@@ -231,6 +234,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         return profile.id !== user?.id;
       });
       setSearchResults(filteredProfiles);
+      setAgencyResults(response.agencies || []);
 
       // Beta T11: searched with a city filter beyond the member's own city.
       if (import.meta.env.VITE_TORA_ENV === 'beta'
@@ -240,6 +244,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     } catch (error) {
       console.error('Search error:', error);
       setSearchResults([]);
+      setAgencyResults([]);
     } finally {
       setLoading(false);
     }
@@ -693,6 +698,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
 
       {/* Search Results */}
       <div className="search-results">
+        {!loading && agencyResults.map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
+        {openAgencyId && <AgencyTeamSheet organisationId={openAgencyId} onClose={() => setOpenAgencyId(null)} onOpenProfile={handleProfileClick} />}
         {loading ? (
           <LoadingGlobe label={t('search.loadingProfiles')} />
         ) : listResults.length > 0 ? (
@@ -763,7 +770,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               </div>
             );
           })
-        ) : (
+        ) : agencyResults.length > 0 ? null : (
           <div className="flex flex-col items-center py-20 text-center">
             <span aria-hidden className="text-white/15 [&>svg]:w-9 [&>svg]:h-9 mb-4"><SearchIcon /></span>
             <p className="text-sm text-white/50">{hasSearched ? t('search.noResults') : t('search.startSearching')}</p>

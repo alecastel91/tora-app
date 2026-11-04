@@ -96,6 +96,7 @@ const ProfilePage = ({
                 <AgencyBadge
                   profileId={profile.id}
                   align="left"
+                  onOpenProfile={onOpenNested}
                   fallback={profile.agencyName ? <p className="m-0 mt-0.5 text-[13px] text-white/50">{profile.agencyName}</p> : null}
                 />
               )}

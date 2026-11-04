@@ -152,6 +152,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         console.log('[ManageProfileScreen] No user.id, skipping dashboard fetch');
         return;
       }
+      if (user.role === 'AGENT') return; // no Insights for agents
 
       try {
         console.log('[ManageProfileScreen] Fetching deals for user:', user.id);
@@ -164,10 +165,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         const response = await apiService.getDeals({ profileId: user.id });
         console.log('[ManageProfileScreen] Deals response:', response);
 
-        // An agent also receives the roster's other gigs with the fee hidden
-        // (calendar awareness only). Those are left out here, so an agent's
-        // booking counts and money describe the same bookings: the ones they run.
-        const countedDeals = (response?.deals || []).filter((deal) => !deal.limitedVisibility);
+        const countedDeals = response?.deals || [];
 
         if (countedDeals.length > 0) {
           setDeals(countedDeals);
@@ -516,8 +514,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   // is the metrics, chart, reach, top cities and who-viewed-you.
   const renderDashboardTab = ({ part } = { part: 'insights' }) => {
     const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
-    // An agent's figures are their artists' fees, not the agent's own income.
-    const revenueLabel = user?.role === 'AGENT' ? t('manage.bookingValue') : isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
+    const revenueLabel = isPromoterOrVenue ? t('manage.costs') : t('manage.revenue');
     const showActions = part === 'actions';
     const showInsights = part === 'insights';
 
@@ -921,12 +918,12 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
       );
     };
 
-    // An agent's own Documents: templates only (press kit and riders are the
-    // artists', managed from Manage artist); an artist's agents see these
-    // templates under "<agency>'s templates" and the artist sees theirs.
+    // An agent's own Documents: templates only, private to them (press kit,
+    // riders and the artist's templates are in that artist's Manage).
     if (user?.role === 'AGENT') {
       return (
         <div className="artist-info-tab">
+          <p className="form-hint mt-0" style={{ gridColumn: '1 / -1' }}>{t('templates.agentOwnHint')}</p>
           <InvoiceSetupSection profile={user} />
           <ContractTemplateSection profile={user} />
         </div>
@@ -979,12 +976,15 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           {t('manage.actionsRequired')}
           {actionItems?.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
         </button>
-        <button
-          className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => handleTabChange('dashboard')}
-        >
-          {t('manage.insights')}
-        </button>
+        {/* An agent's numbers are per artist, in that artist's Manage. */}
+        {user?.role !== 'AGENT' && (
+          <button
+            className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => handleTabChange('dashboard')}
+          >
+            {t('manage.insights')}
+          </button>
+        )}
         <button
           className={`tab-button ${activeTab === 'documents' ? 'active' : ''}`}
           onClick={() => handleTabChange('documents')}

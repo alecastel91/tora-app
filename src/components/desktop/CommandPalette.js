@@ -1,3 +1,4 @@
+import AgencyTeamSheet from '../common/AgencyTeamSheet';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -16,6 +17,8 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [profiles, setProfiles] = useState([]);
+  const [agencies, setAgencies] = useState([]);
+  const [openAgencyId, setOpenAgencyId] = useState(null);
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef(null);
   const seq = useRef(0);
@@ -32,19 +35,19 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
   }, []);
 
   useEffect(() => {
-    if (!open) { setQuery(''); setProfiles([]); setCursor(0); return; }
+    if (!open) { setQuery(''); setProfiles([]); setAgencies([]); setCursor(0); return; }
     setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
   // Profiles: the same search endpoint, a short page, debounced.
   useEffect(() => {
     const q = query.trim();
-    if (!open || q.length < 2 || !user?.id) { setProfiles([]); return undefined; }
+    if (!open || q.length < 2 || !user?.id) { setProfiles([]); setAgencies([]); return undefined; }
     const n = ++seq.current;
     const id = setTimeout(() => {
       apiService.searchProfiles({ activeProfileId: user.id, search: q, limit: 8 })
-        .then((r) => { if (n === seq.current) setProfiles((r.profiles || r || []).filter((p) => p.id !== user.id)); })
-        .catch(() => { if (n === seq.current) setProfiles([]); });
+        .then((r) => { if (n === seq.current) { setProfiles((r.profiles || r || []).filter((p) => p.id !== user.id)); setAgencies(r.agencies || []); } })
+        .catch(() => { if (n === seq.current) { setProfiles([]); setAgencies([]); } });
     }, 220);
     return () => clearTimeout(id);
   }, [query, open, user?.id]);
@@ -53,15 +56,18 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
   const pageHits = useMemo(() => pages.filter((p) => !q || p.label.toLowerCase().includes(q)), [pages, q]);
   const items = useMemo(() => [
     ...pageHits.map((p) => ({ kind: 'page', id: p.id, label: p.label })),
+    ...agencies.map((a) => ({ kind: 'agency', id: a.id, label: a.name, agency: a })),
     ...profiles.map((p) => ({ kind: 'profile', id: p.id, label: p.name, profile: p })),
-  ], [pageHits, profiles]);
+  ], [pageHits, agencies, profiles]);
 
   useEffect(() => { setCursor(0); }, [items.length, q]);
 
   const run = (item) => {
     if (!item) return;
     setOpen(false);
-    if (item.kind === 'page') onGo(item.id); else onOpenProfile(item.profile);
+    if (item.kind === 'page') onGo(item.id);
+    else if (item.kind === 'agency') setOpenAgencyId(item.id);
+    else onOpenProfile(item.profile);
   };
 
   const onInputKey = (e) => {
@@ -70,7 +76,11 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
     else if (e.key === 'Enter') { e.preventDefault(); run(items[cursor]); }
   };
 
-  if (!open) return null;
+  if (!open) {
+    return openAgencyId
+      ? <AgencyTeamSheet organisationId={openAgencyId} onClose={() => setOpenAgencyId(null)} onOpenProfile={onOpenProfile} />
+      : null;
+  }
 
   let lastKind = null;
   return (
@@ -91,7 +101,7 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
           <ul className="max-h-[48vh] overflow-y-auto p-2">
             {items.length === 0 && <li className="px-3 py-6 text-center text-[13px] text-white/35">{t('search.noResults')}</li>}
             {items.map((item, i) => {
-              const header = item.kind !== lastKind ? (item.kind === 'page' ? t('desktop.pages') : t('desktop.profilesLabel')) : null;
+              const header = item.kind !== lastKind ? (item.kind === 'page' ? t('desktop.pages') : item.kind === 'agency' ? t('agency.searchCardLabel') : t('desktop.profilesLabel')) : null;
               lastKind = item.kind;
               return (
                 <React.Fragment key={`${item.kind}:${item.id}`}>
@@ -107,6 +117,11 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
                           <Avatar profile={{ ...item.profile, name: item.label }} className="h-7 w-7 text-[11px]" />
                           <span className="min-w-0 flex-1 truncate">{item.label}</span>
                           <span className="shrink-0 text-[11px] text-white/40">{roleLabel(item.profile.role, t)}{item.profile.city ? ` · ${item.profile.city}` : ''}</span>
+                        </>
+                      ) : item.kind === 'agency' ? (
+                        <>
+                          <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                          <span className="shrink-0 text-[11px] text-white/40">{t('agency.teamSummary', { n: item.agency.memberCount, total: item.agency.artistTotal })}</span>
                         </>
                       ) : (
                         <span className="flex-1">{item.label}</span>

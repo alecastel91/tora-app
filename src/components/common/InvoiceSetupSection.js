@@ -67,12 +67,12 @@ const InvoiceTemplateDetails = ({ template, save, busy, close }) => {
   );
 };
 
-const InvoiceSetupSection = ({ profile }) => {
+const InvoiceSetupSection = ({ profile, viewer }) => {
   const store = useDocumentTemplates({ profileId: profile?.id, api: apiService.invoiceTemplates, toasts: { added: 'invoices.added', saved: 'invoices.saved', removed: 'invoices.removed', defaultSet: 'templates.defaultSet' } });
   if (!profile?.id) return null;
   return (
     <TemplatesSection
-      ns="invoices" icon={<FileTextIcon />} store={store} profile={profile}
+      ns="invoices" icon={<FileTextIcon />} store={store} profile={profile} viewer={viewer}
       renderDetails={(template, ctx) => <InvoiceTemplateDetails template={template} {...ctx} />}
     />
   );

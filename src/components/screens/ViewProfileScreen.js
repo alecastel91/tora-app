@@ -617,6 +617,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           {profile.role === 'AGENT' && (
             <AgencyBadge
               profileId={profile.id}
+              onOpenProfile={setNestedProfile}
               fallback={profile.agencyName ? <p className="text-center text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p> : null}
             />
           )}

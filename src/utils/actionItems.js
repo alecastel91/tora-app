@@ -11,6 +11,7 @@ export const ACTION_ICONS = {
   counter_offer_pending: HandshakeIcon,
   contract_to_send: FileIcon,
   contract_to_sign: FileIcon,
+  documents_to_share: FileIcon,
   payment_to_mark_sent: DollarIcon,
   payment_to_confirm_received: DollarIcon,
   payment_to_resolve: DollarIcon,
@@ -51,6 +52,7 @@ const ACTION_LABEL_KEYS = {
   'Mark Sent': 'manage.actionMarkSent',
   'Confirm': 'manage.actionConfirm',
   'Resolve': 'manage.actionResolve',
+  'Share': 'manage.actionShare',
 };
 
 const ACTION_TYPE_KEYS = {
@@ -58,6 +60,7 @@ const ACTION_TYPE_KEYS = {
   counter_offer_pending: 'manage.actionCounterOffer',
   contract_to_send: 'manage.actionContractToSend',
   contract_to_sign: 'manage.actionContractToSign',
+  documents_to_share: 'manage.actionDocumentsToShare',
   payment_to_mark_sent: 'manage.actionPaymentToMarkSent',
   payment_to_resolve: 'manage.actionPaymentToResolve',
   representation_request_received: 'manage.actionRepresentationRequest',

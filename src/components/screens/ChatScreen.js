@@ -3090,7 +3090,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                                 library: currentUser.role === 'AGENT'
                                   ? t('chat.libraryOf', { name: selectedArtistForDocs?.name || t('chat.their') })
                                   : t('chat.yourLibrary'),
-                              })} <strong>{t('chat.manageDocsPath')}</strong>.
+                              })} <strong>{t(currentUser.role === 'AGENT' ? 'chat.manageDocsPathAgent' : 'chat.manageDocsPath')}</strong>.
                             </p>
                           ) : (
                             docs.map((doc) => (

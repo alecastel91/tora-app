@@ -76,12 +76,12 @@ const WordDetails = ({ template, save, busy, close }) => {
   );
 };
 
-const ContractTemplateSection = ({ profile }) => {
+const ContractTemplateSection = ({ profile, viewer }) => {
   const store = useDocumentTemplates({ profileId: profile?.id, api: apiService.contractTemplates, toasts: { added: 'contracts.added', saved: 'contracts.saved', removed: 'contracts.removed', defaultSet: 'templates.defaultSet' } });
   if (!profile?.id) return null;
   return (
     <TemplatesSection
-      ns="contracts" icon={<FileTextIcon />} store={store} profile={profile}
+      ns="contracts" icon={<FileTextIcon />} store={store} profile={profile} viewer={viewer}
       renderDetails={(template, ctx) => (template.kind === 'docx'
         ? <WordDetails template={template} {...ctx} />
         : <ClausesEditor template={template} {...ctx} placeholders={store.placeholders || []} />)}

@@ -1,3 +1,4 @@
+import AgencyTeamSheet, { AgencySearchCard } from '../common/AgencyTeamSheet';
 import React, { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -33,6 +34,8 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
   const [filters, setFilters] = useState(EMPTY);
   const [showFilters, setShowFilters] = useState(false);
   const [results, setResults] = useState([]);
+  const [agencies, setAgencies] = useState([]);
+  const [openAgencyId, setOpenAgencyId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [full, setFull] = useState(false);
   // A city/country tapped on the globe narrows the LIST only. It must stay out
@@ -55,8 +58,9 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
       const r = await apiService.searchProfiles(params);
       if (n !== seq.current) return;
       setResults((r.profiles || r || []).filter((p) => p.id !== user.id));
+      setAgencies(r.agencies || []);
     } catch (e) {
-      if (n === seq.current) setResults([]);
+      if (n === seq.current) { setResults([]); setAgencies([]); }
     } finally {
       if (n === seq.current) setLoading(false);
     }
@@ -172,7 +176,9 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
           <div className="px-3 py-2 text-[11px] text-white/45">{t('desktop.results', { n: list.length })}</div>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
-            {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? (
+            {agencies.map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
+            {openAgencyId && <AgencyTeamSheet organisationId={openAgencyId} onClose={() => setOpenAgencyId(null)} onOpenProfile={onOpenProfile} />}
+            {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? agencies.length > 0 ? null : (
               <p className="py-14 text-center text-[13px] text-white/35">{t('search.noResults')}</p>
             ) : list.map((profile) => {
               const liked = likedProfiles.has(profile.id);

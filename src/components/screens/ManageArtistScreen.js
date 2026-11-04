@@ -10,7 +10,8 @@ import { CloseIcon, CalendarIcon, DollarIcon, AlertIcon, TrendingUpIcon, ImageIc
 import Modal from '../common/Modal';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
-import { SharedTemplatesSection } from '../common/TemplatesSection';
+import InvoiceSetupSection from '../common/InvoiceSetupSection';
+import ContractTemplateSection from '../common/ContractTemplateSection';
 import { zones, countriesByZone, citiesByCountry, genresList, getZoneFromCountry } from '../../data/profiles';
 import apiService from '../../services/api';
 import { useAppContext } from '../../contexts/AppContext';
@@ -129,13 +130,17 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         // The agent's own deals (GET /deals is owner-only, so asking for the
         // artist's id was a 403), narrowed to this artist like CalendarPane does.
         const response = await apiService.getDeals({ profileId: user.id });
-        const deals = (response?.deals || []).filter((d) => dealIsForArtist(d, artistId));
+        const artistDeals = (response?.deals || []).filter((d) => dealIsForArtist(d, artistId));
+        // Gigs this agent does not run arrive with the fee hidden. They stay on
+        // the events list but out of the numbers, so gig counts and money
+        // describe the same bookings.
+        const deals = artistDeals.filter((d) => !d.limitedVisibility);
 
         console.log('ManageArtistScreen - API response:', response);
 
         if (response?.deals) {
           // Store all deals for events list
-          setDeals(deals);
+          setDeals(artistDeals);
 
           const today = new Date();
           const yearStart = new Date(today.getFullYear(), 0, 1); // January 1st of current year
@@ -636,6 +641,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
 
   // Documents Tab (Press Kit, Technical Riders, Contracts)
   const renderDocumentsTab = () => {
+    const artistRef = { id: artistProfile?.profileId || artistProfile?.id };
     const renderDocCategory = (category, icon, title, note = null) => (
       <div className="dashboard-section" key={category}>
         <div className="section-header">
@@ -735,9 +741,10 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
         {renderDocCategory('hospitalityRider', <SlidersIcon />, t('manageArtist.hospitalityRider'), t('manageArtist.hospitalityRiderNote'))}
         {/* Contracts come from the templates below; files uploaded before that stay until deleted. */}
         {documents.contracts?.length > 0 && renderDocCategory('contracts', <FileTextIcon />, t('manageArtist.contracts'), t('manageArtist.contractsNote'))}
-        {/* The artist's own templates, as the agent may use them for this artist's bookings. */}
-        <SharedTemplatesSection ns="invoices" icon={<FileTextIcon />} api={apiService.invoiceTemplates} viewerId={user?.id} ownerId={artistProfile?.profileId || artistProfile?.id} ownerName={artistProfile?.name || ''} />
-        <SharedTemplatesSection ns="contracts" icon={<FileTextIcon />} api={apiService.contractTemplates} viewerId={user?.id} ownerId={artistProfile?.profileId || artistProfile?.id} ownerName={artistProfile?.name || ''} />
+        {/* Templates on the artist's profile: added here or by the artist, seen by both. */}
+        <p className="form-hint" style={{ gridColumn: '1 / -1' }}>{t('templates.artistSeesHint', { name: artistProfile?.name || '' })}</p>
+        <InvoiceSetupSection profile={artistRef} viewer={user} />
+        <ContractTemplateSection profile={artistRef} viewer={user} />
       </div>
     );
   };

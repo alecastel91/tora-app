@@ -86,7 +86,7 @@ const OwnProfilePage = ({
               <span className="truncate">{user?.name || t('profile.yourName')}</span>
               {!unverified && <VerifiedBadge size={18} channel={user?.verifyChannel} />}
             </h1>
-            {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" />}
+            {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={onOpenProfile} />}
             <p className="m-0 mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-white/60">
               <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${roleTone}`}>{roleLabel(role || 'ARTIST', t)}</span>
               <span className="inline-flex items-center gap-1 [&>svg]:h-3.5 [&>svg]:w-3.5"><LocationIcon />{user?.location || t('profile.addLocation')}</span>
@@ -100,9 +100,8 @@ const OwnProfilePage = ({
 
           <div className="d3-op-actions flex shrink-0 flex-wrap justify-end gap-2">
             <Action icon={<EditIcon />} label={t('profile.editProfile')} onClick={onEdit} primary />
-            {role === 'AGENT' && <Action icon={<ListIcon />} label={t('roster.title')} onClick={onRoster} />}
-            {/* Agents too: their own Manage holds the agency's invoice and contract templates. */}
             <Action icon={<GridIcon />} label={t('profile.manageLabel')} onClick={onManage} dot={ownHasActions} />
+            {role === 'AGENT' && <Action icon={<ListIcon />} label={t('roster.title')} onClick={onRoster} />}
             {role === 'ARTIST' && <Action icon={<HandshakeIcon />} label={t('profile.findAgentLabel')} onClick={onFindAgent} />}
             <Action
               icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}

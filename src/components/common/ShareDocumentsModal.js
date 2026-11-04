@@ -221,7 +221,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
 
                   {status === 'pending' && !cat.uploadOnly && docsSource.length === 0 && (
                     <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.5 }}>
-                      {t('docs.noneInLibraryBefore', { label: cat.label.toLowerCase() })} <strong>{t('chat.manageDocsPath')}</strong>{t('docs.noneInLibraryAfter')}
+                      {t('docs.noneInLibraryBefore', { label: cat.label.toLowerCase() })} <strong>{t(currentUser?.role === 'AGENT' ? 'chat.manageDocsPathAgent' : 'chat.manageDocsPath')}</strong>{t('docs.noneInLibraryAfter')}
                     </p>
                   )}
                 </div>

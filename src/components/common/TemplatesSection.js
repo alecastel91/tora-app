@@ -14,10 +14,9 @@ export const TemplateKindBadge = ({ kind }) => {
 };
 
 /**
- * The templates a booking document can be made from: the member's own, then
- * the ones their agent / artists share (`list.shared`, each marked with its
- * owner). An agent issuing for one artist sees that artist's, not the whole
- * roster's. → [{ ...template, shared?, ownerId?, ownerName? }]
+ * The templates a booking document can be made from: the member's own, then,
+ * for an agent, those of the booking's artist (`list.shared`, each marked with
+ * its owner), not the whole roster's. → [{ ...template, shared?, ownerId?, ownerName? }]
  */
 export const usableTemplates = (list, { viewer, artistId } = {}) => {
   const own = list?.templates || [];
@@ -51,66 +50,6 @@ export const TemplatePicker = ({ templates, templateId, onPick }) => {
         </p>
       )}
     </>
-  );
-};
-
-/** Rows for templates someone else owns: name, kind, file, and a sample preview — nothing to edit. */
-const SharedRows = ({ templates, busy, onSample }) => {
-  const { t } = useLanguage();
-  return (
-    <div className="template-list">
-      {templates.map((tpl) => (
-        <div key={tpl.id} className="template-row is-shared">
-          <div className="template-row-main">
-            <div className="template-card-title"><strong>{tpl.name}</strong></div>
-            <div className="template-row-sub">
-              <TemplateKindBadge kind={tpl.kind} />
-              {tpl.file?.originalName && <span className="template-file" title={tpl.file.originalName}>{tpl.file.originalName}</span>}
-            </div>
-          </div>
-          <div className="template-row-actions">
-            <button type="button" className="template-act" disabled={!!busy} onClick={() => onSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-/**
- * One linked profile's templates as the viewer sees them (Manage artist →
- * Documents: the artist's invoice / contract templates, read through the
- * agent's own list). Preview only; the owner edits from their own tab.
- */
-export const SharedTemplatesSection = ({ ns, icon, api, viewerId, ownerId, ownerName }) => {
-  const { t } = useLanguage();
-  const [templates, setTemplates] = useState(null); // null = loading
-  const [busy, setBusy] = useState(null);
-  const [sample, setSample] = useState(null);
-  useEffect(() => {
-    if (!viewerId || !ownerId) return undefined;
-    let cancelled = false;
-    setTemplates(null);
-    api.list(viewerId)
-      .then((r) => { if (!cancelled) setTemplates(((r.shared || []).find((g) => g.ownerId === ownerId) || {}).templates || []); })
-      .catch(() => { if (!cancelled) setTemplates([]); });
-    return () => { cancelled = true; };
-  }, [viewerId, ownerId]); // eslint-disable-line react-hooks/exhaustive-deps
-  const closeSample = () => setSample((x) => { if (x) URL.revokeObjectURL(x.url); return null; });
-  const showSample = async (tpl) => {
-    if (busy) return;
-    closeSample(); setBusy(tpl.id);
-    try { setSample({ url: await api.sample(viewerId, tpl.id), name: tpl.name }); } catch (e) { appAlert(e.message || t('common.error')); } finally { setBusy(null); }
-  };
-  return (
-    <div className={`dashboard-section templates-section templates-${ns}`}>
-      <div className="section-header"><h3>{icon} {t(`${ns}.setupTitle`)}</h3></div>
-      {templates === null ? <p className="form-hint mt-0">{t('common.loading')}</p>
-        : templates.length === 0 ? <p className="form-hint mt-0">{t('templates.sharedNone', { name: ownerName })}</p>
-        : <SharedRows templates={templates} busy={busy} onSample={showSample} />}
-      {templates?.length > 0 && <p className="form-hint">{t('templates.sharedManagedBy', { name: ownerName })}</p>}
-      {sample && <PdfViewerModal url={sample.url} title={`${sample.name} · ${t('templates.sampleTitle')}`} onClose={closeSample} />}
-    </div>
   );
 };
 
@@ -157,19 +96,19 @@ export const TemplateEditorActions = ({ dirty, busy, onSave, onClose }) => {
  * Profile → Manage → Documents: a row per template (name, kind, file,
  * default) with quiet actions — sample, details (an editor the caller
  * renders, opened under the row), make default, delete — and the two ways
- * to add one. Templates the member's agent / artists share follow, by
- * owner, with a sample preview only. The explanations live behind the "i".
+ * to add one. The explanations live behind the "i".
  *
  * props: ns ('invoices' | 'contracts') for the copy, store = useDocumentTemplates(),
- * profile, renderDetails(template, { save, busy, close }) → the editor.
+ * profile, renderDetails(template, { save, busy, close }) → the editor, and
+ * viewer when an agent manages an artist's list (their plan is the one that counts).
  */
-const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
+const TemplatesSection = ({ ns, icon, store, profile, viewer, renderDetails }) => {
   const { t } = useLanguage();
   const fileRef = useRef(null);
   const [open, setOpen] = useState(null);      // template id with details open
   const [guide, setGuide] = useState(false);
   const [sample, setSample] = useState(null);  // { url, name }
-  const yearly = isYearlyViewer(profile);
+  const yearly = isYearlyViewer(viewer || profile);
   const { templates, defaultId, converter, loading, error, busy } = store;
   const MAX = 8;
   const full = templates.length >= MAX;
@@ -243,14 +182,6 @@ const TemplatesSection = ({ ns, icon, store, profile, renderDetails }) => {
           })}
         </div>
       )}
-
-      {(store.shared || []).map((g) => (
-        <div key={g.ownerId} className="template-shared-group">
-          <p className="form-hint template-shared-title">{t('templates.sharedFrom', { name: g.ownerName })}</p>
-          <SharedRows templates={g.templates} busy={busy} onSample={showSample} />
-        </div>
-      ))}
-      {(store.shared || []).length > 0 && <p className="form-hint">{t('templates.sharedHint')}</p>}
 
       <input ref={fileRef} type="file" accept={wordOff ? '.pdf,application/pdf' : '.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document'} style={{ display: 'none' }} onChange={onFiles} />
       <div className="template-add-row">
