@@ -13485,7 +13485,6 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .agency-team-name { margin: 0; font-size: 14px; font-weight: 600; color: #fff; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
 .agency-team-admin { font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; border: 1px solid rgba(0, 200, 117, 0.45); color: #00C875; }
 .agency-team-place { margin: 1px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.45); }
-.agency-team-count { font-size: 12px; color: rgba(255, 255, 255, 0.6); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .agency-team-footer { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .agency-team-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: rgba(255, 255, 255, 0.6); text-align: center; }
 
@@ -13629,8 +13628,6 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .contract-clause.is-changed { background: rgba(255, 193, 7, 0.06); border-left: 2px solid rgba(255, 193, 7, 0.8); padding-left: 8px; }
 .contract-clause-no { font-size: 12px; color: rgba(255, 255, 255, 0.45); min-width: 18px; font-variant-numeric: tabular-nums; }
 .contract-changed-chip { font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; border: 1px solid rgba(255, 193, 7, 0.6); color: #FFC107; }
-
-/* Templates shared by the member's agent / artists (Manage → Documents). */
 
 /* Invoice modal: the editable details block (bill-to, description, dates). */
 .invoice-details-toggle { align-self: flex-start; margin: 2px 0 8px; }

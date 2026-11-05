@@ -2,7 +2,7 @@
 // table). Everything here mirrors a rule BookingsScreen already applies to its
 // cards — the same helpers, so a row and the card it opens never disagree.
 import { isArtistSideForDeal } from '../../utils/contractSigner';
-import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
+import { DOC_CATEGORIES, categoryStatus, documentsStillDue } from '../../utils/documentCategories';
 import { bookingStatusLine } from '../../utils/bookingStatus';
 import { isOffDeal, formatFee, isConsentOnlyFor } from '../../utils/dealStatus';
 
@@ -54,7 +54,7 @@ export function bookedArtistName(deal, user) {
 
 /** The status sentence with the same pending-docs input the card uses. */
 export function statusLineFor(deal, user, t) {
-  const hasPendingDocs = deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, user)
+  const hasPendingDocs = documentsStillDue(deal) && isArtistSideForDeal(deal, user)
     && DOC_CATEGORIES.some((c) => categoryStatus(deal.sharedDocuments, c.key) === 'pending');
   return bookingStatusLine(deal, user, t, { hasPendingDocs });
 }

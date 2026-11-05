@@ -10,7 +10,7 @@ import { roleLabel } from '../../utils/roles';
 import { Avatar } from './primitives';
 import InviteFriendsSection from '../common/InviteFriendsSection';
 import { useExternalEventsRange } from '../../hooks/useExternalEvents';
-import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
+import { BOOKING_ACTIONS, localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { HandshakeIcon, MessageIcon, CalendarCheckIcon, BookingsIcon } from '../../utils/icons';
 import {
   statusLabel, statusChipClass, counterpartFor, isConsentOnlyFor, bookedArtistName,
@@ -58,9 +58,7 @@ const StatTile = ({ icon, label, value, accent = false, onClick }) => (
   </button>
 );
 
-// The sidebar dot counts booking-workflow actions only (representation
-// requests route to Messages); the tile says the same number as the dot.
-const BOOKING_ACTIONS = new Set(['offer_received', 'counter_offer_pending', 'contract_to_send', 'contract_to_sign', 'documents_to_share', 'payment_to_mark_sent', 'payment_to_confirm_received', 'payment_to_resolve']);
+// The tile says the same number as the sidebar dot (BOOKING_ACTIONS).
 const ACTION_ROWS = 8;
 
 const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {

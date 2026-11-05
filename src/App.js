@@ -19,6 +19,7 @@ import AgentPlanCard from './components/common/AgentPlanCard';
 import AgentTierCard from './components/common/AgentTierCard';
 import ExtrasShop from './components/common/ExtrasShop';
 import { billingTier, accountPlan } from './utils/subscription';
+import { BOOKING_ACTIONS } from './utils/actionItems';
 import { premiumFeatureRows } from './utils/premiumFeatures';
 import { formatMoney, MEMBER_PRICES, AGENT_PRICES, EXTRA_PRICES, normalizeCurrency, yearlyPerMonth } from './utils/money';
 import { useLanguage } from './contexts/LanguageContext';
@@ -461,14 +462,7 @@ function App() {
         // requests route to Messages, not Bookings).
         if (actionData?.counts?.byType) {
           const bt = actionData.counts.byType;
-          const bookingCount =
-            (bt.offer_received || 0) +
-            (bt.counter_offer_pending || 0) +
-            (bt.contract_to_send || 0) +
-            (bt.contract_to_sign || 0) +
-            (bt.payment_to_mark_sent || 0) +
-            (bt.payment_to_confirm_received || 0);
-          setBookingsActionCount(bookingCount);
+          setBookingsActionCount([...BOOKING_ACTIONS].reduce((sum, type) => sum + (bt[type] || 0), 0));
         }
       } catch (error) {
         console.error('Error fetching unread count:', error);

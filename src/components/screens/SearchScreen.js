@@ -87,6 +87,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   // Fetch profiles from backend
   const fetchProfiles = async () => {
     if (loading || profilesLoaded) return; // Prevent duplicate fetches
+    setAgencyResults([]); // the browse list has no agency cards
 
     const startTime = performance.now();
     console.log('🔍 [SearchScreen] Starting to fetch profiles');
@@ -126,6 +127,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     // Reset and reload profiles when user changes (e.g., login/logout)
     setProfilesLoaded(false);
     setSearchResults([]);
+    setAgencyResults([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 

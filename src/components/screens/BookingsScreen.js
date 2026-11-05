@@ -16,7 +16,7 @@ import ImageLightbox from '../common/ImageLightbox';
 import EventLogisticsDetails from '../common/EventLogisticsDetails';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatureIsArtistSide } from '../../utils/contractSigner';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
-import { DOC_CATEGORIES, categoryStatus } from '../../utils/documentCategories';
+import { DOC_CATEGORIES, categoryStatus, documentsStillDue } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl, isPdfFile } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
@@ -562,7 +562,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   // Pending doc categories drive the Share Documents CTA, the Skip button and
   // the status sentence — one derivation for all three.
   const pendingDocCategoriesFor = (deal) => (
-    (deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser))
+    (documentsStillDue(deal) && isArtistSideForDeal(deal, currentUser))
       ? DOC_CATEGORIES.filter((c) => categoryStatus(deal.sharedDocuments, c.key) === 'pending')
       : []);
   const statusLineById = useMemo(() => new Map(deals.map((d) => [

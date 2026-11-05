@@ -31,6 +31,12 @@ export function isValidCategory(key) {
   return DOC_CATEGORY_KEYS.includes(key);
 }
 
+// A signed booking asks for its documents until it is fully paid; after that
+// they can still be managed, but nothing asks for them any more.
+export function documentsStillDue(deal) {
+  return deal?.contract?.status === 'FULLY_SIGNED' && deal?.payment?.status !== 'FULLY_PAID';
+}
+
 // Status of a shared-document entry on a deal.
 export function categoryStatus(sharedDocuments, key) {
   const entry = sharedDocuments?.[key];

@@ -6,6 +6,10 @@ import {
   AlertIcon,
 } from './icons';
 
+// Actions that live in Bookings (representation requests route to Messages):
+// what the tab dot and the dashboard tile count, in one place.
+export const BOOKING_ACTIONS = new Set(['offer_received', 'counter_offer_pending', 'contract_to_send', 'contract_to_sign', 'documents_to_share', 'payment_to_mark_sent', 'payment_to_confirm_received', 'payment_to_resolve']);
+
 export const ACTION_ICONS = {
   offer_received: HandshakeIcon,
   counter_offer_pending: HandshakeIcon,

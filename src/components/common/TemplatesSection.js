@@ -18,9 +18,9 @@ export const TemplateKindBadge = ({ kind }) => {
  * for an agent, those of the booking's artist (`list.shared`, each marked with
  * its owner), not the whole roster's. → [{ ...template, shared?, ownerId?, ownerName? }]
  */
-export const usableTemplates = (list, { viewer, artistId } = {}) => {
+export const usableTemplates = (list, artistId) => {
   const own = list?.templates || [];
-  const groups = (list?.shared || []).filter((g) => !(viewer?.role === 'AGENT' && artistId && g.ownerId !== artistId));
+  const groups = (list?.shared || []).filter((g) => g.ownerId === artistId);
   return [...own, ...groups.flatMap((g) => g.templates.map((x) => ({ ...x, shared: true, ownerId: g.ownerId, ownerName: g.ownerName })))];
 };
 
@@ -100,7 +100,8 @@ export const TemplateEditorActions = ({ dirty, busy, onSave, onClose }) => {
  *
  * props: ns ('invoices' | 'contracts') for the copy, store = useDocumentTemplates(),
  * profile, renderDetails(template, { save, busy, close }) → the editor, and
- * viewer when an agent manages an artist's list (their plan is the one that counts).
+ * viewer when an agent manages an artist's list: their plan counts, the default
+ * stays the artist's, and `readOnly` rows (not added by this agent) are preview only.
  */
 const TemplatesSection = ({ ns, icon, store, profile, viewer, renderDetails }) => {
   const { t } = useLanguage();
@@ -167,9 +168,9 @@ const TemplatesSection = ({ ns, icon, store, profile, viewer, renderDetails }) =
                 </div>
                 <div className="template-row-actions">
                   <button type="button" className="template-act" disabled={!!busy} onClick={() => showSample(tpl)}>{busy === tpl.id ? '…' : t('templates.preview')}</button>
-                  <button type="button" className={`template-act${isOpen ? ' is-on' : ''}`} onClick={() => setOpen(isOpen ? null : tpl.id)}>{isOpen ? t('templates.hideDetails') : t('templates.details')}</button>
-                  {!isDefault && <button type="button" className="template-act" disabled={!!busy} onClick={() => store.makeDefault(tpl.id)}>{t('templates.makeDefault')}</button>}
-                  <button type="button" className="template-act is-danger" disabled={!!busy} onClick={() => remove(tpl)}>{t('templates.delete')}</button>
+                  {!tpl.readOnly && <button type="button" className={`template-act${isOpen ? ' is-on' : ''}`} onClick={() => setOpen(isOpen ? null : tpl.id)}>{isOpen ? t('templates.hideDetails') : t('templates.details')}</button>}
+                  {!isDefault && !viewer && <button type="button" className="template-act" disabled={!!busy} onClick={() => store.makeDefault(tpl.id)}>{t('templates.makeDefault')}</button>}
+                  {!tpl.readOnly && <button type="button" className="template-act is-danger" disabled={!!busy} onClick={() => remove(tpl)}>{t('templates.delete')}</button>}
                 </div>
                 {isOpen && (
                   <div className="template-details">

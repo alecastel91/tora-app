@@ -36,6 +36,7 @@ const CommandPalette = ({ pages, onGo, onOpenProfile }) => {
 
   useEffect(() => {
     if (!open) { setQuery(''); setProfiles([]); setAgencies([]); setCursor(0); return; }
+    setOpenAgencyId(null);
     setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 

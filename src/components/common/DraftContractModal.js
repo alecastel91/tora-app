@@ -49,8 +49,8 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
     apiService.contractTemplates.list(currentUser.id)
       .then((r) => {
         if (cancelled) return;
-        // Own templates, then the ones shared by the agent / the artist of this booking.
-        const list = usableTemplates(r, { viewer: currentUser, artistId: deal?.bookedArtistId || deal?.artistId });
+        // Own templates, then, for an agent, those of this booking's artist.
+        const list = usableTemplates(r, deal?.bookedArtistId || deal?.artistId);
         setTemplates(list);
         if (!list.length) setNeedsSetup(true); else setTemplateId(list.some((x) => x.id === r.defaultId) ? r.defaultId : list[0].id);
       })

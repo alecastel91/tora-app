@@ -165,13 +165,13 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         const response = await apiService.getDeals({ profileId: user.id });
         console.log('[ManageProfileScreen] Deals response:', response);
 
-        const countedDeals = response?.deals || [];
+        const fetchedDeals = response?.deals || [];
 
-        if (countedDeals.length > 0) {
-          setDeals(countedDeals);
+        if (fetchedDeals.length > 0) {
+          setDeals(fetchedDeals);
 
           // Count upcoming gigs with PENDING, NEGOTIATING, or ACCEPTED status
-          const upcoming = countedDeals.filter(deal => {
+          const upcoming = fetchedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const hasUpcomingDate = dealDate >= today;
             const hasActiveStatus = ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status);
@@ -180,7 +180,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           setUpcomingGigs(upcoming.length);
 
           // Calculate This Year Gigs: only completed or past accepted deals this year
-          const thisYearDeals = countedDeals.filter(deal => {
+          const thisYearDeals = fetchedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isThisYear = dealDate >= yearStart && dealDate <= today;
             const isCompleted = deal.status === 'COMPLETED';
@@ -190,7 +190,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           setThisYearGigs(thisYearDeals.length);
 
           // Calculate YTD Revenue: sum all COMPLETED or past ACCEPTED deals from current year
-          const ytdDeals = countedDeals.filter(deal => {
+          const ytdDeals = fetchedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isThisYear = dealDate >= yearStart && dealDate <= today;
             const isCompleted = deal.status === 'COMPLETED';
@@ -262,7 +262,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
           // Revenue events for the chart (converted once to the preferred currency)
           const startDate = new Date('2024-01-01');
-          const historicalDeals = countedDeals.filter(deal => {
+          const historicalDeals = fetchedDeals.filter(deal => {
             const dealDate = new Date(deal.date);
             const isFrom2024 = dealDate >= startDate;
             const isCompleted = deal.status === 'COMPLETED';
