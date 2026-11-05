@@ -23,7 +23,7 @@ import {
 const Panel = ({ title, action, children, className = '' }) => (
   <section className={`d3-panel flex min-w-0 flex-col ${className}`}>
     <header className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2.5">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">{title}</h2>
+      <h2 className="d3-dash-title">{title}</h2>
       {action && (
         <button
           onClick={action.onClick}
@@ -41,19 +41,14 @@ const Empty = ({ text }) => (
   <p className="px-2 py-8 text-center text-[13px] text-white/35">{text}</p>
 );
 
-const StatTile = ({ icon, label, value, accent = false, onClick }) => (
+const StatTile = ({ label, value, accent = false, onClick }) => (
   <button
     onClick={onClick}
-    className={`d3-panel flex min-w-[150px] cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#101014]
-                ${accent && value > 0 ? 'border-infrared/40' : ''}`}
+    className="flex cursor-pointer items-center border-0 bg-transparent p-0 text-left"
   >
-    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] [&>svg]:h-4 [&>svg]:w-4
-                      ${accent && value > 0 ? 'text-infrared' : 'text-white/60'}`}>
-      {icon}
-    </span>
     <span className="min-w-0">
-      <span className="block font-futuristic text-[22px] font-semibold leading-none tracking-tight text-white">{value}</span>
-      <span className="mt-1 block truncate text-[10.5px] uppercase tracking-[0.12em] text-white/45">{label}</span>
+      <span className={`block font-space-grotesk text-[24px] font-bold leading-none ${accent && value > 0 ? 'text-[#FF3366]' : 'text-white'}`}>{value}</span>
+      <span className="mt-1 block truncate text-[12px] text-white/70">{label}</span>
     </span>
   </button>
 );
@@ -161,19 +156,18 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
         {/* ---- header: who you are, and the four numbers that matter ---- */}
         <div className="d3-dash-span flex flex-wrap items-end justify-between gap-5">
           <div className="flex items-center gap-4">
-            <Avatar profile={user} className="h-12 w-12 text-[15px]" />
             <div>
-              <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-white">{user.name}</h1>
+              <h1 className="d3-dash-name">{user.name}</h1>
               <p className="mt-0.5 text-[12.5px] text-white/50">
                 {roleLabel(user.role, t)}{user.city ? ` · ${user.city}` : ''}
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <StatTile icon={<HandshakeIcon />} label={t('desktop.yourMove')} value={yourMove} accent onClick={() => onSwitchTab('bookings')} />
-            <StatTile icon={<BookingsIcon />} label={t('desktop.openOffers')} value={openOffers} onClick={() => onSwitchTab('bookings')} />
-            <StatTile icon={<CalendarCheckIcon />} label={t('desktop.confirmedAhead')} value={upcoming.length} onClick={() => onSwitchTab('tour')} />
-            <StatTile icon={<MessageIcon />} label={t('desktop.unread')} value={unread} accent onClick={() => onSwitchTab('messages')} />
+          <div className="flex flex-wrap gap-8">
+            <StatTile label={t('desktop.yourMove')} value={yourMove} accent onClick={() => onSwitchTab('bookings')} />
+            <StatTile label={t('desktop.openOffers')} value={openOffers} onClick={() => onSwitchTab('bookings')} />
+            <StatTile label={t('desktop.confirmedAhead')} value={upcoming.length} onClick={() => onSwitchTab('tour')} />
+            <StatTile label={t('desktop.unread')} value={unread} accent onClick={() => onSwitchTab('messages')} />
           </div>
         </div>
 
@@ -192,7 +186,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
                     <li key={item.id || title}>
                       <button
                         onClick={() => openAction(item)}
-                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors hover:bg-white/[0.04]"
+                        className="d3-dash-action flex w-full cursor-pointer items-center gap-3 px-2.5 text-left transition-colors hover:bg-white/[0.04]"
                       >
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] [&>svg]:h-4 [&>svg]:w-4 ${item.urgent ? 'text-infrared' : 'text-white/70'}`}>
                           <Icon />
@@ -201,7 +195,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
                           <span className="block truncate text-[13.5px] text-white">{title}</span>
                           {item.subtitle && <span className="block truncate text-[12px] text-white/45">{item.subtitle}</span>}
                         </span>
-                        <span className="shrink-0 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-infrared">{actionLabel}</span>
+                        <span className="d3-dash-cta">{actionLabel}</span>
                       </button>
                     </li>
                   );

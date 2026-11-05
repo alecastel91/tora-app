@@ -312,6 +312,20 @@ const ja = {
     yearlyOnly: "AIによる過去書類の読み取りは年額プランの機能です。フォームは手入力でも設定できます。",
   },
 
+  offerRoute: {
+    title: 'このオファーの送り先は？',
+    representedOne: '{{artist}}にはエージェントがいます。地域によって本人がブッキングする場合もあるため、どちらにも送れます。',
+    representedMany: '{{artist}}には複数のエージェントがいます（地域ごとの担当など）。いずれかのエージェント、またはアーティスト本人に送れます。',
+    sendToAgent: 'このエージェントにオファーを送る',
+    connectFirst: '先にこのエージェントとつながる',
+    requestPending: 'つながりリクエスト保留中',
+    sendDirect: 'アーティストに直接送る',
+    directHint: 'このブッキングはアーティスト本人が担当します。',
+    connectHint: '{{name}}がリクエストを承認すると、オファーを送れるようになります。',
+    connectSent: '{{name}}にリクエストを送りました。承認されたら、もう一度{{artist}}へのオファーを作成し、このエージェントを選んでください。',
+    back: '戻る',
+  },
+
   connect: {
     selectAgent: 'エージェントを選択',
     withAgent: 'エージェントとつながる',
@@ -453,6 +467,13 @@ const ja = {
     viaArtistDirect: '{{name}}経由 · アーティスト直接',
     viaOtherAgent: 'via {{name}} · 別のエージェントが担当',
     limitedViewNote: 'ギャラ・契約書・書類は、このブッキングを担当するエージェントのみが確認できます。',
+    limitedViewDirect: 'このブッキングはアーティスト本人が担当しているため、ギャラ・契約書・書類は本人のみ確認できます。本人からあなたに任せることができます。',
+    viewOnlyDirect: 'アーティスト直接 · 閲覧のみ',
+    viewOnlyCoAgent: '別のエージェントが担当 · 閲覧のみ',
+    handToAgent: '{{name}}に任せる',
+    handToAgentConfirm: 'このブッキングを{{name}}に任せますか？ギャラ・契約書・書類が共有され、今後はこのエージェントが担当します。ブッキングは引き続き確認できますが、ご自身で取り戻すことはできません。',
+    handOwnOffer: 'あなたのオファーへの返答待ちです。返答があった後に任せることができます。',
+    handFailed: 'このブッキングを任せることができませんでした。もう一度お試しください。',
     agentGeneric: 'エージェント',
     managedByAgent: 'このブッキングはあなたのエージェントが管理しています。',
     managedByAgentNamed: 'このブッキングはあなたのエージェント（{{name}}）が管理しています。',
@@ -1197,6 +1218,7 @@ const ja = {
     loadArtistProfileFailed: 'アーティストのプロフィールを読み込めませんでした',
     createTour: 'ツアーを作成',
     editTour: 'ツアーを編集',
+    viewBookings: '予約を見る',
     selectZone: 'ゾーンを選択',
     zoneHint: 'ツアーエリア - ゾーン全域ツアーの場合は国を空欄に',
     countryOptional: '国（任意）',
@@ -1368,6 +1390,8 @@ const ja = {
   profile: {
 
     about: '概要',
+
+    photoFullNote: '丸い切り抜きは一覧用です。プロフィール上部には写真全体が表示されるので、全体を見せてもよい写真を選んでください。',
 
     changePhoto: '写真を変更',
     techSpecs: 'ルームと機材',
@@ -1722,6 +1746,8 @@ const ja = {
       DOCUMENT_SHARED: '{{name}}さんが書類を共有しました',
       DEAL_CANCELLED: '「{{event}}」がキャンセルされました',
       DEAL_COMPLETED: '「{{event}}」が完了になりました',
+      DEAL_HANDED_TO_AGENT: '{{name}}が{{event}}をあなたに任せました',
+      DEAL_AGENT_TOOK_OVER: '{{event}}は{{name}}が担当するようになりました',
       VENUE_EVENT_REQUEST: '{{name}}さんが{{date}}にあなたのベニューでイベント開催を希望しています',
       MESSAGE: '{{name}}: {{preview}}',
       MESSAGE_DOCUMENT: '{{name}}さんが書類を送りました: {{title}}',
@@ -1814,6 +1840,8 @@ const ja = {
   },
 
   agency: {
+    agentsHeading: 'エージェント',
+    artistsHeading: 'アーティスト',
     title: 'エージェンシー',
     howItWorks: "エージェンシーでは、所属エージェントが1つのチームとして各メンバーのプロフィールに表示されます。ログイン、担当アーティスト、プランは各エージェントのままです。",
     promptTitle: '{{agency}}のメンバーがすでにTORAにいます',
@@ -2244,6 +2272,11 @@ const ja = {
     thisBooking: 'このブッキング',
     theOtherParty: '相手方',
     offerAccepted: {
+      eyebrow: 'オファー成立',
+      title: 'ブッキング確定',
+      subtitle: '{{counterpart}}が{{name}}のオファーを承諾しました。ブッキングで確認できます。',
+    },
+    offerBooked: {
       eyebrow: 'オファー成立',
       title: 'ブッキング確定',
       subtitle: '{{counterpart}}が{{name}}のオファーを承諾しました。ブッキングで確認できます。',

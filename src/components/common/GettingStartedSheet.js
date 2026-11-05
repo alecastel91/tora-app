@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import OverlayPortal from './OverlayPortal';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { SearchIcon, HandshakeIcon, PlaneIcon, ProfileIcon, BookingsIcon, StarIcon } from '../../utils/icons';
 
 /**
  * First-login "Getting started" carousel — six swipeable slides that explain
@@ -11,12 +10,12 @@ import { SearchIcon, HandshakeIcon, PlaneIcon, ProfileIcon, BookingsIcon, StarIc
 // note; production builds close on the "you're all set" send-off.
 const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
 const SLIDES = [
-  { key: 'welcome', Icon: StarIcon },
-  { key: 'profile', Icon: ProfileIcon },
-  { key: 'discover', Icon: SearchIcon },
-  { key: 'book', Icon: BookingsIcon },
-  { key: 'tourKickstart', Icon: PlaneIcon },
-  { key: IS_BETA ? 'beta' : 'ready', Icon: HandshakeIcon },
+  { key: 'welcome' },
+  { key: 'profile' },
+  { key: 'discover' },
+  { key: 'book' },
+  { key: 'tourKickstart' },
+  { key: IS_BETA ? 'beta' : 'ready' },
 ];
 
 const GettingStartedSheet = ({ open, onClose }) => {
@@ -60,9 +59,8 @@ const GettingStartedSheet = ({ open, onClose }) => {
         </div>
 
         <div className="onboarding-track" ref={trackRef} onScroll={onScroll}>
-          {SLIDES.map(({ key, Icon }) => (
+          {SLIDES.map(({ key }) => (
             <div key={key} className="onboarding-slide">
-              <div className="onboarding-icon"><Icon /></div>
               <h2 className="onboarding-title">{t(`onboarding.${key}Title`)}</h2>
               <p className="onboarding-body">{t(`onboarding.${key}Body`)}</p>
             </div>

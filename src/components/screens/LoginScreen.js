@@ -62,7 +62,7 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="fixed inset-0 flex items-start justify-center bg-black px-5 py-5 overflow-y-auto"
         >
-      <div aria-hidden className="auth-cover" />
+      <div aria-hidden className="auth-cover auth-cover-split" />
       {/* quiet-premium backdrop: faint crimson bloom + engineering grid fading out */}
       <div
         aria-hidden
@@ -85,7 +85,7 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
           <img
             src="/tora_logo_white.png"
             alt="TORA"
-            className="max-w-[170px] md:max-w-[190px] h-auto mb-3 block"
+            className="max-w-[170px] md:max-w-[190px] h-auto mb-3 mx-auto block"
           />
           {/* Logo motto — ALWAYS English, never translated (hardcoded literal by design) */}
           <p className="text-white/70 text-[10px] md:text-[11px] tracking-[0.25em] font-normal mt-2 whitespace-nowrap uppercase font-tech">
@@ -157,9 +157,9 @@ const LoginScreen = ({ onLoginSuccess, onSwitchToSignup, onSwitchToForgotPasswor
             <button
               type="submit"
               disabled={loading}
-              className="auth-submit w-full py-3.5 bg-[#DE2A57] border border-[#DE2A57] rounded-xl text-white text-[11px]
+              className="auth-submit w-full py-3.5 bg-[var(--color-crimson-action)] border border-[var(--color-crimson-action)] rounded-xl text-white text-[11px]
                          font-semibold uppercase tracking-[0.15em] font-tech cursor-pointer transition-all duration-300
-                         hover:bg-[#C9204B] hover:border-[#C9204B] active:scale-[0.98]
+                         hover:bg-[var(--color-crimson-action-hover)] hover:border-[var(--color-crimson-action-hover)] active:scale-[0.98]
                          disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t('auth.loggingIn') : t('auth.logIn')}

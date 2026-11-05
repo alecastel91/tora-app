@@ -312,6 +312,20 @@ const it = {
     yearlyOnly: "La lettura dei tuoi documenti passati con l'IA è una funzione del piano Annuale. Puoi comunque compilare il modulo a mano.",
   },
 
+  offerRoute: {
+    title: 'A chi inviare questa offerta?',
+    representedOne: '{{artist}} ha un agente. Alcuni artisti gestiscono da soli certe regioni, quindi puoi inviarla a entrambi.',
+    representedMany: '{{artist}} ha più agenti, spesso per regioni diverse. Puoi inviarla a uno di loro o all\'artista.',
+    sendToAgent: 'Invia l\'offerta a questo agente',
+    connectFirst: 'Connettiti prima con questo agente',
+    requestPending: 'Richiesta di connessione in sospeso',
+    sendDirect: 'Invia direttamente all\'artista',
+    directHint: 'L\'artista gestisce personalmente questa prenotazione.',
+    connectHint: 'Quando {{name}} accetterà la richiesta, potrai inviargli l\'offerta.',
+    connectSent: 'Richiesta inviata a {{name}}. Quando la accetterà, rifai l\'offerta per {{artist}} e selezionalo.',
+    back: 'Indietro',
+  },
+
   connect: {
     selectAgent: 'Seleziona agente',
     withAgent: "Collegati con l'agente",
@@ -453,6 +467,13 @@ const it = {
     viaArtistDirect: 'tramite {{name}} · Diretto',
     viaOtherAgent: 'via {{name}} · Gestito da un altro agente',
     limitedViewNote: 'Compenso, contratto e documenti restano all\'agente che gestisce questa prenotazione.',
+    limitedViewDirect: 'L\'artista gestisce questa prenotazione, quindi compenso, contratto e documenti restano a lui. Può affidarla a te.',
+    viewOnlyDirect: 'Diretta con l\'artista · sola lettura',
+    viewOnlyCoAgent: 'Gestita da un altro agente · sola lettura',
+    handToAgent: 'Affida a {{name}}',
+    handToAgentConfirm: 'Affidare questa prenotazione a {{name}}? Vedrà compenso, contratto e documenti e la gestirà da ora in poi. Continuerai a vedere la prenotazione, ma non potrai riprenderla da solo.',
+    handOwnOffer: 'La tua offerta attende ancora una risposta. Potrai affidare la prenotazione dopo la risposta.',
+    handFailed: 'Impossibile affidare questa prenotazione. Riprova.',
     agentGeneric: 'il suo agente',
     managedByAgent: 'Questa prenotazione è gestita dal tuo agente.',
     managedByAgentNamed: 'Questa prenotazione è gestita dal tuo agente ({{name}}).',
@@ -1197,6 +1218,7 @@ const it = {
     loadArtistProfileFailed: "Impossibile caricare il profilo dell'artista",
     createTour: 'Crea tour',
     editTour: 'Modifica tour',
+    viewBookings: 'Vedi i booking',
     selectZone: 'Seleziona zona',
     zoneHint: 'Area del tour - lascia il paese vuoto per un tour su tutta la zona',
     countryOptional: 'Paese (facoltativo)',
@@ -1368,6 +1390,8 @@ const it = {
   profile: {
 
     about: 'Info',
+
+    photoFullNote: 'Il ritaglio rotondo serve per gli elenchi. In alto nel profilo appare la foto intera, quindi scegline una che vuoi mostrare per intero.',
 
     changePhoto: 'Cambia foto',
     techSpecs: 'Sale e tecnica',
@@ -1722,6 +1746,8 @@ const it = {
       DOCUMENT_SHARED: '{{name}} ha condiviso un documento con te',
       DEAL_CANCELLED: '{{event}} è stato annullato',
       DEAL_COMPLETED: '{{event}} è stato segnato come completato',
+      DEAL_HANDED_TO_AGENT: '{{name}} ti ha affidato {{event}}',
+      DEAL_AGENT_TOOK_OVER: '{{name}} ora gestisce {{event}}',
       VENUE_EVENT_REQUEST: '{{name}} vuole organizzare un evento nel tuo locale il {{date}}',
       MESSAGE: '{{name}}: {{preview}}',
       MESSAGE_DOCUMENT: '{{name}} ha inviato un documento: {{title}}',
@@ -1814,6 +1840,8 @@ const it = {
   },
 
   agency: {
+    agentsHeading: 'Agenti',
+    artistsHeading: 'Artisti',
     title: 'Agenzia',
     howItWorks: "Un'agenzia mostra i suoi agenti come un'unica squadra sul profilo di ogni membro. Ogni agente mantiene il proprio accesso, i propri artisti e il proprio piano.",
     promptTitle: 'Qualcuno di {{agency}} è già su TORA',
@@ -2246,6 +2274,11 @@ const it = {
     offerAccepted: {
       eyebrow: 'Offerta accettata',
       title: 'Sei ingaggiato',
+      subtitle: '{{counterpart}} ha accettato la tua offerta per {{name}}. Trovi la data in Prenotazioni.',
+    },
+    offerBooked: {
+      eyebrow: 'Offerta accettata',
+      title: 'Data confermata',
       subtitle: '{{counterpart}} ha accettato la tua offerta per {{name}}. Trovi la data in Prenotazioni.',
     },
     contractSigned: {

@@ -3,12 +3,10 @@ import JumpTabs from '../common/JumpTabs';
 import ProfileActions from '../common/ProfileActions';
 import React, { useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { roleLabel, roleChipClass } from '../../utils/roles';
-import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
+import { fmtStat, Section, Panel, Stat, profileLinks } from './primitives';
 import { formatEventDate } from '../../utils/dates';
 import { networkSectionsForRole } from '../../utils/networkSections';
-import { HeartIcon, LocationIcon } from '../../utils/icons';
-import VerifiedBadge from '../common/VerifiedBadge';
+import { HeartIcon } from '../../utils/icons';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
@@ -84,6 +82,7 @@ const ProfilePage = ({
                 <ProfileActions
                   viewerRole={currentUser?.role}
                   targetRole={role}
+                  targetHasRoster={hasRoster}
                   isLiked={isLiked}
                   isConnected={isConnected}
                   hasPendingRequest={hasPendingRequest}

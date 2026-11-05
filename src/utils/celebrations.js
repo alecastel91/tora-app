@@ -117,7 +117,9 @@ const dealMilestones = (deal, profileId, ownedIds) => {
 
   // The offer landing a yes belongs to whoever sent it.
   if (deal.status === 'ACCEPTED' && mine(deal.initiatorId)) {
-    out.push({ id: `${deal.id}:offer`, moment: MOMENT.OFFER_ACCEPTED, deal });
+    // Only the artist is booked. A promoter, venue or agent booked someone.
+    const artistSent = mine(deal.artistId) || mine(deal.bookedArtistId);
+    out.push({ id: `${deal.id}:offer`, moment: artistSent ? MOMENT.OFFER_ACCEPTED : MOMENT.OFFER_BOOKED, deal });
   }
   // Fully signed is the "it's official" beat, and it belongs to both sides.
   if (deal.contract?.status === 'FULLY_SIGNED' && !deal.contract?.skipped) {
@@ -138,9 +140,9 @@ export function celebrateDealMilestones(profileId, deals, ownedProfileIds = []) 
   );
 
   for (const m of fresh) {
-    // The copy names who it was with: the booker for the artist's side, the
-    // artist for the booker's side.
-    const onArtistSide = mine(m.deal.artistId) || mine(m.deal.bookedArtistId);
+    // The copy names who it was with: the booker for the artist's side (the
+    // agent is on that side too), the artist for the booker's side.
+    const onArtistSide = mine(m.deal.artistId) || mine(m.deal.bookedArtistId) || mine(m.deal.agentId);
     celebrateMoment(m.moment, {
       name: m.deal.eventName || m.deal.venueName || '',
       counterpart: (onArtistSide ? m.deal.venue?.name : m.deal.artist?.name) || '',
@@ -161,9 +163,10 @@ export function celebrateBadges(profileId, badges) {
   }
 }
 
-/** The three action moments. Named so the call sites read as English. */
+/** The action moments. Named so the call sites read as English. */
 export const MOMENT = {
   OFFER_ACCEPTED: 'offerAccepted',
+  OFFER_BOOKED: 'offerBooked',
   CONTRACT_SIGNED: 'contractSigned',
   REPRESENTATION: 'representationConfirmed',
 };

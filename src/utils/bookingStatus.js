@@ -12,12 +12,23 @@ import { OFF_STATUSES } from './dealStatus.js';
  * Returns { text, mine } or null when nothing is pending (mine = the next move
  * is the viewer's).
  */
+/** An artist on an agent-led deal: their agent holds the buttons. */
+export function isArtistViaAgent(deal, viewer) {
+  return !!deal.bookedArtistId && viewer.role === 'ARTIST';
+}
+
 export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = {}) {
   if (!deal || !viewer) return null;
+  // A roster artist's gig this agent isn't running: say so instead of leaving a blank.
+  if (deal.limitedVisibility) {
+    return { text: t(deal.agentId ? 'bookings.viewOnlyCoAgent' : 'bookings.viewOnlyDirect'), mine: false };
+  }
   const artistSide = isArtistSideForDeal(deal, viewer);
   // An agent only has a move on deals they lead (same rule as the backend's
   // ledByViewer): on an artist-direct deal of a roster artist they just watch.
   if (viewer.role === 'AGENT' && !artistSide) return null;
+  // The artist on an agent-led deal: their agent has the buttons, and the card says so.
+  if (isArtistViaAgent(deal, viewer)) return null;
   const name = (artistSide ? deal.venue?.name : deal.artist?.name) || t('bookings.theOtherParty');
   const line = (key, mine, vars = {}) => ({ text: t(`bookings.line.${key}`, { name, ...vars }), mine });
   const summary = summarizeDealPayment(deal);

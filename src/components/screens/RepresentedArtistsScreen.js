@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { useAppContext } from '../../contexts/AppContext';
 import { CloseIcon, AddIcon, TrashIcon } from '../../utils/icons';
+import PhotoCard from '../common/PhotoCard';
 import ViewProfileScreen from './ViewProfileScreen';
 import ManageArtistScreen from './ManageArtistScreen';
 import SearchArtistsModal from '../common/SearchArtistsModal';
@@ -142,10 +143,6 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   };
 
 
-  const getInitial = (name) => {
-    return name ? name.charAt(0).toUpperCase() : 'A';
-  };
-
   const handleViewProfile = async (artist) => {
     // Fetch the full profile data from the API
     // Note: artist object from representingArtists has profileId field
@@ -228,12 +225,12 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
         </button>
         <h1>{t('roster.title')}</h1>
         <button
-          className="add-artist-btn"
+          className="btn btn-primary add-artist-cta"
           onClick={() => usage.atLimit ? setShowUpgradeModal(true) : setShowSearchModal(true)}
           title={usage.atLimit ? t('roster.limitReachedTitle') : t('roster.addArtist')}
           style={usage.atLimit ? { opacity: 0.5 } : undefined}
         >
-          <AddIcon />
+          {t('roster.addArtist')}
         </button>
       </div>
 
@@ -255,45 +252,38 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
             {representedArtists.map((artist) => {
               const dormant = isDormantArtist(user, artist.profileId || artist.id);
               return (
-              <div key={artist.profileId || artist.id} className={`artist-card-row${dormant ? ' is-dormant' : ''}`}>
-                {/* Tapping the card body opens the artist profile; Manage and
-                    Delete stay as their own controls. Removing the VIEW button
-                    frees the space that was squeezing the name/location. */}
-                <div
-                  className="artist-card-main"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleViewProfile(artist)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleViewProfile(artist); } }}
-                >
-                  <div className="artist-avatar-small">
-                    {(artist.avatar || avatarMap[artist.profileId || artist.id]) ? (
-                      <img src={artist.avatar || avatarMap[artist.profileId || artist.id]} alt={artist.name} />
-                    ) : (
-                      getInitial(artist.name)
-                    )}
-                  </div>
-                  <div className="artist-card-content">
-                    <div className="artist-row-info">
-                      <div className="artist-name-inline">{artist.name}</div>
-                      <div className="artist-location-inline">
-                        {dormant ? <span className="artist-dormant-chip" title={t('agentPlan.dormantHint')}>{t('agentPlan.dormant')}</span> : artist.location}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="artist-row-actions">
-                  {dormant ? (
+              <PhotoCard
+                key={artist.profileId || artist.id}
+                variant="tile"
+                hideRole
+                dim={dormant}
+                profile={{ ...artist, role: 'ARTIST', avatar: artist.avatar || avatarMap[artist.profileId || artist.id] }}
+                place={artist.location}
+                chip={dormant ? t('agentPlan.dormant') : null}
+                onOpen={() => handleViewProfile(artist)}
+                topRight={(
                   <button
-                    className="btn btn-outline btn-sm"
+                    type="button"
+                    className="photo-card-round"
+                    aria-label={`Remove ${artist.name}`}
+                    onClick={() => handleRemoveArtist(artist)}
+                    disabled={removingArtistId === (artist.profileId || artist.id)}
+                  >
+                    {removingArtistId === (artist.profileId || artist.id) ? '...' : <TrashIcon />}
+                  </button>
+                )}
+                actions={dormant ? (
+                  <button
+                    className="btn btn-outline photo-card-cta"
                     disabled={!!switchingId}
+                    title={t('agentPlan.dormantHint')}
                     onClick={() => makeActive(artist)}
                   >
                     {switchingId === (artist.profileId || artist.id) ? '...' : t('agentPlan.makeActive')}
                   </button>
-                  ) : (
+                ) : (
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-outline photo-card-cta"
                     onClick={() => handleManageArtist(artist)}
                     style={{ position: 'relative' }}
                   >
@@ -314,17 +304,8 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                       />
                     )}
                   </button>
-                  )}
-                  <button
-                    className="shrink-0 p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-[#111117] transition-colors cursor-pointer bg-transparent border-none disabled:opacity-40"
-                    aria-label={`Remove ${artist.name}`}
-                    onClick={() => handleRemoveArtist(artist)}
-                    disabled={removingArtistId === (artist.profileId || artist.id)}
-                  >
-                    {removingArtistId === (artist.profileId || artist.id) ? '...' : <TrashIcon />}
-                  </button>
-                </div>
-              </div>
+                )}
+              />
               );
             })}
           </div>

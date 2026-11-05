@@ -5,7 +5,7 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
 import { profileEmbeds } from '../../utils/mediaLinks';
-import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, LocationIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
+import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
 import EditProfileScreen from './EditProfileScreen';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
 import AddProfileScreen from './AddProfileScreen';
@@ -21,7 +21,6 @@ import BioTranslate from '../common/BioTranslate';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { getAvatarClass, roleLabel, ROLES } from '../../utils/roles';
-import VerifiedBadge from '../common/VerifiedBadge';
 import VerificationModal from '../common/VerificationModal';
 import PhotoGallery from '../common/PhotoGallery';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
@@ -64,13 +63,13 @@ const InstagramGlyph = () => (
 // Glassmorphic action tile (Edit Profile / Manage / Find Agent / Add Profile).
 const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
 
-const ActionCard = ({ icon, label, onClick, dot, primary }) => {
+const ActionCard = ({ icon, label, onClick, dot, primary, strong }) => {
   const { t } = useLanguage();
   return (
   <button
     type="button"
     onClick={onClick}
-    className={`poster-action ${primary ? 'is-primary' : ''}`}
+    className={`poster-action ${primary ? 'is-primary' : ''} ${strong ? 'is-strong' : ''}`}
   >
     <span>{label}</span>
     {dot && (
@@ -130,7 +129,6 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   const [showLikesList, setShowLikesList] = useState(false);
   const [showLikersList, setShowLikersList] = useState(false);
   const [showConnectionsList, setShowConnectionsList] = useState(false);
-  const [showAllGenres, setShowAllGenres] = useState(false);
   const [showProfileSwitcher, setShowProfileSwitcher] = useState(false);
   // Profile the app opens on at login. accountUser is the source of truth
   // (/me and the update-preferences response both carry it); the pending
@@ -340,15 +338,6 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     return name ? name.charAt(0).toUpperCase() : 'A';
   };
 
-  // Role accent classes drawn from the shared design tokens (--color-role-*).
-  // Outline-pill style per the reference (ARTIST = ethereal violet).
-  const roleBadgeClasses = {
-    ARTIST: 'text-role-artist border-role-artist/60',
-    VENUE: 'text-role-venue border-role-venue/60',
-    PROMOTER: 'text-role-promoter border-role-promoter/60',
-    AGENT: 'text-role-agent border-role-agent/60',
-  };
-
   // Only one profile sub-screen (manage / edit / roster / find agent / add /
   // manage artist / view artist) open at a time — opening one closes the rest.
   const closeSubScreens = () => {
@@ -411,14 +400,6 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
 
   // Show full-screen calendar if requested
 
-
-  // Bloom behind the avatar takes the profile's canonical role color.
-  const roleBloomColor = {
-    ARTIST: 'rgba(102, 126, 234, 0.26)',   // #667EEA
-    VENUE: 'rgba(245, 87, 108, 0.24)',     // #F5576C
-    PROMOTER: 'rgba(255, 193, 7, 0.22)',  // #FFC107
-    AGENT: 'rgba(67, 233, 123, 0.22)',     // #43E97B
-  }[user?.role] || 'rgba(255, 255, 255, 0.10)';
 
   // Prefer the enriched roster (current avatars/locations) over the raw
   // JSONB snapshot in the context user.
@@ -539,6 +520,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       <div className="poster-page relative isolate" ref={posterPageRef}>
       {/* ===== Header: the photo, the name, and the way to change it ===== */}
       <PosterHero
+        own
         profile={user}
         top={(
           <>
@@ -630,7 +612,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       {/* ===== Actions (2x2 glass grid) ===== */}
       <div className="poster-own-actions">
         <ActionCard primary icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
-        <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
+        <ActionCard strong icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         {user?.role === 'AGENT' && (
           <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => { closeSubScreens(); setShowRepresentedArtists(true); }} />
         )}
@@ -1077,7 +1059,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // Profile sub-screens: full-screen on mobile (master hidden via CSS), a
   // right-hand detail pane beside the profile column on desktop. These
   // branches must live AFTER every declaration above — renderProfileBody
-  // reads consts like roleBloomColor (TDZ).
+  // reads consts declared above (TDZ).
   const renderSplit = (detail) => (
     <div className="md-split">
       <div className="md-master">{renderProfileBody({ compact: true })}</div>

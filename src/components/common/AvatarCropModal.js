@@ -111,6 +111,7 @@ const AvatarCropModal = ({ file, onCancel, onApply }) => {
           />
           <span className="text-white/40 text-base leading-none">+</span>
         </div>
+        <p className="m-0 mt-3 text-[12px] leading-snug text-white/70">{t('profile.photoFullNote')}</p>
         {cropError && (
           <p className="m-0 mt-3 text-[12px] text-role-venue/90 text-center">{cropError}</p>
         )}

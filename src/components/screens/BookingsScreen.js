@@ -21,7 +21,7 @@ import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary'
 import { getAuthedBackendUrl, buildPaymentProofUrl, isPdfFile } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
 import { OFF_STATUSES, formatFee, isConsentOnlyFor } from '../../utils/dealStatus';
-import { bookingStatusLine } from '../../utils/bookingStatus';
+import { bookingStatusLine, isArtistViaAgent } from '../../utils/bookingStatus';
 import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatTimestamp, formatEventDate } from '../../utils/dates';
@@ -292,6 +292,22 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       console.error('Error loading older bookings:', err);
     } finally {
       setLoadingOlderDeals(false);
+    }
+  };
+
+  const handleHandToAgent = async (deal, agent) => {
+    if (actionBusy) return;
+    const name = repEntryName(agent);
+    if (!(await appConfirm(t('bookings.handToAgentConfirm', { name })))) return;
+    setActionBusy(true);
+    try {
+      await apiService.handDealToAgent(deal.id, currentUser.id, repEntryId(agent));
+      await fetchDeals();
+      reloadProfileData();
+    } catch (err) {
+      appAlert(t(err.code === 'OWN_OFFER_PENDING' ? 'bookings.handOwnOffer' : 'bookings.handFailed'));
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -741,7 +757,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     //     artist is in charge; hide all workflow controls.
     //   hideWorkflow — either of the above hide-conditions applies.
     const artistRepresentedBy = toRepEntries(deal.artist?.representedBy);
-    const isArtistViewerViaAgent = !!deal.bookedArtistId && currentUser.role === 'ARTIST';
+    const isArtistViewerViaAgent = isArtistViaAgent(deal, currentUser);
     // Booker only sees "via agent" when the deal itself was agent-led
     // (bookedArtistId set). An artist-direct booking with an artist who
     // happens to have agents stays clean — no via line.
@@ -763,6 +779,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         !deal.bookedArtistId
       );
     const hideWorkflow = delegateToAgent || agentReadOnly;
+    // A booking the artist runs themselves can go to one of their agents.
+    const handOverAgents = currentUser.role === 'ARTIST' && deal.artistId === currentUser.id
+      && !deal.bookedArtistId && !deal.agentId && ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status)
+      ? toRepEntries(currentUser.representedBy).filter((a) => !a.dormant && repEntryId(a))
+      : [];
     // An artist can have several — often regional — agents, but exactly one
     // runs this deal (`deal.agentId`). Name that one; only fall back to
     // listing every agent on legacy deals that predate the column.
@@ -1527,8 +1548,23 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           <>
             {limitedView && (
               <p className="mb-3 text-[11px] leading-relaxed text-white/35">
-                {t('bookings.limitedViewNote')}
+                {t(deal.agentId ? 'bookings.limitedViewNote' : 'bookings.limitedViewDirect')}
               </p>
+            )}
+            {handOverAgents.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {handOverAgents.map((agent) => (
+                  <button
+                    key={repEntryId(agent)}
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    disabled={actionBusy}
+                    onClick={() => handleHandToAgent(deal, agent)}
+                  >
+                    {t('bookings.handToAgent', { name: repEntryName(agent) })}
+                  </button>
+                ))}
+              </div>
             )}
             {(deal.eventName || deal.performanceType) && (
               <div className="flex items-center gap-2.5 mb-2">
@@ -1558,26 +1594,20 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
             {deal.status === 'ACCEPTED' && !hideWorkflow && (
               <div className="workflow-actions">
-                {/* Message — kept inside workflow-actions when the deal is
-                    accepted so all the booking-card CTAs (View Contract,
-                    Share Documents, Update Payment, Message) sit in one
-                    visually-consistent row. */}
-                {!hideWorkflow && (
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => onOpenChat && onOpenChat(messageTarget)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    {t('search.message')}
-                  </button>
-                )}
+                <button
+                  className="btn btn-outline"
+                  onClick={() => onOpenChat && onOpenChat(messageTarget)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  {t('search.message')}
+                </button>
 
                 {/* Closing the booking out. Both live only on a confirmed
                     booking that hasn't already ended — an offer that was never
                     accepted is declined or withdrawn, which are other buttons. */}
-                {!hideWorkflow && deal.status === 'ACCEPTED' && (() => {
+                {(() => {
                   // "Completed" is a claim about something that already
                   // happened, so the button doesn't exist before the date.
                   const eventPassed = deal.date && new Date(deal.date) <= new Date();

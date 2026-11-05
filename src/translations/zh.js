@@ -312,6 +312,20 @@ const zh = {
     yearlyOnly: "用 AI 读取过去的文件是年度方案功能。你仍可手动填写表单。",
   },
 
+  offerRoute: {
+    title: '这份报价发给谁？',
+    representedOne: '{{artist}}有经纪人。有些艺人在部分地区自己接洽，因此两边都可以发送。',
+    representedMany: '{{artist}}有多位经纪人，通常负责不同地区。您可以发给其中一位，或直接发给艺人。',
+    sendToAgent: '将报价发给这位经纪人',
+    connectFirst: '先与这位经纪人建立联系',
+    requestPending: '联系请求待处理',
+    sendDirect: '直接发给艺人',
+    directHint: '此预订由艺人本人负责。',
+    connectHint: '{{name}}接受您的请求后，您就可以向其发送报价。',
+    connectSent: '请求已发送给{{name}}。对方接受后，请重新为{{artist}}发起报价并选择对方。',
+    back: '返回',
+  },
+
   connect: {
     selectAgent: '选择经纪人',
     withAgent: '与经纪人建立联系',
@@ -453,6 +467,13 @@ const zh = {
     viaArtistDirect: '经由{{name}} · 直接',
     viaOtherAgent: 'via {{name}} · 由其他经纪人负责',
     limitedViewNote: '费用、合同与文件仅对负责此预订的经纪人可见。',
+    limitedViewDirect: '此预订由艺人本人负责，费用、合同和文件仅对其可见。艺人可以将其交给您。',
+    viewOnlyDirect: '艺人直接负责 · 仅查看',
+    viewOnlyCoAgent: '由其他经纪人负责 · 仅查看',
+    handToAgent: '交给{{name}}处理',
+    handToAgentConfirm: '将此预订交给{{name}}？对方将看到费用、合同和文件，并从此负责这场预订。您仍能看到预订，但无法自行收回。',
+    handOwnOffer: '对方还未回复您的报价。回复后才能移交此预订。',
+    handFailed: '无法移交此预订，请重试。',
     agentGeneric: '其经纪人',
     managedByAgent: '此预订由您的经纪人管理。',
     managedByAgentNamed: '此预订由您的经纪人（{{name}}）管理。',
@@ -1197,6 +1218,7 @@ const zh = {
     loadArtistProfileFailed: '无法加载艺人档案',
     createTour: '创建巡演',
     editTour: '编辑巡演',
+    viewBookings: '查看预订',
     selectZone: '选择地区',
     zoneHint: '巡演范围——国家留空即为全地区巡演',
     countryOptional: '国家（可选）',
@@ -1368,6 +1390,8 @@ const zh = {
   profile: {
 
     about: '简介',
+
+    photoFullNote: '圆形裁剪用于列表。个人资料顶部会显示完整照片,请选择可以完整展示的照片。',
 
     changePhoto: '更换照片',
     techSpecs: '房间与设备',
@@ -1722,6 +1746,8 @@ const zh = {
       DOCUMENT_SHARED: '{{name}} 与你分享了一份文件',
       DEAL_CANCELLED: '{{event}} 已取消',
       DEAL_COMPLETED: '{{event}} 已标记为完成',
+      DEAL_HANDED_TO_AGENT: '{{name}}已将{{event}}交给您',
+      DEAL_AGENT_TOOK_OVER: '{{event}}现由{{name}}负责',
       VENUE_EVENT_REQUEST: '{{name}} 希望于 {{date}} 在你的场地举办活动',
       MESSAGE: '{{name}}：{{preview}}',
       MESSAGE_DOCUMENT: '{{name}} 发送了文件：{{title}}',
@@ -1814,6 +1840,8 @@ const zh = {
   },
 
   agency: {
+    agentsHeading: '经纪人',
+    artistsHeading: '艺人',
     title: '经纪公司',
     howItWorks: "经纪公司会将旗下经纪人作为一个团队，显示在每位成员的档案上。每位经纪人保留自己的登录、艺人和方案。",
     promptTitle: '{{agency}} 的成员已在 TORA 上',
@@ -2244,6 +2272,11 @@ const zh = {
     thisBooking: '这次预订',
     theOtherParty: '对方',
     offerAccepted: {
+      eyebrow: '报价已接受',
+      title: '演出已确认',
+      subtitle: '{{counterpart}}已接受你对{{name}}的报价，可在「预订」中查看。',
+    },
+    offerBooked: {
       eyebrow: '报价已接受',
       title: '演出已确认',
       subtitle: '{{counterpart}}已接受你对{{name}}的报价，可在「预订」中查看。',

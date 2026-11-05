@@ -26,6 +26,8 @@ const TYPE_TO_TAB = {
   DOCUMENT_SHARED: 'bookings',
   PAYMENT_RECEIVED: 'bookings',
   DEAL_COMPLETED: 'bookings',
+  DEAL_HANDED_TO_AGENT: 'bookings',
+  DEAL_AGENT_TOOK_OVER: 'bookings',
   DEAL_CANCELLED: 'bookings',
   // Event-venue consent (a promoter tagged your venue for their event)
   VENUE_EVENT_REQUEST: 'bookings',

@@ -173,16 +173,15 @@ const MessagesScreen = ({ onOpenChat, onCloseChat, chatOpen = false, isActive = 
 
 
   // Obsidian Neon segmented tab (Messages / Requests) with count pill.
-  const TabButton = ({ id, label, icon, count }) => (
+  const TabButton = ({ id, label, count }) => (
     <button
       className={`flex-1 flex items-center justify-center gap-[7px] py-3.5 text-[11px] font-tech font-semibold
                   uppercase tracking-[0.15em] whitespace-nowrap border-b-2 -mb-px transition-colors cursor-pointer
                   ${activeTab === id
-                    ? 'text-infrared border-infrared'
-                    : 'text-white/40 border-transparent hover:text-white/70'}`}
+                    ? 'text-white border-infrared'
+                    : 'text-white/65 border-transparent hover:text-white'}`}
       onClick={() => { if (id !== activeTab && chatOpen) onCloseChat?.(); setActiveTab(id); }}
     >
-      {icon}
       {label}
       <CountBadge count={count} />
     </button>
@@ -212,24 +211,11 @@ const MessagesScreen = ({ onOpenChat, onCloseChat, chatOpen = false, isActive = 
           id="messages"
           label={t('messages.title')}
           count={totalUnread}
-          icon={(
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-          )}
         />
         <TabButton
           id="requests"
           label={t('messages.requests')}
           count={connectionRequests.length + vouches.pending.length}
-          icon={(
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="8.5" cy="7" r="4" />
-              <line x1="20" y1="8" x2="20" y2="14" />
-              <line x1="23" y1="11" x2="17" y2="11" />
-            </svg>
-          )}
         />
       </div>
 

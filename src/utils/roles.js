@@ -22,11 +22,6 @@ export const roleChipClass = (role) => ({
   AGENT: 'border-role-agent/50 text-role-agent',
 }[role] || 'border-white/30 text-white/70');
 
-/** A soft wash of the role colour for backgrounds. */
-export const roleBloom = (role, pct = 18) => (ROLES.includes(role)
-  ? `color-mix(in srgb, var(--color-role-${role.toLowerCase()}) ${pct}%, transparent)`
-  : 'rgba(255,255,255,0.08)');
-
 export const ROLES = ['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'];
 
 export const ROLE_COLOR = {

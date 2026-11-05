@@ -312,6 +312,20 @@ const fr = {
     yearlyOnly: "La lecture de vos anciens documents par l'IA est une fonction de l'offre Annuelle. Vous pouvez toujours remplir le formulaire à la main.",
   },
 
+  offerRoute: {
+    title: 'Qui doit recevoir cette offre ?',
+    representedOne: '{{artist}} a un agent. Certains artistes gèrent eux-mêmes certaines régions, vous pouvez donc l\'envoyer à l\'un ou à l\'autre.',
+    representedMany: '{{artist}} a plusieurs agents, souvent selon les régions. Vous pouvez l\'envoyer à l\'un d\'eux ou à l\'artiste.',
+    sendToAgent: 'Envoyer l\'offre à cet agent',
+    connectFirst: 'Se connecter d\'abord à cet agent',
+    requestPending: 'Demande de connexion en attente',
+    sendDirect: 'Envoyer directement à l\'artiste',
+    directHint: 'L\'artiste gère lui-même cette réservation.',
+    connectHint: 'Une fois votre demande acceptée par {{name}}, vous pourrez lui envoyer l\'offre.',
+    connectSent: 'Demande envoyée à {{name}}. Une fois acceptée, refaites votre offre pour {{artist}} et choisissez cet agent.',
+    back: 'Retour',
+  },
+
   connect: {
     selectAgent: 'Choisir un agent',
     withAgent: "Se connecter avec l'agent",
@@ -453,6 +467,13 @@ const fr = {
     viaArtistDirect: 'via {{name}} · Direct',
     viaOtherAgent: 'via {{name}} · Géré par un autre agent',
     limitedViewNote: 'Le cachet, le contrat et les documents restent avec l\'agent qui gère cette réservation.',
+    limitedViewDirect: 'L\'artiste gère cette réservation : le cachet, le contrat et les documents restent avec lui. Il peut vous la confier.',
+    viewOnlyDirect: 'En direct avec l\'artiste · lecture seule',
+    viewOnlyCoAgent: 'Gérée par un autre agent · lecture seule',
+    handToAgent: 'Confier à {{name}}',
+    handToAgentConfirm: 'Confier cette réservation à {{name}} ? Cet agent verra le cachet, le contrat et les documents, et la gérera désormais. Vous verrez toujours la réservation, mais vous ne pourrez pas la reprendre vous-même.',
+    handOwnOffer: 'Votre offre attend encore une réponse. Vous pourrez confier la réservation une fois la réponse reçue.',
+    handFailed: 'Impossible de confier cette réservation. Veuillez réessayer.',
     agentGeneric: 'son agent',
     managedByAgent: 'Cette réservation est gérée par votre agent.',
     managedByAgentNamed: 'Cette réservation est gérée par votre agent ({{name}}).',
@@ -1197,6 +1218,7 @@ const fr = {
     loadArtistProfileFailed: "Impossible de charger le profil de l'artiste",
     createTour: 'Créer une tournée',
     editTour: 'Modifier la tournée',
+    viewBookings: 'Voir les bookings',
     selectZone: 'Choisir une zone',
     zoneHint: 'Zone de la tournée - laissez le pays vide pour une tournée sur toute la zone',
     countryOptional: 'Pays (facultatif)',
@@ -1368,6 +1390,8 @@ const fr = {
   profile: {
 
     about: 'À propos',
+
+    photoFullNote: 'Le recadrage rond sert aux listes. Le haut de votre profil affiche la photo entière, choisissez donc une photo à montrer en entier.',
 
     changePhoto: 'Changer la photo',
     techSpecs: 'Salles et technique',
@@ -1722,6 +1746,8 @@ const fr = {
       DOCUMENT_SHARED: '{{name}} a partagé un document avec toi',
       DEAL_CANCELLED: '{{event}} a été annulé',
       DEAL_COMPLETED: '{{event}} a été marqué comme terminé',
+      DEAL_HANDED_TO_AGENT: '{{name}} vous a confié {{event}}',
+      DEAL_AGENT_TOOK_OVER: '{{name}} gère désormais {{event}}',
       VENUE_EVENT_REQUEST: '{{name}} souhaite organiser un événement dans ta salle le {{date}}',
       MESSAGE: '{{name}} : {{preview}}',
       MESSAGE_DOCUMENT: '{{name}} a envoyé un document : {{title}}',
@@ -1814,6 +1840,8 @@ const fr = {
   },
 
   agency: {
+    agentsHeading: 'Agents',
+    artistsHeading: 'Artistes',
     title: 'Agence',
     howItWorks: "Une agence présente ses agents comme une seule équipe sur le profil de chaque membre. Chaque agent garde son accès, ses artistes et son offre.",
     promptTitle: 'Quelqu\'un de {{agency}} est déjà sur TORA',
@@ -2246,6 +2274,11 @@ const fr = {
     offerAccepted: {
       eyebrow: 'Offre acceptée',
       title: 'C\'est réservé',
+      subtitle: '{{counterpart}} a accepté votre offre pour {{name}}. La date est dans Réservations.',
+    },
+    offerBooked: {
+      eyebrow: 'Offre acceptée',
+      title: 'Date confirmée',
       subtitle: '{{counterpart}} a accepté votre offre pour {{name}}. La date est dans Réservations.',
     },
     contractSigned: {

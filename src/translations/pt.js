@@ -312,6 +312,20 @@ const pt = {
     yearlyOnly: "Ler os seus documentos antigos com IA é uma função do plano Anual. Você ainda pode preencher o formulário manualmente.",
   },
 
+  offerRoute: {
+    title: 'Quem deve receber esta oferta?',
+    representedOne: '{{artist}} tem um agente. Alguns artistas gerem certas regiões por conta própria, por isso pode enviá-la a qualquer um dos dois.',
+    representedMany: '{{artist}} tem vários agentes, muitas vezes para regiões diferentes. Pode enviá-la a um deles ou ao artista.',
+    sendToAgent: 'Enviar a oferta a este agente',
+    connectFirst: 'Ligar-se primeiro a este agente',
+    requestPending: 'Pedido de ligação pendente',
+    sendDirect: 'Enviar diretamente ao artista',
+    directHint: 'O artista gere esta reserva pessoalmente.',
+    connectHint: 'Quando {{name}} aceitar o pedido, poderá enviar-lhe a oferta.',
+    connectSent: 'Pedido enviado a {{name}}. Depois de aceite, volte a fazer a oferta para {{artist}} e selecione este agente.',
+    back: 'Voltar',
+  },
+
   connect: {
     selectAgent: 'Selecionar agente',
     withAgent: 'Ligar-me ao agente',
@@ -453,6 +467,13 @@ const pt = {
     viaArtistDirect: 'via {{name}} · Direto',
     viaOtherAgent: 'via {{name}} · Gerido por outro agente',
     limitedViewNote: 'O cachê, o contrato e os documentos ficam com o agente que gere esta reserva.',
+    limitedViewDirect: 'O artista gere esta reserva, por isso o cachê, o contrato e os documentos ficam com ele. Pode passá-la para si.',
+    viewOnlyDirect: 'Direta com o artista · só leitura',
+    viewOnlyCoAgent: 'Gerida por outro agente · só leitura',
+    handToAgent: 'Deixar {{name}} tratar disto',
+    handToAgentConfirm: 'Passar esta reserva para {{name}}? Verá o cachê, o contrato e os documentos e passará a geri-la. Continuará a ver a reserva, mas não poderá recuperá-la sozinho.',
+    handOwnOffer: 'A sua oferta ainda aguarda resposta. Poderá passar a reserva depois de responderem.',
+    handFailed: 'Não foi possível passar esta reserva. Tente novamente.',
     agentGeneric: 'o seu agente',
     managedByAgent: 'Esta reserva é gerida pelo seu agente.',
     managedByAgentNamed: 'Esta reserva é gerida pelo seu agente ({{name}}).',
@@ -1197,6 +1218,7 @@ const pt = {
     loadArtistProfileFailed: 'Não foi possível carregar o perfil do artista',
     createTour: 'Criar tour',
     editTour: 'Editar tour',
+    viewBookings: 'Ver bookings',
     selectZone: 'Selecionar zona',
     zoneHint: 'Área da tour - deixa o país vazio para uma tour em toda a zona',
     countryOptional: 'País (opcional)',
@@ -1368,6 +1390,8 @@ const pt = {
   profile: {
 
     about: 'Sobre',
+
+    photoFullNote: 'O recorte redondo é para as listas. O topo do seu perfil mostra a foto inteira, por isso escolha uma que queira mostrar por completo.',
 
     changePhoto: 'Alterar foto',
     techSpecs: 'Salas e técnica',
@@ -1722,6 +1746,8 @@ const pt = {
       DOCUMENT_SHARED: '{{name}} compartilhou um documento com você',
       DEAL_CANCELLED: '{{event}} foi cancelado',
       DEAL_COMPLETED: '{{event}} foi marcado como concluído',
+      DEAL_HANDED_TO_AGENT: '{{name}} passou-lhe {{event}}',
+      DEAL_AGENT_TOOK_OVER: '{{name}} gere agora {{event}}',
       VENUE_EVENT_REQUEST: '{{name}} quer realizar um evento no seu espaço em {{date}}',
       MESSAGE: '{{name}}: {{preview}}',
       MESSAGE_DOCUMENT: '{{name}} enviou um documento: {{title}}',
@@ -1814,6 +1840,8 @@ const pt = {
   },
 
   agency: {
+    agentsHeading: 'Agentes',
+    artistsHeading: 'Artistas',
     title: 'Agência',
     howItWorks: "Uma agência mostra os seus agentes como uma só equipe no perfil de cada membro. Cada agente mantém o próprio login, os seus artistas e o seu plano.",
     promptTitle: 'Alguém da {{agency}} já está no TORA',
@@ -2246,6 +2274,11 @@ const pt = {
     offerAccepted: {
       eyebrow: 'Proposta aceite',
       title: 'Está marcado',
+      subtitle: '{{counterpart}} aceitou a sua proposta para {{name}}. A marcação está em Reservas.',
+    },
+    offerBooked: {
+      eyebrow: 'Proposta aceite',
+      title: 'Data confirmada',
       subtitle: '{{counterpart}} aceitou a sua proposta para {{name}}. A marcação está em Reservas.',
     },
     contractSigned: {

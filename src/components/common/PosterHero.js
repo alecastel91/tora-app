@@ -9,7 +9,7 @@ import VerifiedBadge from './VerifiedBadge';
    nothing important is cropped. No photo: the role colour and the initial.
    `wide` is the desktop banner, where tall photos sit on the right over a
    blurred copy of themselves because stretching one would cut the face. */
-const PosterHero = ({ profile, wide = false, top = null, actions = null, children = null }) => {
+const PosterHero = ({ profile, own = false, wide = false, top = null, actions = null, children = null }) => {
   const { t } = useLanguage();
   const [shape, setShape] = useState(null); // tall | square | landscape
   const src = profile?.avatarLarge || profile?.avatar || null;
@@ -26,7 +26,7 @@ const PosterHero = ({ profile, wide = false, top = null, actions = null, childre
     <div className={`poster-hero poster-role-${role.toLowerCase()} ${wide ? 'poster-wide' : ''} ${src ? `poster-${shape || 'tall'}` : 'poster-empty'}`}>
       {src ? (
         <>
-          {wide && <img src={src} alt="" aria-hidden className="poster-backdrop" />}
+          {wide && shape !== 'landscape' && <img src={src} alt="" aria-hidden className="poster-backdrop" />}
           <img src={src} alt={profile?.name || ''} className="poster-photo" onLoad={onLoad} />
         </>
       ) : (
@@ -41,7 +41,7 @@ const PosterHero = ({ profile, wide = false, top = null, actions = null, childre
             {profile?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={wide ? 26 : 20} className="poster-seal" channel={profile?.verifyChannel} />}
           </h1>
           <div className="poster-meta">
-            <span>{profile?.location || t('profile.addLocation')}</span>
+            <span>{profile?.location || (own ? t('profile.addLocation') : '')}</span>
             <span className="poster-role">{roleLabel(role, t)}</span>
           </div>
           {children}

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
    the page, so a section only appears here when that section is really shown
    for this role and viewer. One long scroll stays the real layout. */
 const HEADINGS = '.poster-h2, .profile-embeds h4';
+const headingsIn = (root) => [...root.querySelectorAll(HEADINGS)].filter((el) => el.textContent.trim());
 
 const JumpTabs = ({ scope }) => {
   const [items, setItems] = useState([]);
@@ -13,21 +14,28 @@ const JumpTabs = ({ scope }) => {
     const root = scope?.current;
     if (!root) return undefined;
     const read = () => {
-      const next = [...root.querySelectorAll(HEADINGS)].map((el) => el.textContent.trim()).filter(Boolean);
+      const next = headingsIn(root).map((el) => el.textContent.trim());
       setItems((prev) => (prev.join('|') === next.join('|') ? prev : next));
     };
     read();
     // Sections arrive after their fetches finish.
-    const observer = new MutationObserver(read);
-    observer.observe(root, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    let frame;
+    const observer = new MutationObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(read);
+    });
+    observer.observe(root, { childList: true, characterData: true, subtree: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, [scope]);
 
   if (items.length < 2) return null;
 
   const go = (index) => {
     setActive(index);
-    const el = scope.current?.querySelectorAll(HEADINGS)[index];
+    const el = scope.current && headingsIn(scope.current)[index];
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 

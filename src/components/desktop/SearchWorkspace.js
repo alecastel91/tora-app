@@ -5,11 +5,12 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import { isPremiumViewer } from '../../utils/subscription';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
-import { ROLES, roleLabel, getAvatarClass } from '../../utils/roles';
+import { ROLES, roleLabel } from '../../utils/roles';
 import { appAlert } from '../../utils/dialogs';
 import { HeartIcon, SearchIcon } from '../../utils/icons';
 import LoadingGlobe from '../common/LoadingGlobe';
 import ConnectAction from '../common/ConnectAction';
+import PhotoCard from '../common/PhotoCard';
 import OverlayPortal from '../common/OverlayPortal';
 import FilterSheet, { FilterButton } from '../common/FilterSheet';
 
@@ -175,7 +176,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
 
           <div className="px-3 py-2 text-[11px] text-white/45">{t('desktop.results', { n: list.length })}</div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+          <div className="d3-ws-list min-h-0 flex-1 overflow-y-auto">
             {agencies.map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
             {openAgencyId && <AgencyTeamSheet organisationId={openAgencyId} onClose={() => setOpenAgencyId(null)} onOpenProfile={onOpenProfile} />}
             {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? agencies.length > 0 ? null : (
@@ -183,27 +184,26 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
             ) : list.map((profile) => {
               const liked = likedProfiles.has(profile.id);
               return (
-                <div key={profile.id} className="search-result-card">
-                  <div className="result-content">
-                    <div className={`result-avatar ${getAvatarClass(profile.role)} clickable`} onClick={() => onOpenProfile(profile)}>
-                      {profile.avatar ? <img src={profile.avatar} alt={profile.name} /> : profile.name.charAt(0).toUpperCase()}
-                      {profile.isVerified && <span className="verified-badge">✓</span>}
-                    </div>
-                    <div className="result-info clickable" onClick={() => onOpenProfile(profile)}>
-                      <div className="result-header">
-                        <h3>{profile.name}</h3>
-                        <span className={`role-badge badge-${String(profile.role).toLowerCase()}`}>{roleLabel(profile.role, t)}</span>
-                      </div>
-                      <p className="result-location">{profile.location || [profile.city, profile.country].filter(Boolean).join(', ')}</p>
-                    </div>
-                  </div>
-                  <div className="result-actions">
-                    <button className={`btn ${liked ? 'btn-liked' : 'btn-outline'} btn-like`} onClick={() => like(profile)}>
-                      <HeartIcon filled={liked} /> {liked ? t('search.liked') : t('search.like')}
-                    </button>
-                    <ConnectAction profile={profile} onMessage={onOpenChat} onOpenPremium={onOpenPremium} />
-                  </div>
-                </div>
+                <PhotoCard
+                  key={profile.id}
+                  profile={profile}
+                  place={profile.location || [profile.city, profile.country].filter(Boolean).join(', ')}
+                  onOpen={() => onOpenProfile(profile)}
+                  actions={(
+                    <>
+                      <button
+                        type="button"
+                        className={`photo-card-like${liked ? ' is-on' : ''}`}
+                        aria-label={liked ? t('search.liked') : t('search.like')}
+                        aria-pressed={liked}
+                        onClick={() => like(profile)}
+                      >
+                        <HeartIcon filled={liked} /><span>{liked ? t('search.liked') : t('search.like')}</span>
+                      </button>
+                      <ConnectAction profile={profile} onMessage={onOpenChat} onOpenPremium={onOpenPremium} />
+                    </>
+                  )}
+                />
               );
             })}
           </div>

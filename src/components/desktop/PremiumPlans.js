@@ -51,7 +51,7 @@ const PremiumPlans = ({
     }
     if (onAgentPlan) {
       return (
-        <button className={`btn ${plan === 'yearly' ? 'btn-primary' : 'btn-outline'} w-full`} onClick={() => onSelectPlan(plan)}>
+        <button className={`btn ${plan === 'yearly' ? 'btn-liked' : 'btn-outline'} w-full`} onClick={() => onSelectPlan(plan)}>
           {t('premium.switchToMembership')}
         </button>
       );

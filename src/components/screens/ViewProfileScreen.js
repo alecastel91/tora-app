@@ -8,18 +8,17 @@ import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
 import { useAppContext } from '../../contexts/AppContext';
-import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon, LocationIcon } from '../../utils/icons';
+import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon } from '../../utils/icons';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import LimitReachedModal from '../common/LimitReachedModal';
 import apiService from '../../services/api';
-import VerifiedBadge from '../common/VerifiedBadge';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatEventDate } from '../../utils/dates';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
-import MakeOfferModal from '../common/MakeOfferModal';
+import OfferFlow from '../common/OfferFlow';
 import PosterHero from '../common/PosterHero';
 import JumpTabs from '../common/JumpTabs';
 import ProfileActions from '../common/ProfileActions';
@@ -111,7 +110,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   const [listModal, setListModal] = useState(null); // 'likes' | 'connections'
   const [listData, setListData] = useState({});
   const [likers, setLikers] = useState(null); // eager — powers the liked-by line
-  const [showAllGenres, setShowAllGenres] = useState(false);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [showGigsModal, setShowGigsModal] = useState(false);
   const [gigs, setGigs] = useState(null);
@@ -439,16 +437,6 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
     return name ? name.charAt(0).toUpperCase() : 'A';
   };
   
-  const getRoleBadgeClass = (role) => {
-    const roleClasses = {
-      'ARTIST': 'role-badge',
-      'VENUE': 'role-badge venue',
-      'PROMOTER': 'role-badge promoter',
-      'AGENT': 'role-badge agent'
-    };
-    return roleClasses[role] || 'role-badge';
-  };
-  
   // Someone this member blocked. The server sends back a name and nothing
   // else, so there is a real page here instead of a profile that refuses to
   // open — which is what a 404 looked like — and the undo sits on it.
@@ -587,6 +575,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             <ProfileActions
               viewerRole={currentUser?.role}
               targetRole={profile.role}
+              targetHasRoster={Array.isArray(profile.representingArtists) && profile.representingArtists.length > 0}
               isLiked={isLiked}
               isConnected={isConnected}
               hasPendingRequest={hasPendingRequest}
@@ -1072,7 +1061,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       )}
 
       {/* Message Modal */}
-        <MakeOfferModal
+        <OfferFlow
         isOpen={showTourOffer}
         onClose={() => setShowTourOffer(false)}
         recipientProfile={profile}

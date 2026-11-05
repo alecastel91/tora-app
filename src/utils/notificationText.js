@@ -40,6 +40,8 @@ export function renderNotificationText(notif, t, locale) {
     case 'CONTRACT_WITHDRAWN': return withName('CONTRACT_WITHDRAWN');
     case 'DOCUMENT_SHARED': return withName('DOCUMENT_SHARED');
     case 'DEAL_CANCELLED': return rd.eventName ? tr('DEAL_CANCELLED', { event: rd.eventName }) : text;
+    case 'DEAL_HANDED_TO_AGENT': return rd.eventName ? tr('DEAL_HANDED_TO_AGENT', { name: rd.artistName, event: rd.eventName }) : text;
+    case 'DEAL_AGENT_TOOK_OVER': return rd.eventName ? tr('DEAL_AGENT_TOOK_OVER', { name: rd.agentName, event: rd.eventName }) : text;
     case 'DEAL_COMPLETED': return rd.eventName ? tr('DEAL_COMPLETED', { event: rd.eventName }) : text;
     case 'VENUE_EVENT_REQUEST':
       return rd.date ? withName('VENUE_EVENT_REQUEST', { date: formatEventDate(rd.date, locale) }) : text;

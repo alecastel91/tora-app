@@ -312,6 +312,20 @@ const ko = {
     yearlyOnly: "AI로 과거 문서를 읽는 기능은 연간 플랜 전용입니다. 양식은 직접 입력할 수 있습니다.",
   },
 
+  offerRoute: {
+    title: '이 오퍼를 누구에게 보낼까요?',
+    representedOne: '{{artist}}에게는 에이전트가 있습니다. 일부 지역은 아티스트가 직접 부킹하기도 하므로 어느 쪽으로든 보낼 수 있습니다.',
+    representedMany: '{{artist}}에게는 지역별로 여러 에이전트가 있을 수 있습니다. 그중 한 명 또는 아티스트에게 보낼 수 있습니다.',
+    sendToAgent: '이 에이전트에게 오퍼 보내기',
+    connectFirst: '먼저 이 에이전트와 연결하기',
+    requestPending: '연결 요청 대기 중',
+    sendDirect: '아티스트에게 직접 보내기',
+    directHint: '이 부킹은 아티스트가 직접 진행합니다.',
+    connectHint: '{{name}}님이 요청을 수락하면 오퍼를 보낼 수 있습니다.',
+    connectSent: '{{name}}님에게 요청을 보냈습니다. 수락되면 {{artist}} 오퍼를 다시 만들고 이 에이전트를 선택하세요.',
+    back: '뒤로',
+  },
+
   connect: {
     selectAgent: '에이전트 선택',
     withAgent: '에이전트와 연결',
@@ -453,6 +467,13 @@ const ko = {
     viaArtistDirect: '{{name}} 경유 · 직접',
     viaOtherAgent: 'via {{name}} · 다른 에이전트가 담당',
     limitedViewNote: '개런티, 계약서, 서류는 이 부킹을 담당하는 에이전트만 볼 수 있습니다.',
+    limitedViewDirect: '이 부킹은 아티스트가 직접 진행하므로 개런티, 계약서, 서류는 아티스트만 볼 수 있습니다. 아티스트가 나에게 맡길 수 있습니다.',
+    viewOnlyDirect: '아티스트 직접 진행 · 보기 전용',
+    viewOnlyCoAgent: '다른 에이전트 진행 · 보기 전용',
+    handToAgent: '{{name}}에게 맡기기',
+    handToAgentConfirm: '이 부킹을 {{name}}에게 맡길까요? 개런티, 계약서, 서류를 보게 되며 앞으로 이 부킹을 진행합니다. 부킹은 계속 볼 수 있지만 직접 되찾을 수는 없습니다.',
+    handOwnOffer: '내 오퍼에 대한 답변을 기다리는 중입니다. 답변을 받은 후 맡길 수 있습니다.',
+    handFailed: '이 부킹을 맡기지 못했습니다. 다시 시도해 주세요.',
     agentGeneric: '에이전트',
     managedByAgent: '이 부킹은 담당 에이전트가 관리합니다.',
     managedByAgentNamed: '이 부킹은 담당 에이전트({{name}})가 관리합니다.',
@@ -1197,6 +1218,7 @@ const ko = {
     loadArtistProfileFailed: '아티스트 프로필을 불러오지 못했습니다',
     createTour: '투어 만들기',
     editTour: '투어 수정',
+    viewBookings: '부킹 보기',
     selectZone: '지역 선택',
     zoneHint: '투어 지역 - 국가를 비워 두면 지역 전체 투어가 됩니다',
     countryOptional: '국가 (선택)',
@@ -1368,6 +1390,8 @@ const ko = {
   profile: {
 
     about: '소개',
+
+    photoFullNote: '원형 자르기는 목록에 사용됩니다. 프로필 상단에는 사진 전체가 표시되니 전체를 보여도 괜찮은 사진을 선택하세요.',
 
     changePhoto: '사진 변경',
     techSpecs: '룸과 장비',
@@ -1722,6 +1746,8 @@ const ko = {
       DOCUMENT_SHARED: '{{name}}님이 문서를 공유했습니다',
       DEAL_CANCELLED: '{{event}}이(가) 취소되었습니다',
       DEAL_COMPLETED: '{{event}}이(가) 완료로 표시되었습니다',
+      DEAL_HANDED_TO_AGENT: '{{name}}님이 {{event}}을(를) 맡겼습니다',
+      DEAL_AGENT_TOOK_OVER: '이제 {{name}}님이 {{event}}을(를) 진행합니다',
       VENUE_EVENT_REQUEST: '{{name}}님이 {{date}}에 내 베뉴에서 이벤트를 열고 싶어 합니다',
       MESSAGE: '{{name}}: {{preview}}',
       MESSAGE_DOCUMENT: '{{name}}님이 문서를 보냈습니다: {{title}}',
@@ -1814,6 +1840,8 @@ const ko = {
   },
 
   agency: {
+    agentsHeading: '에이전트',
+    artistsHeading: '아티스트',
     title: '에이전시',
     howItWorks: "에이전시는 소속 에이전트를 하나의 팀으로 모든 멤버의 프로필에 보여줍니다. 각 에이전트의 로그인, 아티스트, 플랜은 그대로입니다.",
     promptTitle: '{{agency}}의 멤버가 이미 TORA에 있습니다',
@@ -2244,6 +2272,11 @@ const ko = {
     thisBooking: '이 부킹',
     theOtherParty: '상대방',
     offerAccepted: {
+      eyebrow: '제안 수락됨',
+      title: '섭외 확정',
+      subtitle: '{{counterpart}}님이 {{name}} 제안을 수락했습니다. 부킹에서 확인하세요.',
+    },
+    offerBooked: {
       eyebrow: '제안 수락됨',
       title: '섭외 확정',
       subtitle: '{{counterpart}}님이 {{name}} 제안을 수락했습니다. 부킹에서 확인하세요.',

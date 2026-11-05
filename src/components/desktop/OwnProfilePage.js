@@ -1,9 +1,8 @@
 import React, { useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { getAvatarClass, roleLabel, roleChipClass, roleBloom, ROLES } from '../../utils/roles';
+import { roleLabel, ROLES } from '../../utils/roles';
 import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
-import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, LocationIcon, StarIcon, ShieldIcon } from '../../utils/icons';
-import VerifiedBadge from '../common/VerifiedBadge';
+import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, StarIcon, ShieldIcon } from '../../utils/icons';
 import PosterHero from '../common/PosterHero';
 import JumpTabs from '../common/JumpTabs';
 import ProfileBadges from '../common/ProfileBadges';
@@ -39,7 +38,7 @@ const Action = ({ icon, label, onClick, dot, primary }) => (
     type="button"
     onClick={onClick}
     className={`relative flex h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors
-                [&>svg]:h-4 [&>svg]:w-4 ${primary ? 'border-transparent bg-[#DE2A57] text-white hover:bg-[#C9204B]' : 'border-white/12 bg-white/[0.03] text-white/85 hover:border-white/30 hover:text-white'}`}
+                [&>svg]:h-4 [&>svg]:w-4 ${primary ? 'border-transparent bg-[var(--color-crimson-action)] text-white hover:bg-[var(--color-crimson-action-hover)]' : 'border-white/12 bg-white/[0.03] text-white/85 hover:border-white/30 hover:text-white'}`}
   >
     <span className={`${primary ? 'text-white' : 'text-infrared'} [&>svg]:h-4 [&>svg]:w-4`}>{icon}</span>
     {label}
@@ -56,8 +55,6 @@ const OwnProfilePage = ({
   const pageRef = useRef(null);
   const { t } = useLanguage();
   const role = user?.role;
-  const roleTone = roleChipClass(role);
-  const bloom = roleBloom(role);
 
   const links = profileLinks(user, t);
 
@@ -70,6 +67,7 @@ const OwnProfilePage = ({
       {/* ---- identity band: who you are, and what you do here ---- */}
       <header className="d3-op-head d3-panel">
         <PosterHero
+          own
           wide
           profile={user}
           top={(

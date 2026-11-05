@@ -312,6 +312,20 @@ const en = {
     yearlyOnly: "Reading your past documents with AI is a Yearly feature. You can still fill in the form by hand.",
   },
 
+  offerRoute: {
+    title: 'Who should get this offer?',
+    representedOne: '{{artist}} has an agent. Some artists book certain regions themselves, so you can send it to either.',
+    representedMany: '{{artist}} has several agents, often for different regions. You can send it to one of them or to the artist.',
+    sendToAgent: 'Send the offer to this agent',
+    connectFirst: 'Connect with this agent first',
+    requestPending: 'Connection request pending',
+    sendDirect: 'Send directly to the artist',
+    directHint: 'The artist runs this booking themselves.',
+    connectHint: 'Once {{name}} accepts your request, you can send them the offer.',
+    connectSent: 'Request sent to {{name}}. Once they accept, make your offer for {{artist}} again and choose them.',
+    back: 'Back',
+  },
+
   connect: {
     selectAgent: 'Select Agent',
     withAgent: 'Connect with Agent',
@@ -453,6 +467,13 @@ const en = {
     viaArtistDirect: 'via {{name}} · Artist-direct',
     viaOtherAgent: 'via {{name}} · Handled by another agent',
     limitedViewNote: 'Fees, contract and documents stay with the agent running this booking.',
+    limitedViewDirect: 'The artist is running this booking, so the fee, contract and documents stay with them. They can hand it to you.',
+    viewOnlyDirect: 'Direct with artist · view only',
+    viewOnlyCoAgent: 'Run by another agent · view only',
+    handToAgent: 'Let {{name}} handle this',
+    handToAgentConfirm: 'Hand this booking to {{name}}? They will see the fee, contract and documents and run it from here. You will still see the booking, but you can\'t take it back yourself.',
+    handOwnOffer: 'The venue or promoter still has to reply to your offer. You can hand this booking over once they have.',
+    handFailed: 'Couldn\'t hand over this booking. Please try again.',
     agentGeneric: 'their agent',
     managedByAgent: 'This booking is managed by your agent.',
     managedByAgentNamed: 'This booking is managed by your agent ({{name}}).',
@@ -1197,6 +1218,7 @@ const en = {
     loadArtistProfileFailed: 'Failed to load artist profile',
     createTour: 'Create Tour',
     editTour: 'Edit Tour',
+    viewBookings: 'View bookings',
     selectZone: 'Select Zone',
     zoneHint: 'Tour area - leave country empty for zone-wide tour',
     countryOptional: 'Country (Optional)',
@@ -1369,6 +1391,7 @@ const en = {
   // Profile Screen
   profile: {
     about: 'About',
+    photoFullNote: 'The round crop is for lists. The top of your profile shows your full photo, so choose one you are happy to show in full.',
     changePhoto: 'Change photo',
     techSpecs: 'Rooms and tech',
     capacityShort: 'cap.',
@@ -1728,6 +1751,8 @@ const en = {
       DOCUMENT_SHARED: '{{name}} shared a document with you',
       DEAL_CANCELLED: '{{event}} was cancelled',
       DEAL_COMPLETED: '{{event}} was marked as completed',
+      DEAL_HANDED_TO_AGENT: '{{name}} handed you {{event}}',
+      DEAL_AGENT_TOOK_OVER: '{{name}} now runs {{event}}',
       VENUE_EVENT_REQUEST: '{{name}} wants to hold an event at your venue on {{date}}',
       MESSAGE: '{{name}}: {{preview}}',
       MESSAGE_DOCUMENT: '{{name}} sent a document: {{title}}',
@@ -1824,6 +1849,8 @@ const en = {
   
   // Common
   agency: {
+    agentsHeading: 'Agents',
+    artistsHeading: 'Artists',
     title: 'Agency',
     howItWorks: "An agency shows its agents as one team, on every member's profile. Each agent keeps their own login, artists and plan.",
     promptTitle: 'Someone from {{agency}} is already on TORA',
@@ -2256,6 +2283,11 @@ const en = {
     offerAccepted: {
       eyebrow: 'Offer accepted',
       title: 'You\'re booked',
+      subtitle: '{{counterpart}} accepted your offer for {{name}}. The booking is now in Bookings.',
+    },
+    offerBooked: {
+      eyebrow: 'Offer accepted',
+      title: 'Artist booked',
       subtitle: '{{counterpart}} accepted your offer for {{name}}. The booking is now in Bookings.',
     },
     contractSigned: {

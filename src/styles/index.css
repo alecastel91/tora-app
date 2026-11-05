@@ -7,6 +7,12 @@
  * Single source of truth lives in tora-application/src/styles/tora-theme.css. */
 @import "./tora-theme.css";
 
+/* Main action buttons: darker than infrared so white text passes contrast. */
+@theme static {
+  --color-crimson-action: #DE2A57;
+  --color-crimson-action-hover: #C9204B;
+}
+
 /* Canonical role colors (user-defined). The synced theme has agent/promoter
  * wrong (agent gold, promoter cyan); corrected here until the canonical
  * tora-theme.css in tora-application is updated. */

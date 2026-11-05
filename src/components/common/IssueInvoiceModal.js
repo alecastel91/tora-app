@@ -141,7 +141,7 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
 
           <div className="invoice-kind-row">
             {['deposit', 'final', 'full'].map((k) => (
-              <button key={k} type="button" className={`btn btn-sm ${kind === k ? 'btn-primary' : 'btn-outline'}`} onClick={() => pickKind(k)}>
+              <button key={k} type="button" className={`btn btn-sm ${kind === k ? 'btn-liked' : 'btn-outline'}`} onClick={() => pickKind(k)}>
                 {t(`invoices.kind.${k}`)}
               </button>
             ))}

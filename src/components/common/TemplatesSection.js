@@ -38,7 +38,7 @@ export const TemplatePicker = ({ templates, templateId, onPick }) => {
       {templates.length > 1 && (
         <div className="invoice-kind-row">
           {templates.map((x) => (
-            <button key={x.id} type="button" className={`btn btn-sm ${templateId === x.id ? 'btn-primary' : 'btn-outline'}`} onClick={() => { if (x.id !== templateId) onPick(x.id); }}>{x.shared ? `${x.name} · ${x.ownerName}` : x.name}</button>
+            <button key={x.id} type="button" className={`btn btn-sm ${templateId === x.id ? 'btn-liked' : 'btn-outline'}`} onClick={() => { if (x.id !== templateId) onPick(x.id); }}>{x.shared ? `${x.name} · ${x.ownerName}` : x.name}</button>
           ))}
         </div>
       )}

@@ -59,7 +59,7 @@ const CalendarReviewSheet = ({ isOpen, profileId, review, onClose, onDecided }) 
                     </div>
                     <div className="calendar-review-kind">
                       {['GIG', 'TRAVEL'].map((k) => (
-                        <button key={k} type="button" className={`btn btn-sm ${e.kind === k ? 'btn-primary' : 'btn-outline'}`} onClick={() => setEdit(it.id, { kind: k })}>
+                        <button key={k} type="button" className={`btn btn-sm ${e.kind === k ? 'btn-liked' : 'btn-outline'}`} onClick={() => setEdit(it.id, { kind: k })}>
                           {t(k === 'GIG' ? 'calendarSync.kindGig' : 'calendarSync.kindTrip')}
                         </button>
                       ))}

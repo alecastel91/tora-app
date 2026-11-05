@@ -19,6 +19,10 @@ test('counter offer from the artist side flips the turn', () => {
   assert.equal(bookingStatusLine(deal, artist, t).mine, false);
 });
 
+test('an artist on an agent-led deal has no move of their own', () => {
+  assert.equal(bookingStatusLine({ ...base, status: 'ACCEPTED', bookedArtistId: base.artistId }, { ...artist, role: 'ARTIST' }, t), null);
+});
+
 test('accepted: contract to send, then to sign by the receiver', () => {
   const noContract = { ...base, status: 'ACCEPTED' };
   assert.equal(bookingStatusLine(noContract, artist, t).text, 'bookings.line.sendContract|name=CIRCUIT');

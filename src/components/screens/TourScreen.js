@@ -8,7 +8,10 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { formatEventDate, clampDateRange } from '../../utils/dates';
 import { subscribeToTours } from '../../services/realtime';
 import ViewProfileScreen from './ViewProfileScreen';
-import MakeOfferModal from '../common/MakeOfferModal';
+import PhotoCard from '../common/PhotoCard';
+import { roleLabel } from '../../utils/roles';
+import TourPoster from '../common/TourPoster';
+import OfferFlow from '../common/OfferFlow';
 import { CalendarIcon, PlaneIcon, LocationIcon, HandshakeIcon, DollarIcon, TargetIcon, StarIcon, EyeIcon, SlidersIcon, HeartIcon } from '../../utils/icons';
 import { isVerificationGate } from '../../utils/errors';
 import apiService from '../../services/api';
@@ -853,26 +856,25 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
     return (
       <>
-        {prof.avatar && <img src={prof.avatar} alt="" aria-hidden className="d3-mat-banner" />}
-        <div className="d3-mat-head">
-          <div className={`match-avatar avatar-${(prof.role || 'artist').toLowerCase()} clickable`}
-               onClick={() => handleProfileClick(prof.id)}>
-            {prof.avatar ? <img src={prof.avatar} alt={prof.name} /> : (prof.name || '?').charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0">
-            <div className="match-name-role !mb-0">
-              <h3 className="truncate">{prof.name}</h3>
-              <span className={`role-badge ${(prof.role || '').toLowerCase()}`}>{prof.role}</span>
-            </div>
-            <p className="d3-mat-loc">
-              {isConnected ? <span className="d3-mat-rel">{t('tour.feedConnected')}</span> : null}
+        <div className={`d3-mat-hero poster-role-${String(prof.role || 'artist').toLowerCase()}${prof.avatarLarge || prof.avatar ? '' : ' poster-empty'}`}>
+          {(prof.avatarLarge || prof.avatar)
+            ? <img src={prof.avatarLarge || prof.avatar} alt="" aria-hidden />
+            : <span aria-hidden className="photo-card-initial">{(prof.name || '?').charAt(0).toUpperCase()}</span>}
+          <button type="button" className="photo-card-open" aria-label={prof.name} onClick={() => handleProfileClick(prof.id)} />
+          <div className="d3-mat-hero-text">
+            <h2 className="d3-mat-hero-name">{prof.name}</h2>
+            <p className="d3-mat-hero-meta">
               {prof.location}
               {/* Real field, filled in by the venue — absent on most profiles today. */}
               {prof.venueCapacity ? ` · ${t('profile.capacity')} ${Number(prof.venueCapacity).toLocaleString()}` : ''}
+              {' · '}<span className="poster-role">{roleLabel(prof.role, t)}</span>
+              {isConnected ? <> · <span className="d3-mat-rel">{t('tour.feedConnected')}</span></> : null}
             </p>
           </div>
         </div>
 
+        <div className="d3-mat-body">
+        <div className="d3-mat-body-main">
         {months.length > 0 && (
           <div className="d3-mat-ov">
             <p className="d3-mat-lbl">
@@ -898,6 +900,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           </div>
         )}
 
+        </div>
+        <div className="d3-mat-body-side">
         {genreList.length > 0 && (
           <div className="d3-mat-ov">
             <p className="d3-mat-lbl">{sharedGenres.length > 0 ? t('desktop.matGenresShared') : t('search.genres')}</p>
@@ -937,6 +941,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           )}
           <button className="btn" onClick={() => handleProfileClick(prof.id)}>{t('desktop.view')}</button>
         </div>
+        </div>
+        </div>
       </>
     );
   };
@@ -947,7 +953,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (!isPremiumUser()) {
       return (
         <div className="tour-kickstart-content">
-          <div className="coming-soon-placeholder">
+          <div className="coming-soon-placeholder tour-gate">
             <div className="coming-soon-icon">
               <StarIcon />
             </div>
@@ -988,13 +994,18 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     return (
       <div className="tour-kickstart-content">
         <div className="coming-soon-placeholder">
+          {!nativeDesktop && matches.length > 0 && (
+            <h1 className="tour-page-title">
+              {matches.length === 1 ? t('tour.matchFound', { n: matches.length }) : t('tour.matchesFound', { n: matches.length })}
+            </h1>
+          )}
           {renderSubTabHeader({
             intro: (
               <>
-                <p className="m-0">{t('tour.matchesIntro')}</p>
+                {matches.length === 0 && <p className="m-0">{t('tour.matchesIntro')}</p>}
                 {/* Where the matches come from — otherwise "I filled in my
                     calendar and nothing happened". */}
-                <p className="m-0 mt-1 text-white/35">
+                <p className="m-0">
                   {t(isAgent ? 'tour.matchesSourceAgent' : 'tour.matchesSource')}{' '}
                   <button type="button" className="border-0 bg-transparent p-0 text-xs text-white/60 underline"
                     onClick={() => { closeTourPanes(); setActiveTab('calendar'); }}>
@@ -1034,82 +1045,37 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               </div>
             ) : matches.length > 0 ? (
               <div className="matches-results">
-                <p className="matches-count">
-                  {matches.length === 1 ? t('tour.matchFound', { n: matches.length }) : t('tour.matchesFound', { n: matches.length })}
-                </p>
-
                 {matches.map((match, index) => {
                   const profileId = match.profile.id;
                   const isRequested = sentRequests.has(profileId);
                   const isConnected = connectedUsers.has(profileId);
-
+                  const genres = match.profile.genres || [];
                   return (
-                    <div key={`${profileId}-${index}`} className="match-card-simple">
-                      {match.forArtist && (
-                        <div className="text-[10px] uppercase tracking-[0.15em] text-infrared/80 font-tech mb-1.5">
-                          {t('bookings.forArtist', { name: match.forArtist.name })}
-                        </div>
-                      )}
-                      <div className="match-date-location">
-                        <span><CalendarIcon /> {match.dates}</span>
-                        <span><LocationIcon /> {match.profile.location}</span>
-                      </div>
-
-                      <div className="match-profile-content">
-                        <div
-                          className={`match-avatar avatar-${match.profile.role.toLowerCase()} clickable`}
-                          onClick={() => handleProfileClick(profileId)}
-                        >
-                          {match.profile.avatar ? (
-                            <img src={match.profile.avatar} alt={match.profile.name} />
-                          ) : (
-                            match.profile.name.charAt(0).toUpperCase()
-                          )}
-                          {match.profile.isVerified && <span className="verified-badge">✓</span>}
-                        </div>
-
-                        <div
-                          className="match-info clickable"
-                          onClick={() => handleProfileClick(profileId)}
-                        >
-                          <div className="match-name-role">
-                            <h3>{match.profile.name}</h3>
-                            <span className={`role-badge ${match.profile.role.toLowerCase()}`}>
-                              {match.profile.role}
-                            </span>
-                          </div>
-                          <p className="match-base-location">{match.profile.location}</p>
-                        </div>
-                      </div>
-
-                      {match.profile.genres && match.profile.genres.length > 0 && (
-                        <div className="match-genres-simple">
-                          {match.profile.genres.slice(0, 3).map(genre => (
-                            <span key={genre} className="genre-tag-small">{genre}</span>
-                          ))}
-                          {match.profile.genres.length > 3 && (
-                            <span className="genre-tag-small">+{match.profile.genres.length - 3}</span>
-                          )}
-                        </div>
-                      )}
-
-                      {isConnected ? (
+                    <PhotoCard
+                      key={`${profileId}-${index}`}
+                      variant="match"
+                      profile={match.profile}
+                      place={match.profile.location}
+                      chip={match.forArtist ? `${t('bookings.forArtist', { name: match.forArtist.name })} · ${match.dates}` : match.dates}
+                      note={genres.length > 0 ? genres.slice(0, 3).join(', ') : null}
+                      onOpen={() => handleProfileClick(profileId)}
+                      actions={isConnected ? (
                         <button
-                          className="btn btn-message btn-match-full"
+                          className="btn btn-outline photo-card-cta"
                           onClick={() => handleMessage(match.profile, t('tour.matchDraft', { name: match.profile.name, dates: match.dates }))}
                         >
                           {t('search.message')}
                         </button>
                       ) : (
                         <button
-                          className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'} btn-match-full`}
+                          className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'} photo-card-cta`}
                           onClick={() => handleConnect(match.profile)}
                           disabled={isRequested}
                         >
                           {isRequested ? t('search.requested') : t('search.connect')}
                         </button>
                       )}
-                    </div>
+                    />
                   );
                 })}
               </div>
@@ -1152,11 +1118,11 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 {travelFeed.length === 0 && !feedLoading && (
                   <p className="text-sm text-white/40">{t('tour.travelFeedEmpty')}</p>
                 )}
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col">
                   {travelFeed.map((s, i) => (
                     <div
                       key={`${s.profile.id}-${s.startDate}-${i}`}
-                      className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3 cursor-pointer hover:border-infrared/40 transition-colors"
+                      className="travel-feed-row"
                       onClick={() => setViewingProfile(s.profile)}
                     >
                       <div className={`match-avatar avatar-${(s.profile.role || 'artist').toLowerCase()} shrink-0`}>
@@ -1962,7 +1928,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (!isPremiumUser()) {
       return (
         <div className="tour-kickstart-content">
-          <div className="coming-soon-placeholder">
+          <div className="coming-soon-placeholder tour-gate">
             <div className="coming-soon-icon">
               <StarIcon />
             </div>
@@ -2021,10 +1987,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             })}
           </div>}
           <div className="tour-kickstart-section">
-            {!only && <div className="section-header">
-              <h3>{t('tour.myTours')}</h3>
-            </div>}
-
             {/* Tour cards or empty state */}
             {toursLoading ? (
               <LoadingGlobe label={t('tour.loadingTours')} />
@@ -2038,129 +2000,53 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <div className="tour-cards-list">
                 {visibleTours.map(tour => {
                   const pct = Math.min(100, Math.round(((tour.totalRevenue || 0) / (tour.minRevenue || 1)) * 100));
-                  const statusPill = {
-                    ACTIVE: 'text-role-agent border-role-agent/50',
-                    COMPLETED: 'text-white/60 border-white/25',
-                    CANCELLED: 'text-role-venue border-role-venue/50',
-                  }[tour.status] || 'text-white/60 border-white/25';
                   return (
-                  <div
-                    key={tour.id}
-                    className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 transition-colors hover:border-white/20"
-                  >
-                    {/* Header: destination + window, status pill */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className="min-w-0">
-                        <h4 className="text-[17px] font-semibold text-white font-space-grotesk tracking-[-0.01em] m-0 truncate">
-                          {t('tour.tourTitle', { location: tour.country || tour.zone })}
-                        </h4>
-                        {user?.role === 'AGENT' && tour.artist?.name && (
-                          <p className="text-[11px] text-infrared/90 font-tech mt-1 m-0 truncate">
-                            {tour.artist.name}
-                          </p>
-                        )}
-                        <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          {formatEventDate(tour.startDate, t('dateFormat.locale'), { month: 'short', day: 'numeric' })}
-                          {' — '}
-                          {formatEventDate(tour.endDate, t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
-                          {tour.zone && tour.country ? ` · ${tour.zone}` : ''}
-                        </p>
-                      </div>
-                      <div className="shrink-0 flex flex-col items-end gap-1">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[9px]
-                                          font-semibold uppercase tracking-[0.15em] font-tech ${statusPill}`}>
-                          {tourStatusLabel(tour.status)}
-                        </span>
-                        {/* Closed to offers is a state of a LIVE tour, so it
-                            reads alongside the status rather than replacing it. */}
-                        {tour.closedToOffers && tour.status === 'ACTIVE' && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-white/20
-                                           text-white/55 text-[9px] font-semibold uppercase tracking-[0.15em] font-tech">
-                            {t('tour.fullyBooked')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Console: gigs + interest + revenue tiles */}
-                    <div className="grid grid-cols-3 gap-2.5 mb-3">
-                      {/* The two counts ARE the way in to their lists — a
-                          separate "View gigs" / "View interested" button pair
-                          restated the same numbers and pushed the action row
-                          to five CTAs, which wrapped and clipped. */}
-                      <button
-                        type="button"
-                        onClick={() => handleViewTourGigs(tour)}
-                        className="text-left rounded-xl border border-white/10 bg-[#070709] px-3 py-2.5
-                                   transition-colors hover:border-infrared/40 cursor-pointer"
-                      >
-                        <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
-                          {tour.confirmedGigs || 0}
-                        </p>
-                        <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          {t('tour.gigsConfirmed')}
-                        </p>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleViewInterests(tour)}
-                        className="text-left rounded-xl border border-white/10 bg-[#070709] px-3 py-2.5
-                                   transition-colors hover:border-infrared/40 cursor-pointer"
-                      >
-                        <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
-                          {tour.interestsCount || 0}
-                        </p>
-                        <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          {t('tour.interestedCount')}
-                        </p>
-                      </button>
-                      <div className="rounded-xl border border-white/10 bg-[#070709] px-3 py-2.5">
-                        <p className="text-lg font-bold text-white font-space-grotesk leading-none m-0">
-                          {Math.round(tour.totalRevenue || 0).toLocaleString()}
-                          <span className="text-xs font-medium text-white/35"> / {Math.round(tour.minRevenue || 0).toLocaleString()} {tour.revenueCurrency || 'EUR'}</span>
-                        </p>
-                        <p className="text-[9px] uppercase tracking-[0.15em] text-white/40 font-tech mt-1.5 m-0">
-                          {t('tour.revenueTarget')}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Thin crimson progress line */}
-                    <div className="flex items-center gap-2.5 mb-4">
-                      <div className="flex-1 h-[3px] rounded-full bg-white/10 overflow-hidden">
-                        <div className="h-full rounded-full bg-infrared" style={{ width: `${pct}%` }} />
-                      </div>
-                      <span className="shrink-0 text-[10px] text-white/50 font-tech">{pct}%</span>
-                    </div>
-
-                    {/* Actions: the two things you DO to a tour, then the
-                        quiet destructive one. Labels stay on one line; the row
-                        wraps rather than clipping on a narrow phone. */}
-                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-white/[0.07]">
-                      <button
-                        className="btn btn-outline btn-small whitespace-nowrap"
-                        onClick={() => handleEditTour(tour)}
-                      >
-                        {t('common.edit')}
-                      </button>
-                      {tour.status === 'ACTIVE' && (
-                        <button
-                          className={`btn btn-small whitespace-nowrap ${tour.closedToOffers ? 'btn-primary' : 'btn-outline'}`}
-                          disabled={tourActionBusy === tour.id}
-                          onClick={() => handleToggleTourOffers(tour)}
-                        >
-                          {tourActionBusy === tour.id
-                            ? '...'
-                            : (tour.closedToOffers ? t('tour.reopenToOffers') : t('tour.closeToOffers'))}
-                        </button>
+                  <div key={tour.id} className="tour-card tour-card--poster">
+                    <TourPoster
+                      photo={tour.artist?.avatarLarge || tour.artist?.avatar || (user?.role === 'ARTIST' ? (user.avatarLarge || user.avatar) : null)}
+                      initial={(tour.artist?.name || user?.name || '?').charAt(0).toUpperCase()}
+                      title={t('tour.tourTitle', { location: tour.country || tour.zone })}
+                      sub={[tour.artist?.name, tourDatesLabel(tour)].filter(Boolean).join(' · ')}
+                      where={tour.zone && tour.country ? tour.zone : null}
+                      status={(
+                        <>
+                          <span className={`tour-status tour-status--${String(tour.status).toLowerCase()}`}>{tourStatusLabel(tour.status)}</span>
+                          {tour.closedToOffers && tour.status === 'ACTIVE' && <span className="tour-status">{t('tour.fullyBooked')}</span>}
+                        </>
                       )}
-                      <button
-                        className="ml-auto bg-transparent border-none cursor-pointer text-[10px] uppercase tracking-[0.1em]
-                                   font-tech text-white/35 hover:text-role-venue transition-colors whitespace-nowrap"
-                        onClick={() => handleDeleteTour(tour)}
-                      >
-                        {t('tour.cancelTour')}
-                      </button>
+                      onOpen={() => handleViewTourGigs(tour)}
+                    />
+                    <div className="tour-body">
+                      <div className="tour-revenue">
+                        <div className="tour-revenue-head">
+                          <span>{t('tour.revenueTarget')}</span>
+                          <span>{Math.round(tour.totalRevenue || 0).toLocaleString()} / {Math.round(tour.minRevenue || 0).toLocaleString()} {tour.revenueCurrency || 'EUR'}</span>
+                        </div>
+                        <div className="tour-bar"><i style={{ width: `${pct}%` }} /></div>
+                      </div>
+                      {/* The two counts ARE the way in to their lists. */}
+                      <div className="tour-figures">
+                        <button type="button" className="tour-figure" onClick={() => handleViewTourGigs(tour)}>
+                          <b>{tour.confirmedGigs || 0}</b><span>{t('tour.gigsConfirmed')}</span>
+                        </button>
+                        <button type="button" className="tour-figure" onClick={() => handleViewInterests(tour)}>
+                          <b>{tour.interestsCount || 0}</b><span>{t('tour.interestedCount')}</span>
+                        </button>
+                      </div>
+                      <div className="tour-card-footer">
+                        <button className="btn btn-primary" onClick={() => handleViewTourGigs(tour)}>{t('tour.viewBookings')}</button>
+                        <button className="btn btn-outline" onClick={() => handleEditTour(tour)}>{t('tour.editTour')}</button>
+                      </div>
+                      <div className="tour-quiet">
+                        {tour.status === 'ACTIVE' && (
+                          <button type="button" disabled={tourActionBusy === tour.id} onClick={() => handleToggleTourOffers(tour)}>
+                            {tourActionBusy === tour.id
+                              ? '...'
+                              : (tour.closedToOffers ? t('tour.reopenToOffers') : t('tour.closeToOffers'))}
+                          </button>
+                        )}
+                        <button type="button" className="is-danger" onClick={() => handleDeleteTour(tour)}>{t('tour.cancelTour')}</button>
+                      </div>
                     </div>
                   </div>
                   );
@@ -2211,65 +2097,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             ) : (
               <div className="tour-cards-list">
                 {filteredTours.map(tour => (
-                  <div key={tour.id} className="tour-card">
-                    {tour.artist?.avatar && (
-                      <div className="tour-poster">
-                        <img src={tour.artist.avatar} alt="" aria-hidden />
-                        <h3 className="tour-poster-title">{t('tour.tourTitle', { location: tour.country || tour.zone })}</h3>
-                      </div>
-                    )}
-                    <div className="tour-card-header">
-                      {/* Artist identity links to the profile (replaces the old
-                          View Artist CTA in the footer) */}
-                      <div
-                        className="tour-artist-info"
-                        role="button"
-                        tabIndex={0}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => handleViewTourArtist(tour)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleViewTourArtist(tour); } }}
-                      >
-                        <div className="tour-artist-avatar">
-                          {tour.artist?.avatar ? (
-                            <img src={tour.artist.avatar} alt={tour.artist.name} />
-                          ) : (
-                            <div className="avatar-placeholder">
-                              {tour.artist?.name?.charAt(0) || 'A'}
-                            </div>
-                          )}
-                        </div>
-                        <div className="tour-artist-details">
-                          <h4 className="tour-artist-name">{tour.artist?.name || t('tour.unknownArtist')}</h4>
-                          <p className="tour-artist-role">{tour.artist?.role || t('tour.artistRoleFallback')}</p>
-                          {tour.artist?.id && connectedUsers?.has(tour.artist.id) && (
-                            <button
-                              type="button"
-                              className="btn btn-outline btn-sm"
-                              style={{ marginTop: 6 }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleMessage(tour.artist, t('tour.tourDraft', { name: tour.artist.name, where: tour.country || tour.zone, dates: tourDatesLabel(tour) }));
-                              }}
-                            >
-                              {t('search.message')}
-                            </button>
-                          )}
-                          <p className="tour-location-info">
-                            <LocationIcon /> {t('tour.tourTitle', { location: tour.country || tour.zone })}
-                          </p>
-                        </div>
-                      </div>
-                      <span className={`tour-status-badge status-${tour.status.toLowerCase()}`}>
-                        {tourStatusLabel(tour.status)}
-                      </span>
-                    </div>
-                    <div className="tour-dates-section">
-                      <CalendarIcon />
-                      <span>
-                        {formatEventDate(tour.startDate, t('dateFormat.locale'), { month: 'short', day: 'numeric' })} - {formatEventDate(tour.endDate, t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </span>
-                    </div>
-                    <div className="tour-card-body">
+                  <div key={tour.id} className="tour-card tour-card--poster">
+                    <TourPoster
+                      photo={tour.artist?.avatarLarge || tour.artist?.avatar}
+                      initial={(tour.artist?.name || '?').charAt(0).toUpperCase()}
+                      title={t('tour.tourTitle', { location: tour.country || tour.zone })}
+                      sub={[tour.artist?.name || t('tour.unknownArtist'), tourDatesLabel(tour)].join(' · ')}
+                      where={tour.zone && tour.country ? tour.zone : null}
+                      status={<span className={`tour-status tour-status--${tour.status.toLowerCase()}`}>{tourStatusLabel(tour.status)}</span>}
+                      onOpen={() => handleViewTourArtist(tour)}
+                    />
+                    <div className="tour-body">
                       {/* Booking traction. Deliberately NOT the revenue
                           progress bar the owner sees: how much the tour still
                           needs to earn is the owner's planning figure, and it
@@ -2321,20 +2159,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                           </div>
                         )}
                         {(tour.interestsCount || 0) > 0 && (
-                          <div className="tour-stat">
-                            <span className="tour-stat-value text-infrared">
-                              {t('tour.interestedCountPublic', { n: tour.interestsCount })}
-                            </span>
+                          <div className="tour-stat tour-stat--end">
+                            <span className="tour-stat-label">{t('tour.interestedCount')}</span>
+                            <span className="tour-stat-value">{tour.interestsCount}</span>
                           </div>
                         )}
                       </div>
                       {tour.artist?.genres && tour.artist.genres.length > 0 && (
-                        <div className="tour-genres">
-                          <span className="genres-label">{t('tour.genresLabel')}</span>
-                          <span>{tour.artist.genres.slice(0, 3).join(', ')}</span>
-                        </div>
+                        <p className="tour-genres-line">{tour.artist.genres.slice(0, 3).join(', ')}</p>
                       )}
-                    </div>
                     <div className="tour-card-footer">
                       {tour.myProposal ? (
                         // User has already sent a proposal
@@ -2377,6 +2210,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         <HeartIcon filled={!!tour.myInterest} />{' '}
                         {tour.myInterest ? t('tour.interested') : t('tour.imInterested')}
                       </button>
+                    </div>
+                    {tour.artist?.id && connectedUsers?.has(tour.artist.id) && (
+                      <div className="tour-quiet">
+                        <button
+                          type="button"
+                          onClick={() => handleMessage(tour.artist, t('tour.tourDraft', { name: tour.artist.name, where: tour.country || tour.zone, dates: tourDatesLabel(tour) }))}
+                        >
+                          {t('search.message')}
+                        </button>
+                      </div>
+                    )}
                     </div>
                   </div>
                 ))}
@@ -2589,7 +2433,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       {renderEditTourModal()}
 
       {/* Make Offer Modal (for tours) */}
-      <MakeOfferModal
+      <OfferFlow
         isOpen={showMakeOfferModal}
         dockAsDrawer
         onClose={() => {

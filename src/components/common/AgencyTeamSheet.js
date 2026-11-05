@@ -72,6 +72,8 @@ const AgencyTeamSheet = ({ organisationId, onClose, onOpenProfile }) => {
 
   const org = data?.organisation;
   const viewer = data?.viewer;
+  const heroPhoto = org?.members?.find((m) => m.avatar)?.avatar || null;
+  const artists = org ? [...new Map(org.members.flatMap((m) => m.artists).map((a) => [a.profileId, a])).values()] : [];
 
   const request = () => run(async () => {
     await apiService.requestToJoinOrganisation(org.id);
@@ -91,22 +93,34 @@ const AgencyTeamSheet = ({ organisationId, onClose, onOpenProfile }) => {
             <p className="agency-team-note">{failed ? t('common.error') : t('common.loading')}</p>
           ) : (
             <>
-              <h2 className="message-modal-title">{t('agency.teamTitle', { agency: org.name })}</h2>
-              <p className="agency-team-summary">{t('agency.teamSummary', { n: org.memberCount, total: org.artistTotal })}</p>
+              <div className={`agency-team-hero poster-role-agent${heroPhoto ? '' : ' poster-empty'}`}>
+                {heroPhoto && <img src={heroPhoto} alt="" aria-hidden />}
+                <div className="agency-team-hero-text">
+                  <h2 className="agency-team-hero-name">{org.name}</h2>
+                  <p className="agency-team-summary">{t('agency.teamSummary', { n: org.memberCount, total: org.artistTotal })}</p>
+                </div>
+              </div>
+              <h3 className="agency-team-heading">{t('agency.agentsHeading')}</h3>
               <ul className="agency-team-list">
                 {org.members.map((m) => (
-                  <li key={m.profileId}>
-                    <Person person={m} role="AGENT" onOpen={open} />
-                    {m.artists.length > 0 && (
-                      <ul className="agency-team-artists">
-                        {m.artists.map((a) => (
-                          <li key={a.profileId}><Person person={a} role="ARTIST" onOpen={open} /></li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
+                  <li key={m.profileId}><Person person={m} role="AGENT" onOpen={open} /></li>
                 ))}
               </ul>
+              {artists.length > 0 && (
+                <>
+                  <h3 className="agency-team-heading">{t('agency.artistsHeading')}</h3>
+                  <div className="agency-team-artist-grid">
+                    {artists.map((a) => (
+                      <button type="button" key={a.profileId} className="agency-team-artist-tile" onClick={() => open(a, 'ARTIST')}>
+                        <span className="agency-team-artist-photo">
+                          {a.avatar ? <img src={a.avatar} alt="" loading="lazy" /> : <span aria-hidden>{(a.name || '?').charAt(0).toUpperCase()}</span>}
+                        </span>
+                        <span className="agency-team-artist-name">{a.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
               <TeamFooter org={org} viewer={viewer} busy={busy} onRequest={request} />
             </>
           )}

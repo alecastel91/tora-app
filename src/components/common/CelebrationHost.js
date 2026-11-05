@@ -12,6 +12,7 @@ import { HandshakeIcon, ClipboardCheckIcon, StarIcon } from '../../utils/icons';
  */
 const MOMENT_ART = {
   offerAccepted: { icon: <StarIcon />, accent: '#43E97B' },
+  offerBooked: { icon: <StarIcon />, accent: '#43E97B' },
   contractSigned: { icon: <ClipboardCheckIcon />, accent: '#FF3366' },
   representationConfirmed: { icon: <HandshakeIcon />, accent: '#43E97B' },
 };

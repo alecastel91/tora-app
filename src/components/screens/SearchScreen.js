@@ -6,6 +6,7 @@ import { isVerificationGate } from '../../utils/errors';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon, GlobeIcon, ListIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
+import PhotoCard from '../common/PhotoCard';
 import Modal from '../common/Modal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import { useAppContext } from '../../contexts/AppContext';
@@ -714,63 +715,38 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             const hasReceivedRequest = receivedRequests.has(profileId);
 
             return (
-              <div key={profileId} className="search-result-card">
-                <div className="result-content">
-                  <div
-                    className={`result-avatar avatar-${profile.role.toLowerCase()} clickable`}
-                    onClick={() => handleProfileClick(profile)}
-                  >
-                    {profile.avatar ? (
-                      <img src={profile.avatar} alt={profile.name} />
+              <PhotoCard
+                key={profileId}
+                profile={profile}
+                place={profile.location}
+                onOpen={() => handleProfileClick(profile)}
+                actions={(
+                  <>
+                    <button
+                      type="button"
+                      className={`photo-card-like${isLiked ? ' is-on' : ''}`}
+                      aria-label={isLiked ? t('search.liked') : t('search.like')}
+                      aria-pressed={isLiked}
+                      onClick={() => handleLike(profileId, profile)}
+                    >
+                      <HeartIcon filled={isLiked} /><span>{isLiked ? t('search.liked') : t('search.like')}</span>
+                    </button>
+                    {isConnected ? (
+                      <button className="btn btn-primary photo-card-cta" onClick={() => handleMessage(profile)}>
+                        {t('search.message')}
+                      </button>
+                    ) : hasReceivedRequest || isRequested ? (
+                      <button className="btn btn-disabled photo-card-cta" disabled>
+                        {t('search.pending')}
+                      </button>
                     ) : (
-                      profile.name.charAt(0).toUpperCase()
+                      <button className="btn btn-primary photo-card-cta" onClick={() => handleConnect(profile)}>
+                        {t('search.connect')}
+                      </button>
                     )}
-                    {profile.isVerified && <span className="verified-badge">✓</span>}
-                  </div>
-                  <div
-                    className="result-info clickable"
-                    onClick={() => handleProfileClick(profile)}
-                  >
-                    <div className="result-header">
-                      <h3>{profile.name}</h3>
-                      <span className={`role-badge badge-${profile.role.toLowerCase()}`}>
-                        {t(`editProfile.${profile.role.toLowerCase()}`)}
-                      </span>
-                    </div>
-                    <p className="result-location">{profile.location}</p>
-                  </div>
-                </div>
-                <div className="result-actions">
-                  <button
-                    className={`btn ${isLiked ? 'btn-liked' : 'btn-outline'} btn-like`}
-                    onClick={() => handleLike(profileId, profile)}
-                  >
-                    <HeartIcon filled={isLiked} /> {isLiked ? t('search.liked') : t('search.like')}
-                  </button>
-                  {isConnected ? (
-                    <button
-                      className="btn btn-message btn-connect"
-                      onClick={() => handleMessage(profile)}
-                    >
-                      {t('search.message')}
-                    </button>
-                  ) : hasReceivedRequest || isRequested ? (
-                    <button
-                      className="btn btn-disabled btn-connect"
-                      disabled={true}
-                    >
-                      {t('search.pending')}
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-primary btn-connect"
-                      onClick={() => handleConnect(profile)}
-                    >
-                      {t('search.connect')}
-                    </button>
-                  )}
-                </div>
-              </div>
+                  </>
+                )}
+              />
             );
           })
         ) : agencyResults.length > 0 ? null : (

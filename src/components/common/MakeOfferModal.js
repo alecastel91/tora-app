@@ -16,7 +16,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 // The final payment can never be due before the deposit.
 const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
 
-const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer = false, preferCountry = null }) => {
+const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null, onSuccess, dockAsDrawer = false, preferCountry = null }) => {
   const { t } = useLanguage();
 
   const { user: currentUser } = useAppContext();
@@ -101,6 +101,11 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDr
     if (!isOpen) return;
     setFormData((prev) => {
       const next = { ...prev };
+      // The booker already chose this artist before picking their agent.
+      if (presetArtist && !next.selectedArtistId) {
+        next.selectedArtistId = presetArtist.profileId;
+        next.selectedArtistName = presetArtist.name;
+      }
       if (currentUser.role === 'VENUE') {
         if (!next.venueName) next.venueName = currentUser.name;
         if (next.eventCapacity === '' && currentUser.venueCapacity != null) next.eventCapacity = String(currentUser.venueCapacity);

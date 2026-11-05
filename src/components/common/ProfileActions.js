@@ -7,20 +7,22 @@ import { HeartIcon } from '../../utils/icons';
    agent pitches a venue or promoter; everyone else connects, then messages.
    Connect and Message keep their rules: Message only once connected, Pending
    while a request is open. */
-export function mainProfileAction(viewerRole, targetRole) {
+export function mainProfileAction(viewerRole, targetRole, targetHasRoster = false) {
   const books = viewerRole === 'VENUE' || viewerRole === 'PROMOTER';
   const booked = targetRole === 'ARTIST' || targetRole === 'AGENT';
-  if (books && booked) return 'offer';
+  // The offer form asks which of the agent's artists, so an empty roster has no way through it.
+  if (books && (targetRole === 'ARTIST' || (targetRole === 'AGENT' && targetHasRoster))) return 'offer';
+  if (books && booked) return 'connect';
   if (!books && !booked && viewerRole) return 'pitch';
   return 'connect';
 }
 
 const ProfileActions = ({
-  viewerRole, targetRole, isLiked, isConnected, hasPendingRequest, actionBusy,
+  viewerRole, targetRole, targetHasRoster, isLiked, isConnected, hasPendingRequest, actionBusy,
   onLike, onMessage, onConnect, onOffer, className = '',
 }) => {
   const { t } = useLanguage();
-  const kind = mainProfileAction(viewerRole, targetRole);
+  const kind = mainProfileAction(viewerRole, targetRole, targetHasRoster);
   const connectLabel = hasPendingRequest ? t('search.pending') : (actionBusy ? '...' : t('search.connect'));
   const connectButton = (variant) => (
     <button

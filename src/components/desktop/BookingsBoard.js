@@ -34,6 +34,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
   const [status, setStatus] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
   const pendingOpen = useRef(null); // a deal deep-linked before it was loaded
+  const autoOpened = useRef(false); // the page opens on its first booking, once
   const [mineOnly, setMineOnly] = useState(false);
   const [sort, setSort] = useState({ key: 'date', dir: 1 }); // date asc by default; past flips below
 
@@ -50,6 +51,7 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
   }, [user?.id]);
 
   useEffect(() => { setLoading(true); setSelectedId(null); load(); }, [load]);
+  useEffect(() => { autoOpened.current = false; }, [user?.id]);
   useEffect(() => (user?.id ? subscribeToDeals(user.id, load) : undefined), [user?.id, load]);
 
   // The bell and the dashboard ask for one deal: select it and show its tab.
@@ -95,6 +97,12 @@ const BookingsBoard = ({ onOpenChat, onNavigateToMessages, onActionCountChange, 
     const val = (d) => (sort.key === 'fee' ? Number(d.currentFee) || 0 : new Date(d.date).getTime());
     return list.sort((a, b) => dir * (val(a) - val(b)));
   }, [byTab, tab, status, query, user, mineOnly, sort, t]);
+
+  useEffect(() => {
+    if (loading || autoOpened.current || rows.length === 0) return;
+    autoOpened.current = true;
+    if (!selectedId && !pendingOpen.current) setSelectedId(rows[0].id);
+  }, [loading, rows, selectedId]);
 
   const toggleSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: 1 }));
   const SortHead = ({ k, children }) => (
