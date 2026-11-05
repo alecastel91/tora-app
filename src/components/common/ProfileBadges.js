@@ -36,7 +36,7 @@ const ProfileBadges = ({ badges, onOpenHub }) => {
 
   return (
     <>
-      <div className="mt-3 flex justify-center">
+      <div className="poster-badges flex justify-center">
         <button
           type="button"
           aria-label={t('badges.sectionTitle')}

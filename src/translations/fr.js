@@ -886,6 +886,8 @@ const fr = {
   },
 
   pitch: {
+
+    send: 'Envoyer une proposition',
     emptyTitle: 'Envoie une proposition à',
     hintVenue: 'Les salles examinent les propositions par message et envoient une offre si elles sont intéressées.',
     hintPromoter: 'Les promoteurs examinent les propositions par message et envoient une offre s\'ils sont intéressés.',
@@ -1364,6 +1366,10 @@ const fr = {
   },
 
   profile: {
+
+    about: 'À propos',
+
+    changePhoto: 'Changer la photo',
     techSpecs: 'Salles et technique',
     capacityShort: 'pers.',
     adminAccount: "Compte administrateur",

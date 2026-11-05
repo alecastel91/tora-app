@@ -886,6 +886,8 @@ const ko = {
   },
 
   pitch: {
+
+    send: '피치 보내기',
     emptyTitle: '피치 보내기:',
     hintVenue: '공연장은 메시지로 피치를 검토하고 관심이 있으면 오퍼를 보냅니다.',
     hintPromoter: '프로모터는 메시지로 피치를 검토하고 관심이 있으면 오퍼를 보냅니다.',
@@ -1364,6 +1366,10 @@ const ko = {
   },
 
   profile: {
+
+    about: '소개',
+
+    changePhoto: '사진 변경',
     techSpecs: '룸과 장비',
     capacityShort: '명',
     adminAccount: "관리자 계정",

@@ -11,7 +11,7 @@ const AuthScreenShell = ({ subtitle, children }) => (
     <div className="w-full max-w-md my-5">
       <div className="text-center mb-12">
         <img
-          src="/tora_logo.png"
+          src="/tora_logo_white.png"
           alt="TORA"
           className="max-w-[200px] md:max-w-[220px] h-auto mb-3 mx-auto block"
         />

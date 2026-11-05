@@ -51,8 +51,9 @@ const GettingStartedSheet = ({ open, onClose }) => {
   return (
     <OverlayPortal><div className="onboarding-overlay">
       <div className="onboarding-sheet">
+        <div aria-hidden className="auth-cover onboarding-cover" />
         <div className="onboarding-top">
-          <img src="/tora_logo.png" alt="TORA" className="onboarding-brand-logo" />
+          <img src="/tora_logo_white.png" alt="TORA" className="onboarding-brand-logo" />
           <button type="button" className="onboarding-skip" onClick={onClose}>
             {t('onboarding.skip')}
           </button>

@@ -27,6 +27,9 @@ import PhotoGallery from '../common/PhotoGallery';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
 import AvatarCropModal from '../common/AvatarCropModal';
+import PosterHero from '../common/PosterHero';
+import JumpTabs from '../common/JumpTabs';
+import { downscaleImageToBlob } from '../../utils/image';
 import HighlightsList from '../common/HighlightsList';
 import OnboardingChecklist from '../common/OnboardingChecklist';
 import AgencyJoinPrompt from '../common/AgencyJoinPrompt';
@@ -61,17 +64,15 @@ const InstagramGlyph = () => (
 // Glassmorphic action tile (Edit Profile / Manage / Find Agent / Add Profile).
 const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
 
-const ActionCard = ({ icon, label, onClick, dot }) => {
+const ActionCard = ({ icon, label, onClick, dot, primary }) => {
   const { t } = useLanguage();
   return (
   <button
     type="button"
     onClick={onClick}
-    className="group relative flex items-center gap-2.5 rounded-2xl border border-white/10 bg-[#0a0a0e]
-               px-3.5 py-3 min-h-[58px] text-left transition-colors hover:border-infrared/40 hover:bg-[#0e0e13]"
+    className={`poster-action ${primary ? 'is-primary' : ''}`}
   >
-    <span className="shrink-0 text-infrared [&>svg]:w-5 [&>svg]:h-5">{icon}</span>
-    <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white font-tech leading-tight">{label}</span>
+    <span>{label}</span>
     {dot && (
       <span
         aria-label={t('manage.actionsRequired')}
@@ -301,6 +302,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // Picking a file opens the adjust step (pan/zoom/round mask); the cropped
   // square then flows through the existing downscale + multipart upload path.
   const [avatarCropFile, setAvatarCropFile] = useState(null);
+  const posterPageRef = useRef(null);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -316,7 +318,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     // (the backend re-encodes to webp regardless; the old downscale pass
     // decoded + re-encoded the same pixels a second time for nothing).
     // Errors propagate to the crop modal's inline error display.
-    const response = await apiService.uploadAvatar(user.id, croppedBlob);
+    // The uncropped photo goes too, larger: it fills the top of the profile.
+    const largeBlob = await downscaleImageToBlob(avatarCropFile, { maxDimension: 1600, quality: 0.85 }).catch(() => null);
+    const response = await apiService.uploadAvatar(user.id, croppedBlob, largeBlob);
     // The multipart endpoint wraps the row: { profile } — updateUser needs
     // the bare profile object (it keys on userData.id).
     const updatedProfile = response.profile || response;
@@ -483,7 +487,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
             )}
           </div>
           <div className="mx-auto max-w-xs space-y-2.5">
-            <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
+            <ActionCard primary icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
             {IS_BETA && (
               <ActionCard icon={<ListIcon />} label="Beta feedback" onClick={() => { closeSubScreens(); setShowBetaFeedback(true); }} />
             )}
@@ -532,95 +536,23 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           onManageArtist={(artist) => { closeSubScreens(); setManagingArtist(artist); }}
         />
       ) : (
-      <div className="relative isolate">
-      {/* deep-space backdrop: role-colored bloom + faint engineering grid, fading out */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-x-5 -top-6 h-64 -z-10"
-        style={{ background: `radial-gradient(60% 100% at 50% 0%, ${roleBloomColor}, transparent 70%)` }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-x-5 -top-6 h-56 -z-10 bg-grid
-                   [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
-      />
-
-      {/* ===== Header — large hero avatar, tight vertical rhythm ===== */}
-      <div className="text-center mb-5">
-        <div className="relative w-[136px] h-[136px] mx-auto mb-3">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="group block w-full h-full rounded-full overflow-hidden bg-near-black ring-1 ring-white/15
-                       flex items-center justify-center
-                       text-5xl font-bold text-white font-space-grotesk"
-          >
-            {user?.avatar ? (
-              <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
-            ) : (
-              getInitial(user?.name)
-            )}
-            <span className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center
-                             opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                             text-white [&>svg]:w-7 [&>svg]:h-7">
+      <div className="poster-page relative isolate" ref={posterPageRef}>
+      {/* ===== Header: the photo, the name, and the way to change it ===== */}
+      <PosterHero
+        profile={user}
+        top={(
+          <>
+            <span />
+            <button type="button" className="poster-icon-btn" onClick={() => fileInputRef.current?.click()} aria-label={t('profile.changePhoto')}>
               <UploadIcon />
-            </span>
-          </button>
-          <span className="pointer-events-none absolute bottom-1 right-1 w-8 h-8 rounded-full
-                           bg-[#232325] border border-white/15 flex items-center justify-center text-white/80
-                           [&>svg]:w-3.5 [&>svg]:h-3.5">
-            <UploadIcon />
-          </span>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            style={{ display: 'none' }}
-          />
-        </div>
-
-        <h2 className="text-3xl font-bold text-white font-space-grotesk tracking-[-0.02em] leading-none mb-1.5">
-          {user?.name || t('profile.yourName')}
-          {user?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" channel={user?.verifyChannel} />}
-        </h2>
-        {user?.role === 'AGENT' && <AgencyBadge profileId={user?.id} onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }} />}
-        <p className="flex items-center justify-center gap-1.5 text-[13px] text-white/60 mb-2 font-tech [&>svg]:w-3.5 [&>svg]:h-3.5">
-          <LocationIcon />{user?.location || t('profile.addLocation')}
-        </p>
-        <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-[10px] font-semibold uppercase
-                         tracking-[0.2em] font-tech ${roleBadgeClasses[user?.role] || 'text-white/70 border-white/20'}`}>
-          {roleLabel(user?.role || 'ARTIST', t)}
-        </div>
-        <ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} />
-
-        {user?.genres && user.genres.length > 0 && (
-          <div className="flex flex-col items-center mt-3">
-            <div
-              className={`flex flex-wrap gap-2 justify-center w-full overflow-hidden transition-[max-height] duration-300
-                          ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[64px]'}`}
-            >
-              {user.genres.map(genre => (
-                <span
-                  key={genre}
-                  className="px-2.5 py-1 rounded-lg bg-[#0c0c11] border border-white/10 text-white/60
-                             text-[8px] font-medium uppercase tracking-[0.15em] font-tech"
-                >
-                  {genre}
-                </span>
-              ))}
-            </div>
-            {user.genres.length > 6 && (
-              <button
-                className="mt-2 px-2 py-1 text-infrared text-xs hover:opacity-80 hover:underline transition-opacity"
-                onClick={() => setShowAllGenres(!showAllGenres)}
-              >
-                {showAllGenres ? t('profile.seeLess') : t('profile.seeMore')}
-              </button>
-            )}
-          </div>
+            </button>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+          </>
         )}
-      </div>
+      >
+        {user?.role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }} />}
+        {user?.genres?.length > 0 && <p className="poster-line">{user.genres.join(', ')}</p>}
+      </PosterHero>
 
       {/* Trial Banner */}
       {(() => {
@@ -679,24 +611,25 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         );
       })()}
 
-      <div className="grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0e] px-2 py-2.5 mb-5">
-        <button type="button" onClick={() => setShowLikesList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-          <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(likedProfiles.size)}</span>
-          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
+      <div className="poster-stats">
+        <button type="button" onClick={() => setShowLikesList(true)} className="poster-stat">
+          <span className="poster-stat-value">{fmtStat(likedProfiles.size)}</span>
+          <span className="poster-stat-label">{t('profile.likesGiven')}</span>
         </button>
-        <button type="button" onClick={() => setShowLikersList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-          <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(likerProfilesList.length)}</span>
-          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likedByLabel')}</span>
+        <button type="button" onClick={() => setShowLikersList(true)} className="poster-stat">
+          <span className="poster-stat-value">{fmtStat(likerProfilesList.length)}</span>
+          <span className="poster-stat-label">{t('profile.likedByLabel')}</span>
         </button>
-        <button type="button" onClick={() => setShowConnectionsList(true)} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-          <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(connectedUsers.size)}</span>
-          <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.connections')}</span>
+        <button type="button" onClick={() => setShowConnectionsList(true)} className="poster-stat">
+          <span className="poster-stat-value">{fmtStat(connectedUsers.size)}</span>
+          <span className="poster-stat-label">{t('profile.connections')}</span>
         </button>
+        <ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} />
       </div>
 
       {/* ===== Actions (2x2 glass grid) ===== */}
-      <div className="grid grid-cols-2 gap-2.5 mb-6">
-        <ActionCard icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
+      <div className="poster-own-actions">
+        <ActionCard primary icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
         <ActionCard icon={<GridIcon />} label={t('profile.manageLabel')} onClick={() => { closeSubScreens(); setShowManageProfile(true); }} dot={ownHasActions} />
         {user?.role === 'AGENT' && (
           <ActionCard icon={<ListIcon />} label={t('roster.title')} onClick={() => { closeSubScreens(); setShowRepresentedArtists(true); }} />
@@ -710,6 +643,8 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           onClick={() => setShowProfileSwitcher(true)}
         />
       </div>
+
+      <JumpTabs scope={posterPageRef} />
 
       {/* Activation checklist — first-session guidance; hides once complete.
           Lives on the profile rather than in the feed: it is about setting
@@ -745,8 +680,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
 
       {/* Bio Section */}
       {user?.bio && (
-        <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 mb-5 text-left">
-          <p className="text-sm leading-relaxed text-white/70 whitespace-pre-line">{user.bio}</p>
+        <div className="poster-section">
+          <h2 className="poster-h2">{t('profile.about')}</h2>
+          <p className="poster-bio whitespace-pre-line">{user.bio}</p>
           <BioTranslate text={user.bio} />
         </div>
       )}
@@ -755,7 +691,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           from the verified network strips) */}
       {['ARTIST', 'PROMOTER', 'VENUE'].includes(user?.role) && Array.isArray(user?.pastHighlights) && user.pastHighlights.length > 0 && (
         <div className="mb-5 text-left">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.pastHighlights')}</p>
+          <p className="poster-h2">{t('viewProfile.pastHighlights')}</p>
           <HighlightsList highlights={user.pastHighlights} />
         </div>
       )}
@@ -771,7 +707,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       {networkSections.map(([key, items, titleKey]) => (
         items.length > 0 && (
           <div key={key} className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t(titleKey)}</p>
+            <p className="poster-h2">{t(titleKey)}</p>
             <ProfileMiniGrid
               profiles={items}
               onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }}
@@ -794,7 +730,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       {/* Agent Artists Representing Section */}
       {user?.role === 'AGENT' && (
         <div className="mb-8 text-left">
-          <h3 className="text-lg font-bold text-white font-space-grotesk mb-4">{t('profile.artistsRepresenting')}</h3>
+          <h3 className="poster-h2">{t('profile.artistsRepresenting')}</h3>
           <div className="flex flex-col gap-3">
             {rosterArtists.length > 0 ? (
               <ArtistRosterGrid
@@ -870,16 +806,15 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
 
       {/* ===== Links ===== */}
       <div className="mb-6 text-left">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{t('profile.links')}</p>
+        <p className="poster-h2 px-1">{t('profile.links')}</p>
         <div className="flex flex-col gap-3">
           <button
             type="button"
             onClick={() => user?.website && window.open(user.website, '_blank')}
             disabled={!user?.website}
-            className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 text-left
-                       transition-colors enabled:hover:border-infrared/40 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="poster-link"
           >
-            <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
+            <span className="poster-link-icon">
               <GlobeIcon />
             </span>
             <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
@@ -891,9 +826,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
               href={`https://instagram.com/${user.instagram.replace('@', '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors"
+              className="poster-link"
             >
-              <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
+              <span className="poster-link-icon">
                 <InstagramGlyph />
               </span>
               <span className="flex-1 text-sm font-medium text-white">Instagram</span>
@@ -906,9 +841,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
               href={raProfileUrl(user.residentAdvisor)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors"
+              className="poster-link"
             >
-              <span className="w-9 h-9 rounded-full bg-black border border-white/20 flex items-center justify-center shrink-0">
+              <span className="poster-link-icon">
                 <img src={RA_LOGO_WHITE} alt="RA" className="w-[22px] h-auto" />
               </span>
               <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
@@ -921,9 +856,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
               href={user.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors"
+              className="poster-link"
             >
-              <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4">
+              <span className="poster-link-icon">
                 <LinkIcon />
               </span>
               <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>

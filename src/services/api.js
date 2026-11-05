@@ -277,9 +277,10 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  async uploadAvatar(profileId, blob) {
+  async uploadAvatar(profileId, blob, largeBlob = null) {
     const formData = new FormData();
     formData.append('avatar', blob, 'avatar.webp');
+    if (largeBlob) formData.append('avatarLarge', largeBlob, 'avatar-large.webp');
     const headers = {};
     if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
     const response = await fetch(`${API_URL}/profiles/${profileId}/avatar`, {

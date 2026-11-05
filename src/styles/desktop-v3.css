@@ -242,7 +242,7 @@
   html.desktop-v3 .d3-op-head {
     position: relative;
     overflow: hidden;
-    padding: 22px 24px 14px;
+    padding: 0;
   }
 
   /* A narrow band (1024px window, or a pane) puts the actions under the
@@ -921,8 +921,34 @@
   html.desktop-v3 .d3-vp-head {
     position: relative;
     overflow: hidden;
-    padding: 22px 24px 14px 72px;
+    padding: 0;
   }
+
+  /* Poster banner: wide photos fill it; tall photos and logos sit on the right
+     over a blurred copy of themselves. */
+  html.desktop-v3 .poster-wide {
+    margin: 0;
+    min-height: 420px;
+    border-radius: inherit;
+  }
+  html.desktop-v3 .poster-wide .poster-backdrop { position: absolute; inset: -60px; width: calc(100% + 120px); height: calc(100% + 120px); object-fit: cover; filter: blur(60px) saturate(1.4) brightness(0.55); }
+  html.desktop-v3 .poster-wide .poster-photo { left: auto; right: 0; width: min(52%, 620px); height: 100%; aspect-ratio: auto; object-position: center 18%; -webkit-mask-image: linear-gradient(to right, transparent, #000 28%); mask-image: linear-gradient(to right, transparent, #000 28%); }
+  html.desktop-v3 .poster-wide.poster-square .poster-photo { object-fit: contain; object-position: center; }
+  html.desktop-v3 .poster-wide.poster-landscape .poster-photo { width: 100%; object-position: center 40%; -webkit-mask-image: none; mask-image: none; }
+  html.desktop-v3 .poster-wide .poster-fade { height: 60%; }
+  html.desktop-v3 .poster-wide .poster-top { left: 24px; right: 24px; top: 16px; }
+  html.desktop-v3 .poster-wide .poster-body { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 24px; }
+  html.desktop-v3 .poster-wide .poster-identity { min-width: 0; max-width: 640px; }
+  html.desktop-v3 .poster-wide .poster-name { font-size: 58px; line-height: 0.98; letter-spacing: -0.025em; }
+  html.desktop-v3 .poster-wide .poster-meta { justify-content: flex-start; gap: 14px; font-size: 15px; }
+  html.desktop-v3 .poster-wide .poster-actions .btn { min-height: 44px; padding-left: 20px; padding-right: 20px; }
+  html.desktop-v3 .poster-wide .poster-like { width: 44px; padding: 0; }
+  html.desktop-v3 .d3-poster-stats { padding: 12px 24px 14px; }
+  html.desktop-v3 .d3-poster-stats .jump-tabs { margin: 0; }
+  html.desktop-v3 .d3-poster-stats .poster-badges { margin: 0; }
+  html.desktop-v3 .d3-vp-head.d3-panel, html.desktop-v3 .d3-op-head.d3-panel { background: transparent; border: 0; }
+  html.desktop-v3 .d3-vp-body .d3-panel, html.desktop-v3 .d3-op-body .d3-panel { background: transparent; border: 0; padding-left: 0; padding-right: 0; }
+  html.desktop-v3 .d3-mat-banner { display: block; width: calc(100% + 40px); max-width: none; height: 200px; margin: -20px -20px 14px; object-fit: cover; object-position: center 40%; border-radius: inherit; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 
   html.desktop-v3 .d3-vp-body {
     display: grid;

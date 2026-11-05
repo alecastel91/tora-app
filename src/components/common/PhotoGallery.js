@@ -30,7 +30,7 @@ const PhotoGallery = ({ photos, title, cols = 2 }) => {
 
   return (
     <div className="mb-6 text-left">
-      <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{title}</p>
+      <p className="poster-h2 px-1">{title}</p>
       <div className={gridClass}>
         {list.slice(0, cols).map((src, i) => {
           const isMoreTile = i === cols - 1 && extras.length > 0 && !expanded;

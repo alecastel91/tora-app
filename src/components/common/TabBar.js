@@ -43,7 +43,7 @@ const TabBar = ({ activeTab, onTabChange, unreadMessagesCount = 0, unreadProposa
                     bg-black/95 max-lg:border-t border-white/10">
       {/* desktop sidebar brand — hidden on mobile via responsive.css */}
       <div className="sidebar-brand desktop-only">
-        <img src="/tora_logo.png" alt="TORA" />
+        <img src="/tora_logo_white.png" alt="TORA" />
       </div>
       {tabs.map(tab => {
         const Icon = tab.icon;

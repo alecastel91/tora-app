@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import RoomsTechCard from '../common/RoomsTechCard';
 import SafetyMenu from '../common/SafetyMenu';
@@ -20,6 +20,9 @@ import { formatEventDate } from '../../utils/dates';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
 import { raProfileUrl } from '../../utils/urls';
 import MakeOfferModal from '../common/MakeOfferModal';
+import PosterHero from '../common/PosterHero';
+import JumpTabs from '../common/JumpTabs';
+import ProfileActions from '../common/ProfileActions';
 import LockOverlay from '../common/LockOverlay';
 import PhotoGallery from '../common/PhotoGallery';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
@@ -104,6 +107,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
   const [artistTours, setArtistTours] = useState([]);
   const [showTourOffer, setShowTourOffer] = useState(false);
+  const posterPageRef = useRef(null);
   const [listModal, setListModal] = useState(null); // 'likes' | 'connections'
   const [listData, setListData] = useState({});
   const [likers, setLikers] = useState(null); // eager — powers the liked-by line
@@ -575,107 +579,35 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       <>
       {/* Floating back arrow — no header bar, the page starts at the avatar */}
       <BackButton onClose={onClose} label={t('common.back')} />
-      <div className="view-profile-content relative isolate">
-        {/* role-colored bloom + faint grid behind the avatar (quiet-premium backdrop) */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -inset-x-5 -top-5 h-64 -z-10"
-          style={{
-            background: `radial-gradient(60% 100% at 50% 0%, ${
-              {
-                ARTIST: 'rgba(102, 126, 234, 0.18)',
-                VENUE: 'rgba(245, 87, 108, 0.16)',
-                PROMOTER: 'rgba(255, 193, 7, 0.13)',
-                AGENT: 'rgba(67, 233, 123, 0.13)',
-              }[profile.role] || 'rgba(255, 255, 255, 0.08)'
-            }, transparent 70%)`,
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -inset-x-5 -top-5 h-56 -z-10 bg-grid
-                     [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
-        />
-        {/* Hero header: large avatar, tightened vertical rhythm */}
-        <div className="profile-header !mb-5">
-          <div className="profile-avatar-container !w-[136px] !h-[136px] !mb-3">
-            <div className={`profile-avatar !w-[136px] !h-[136px] !text-5xl avatar-${(profile.role || 'artist').toLowerCase()}`}>
-              {profile.avatar ? (
-                <img src={profile.avatar} alt={profile.name} />
-              ) : (
-                getInitial(profile.name)
-              )}
-            </div>
-          </div>
-
-          <div className="profile-name-role-container">
-            <h2 className="profile-name">
-              {profile.name}
-              {profile.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} className="ml-2" channel={profile.verifyChannel} />}
-            </h2>
-          </div>
+      <div className="view-profile-content poster-page relative isolate" ref={posterPageRef}>
+        {/* The photo, the name and what you can do here */}
+        <PosterHero
+          profile={profile}
+          actions={(
+            <ProfileActions
+              viewerRole={currentUser?.role}
+              targetRole={profile.role}
+              isLiked={isLiked}
+              isConnected={isConnected}
+              hasPendingRequest={hasPendingRequest}
+              actionBusy={actionBusy}
+              onLike={handleLike}
+              onMessage={handleMessage}
+              onConnect={handleConnect}
+              onOffer={() => setShowTourOffer(true)}
+            />
+          )}
+        >
           {profile.role === 'AGENT' && (
             <AgencyBadge
               profileId={profile.id}
+              align="left"
               onOpenProfile={setNestedProfile}
-              fallback={profile.agencyName ? <p className="text-center text-[13px] text-white/45 mt-0.5 mb-1">({profile.agencyName})</p> : null}
+              fallback={profile.agencyName ? <p className="poster-agency">{profile.agencyName}</p> : null}
             />
           )}
-          <p className="profile-location"><LocationIcon />{profile.location}</p>
-          <div className="profile-role-centered">
-            <div className={getRoleBadgeClass(profile.role)}>
-              {roleLabel(profile.role, t)}
-            </div>
-          </div>
-          <ProfileBadges badges={profile.badges} />
-          {profile.genres && profile.genres.length > 0 && (
-            <div className="profile-genres-container">
-              <div className={`profile-genres overflow-hidden transition-[max-height] duration-300 ${showAllGenres ? 'max-h-[1000px]' : 'max-h-[60px]'}`}>
-                {profile.genres.map(genre => (
-                  <span key={genre} className="genre-tag">{genre}</span>
-                ))}
-              </div>
-              {profile.genres.length > 6 && (
-                <button
-                  type="button"
-                  className="mt-1.5 bg-transparent border-none p-0 text-infrared text-xs cursor-pointer hover:underline"
-                  onClick={() => setShowAllGenres(!showAllGenres)}
-                >
-                  {showAllGenres ? t('profile.seeLess') : t('profile.seeMore')}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-        
-        {/* Stats */}
-
-        {/* Action Buttons */}
-        <div className="profile-actions-bottom" style={{ marginBottom: '18px' }}>
-          <button
-            className={`btn ${isLiked ? 'btn-primary' : 'btn-outline'} btn-full-width`}
-            onClick={handleLike}
-          >
-            <HeartIcon filled={isLiked} /> {isLiked ? t('search.liked') : t('search.like')}
-          </button>
-          {isConnected ? (
-            <button
-              className="btn btn-message btn-full-width"
-              onClick={handleMessage}
-            >
-              {t('search.message')}
-            </button>
-          ) : (
-            <button
-              className={`btn ${hasPendingRequest ? 'btn-disabled' : 'btn-primary'} btn-full-width`}
-              onClick={handleConnect}
-              disabled={hasPendingRequest || actionBusy}
-            >
-              {hasPendingRequest ? t('search.pending') : (actionBusy ? '...' : t('search.connect'))}
-            </button>
-          )}
-        </div>
-
+          {profile.genres?.length > 0 && <p className="poster-line">{profile.genres.join(', ')}</p>}
+        </PosterHero>
 
         {/* Sender-side alert: counterparty hasn't verified yet */}
         {fullProfile && fullProfile.verifyStatus !== 'VERIFIED' && (
@@ -685,21 +617,24 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         )}
 
         {/* Stats — same row as the own profile; likes-given is a count only */}
-        <div className="mb-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0e] px-2 py-2.5">
+        <div className="poster-stats">
           {/* Count only — the list of who someone liked stays private to them */}
-          <div className="flex flex-col items-center gap-0.5 px-1">
-            <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesGiven)}</span>
-            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likesGiven')}</span>
+          <div className="poster-stat">
+            <span className="poster-stat-value">{fmtStat(profile.likesGiven)}</span>
+            <span className="poster-stat-label">{t('profile.likesGiven')}</span>
           </div>
-          <button type="button" onClick={() => setListModal('likes')} disabled={passedProfile?.id !== currentUser?.id} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03] disabled:cursor-default disabled:hover:scale-100">
-            <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.likesReceived)}</span>
-            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.likedByLabel')}</span>
+          <button type="button" onClick={() => setListModal('likes')} disabled={passedProfile?.id !== currentUser?.id} className="poster-stat">
+            <span className="poster-stat-value">{fmtStat(profile.likesReceived)}</span>
+            <span className="poster-stat-label">{t('profile.likedByLabel')}</span>
           </button>
-          <button type="button" onClick={() => setListModal('connections')} className="flex flex-col items-center gap-0.5 px-1 transition-transform hover:scale-[1.03]">
-            <span className="text-lg font-bold text-white font-space-grotesk">{fmtStat(profile.connectionsCount)}</span>
-            <span className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.connections')}</span>
+          <button type="button" onClick={() => setListModal('connections')} className="poster-stat">
+            <span className="poster-stat-value">{fmtStat(profile.connectionsCount)}</span>
+            <span className="poster-stat-label">{t('profile.connections')}</span>
           </button>
+          <ProfileBadges badges={profile.badges} />
         </div>
+
+        <JumpTabs scope={posterPageRef} />
 
         {/* Instagram-style social proof: only likers the VIEWER also likes */}
         {(() => {
@@ -722,8 +657,9 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Bio — clamped with see-more; authored line breaks preserved */}
         {profile.bio && (
-          <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4 mb-5 text-left">
-            <p className={`text-sm leading-relaxed text-white/70 whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
+          <div className="poster-section">
+            <h2 className="poster-h2">{t('profile.about')}</h2>
+            <p className={`poster-bio whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
             {profile.bio.length > 180 && (
               <button
                 type="button"
@@ -740,7 +676,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {/* Agent roster — visual grid, tap opens the artist's profile */}
         {profile.role === 'AGENT' && Array.isArray(profile.representingArtists) && profile.representingArtists.length > 0 && (
           <div className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{t('profile.artistsRepresenting')}</p>
+            <p className="poster-h2 px-1">{t('profile.artistsRepresenting')}</p>
             <ArtistRosterGrid
               artists={profile.representingArtists}
               onOpenArtist={(artist) => setNestedProfile({
@@ -757,7 +693,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {networkSectionsForRole(profile.role, profile.network).map(([key, items, titleKey]) => (
             items.length > 0 && (
               <div key={key} className="mb-5 text-left">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t(titleKey)}</p>
+                <p className="poster-h2">{t(titleKey)}</p>
                 <ProfileMiniGrid
                   profiles={items}
                   onOpenProfile={(p) => setNestedProfile(p)}
@@ -806,7 +742,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             from the verified network strips) */}
         {['ARTIST', 'PROMOTER', 'VENUE'].includes(profile.role) && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0 && (
           <div className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.pastHighlights')}</p>
+            <p className="poster-h2">{t('viewProfile.pastHighlights')}</p>
             <HighlightsList highlights={profile.pastHighlights} />
           </div>
         )}
@@ -815,7 +751,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             the section as a blurred teaser (tours or not) that opens Premium. */}
         {profile.role === 'ARTIST' && !isPremiumViewer(currentUser) && (
           <div className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.activeTours')}</p>
+            <p className="poster-h2">{t('viewProfile.activeTours')}</p>
             <button
               type="button"
               onClick={() => onOpenPremium && onOpenPremium()}
@@ -839,7 +775,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {profile.role === 'ARTIST' && artistTours.length > 0 && isPremiumViewer(currentUser) && (
           <div className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.activeTours')}</p>
+            <p className="poster-h2">{t('viewProfile.activeTours')}</p>
             <div className="flex flex-col gap-2">
               {artistTours.map((tour) => (
                 <div
@@ -933,36 +869,36 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {/* ===== Links (same rows as the own profile) ===== */}
         {(profile.website || profile.instagram || profile.residentAdvisor || profile.linkedin) && (
           <div className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5 px-1">{t('profile.links')}</p>
+            <p className="poster-h2 px-1">{t('profile.links')}</p>
             <div className="flex flex-col gap-3">
               {profile.website && (
                 <a href={profile.website} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4"><GlobeIcon /></span>
+                   className="poster-link">
+                  <span className="poster-link-icon"><GlobeIcon /></span>
                   <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
               )}
               {profile.instagram && (
                 <a href={`https://instagram.com/${profile.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white [&>svg]:w-4 [&>svg]:h-4"><InstagramGlyph /></span>
+                   className="poster-link">
+                  <span className="poster-link-icon"><InstagramGlyph /></span>
                   <span className="flex-1 text-sm font-medium text-white">Instagram</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
               )}
               {profile.residentAdvisor && (
                 <a href={raProfileUrl(profile.residentAdvisor)} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-black border border-white/20 flex items-center justify-center shrink-0"><RAGlyph /></span>
+                   className="poster-link">
+                  <span className="poster-link-icon"><RAGlyph /></span>
                   <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
               )}
               {profile.linkedin && (
                 <a href={profile.linkedin} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3 hover:border-infrared/40 transition-colors">
-                  <span className="w-9 h-9 rounded-full bg-infrared flex items-center justify-center shrink-0 text-white text-[13px]">in</span>
+                   className="poster-link">
+                  <span className="poster-link-icon">in</span>
                   <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>
                   <span className="text-white/30 text-xs">↗</span>
                 </a>
@@ -980,7 +916,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               className="w-full flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a0a0e] px-4 py-3
                          text-left cursor-pointer hover:border-infrared/40 transition-colors"
             >
-              <span className="w-9 h-9 rounded-full bg-[#111117] border border-white/10 flex items-center justify-center shrink-0 text-infrared [&>svg]:w-4 [&>svg]:h-4">
+              <span className="poster-link-icon">
                 <BookingsIcon />
               </span>
               <span className="flex-1 text-sm font-medium text-white">{t('viewProfile.gigsViaTora', { n: profile.gigsCompleted })}</span>
@@ -992,7 +928,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
         {/* Similar profiles — recommendation strip, hidden below 2 results */}
         {similarProfiles.length >= 2 && (
           <div className="mb-5 text-left">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-tech mb-2.5">{t('viewProfile.similarProfiles')}</p>
+            <p className="poster-h2">{t('viewProfile.similarProfiles')}</p>
             <ProfileMiniGrid
               variant="scroll"
               profiles={similarProfiles}

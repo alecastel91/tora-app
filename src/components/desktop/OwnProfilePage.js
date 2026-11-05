@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getAvatarClass, roleLabel, roleChipClass, roleBloom, ROLES } from '../../utils/roles';
 import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
 import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, LocationIcon, StarIcon, ShieldIcon } from '../../utils/icons';
 import VerifiedBadge from '../common/VerifiedBadge';
+import PosterHero from '../common/PosterHero';
+import JumpTabs from '../common/JumpTabs';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
@@ -37,9 +39,9 @@ const Action = ({ icon, label, onClick, dot, primary }) => (
     type="button"
     onClick={onClick}
     className={`relative flex h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors
-                [&>svg]:h-4 [&>svg]:w-4 ${primary ? 'border-infrared/50 bg-infrared/10 text-white hover:bg-infrared/20' : 'border-white/12 bg-white/[0.03] text-white/85 hover:border-white/30 hover:text-white'}`}
+                [&>svg]:h-4 [&>svg]:w-4 ${primary ? 'border-transparent bg-[#DE2A57] text-white hover:bg-[#C9204B]' : 'border-white/12 bg-white/[0.03] text-white/85 hover:border-white/30 hover:text-white'}`}
   >
-    <span className="text-infrared [&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+    <span className={`${primary ? 'text-white' : 'text-infrared'} [&>svg]:h-4 [&>svg]:w-4`}>{icon}</span>
     {label}
     {dot && <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-infrared shadow-[0_0_6px_rgba(255,51,102,0.7)]" />}
   </button>
@@ -51,6 +53,7 @@ const OwnProfilePage = ({
   fileInputRef, onPickAvatar, onEdit, onManage, onRoster, onFindAgent, onOpenSwitcher, onAddProfile, onSwitchProfile,
   onOpenLikes, onOpenLikers, onOpenConnections, onOpenAchievements, onOpenPremium, onVerify, onOpenProfile, onManageArtist,
 }) => {
+  const pageRef = useRef(null);
   const { t } = useLanguage();
   const role = user?.role;
   const roleTone = roleChipClass(role);
@@ -63,59 +66,41 @@ const OwnProfilePage = ({
   const hasHighlights = ['ARTIST', 'PROMOTER', 'VENUE'].includes(role) && Array.isArray(user?.pastHighlights) && user.pastHighlights.length > 0;
 
   return (
-    <div className="d3-op">
+    <div className="d3-op poster-page" ref={pageRef}>
       {/* ---- identity band: who you are, and what you do here ---- */}
       <header className="d3-op-head d3-panel">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit]" style={{ background: `radial-gradient(60% 120% at 12% 0%, ${bloom}, transparent 70%)` }} />
-        <div className="flex items-start gap-6">
-          <div className="relative shrink-0">
-            <button
-              type="button"
-              onClick={onPickAvatar}
-              title={t('profile.editProfile')}
-              className={`group flex h-[112px] w-[112px] cursor-pointer items-center justify-center overflow-hidden rounded-full text-4xl font-semibold text-white ring-1 ring-white/15 ${getAvatarClass(role)}`}
-            >
-              {user?.avatar ? <img src={user.avatar} alt={user?.name} className="h-full w-full object-cover" /> : (user?.name || '?').charAt(0).toUpperCase()}
-              <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 [&>svg]:h-6 [&>svg]:w-6"><UploadIcon /></span>
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => onPickAvatar(e)} style={{ display: 'none' }} />
-          </div>
+        <PosterHero
+          wide
+          profile={user}
+          top={(
+            <>
+              <button type="button" className="poster-text-btn" onClick={onPickAvatar}><UploadIcon /> {t('profile.changePhoto')}</button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => onPickAvatar(e)} style={{ display: 'none' }} />
+            </>
+          )}
+          actions={(
+            <div className="d3-op-actions flex shrink-0 flex-wrap justify-end gap-2">
+              <Action icon={<EditIcon />} label={t('profile.editProfile')} onClick={onEdit} primary />
+              <Action icon={<GridIcon />} label={t('profile.manageLabel')} onClick={onManage} dot={ownHasActions} />
+              {role === 'AGENT' && <Action icon={<ListIcon />} label={t('roster.title')} onClick={onRoster} />}
+              {role === 'ARTIST' && <Action icon={<HandshakeIcon />} label={t('profile.findAgentLabel')} onClick={onFindAgent} />}
+              <Action
+                icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}
+                label={userProfiles.length > 1 ? t('profile.switchProfileLabel') : t('profile.addProfileLabel')}
+                onClick={onOpenSwitcher}
+              />
+            </div>
+          )}
+        >
+          {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={onOpenProfile} />}
+          {user?.genres?.length > 0 && <p className="poster-line">{user.genres.join(', ')}</p>}
+        </PosterHero>
 
-          <div className="min-w-0 flex-1 pt-1">
-            <h1 className="m-0 flex items-center gap-2 font-futuristic text-[28px] font-semibold leading-tight text-white">
-              <span className="truncate">{user?.name || t('profile.yourName')}</span>
-              {!unverified && <VerifiedBadge size={18} channel={user?.verifyChannel} />}
-            </h1>
-            {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={onOpenProfile} />}
-            <p className="m-0 mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-white/60">
-              <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${roleTone}`}>{roleLabel(role || 'ARTIST', t)}</span>
-              <span className="inline-flex items-center gap-1 [&>svg]:h-3.5 [&>svg]:w-3.5"><LocationIcon />{user?.location || t('profile.addLocation')}</span>
-            </p>
-            {Array.isArray(user?.genres) && user.genres.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {user.genres.map((g) => <span key={g} className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10.5px] uppercase tracking-[0.1em] text-white/65">{g}</span>)}
-              </div>
-            )}
-          </div>
-
-          <div className="d3-op-actions flex shrink-0 flex-wrap justify-end gap-2">
-            <Action icon={<EditIcon />} label={t('profile.editProfile')} onClick={onEdit} primary />
-            <Action icon={<GridIcon />} label={t('profile.manageLabel')} onClick={onManage} dot={ownHasActions} />
-            {role === 'AGENT' && <Action icon={<ListIcon />} label={t('roster.title')} onClick={onRoster} />}
-            {role === 'ARTIST' && <Action icon={<HandshakeIcon />} label={t('profile.findAgentLabel')} onClick={onFindAgent} />}
-            <Action
-              icon={userProfiles.length > 1 ? <SwitchIcon /> : <AddIcon />}
-              label={userProfiles.length > 1 ? t('profile.switchProfileLabel') : t('profile.addProfileLabel')}
-              onClick={onOpenSwitcher}
-            />
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-white/[0.07] pt-3">
+        <div className="d3-poster-stats flex flex-wrap items-center gap-1">
           <Stat value={fmtStat(likedProfilesList.length)} label={t('profile.likesGiven')} onClick={onOpenLikes} />
           <Stat value={fmtStat(likerProfilesList.length)} label={t('profile.likedByLabel')} onClick={onOpenLikers} />
           <Stat value={fmtStat(connectionsList.length)} label={t('profile.connections')} onClick={onOpenConnections} />
-          <div className="ml-auto"><ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} /></div>
+          <div className="ml-auto flex items-center gap-3"><JumpTabs scope={pageRef} /><ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} /></div>
         </div>
       </header>
 
@@ -157,7 +142,8 @@ const OwnProfilePage = ({
 
           {user?.bio ? (
             <div className="d3-panel px-5 py-4">
-              <p className="m-0 whitespace-pre-line text-[14px] leading-relaxed text-white/75">{user.bio}</p>
+              <h2 className="poster-h2">{t('profile.about')}</h2>
+              <p className="poster-bio whitespace-pre-line">{user.bio}</p>
               <div className="mt-1"><BioTranslate text={user.bio} /></div>
             </div>
           ) : (
@@ -264,8 +250,8 @@ const OwnProfilePage = ({
             {links.length === 0 ? <p className="m-0 py-2 text-[12px] text-white/30">—</p> : (
               <div className="flex flex-col gap-2">
                 {links.map((l) => (
-                  <a key={l.key} href={l.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 no-underline transition-colors hover:border-white/25">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-infrared text-white [&>svg]:h-3.5 [&>svg]:w-3.5">{l.icon}</span>
+                  <a key={l.key} href={l.href} target="_blank" rel="noopener noreferrer" className="poster-link no-underline">
+                    <span className="poster-link-icon">{l.icon}</span>
                     <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-white">{l.label}</span>
                     <span className="text-[11px] text-white/30">↗</span>
                   </a>

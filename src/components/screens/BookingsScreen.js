@@ -805,141 +805,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     const hasPendingDocs = pendingDocCategories.length > 0;
     const statusLine = statusLineById.get(deal.id);
 
-    return (
-      <div key={deal.id} id={`booking-${deal.id}`} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
-        <div className="booking-date-badge">
-          <span className="booking-date-month">
-            {formatEventDate(dealDate, t('dateFormat.locale'), { month: 'short', day: undefined, year: undefined })}
-          </span>
-          <span className="booking-date-day">{dayNumber}</span>
-        </div>
-        <div className="booking-compact-view">
-          <div
-            className="party-avatar"
-            onClick={() => toggleDealExpanded(deal.id)}
-            style={{ cursor: 'pointer' }}
-          >
-            {otherParty.avatar ? (
-              <img src={otherParty.avatar} alt={otherParty.name} />
-            ) : (
-              otherParty.name.charAt(0).toUpperCase()
-            )}
-          </div>
-
-          <div
-            className="party-info"
-            onClick={() => toggleDealExpanded(deal.id)}
-            style={{ cursor: 'pointer', flex: 1 }}
-          >
-            <div className="party-name-role">
-              <h3>{otherParty.name}</h3>
-              <span className={`role-badge ${otherParty.role.toLowerCase()}`}>
-                {roleLabel(otherParty.role, t)}
-              </span>
-            </div>
-            {statusLine && (
-              <p className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</p>
-            )}
-            {/* Artist label — shown whenever the deal is for a represented
-                artist and the viewer isn't that artist. Agents viewing their
-                roster need this to tell their bookings apart at a glance. */}
-            {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && (
-              <p className="party-via-agent" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('bookings.forArtist', { name: deal.bookedArtistName })}</p>
-            )}
-            {isViaAgent && agentName && (
-              <p className="party-via-agent">{t('bookings.viaAgent', { name: agentName })}</p>
-            )}
-            {agentReadOnly && (
-              <p className="party-via-agent">
-                {limitedView && deal.bookedArtistId
-                  ? t('bookings.viaOtherAgent', { name: deal.artist?.name || t('chat.theArtistSide') })
-                  : t('bookings.viaArtistDirect', { name: deal.artist?.name || t('chat.theArtistSide') })}
-              </p>
-            )}
-            <p className="party-location">
-              {deal.city && deal.country ? `${deal.city}, ${deal.country}` : otherParty.location}
-            </p>
-            {!isExpanded && (
-            <p className="m-0 mb-2 text-[12px] font-space-grotesk font-medium text-white/85 truncate">
-              {deal.eventName || t('bookings.booking')}
-              {formatFee(deal.currentFee) != null && (
-                <>
-                  <span className="text-white/30"> · </span>
-                  <span className="text-infrared font-semibold">
-                    {formatFee(deal.currentFee)} {deal.currency}
-                  </span>
-                </>
-              )}
-            </p>
-            )}
-            <div className="party-status-row">
-              {(() => {
-                const displayStatus = getDealDisplayStatus(deal);
-                return (
-                  <span className={getStatusBadgeClass(displayStatus)}>
-                    {statusLabel(displayStatus)}
-                  </span>
-                );
-              })()}
-              {/* The tagged TORA venue hasn't confirmed yet — the offer is
-                  being HELD and has not been sent to the artist/agent. */}
-              {deal.eventVenueStatus === 'PENDING' && (
-                <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300
-                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
-                  {t('bookings.awaitingVenue')}
-                </span>
-              )}
-              {/* Venue responded — surface the outcome on the initiator's card. */}
-              {deal.eventVenueStatus === 'CONFIRMED' && (
-                <span className="px-2 py-0.5 rounded-lg bg-[#43E97B]/15 border border-[#43E97B]/40 text-[#43E97B]
-                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
-                  {t('bookings.venueConfirmedBadge')}
-                </span>
-              )}
-              {deal.eventVenueStatus === 'DECLINED' && (
-                <span className="px-2 py-0.5 rounded-lg bg-infrared/15 border border-infrared/40 text-infrared
-                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
-                  {t('bookings.venueDeclinedBadge')}
-                </span>
-              )}
-            </div>
-            {deal.eventVenueStatus === 'PENDING' && (
-              <p className="m-0 mt-1 text-[11px] leading-relaxed text-white/45">
-                {t('bookings.awaitingVenueHint')}
-              </p>
-            )}
-          </div>
-
-          <button
-            className="btn-expand-arrow"
-            onClick={() => toggleDealExpanded(deal.id)}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </button>
-        </div>
-
-        {isExpanded && (
-          <>
-            {limitedView && (
-              <p className="mb-3 text-[11px] leading-relaxed text-white/35">
-                {t('bookings.limitedViewNote')}
-              </p>
-            )}
-            {(deal.eventName || deal.performanceType) && (
-              <div className="flex items-center gap-2.5 mb-2">
-                <h3 className="m-0 text-[16px] font-semibold font-space-grotesk tracking-[-0.01em] text-white truncate">
-                  {deal.eventName || t('bookings.booking')}
-                </h3>
-                {deal.performanceType && (
-                  <span className="shrink-0 px-2 py-0.5 rounded-lg bg-[#0c0c11] border border-white/10 text-white/60
-                                   text-[8px] font-medium uppercase tracking-[0.15em] font-tech">
-                    {deal.performanceType}
-                  </span>
-                )}
-              </div>
-            )}
+    const detailsSlot = () => (
+      <>
             <div className="booking-details">
               {deal.artistName && (
                 <div className="booking-detail-row">
@@ -1065,15 +932,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                 <p className="m-0 text-[12px] leading-relaxed text-white/45">{deal.notes}</p>
               </div>
             )}
+      </>
+    );
 
-            {/* Workflow Timeline for ACCEPTED deals */}
-            {deal.status === 'ACCEPTED' && !hideWorkflow && (
-              <WorkflowTimeline deal={deal} onViewPaymentDetails={() => setDepositHistoryDeal(deal)} />
-            )}
-
-            {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
-            {deal.status === 'ACCEPTED' && !hideWorkflow && (
-              <div className="workflow-actions">
+    const contractSlot = () => (
+      <>
                 {/* Contract Actions. Only the artist side initiates contracts;
                     venue/promoter sees a quiet hint instead. An empty contract
                     = {} (fresh ACCEPTED deal) has no .status set yet — treat
@@ -1352,6 +1215,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   </button>
                 )}
 
+      </>
+    );
+
+    const documentsSlot = () => (
+      <>
                 {/* Document Sharing — artist-side only. Stays visible after
                     everything is shared/skipped so the artist can revisit. */}
                 {deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (
@@ -1480,6 +1348,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   </button>
                 )}
 
+      </>
+    );
+
+    const paymentSlot = () => (
+      <>
                 {/* Confirm receipt — artist-side only, whenever money has been
                     marked but not confirmed. Keyed on the payment summary, not
                     on payment.status: a seeded or legacy payment without that
@@ -1532,6 +1405,159 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   );
                 })()}
 
+      </>
+    );
+
+    return (
+      <div key={deal.id} id={`booking-${deal.id}`} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
+        <div className="booking-date-badge">
+          <span className="booking-date-month">
+            {formatEventDate(dealDate, t('dateFormat.locale'), { month: 'short', day: undefined, year: undefined })}
+          </span>
+          <span className="booking-date-day">{dayNumber}</span>
+        </div>
+        <div className="booking-compact-view">
+          <div
+            className="party-avatar"
+            onClick={() => toggleDealExpanded(deal.id)}
+            style={{ cursor: 'pointer' }}
+          >
+            {otherParty.avatar ? (
+              <img src={otherParty.avatar} alt={otherParty.name} />
+            ) : (
+              otherParty.name.charAt(0).toUpperCase()
+            )}
+          </div>
+
+          <div
+            className="party-info"
+            onClick={() => toggleDealExpanded(deal.id)}
+            style={{ cursor: 'pointer', flex: 1 }}
+          >
+            <div className="party-name-role">
+              <h3>{otherParty.name}</h3>
+              <span className={`role-badge ${otherParty.role.toLowerCase()}`}>
+                {roleLabel(otherParty.role, t)}
+              </span>
+            </div>
+            {statusLine && (
+              <p className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</p>
+            )}
+            {/* Artist label — shown whenever the deal is for a represented
+                artist and the viewer isn't that artist. Agents viewing their
+                roster need this to tell their bookings apart at a glance. */}
+            {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && (
+              <p className="party-via-agent" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('bookings.forArtist', { name: deal.bookedArtistName })}</p>
+            )}
+            {isViaAgent && agentName && (
+              <p className="party-via-agent">{t('bookings.viaAgent', { name: agentName })}</p>
+            )}
+            {agentReadOnly && (
+              <p className="party-via-agent">
+                {limitedView && deal.bookedArtistId
+                  ? t('bookings.viaOtherAgent', { name: deal.artist?.name || t('chat.theArtistSide') })
+                  : t('bookings.viaArtistDirect', { name: deal.artist?.name || t('chat.theArtistSide') })}
+              </p>
+            )}
+            <p className="party-location">
+              {deal.city && deal.country ? `${deal.city}, ${deal.country}` : otherParty.location}
+            </p>
+            {!isExpanded && (
+            <p className="m-0 mb-2 text-[12px] font-space-grotesk font-medium text-white/85 truncate">
+              {deal.eventName || t('bookings.booking')}
+              {formatFee(deal.currentFee) != null && (
+                <>
+                  <span className="text-white/30"> · </span>
+                  <span className="text-infrared font-semibold">
+                    {formatFee(deal.currentFee)} {deal.currency}
+                  </span>
+                </>
+              )}
+            </p>
+            )}
+            <div className="party-status-row">
+              {(() => {
+                const displayStatus = getDealDisplayStatus(deal);
+                return (
+                  <span className={getStatusBadgeClass(displayStatus)}>
+                    {statusLabel(displayStatus)}
+                  </span>
+                );
+              })()}
+              {/* The tagged TORA venue hasn't confirmed yet — the offer is
+                  being HELD and has not been sent to the artist/agent. */}
+              {deal.eventVenueStatus === 'PENDING' && (
+                <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300
+                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
+                  {t('bookings.awaitingVenue')}
+                </span>
+              )}
+              {/* Venue responded — surface the outcome on the initiator's card. */}
+              {deal.eventVenueStatus === 'CONFIRMED' && (
+                <span className="px-2 py-0.5 rounded-lg bg-[#43E97B]/15 border border-[#43E97B]/40 text-[#43E97B]
+                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
+                  {t('bookings.venueConfirmedBadge')}
+                </span>
+              )}
+              {deal.eventVenueStatus === 'DECLINED' && (
+                <span className="px-2 py-0.5 rounded-lg bg-infrared/15 border border-infrared/40 text-infrared
+                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
+                  {t('bookings.venueDeclinedBadge')}
+                </span>
+              )}
+            </div>
+            {deal.eventVenueStatus === 'PENDING' && (
+              <p className="m-0 mt-1 text-[11px] leading-relaxed text-white/45">
+                {t('bookings.awaitingVenueHint')}
+              </p>
+            )}
+          </div>
+
+          <button
+            className="btn-expand-arrow"
+            onClick={() => toggleDealExpanded(deal.id)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+        </div>
+
+        {isExpanded && (
+          <>
+            {limitedView && (
+              <p className="mb-3 text-[11px] leading-relaxed text-white/35">
+                {t('bookings.limitedViewNote')}
+              </p>
+            )}
+            {(deal.eventName || deal.performanceType) && (
+              <div className="flex items-center gap-2.5 mb-2">
+                <h3 className="poster-event-title">
+                  {deal.eventName || t('bookings.booking')}
+                </h3>
+                {deal.performanceType && (
+                  <span className="shrink-0 px-2 py-0.5 rounded-lg bg-[#0c0c11] border border-white/10 text-white/60
+                                   text-[8px] font-medium uppercase tracking-[0.15em] font-tech">
+                    {deal.performanceType}
+                  </span>
+                )}
+              </div>
+            )}
+            {(deal.status !== 'ACCEPTED' || hideWorkflow) && detailsSlot()}
+
+            {/* Workflow Timeline for ACCEPTED deals: each step holds its own actions */}
+            {deal.status === 'ACCEPTED' && !hideWorkflow && (
+              <WorkflowTimeline
+                deal={deal}
+                onViewPaymentDetails={() => setDepositHistoryDeal(deal)}
+                stepActions={{ contractSigned: contractSlot(), documentsShared: documentsSlot(), paymentReceived: paymentSlot() }}
+              />
+            )}
+            {deal.status === 'ACCEPTED' && !hideWorkflow && detailsSlot()}
+
+            {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
+            {deal.status === 'ACCEPTED' && !hideWorkflow && (
+              <div className="workflow-actions">
                 {/* Message — kept inside workflow-actions when the deal is
                     accepted so all the booking-card CTAs (View Contract,
                     Share Documents, Update Payment, Message) sit in one

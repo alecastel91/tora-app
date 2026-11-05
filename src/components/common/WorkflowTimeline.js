@@ -7,7 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
  * Step 3 (documents) completes when each category is shared or skipped.
  * Step 4 (payment) ticks only when the artist has confirmed receipt.
  */
-const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
+const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
   const { t } = useLanguage();
   // Memo keyed on the JSONB blobs that drive every derivation. With many
   // deal cards on screen this avoids redoing reduces + date parsing on every
@@ -45,63 +45,10 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
   // First not-yet-completed step is "current" — it gets the live crimson ring.
   const currentIndex = steps.findIndex((s) => !s.completed);
 
-  return (
-    <div className="workflow-timeline">
-      {/* Horizontal stepper: nodes on a thin track that fills crimson as the deal advances */}
-      <div className="grid grid-cols-4 pt-1">
-        {steps.map((step, index) => {
-          const isCurrent = index === currentIndex;
-          const node = step.completed
-            ? 'bg-infrared text-white'
-            : isCurrent
-              ? 'border border-infrared/70 text-infrared bg-[#131315] shadow-[0_0_10px_rgba(255,51,102,0.35)]'
-              : 'border border-white/15 text-white/30 bg-[#070709]';
-          return (
-            <div key={step.key} className="relative flex flex-col items-center min-w-0">
-              {/* track segment from the previous node's center to this node's edge */}
-              {index > 0 && (
-                <span
-                  aria-hidden
-                  className={`absolute top-[10px] h-[2px] rounded-full
-                              ${steps[index - 1].completed ? 'bg-infrared' : 'bg-white/10'}`}
-                  style={{ left: 'calc(-50% + 13px)', right: 'calc(50% + 13px)' }}
-                />
-              )}
-              {/* node */}
-              <span
-                className={`relative z-[1] w-[22px] h-[22px] rounded-full flex items-center justify-center
-                            text-[10px] font-semibold font-tech transition-colors ${node}`}
-              >
-                {step.completed ? (
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                ) : (
-                  index + 1
-                )}
-              </span>
-              {/* label */}
-              <span
-                className={`mt-2 text-[8px] font-semibold uppercase tracking-[0.12em] font-tech text-center leading-[1.5] px-0.5
-                            ${step.completed ? 'text-white/70' : isCurrent ? 'text-infrared/90' : 'text-white/30'}`}
-              >
-                {step.label}
-              </span>
-              {step.completed && step.timestamp && (
-                <span className="mt-0.5 text-[8px] text-white/25 font-tech">
-                  {new Date(step.timestamp).toLocaleDateString()}
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+  // Two tracks: the lighter fill is what the booker marked paid, the darker
+  // fill (inside it) is what the artist confirmed. Step 4 ticks on confirmed.
+  const paymentBar = showPaymentBar ? (
 
-      {/* Payment progress bar — two tracks. The lighter fill shows what the
-          booker has marked paid; the darker fill (inside it) shows what the
-          artist has confirmed receipt of. Step 4 ticks only when confirmed
-          covers the fee. */}
-      {showPaymentBar && (
         <div style={{ marginTop: '14px', padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px', fontSize: '12px' }}>
             <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>{t('bookings.paymentProgress')}</span>
@@ -154,7 +101,44 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
             )}
           </div>
         </div>
-      )}
+      
+  ) : null;
+
+  return (
+    <div className="workflow-timeline">
+      {/* Vertical steps: each one carries its own actions, so what to do next
+          sits under the step it belongs to. */}
+      <ol className="flow-steps">
+        {steps.map((step, index) => {
+          const isCurrent = index === currentIndex;
+          const state = step.completed ? 'done' : isCurrent ? 'now' : 'todo';
+          const actions = stepActions[step.key];
+          return (
+            <li key={step.key} className={`flow-step flow-${state}`}>
+              <div className="flow-rail">
+                <span className="flow-node">
+                  {step.completed ? (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  ) : (
+                    index + 1
+                  )}
+                </span>
+                {index < steps.length - 1 && <span className="flow-line" />}
+              </div>
+              <div className="flow-body">
+                <div className="flow-label">{step.label}</div>
+                {step.completed && step.timestamp && (
+                  <div className="flow-date">{new Date(step.timestamp).toLocaleDateString()}</div>
+                )}
+                {step.key === 'paymentReceived' && paymentBar}
+                {actions && <div className="workflow-actions flow-actions">{actions}</div>}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
 
         {/* Agreed payment deadlines (become binding on accept). Overdue =
             past the date with the corresponding amount still unconfirmed. */}

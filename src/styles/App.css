@@ -311,12 +311,7 @@
      no other tints. Fixed to the frame; transparent screens read it through.
      The Profile screen paints its own black base so only its role colour
      shows there. */
-  background-color: #000000;
-  background-image:
-    /* pink wash across the top of the page */
-    radial-gradient(120% 44% at 50% -14%, rgba(255, 51, 102, 0.18), transparent 60%),
-    /* soft infrared bloom the web sits in (like torahub.io) */
-    radial-gradient(75% 55% at 50% 42%, rgba(255, 51, 102, 0.07), transparent 72%);
+  background-color: #040407;
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -325,6 +320,7 @@
    so it's strongest in the middle and fades toward the edges — matching the
    torahub.io mesh feel. */
 .app-container::before {
+  display: none;
   content: '';
   position: absolute;
   inset: 0;
@@ -1328,11 +1324,11 @@
 .btn {
   padding: 10px 16px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 11px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 10px;
+  font-size: 11px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1352,15 +1348,21 @@
 
 /* Primary: thin crimson border + 5-8% crimson fill, glows on hover. */
 .btn-primary {
-  background: rgba(255, 51, 102, 0.08);
-  border-color: rgba(255, 51, 102, 0.45);
-  color: var(--text-white);
+  background: var(--color-crimson-action, #DE2A57);
+  border-color: var(--color-crimson-action, #DE2A57);
+  color: #fff;
 }
 
 .btn-primary:hover {
-  background: rgba(255, 51, 102, 0.15);
-  border-color: rgba(255, 51, 102, 0.7);
-  box-shadow: 0 0 20px rgba(255, 51, 102, 0.25);
+  background: #C9204B;
+  border-color: #C9204B;
+}
+
+/* A toggled-on state (Liked, a selected chip): quieter than a main action. */
+.btn-liked {
+  background: rgba(255, 51, 102, 0.1);
+  border-color: rgba(255, 51, 102, 0.5);
+  color: var(--text-white);
 }
 
 .btn-primary:active {
@@ -1422,8 +1424,9 @@
 }
 
 .search-result-card .btn-primary {
-  background: rgba(255, 51, 102, 0.12);
-  border: 1px solid rgba(255, 51, 102, 0.6);
+  background: var(--color-crimson-action, #DE2A57);
+  border: 1px solid var(--color-crimson-action, #DE2A57);
+  color: #fff;
 }
 
 .btn-disabled {
@@ -13677,3 +13680,192 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .agency-search-name { grid-column: 1; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .agency-search-meta { grid-column: 1; font-size: 12.5px; color: rgba(255, 255, 255, 0.6); }
 .agency-search-card .agency-badge-chevron { grid-column: 2; grid-row: 1 / span 3; }
+
+
+/* ===== Poster profile (PosterHero, ProfileActions) ===== */
+.poster-hero {
+  position: relative;
+  margin: -20px -20px 16px;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  text-align: left;
+  background: #040407;
+}
+.profile-screen .poster-hero { margin: -24px -16px 16px; }
+.poster-photo { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 18%; }
+.poster-square .poster-photo { height: auto; aspect-ratio: 1 / 1; object-position: center; }
+.poster-landscape .poster-photo { object-position: center; }
+.poster-fade { position: absolute; inset: auto 0 0 0; height: 70%; background: linear-gradient(to bottom, rgba(4,4,7,0), rgba(4,4,7,0.74) 58%, #040407); pointer-events: none; }
+.poster-empty.poster-role-artist { background: radial-gradient(120% 90% at 30% 10%, #2F2A7A, #12102E 55%, #040407); }
+.poster-empty.poster-role-agent { background: radial-gradient(120% 90% at 30% 10%, #0F6A45, #06291C 55%, #040407); }
+.poster-empty.poster-role-promoter { background: radial-gradient(120% 90% at 30% 10%, #7A5800, #2A1F05 55%, #040407); }
+.poster-empty.poster-role-venue { background: radial-gradient(120% 90% at 30% 10%, #7D2A2A, #2C0F0F 55%, #040407); }
+.poster-initial { position: absolute; right: 8px; top: 24px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 240px; line-height: 1; color: rgba(255,255,255,0.14); }
+.poster-top { position: absolute; left: 16px; right: 16px; top: 12px; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.poster-body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 4px; }
+.poster-name { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 42px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+.poster-seal { margin-left: 8px; vertical-align: 4px; }
+.poster-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: 14px; color: rgba(255,255,255,0.82); }
+.poster-role { flex: none; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+.poster-role-artist .poster-role { color: #A69FFF; }
+.poster-role-agent .poster-role { color: #4BE3A3; }
+.poster-role-promoter .poster-role { color: #FFC933; }
+.poster-role-venue .poster-role { color: #FF8A8A; }
+.poster-agency { margin: 6px 0 0; font-size: 13px; color: rgba(255,255,255,0.72); }
+.poster-icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.22); background: rgba(4,4,7,0.6); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.poster-icon-btn svg { width: 20px; height: 20px; }
+.poster-text-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.22); background: rgba(4,4,7,0.6); color: #fff; font-size: 13px; cursor: pointer; }
+.poster-text-btn svg { width: 16px; height: 16px; }
+.poster-actions { display: flex; gap: 8px; }
+.poster-actions .btn { min-height: 48px; margin: 0; }
+.poster-actions .btn:first-child { flex: 1 1 auto; }
+.poster-actions .btn-message, .poster-actions .btn-outline:not(.poster-like) { flex: 0 1 auto; }
+.poster-like { flex: none; width: 48px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.poster-h2 { margin: 0 0 10px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
+
+/* Booking steps (WorkflowTimeline) */
+.flow-steps { list-style: none; margin: 0; padding: 4px 0 0; text-align: left; }
+.flow-step { display: flex; gap: 12px; }
+.flow-rail { flex: none; width: 28px; display: flex; flex-direction: column; align-items: center; }
+.flow-node { flex: none; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+.flow-line { flex: 1 1 auto; width: 2px; min-height: 18px; background: rgba(255,255,255,0.16); }
+.flow-done .flow-node { background: #FF3366; color: #fff; }
+.flow-done .flow-line { background: #FF3366; }
+.flow-now .flow-node { border: 2px solid #FF3366; color: #FF7A9B; }
+.flow-todo .flow-node { border: 2px solid rgba(255,255,255,0.22); color: rgba(255,255,255,0.68); }
+.flow-body { flex: 1 1 auto; min-width: 0; padding: 3px 0 18px; }
+.flow-label { font-size: 14px; font-weight: 600; color: #fff; }
+.flow-date { margin-top: 2px; font-size: 12px; color: rgba(255,255,255,0.65); }
+.flow-actions { margin-top: 10px; }
+.flow-actions:empty { display: none; }
+
+.flow-actions.workflow-actions { border-top: 0; padding: 0; }
+.flow-actions.workflow-actions .btn { min-height: 44px; }
+
+/* Celebrations with a photo */
+.celebration-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.celebration-photo-fade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(4,4,7,0.15), rgba(4,4,7,0.85) 62%, #040407); }
+.celebration-title { font-size: 28px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; }
+.celebration-card-poster { align-self: flex-end; width: 100%; max-width: 760px; margin-right: auto; padding: 0 20px 56px; text-align: left; }
+.celebration-card-poster .celebration-title { font-size: clamp(56px, 14vw, 112px); line-height: 0.94; letter-spacing: -0.03em; }
+.celebration-card-poster p { max-width: 560px; }
+
+/* Suggested for you: taller photo tiles */
+.poster-tile { width: 42% !important; text-align: left !important; }
+.poster-tile .poster-tile-frame { aspect-ratio: 3 / 4; }
+
+/* Tour Kickstart cards */
+.tour-poster { position: relative; height: 210px; margin: -20px -20px 12px; overflow: hidden; border-radius: inherit; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.tour-poster img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+.tour-poster::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(16,16,21,0) 30%, #101015); }
+.tour-poster-title { position: absolute; left: 14px; right: 14px; bottom: 8px; z-index: 1; margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; color: #fff; }
+
+/* Represented Artists: photo tiles; dormant, Manage and Remove all stay */
+.represented-artists-content .artists-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.represented-artists-content .artist-card-row { flex-direction: column; align-items: stretch; padding: 0; overflow: hidden; }
+.represented-artists-content .artist-card-main { flex-direction: column; align-items: stretch; gap: 8px; padding: 0; }
+.represented-artists-content .artist-avatar-small { width: 100%; height: 190px; border-radius: 0; }
+.represented-artists-content .artist-card-content { padding: 0 10px; }
+.represented-artists-content .artist-name-inline { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 17px; line-height: 1.05; text-transform: uppercase; white-space: normal; }
+.represented-artists-content .artist-row-actions { justify-content: space-between; padding: 8px 10px 10px; }
+
+/* Agency team sheet */
+.agency-team .message-modal-title { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 26px; line-height: 1.05; text-transform: uppercase; }
+
+/* Login, activation, Getting Started */
+.auth-cover { position: absolute; left: 0; right: 0; top: 0; height: 340px; background: linear-gradient(to bottom, rgba(0,0,0,0.05), #000), url('/auth-cover.jpg') center 40% / cover no-repeat; pointer-events: none; }
+.auth-screen { position: relative; }
+.auth-container { position: relative; }
+.onboarding-sheet { position: relative; overflow: hidden; }
+.onboarding-sheet > *:not(.auth-cover) { position: relative; }
+.onboarding-title { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; }
+
+/* News milestones carry the member's photo */
+.news-milestone-photo { display: block; width: 100%; height: 210px; margin-top: 12px; object-fit: cover; object-position: center 25%; border-radius: 12px; }
+
+.represented-artists-content .artist-avatar-small img { border-radius: 0; }
+
+.poster-like svg { width: 20px; height: 20px; flex: none; }
+
+/* Upgrade buttons are main actions: crimson like the rest */
+.btn-upgrade, .btn-upgrade-small, .btn-premium, .btn-upgrade:hover, .btn-upgrade-small:hover, .btn-premium:hover {
+  background: #DE2A57;
+  border-color: #DE2A57;
+  color: #fff;
+}
+
+/* ===== Poster pass 2: flat sections instead of boxes ===== */
+.rounded-2xl { border-radius: 10px !important; }
+.btn-primary { font-family: var(--font-space-grotesk); font-weight: 700; letter-spacing: 0.1em; }
+.poster-line { margin: 6px 0 0; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.72); }
+.poster-page { text-align: left; }
+.poster-stats { display: flex; align-items: center; gap: 22px; padding: 10px 0; margin-bottom: 14px; border-top: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12); }
+.poster-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 0; background: none; border: 0; color: inherit; cursor: pointer; min-height: 44px; justify-content: center; }
+div.poster-stat { cursor: default; }
+.poster-stat-value { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; color: #fff; }
+.poster-stat-label { font-size: 11px; color: rgba(255,255,255,0.65); }
+.poster-stats .poster-badges { margin-left: auto; }
+.poster-own-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.poster-action { position: relative; min-height: 44px; padding: 0 10px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18); background: transparent; color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; }
+.poster-action.is-primary { min-height: 48px; border-color: #DE2A57; background: #DE2A57; color: #fff; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.poster-own-actions .poster-action:nth-child(2) { min-height: 48px; border-color: rgba(255,255,255,0.3); font-family: var(--font-space-grotesk); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+.jump-tabs { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 18px; scrollbar-width: none; }
+.jump-tabs::-webkit-scrollbar { display: none; }
+.jump-tab { flex: none; height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: transparent; color: rgba(255,255,255,0.72); font-size: 13px; font-weight: 500; cursor: pointer; }
+.jump-tab.is-active { background: rgba(255,255,255,0.14); color: #fff; }
+.poster-section { margin-bottom: 26px; text-align: left; }
+.poster-bio { margin: 0; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.82); }
+.poster-page .profile-embeds h4 { margin: 0 0 10px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
+.poster-page .mb-5, .poster-page .mb-6 { margin-bottom: 26px; }
+.poster-row { display: flex; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.poster-link { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; border-bottom: 1px solid rgba(255,255,255,0.1); border-radius: 0; background: transparent; color: #fff; text-align: left; cursor: pointer; width: 100%; }
+.poster-link:disabled { opacity: 0.45; cursor: not-allowed; }
+.poster-link-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: none; color: rgba(255,255,255,0.72); background: transparent; }
+.poster-link-icon svg, .poster-link-icon img { width: 18px; height: 18px; }
+
+/* Booking card: event first, then steps, then details */
+.poster-event-title { margin: 0; flex: 1 1 auto; min-width: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 30px; line-height: 1.04; letter-spacing: -0.02em; text-transform: uppercase; color: #fff; }
+.booking-card .workflow-timeline { margin-top: 12px; padding: 16px 14px 6px; background: #0c0c11; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; }
+.booking-card .workflow-timeline + .booking-details { margin-top: 18px; }
+
+/* Tour Kickstart cards */
+.tour-poster + .tour-card-header .tour-artist-avatar, .tour-poster + .tour-card-header .tour-location-info { display: none; }
+.tour-poster { height: 300px; }
+.tour-poster-title { font-size: 40px; }
+.tour-card .tour-dates-section { background: transparent; border: 0; padding: 0; margin-bottom: 12px; }
+.tour-card .tour-stat-value { font-family: var(--font-space-grotesk); font-weight: 700; }
+.tour-card .tour-card-footer .btn { min-height: 48px; }
+
+/* News milestones */
+.news-milestone { position: relative; margin-top: 12px; height: 270px; border-radius: 10px; overflow: hidden; }
+.news-milestone img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+.news-milestone::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(4,4,7,0) 35%, rgba(4,4,7,0.95)); }
+.news-milestone p { position: absolute; left: 14px; right: 14px; bottom: 12px; z-index: 1; margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 24px; line-height: 1.05; letter-spacing: -0.015em; text-transform: uppercase; color: #fff; }
+
+/* Log in, Activate: photo, then a left-aligned form */
+.auth-cover { height: 400px; }
+.auth-brand { text-align: left; padding-top: 190px; }
+.auth-submit { min-height: 52px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 14px; letter-spacing: 0.12em; }
+.auth-header { text-align: left; padding-top: 170px; }
+.auth-header .auth-logo { margin-left: 0; }
+.auth-screen h2 { font-family: var(--font-space-grotesk); font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; font-size: 40px; line-height: 1; }
+@media (min-width: 1024px) {
+  .auth-cover { right: 40%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0) 45%, #000), url('/auth-cover.jpg') center / cover no-repeat; }
+  .auth-panel { margin-left: 62%; width: 400px; }
+  .auth-brand { padding-top: 120px; }
+}
+
+/* Getting Started: photo on top, big title under it */
+.onboarding-cover { height: 62%; }
+.onboarding-slide { justify-content: flex-end; align-items: flex-start; text-align: left; padding: 0; }
+.onboarding-icon { display: none; }
+.onboarding-title { font-size: 44px; line-height: 0.98; }
+.onboarding-body { font-size: 16px; line-height: 1.5; color: rgba(255,255,255,0.84); max-width: none; }
+.onboarding-next { min-height: 52px; }
+
+
+@media (min-width: 1024px) { html.desktop-v3 .poster-event-title { font-size: 28px; } }
+.news-milestone p { font-size: 20px; }

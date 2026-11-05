@@ -886,6 +886,8 @@ const ja = {
   },
 
   pitch: {
+
+    send: 'ピッチを送る',
     emptyTitle: 'ピッチを送る:',
     hintVenue: 'ベニューはメッセージでピッチを確認し、興味があればオファーを送ります。',
     hintPromoter: 'プロモーターはメッセージでピッチを確認し、興味があればオファーを送ります。',
@@ -1364,6 +1366,10 @@ const ja = {
   },
 
   profile: {
+
+    about: '概要',
+
+    changePhoto: '写真を変更',
     techSpecs: 'ルームと機材',
     capacityShort: '人',
     adminAccount: "管理者アカウント",

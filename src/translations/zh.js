@@ -886,6 +886,8 @@ const zh = {
   },
 
   pitch: {
+
+    send: '发送推介',
     emptyTitle: '向对方发送自荐：',
     hintVenue: '场地会通过消息查看自荐，如有兴趣会发送报价。',
     hintPromoter: '主办方会通过消息查看自荐，如有兴趣会发送报价。',
@@ -1364,6 +1366,10 @@ const zh = {
   },
 
   profile: {
+
+    about: '简介',
+
+    changePhoto: '更换照片',
     techSpecs: '房间与设备',
     capacityShort: '人',
     adminAccount: "管理员账户",

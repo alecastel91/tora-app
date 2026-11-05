@@ -188,9 +188,10 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin, initialCode = '' }) =>
 
   return (
     <div className="auth-screen">
+      <div aria-hidden className="auth-cover" />
       <div className="auth-container">
         <div className="auth-header">
-          <img src="/tora_logo.png" alt="TORA" className="auth-logo" />
+          <img src="/tora_logo_white.png" alt="TORA" className="auth-logo" />
           <p className="auth-subtitle">WHERE MUSIC MEETS</p>
         </div>
 

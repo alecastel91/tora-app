@@ -56,7 +56,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
     <header className="app-header sticky top-0 z-[100] flex items-center justify-between
                        px-4 py-2.5 bg-black/95 border-b border-white/10">
       <div className="logo flex items-center">
-        <img src="/tora_logo.png" alt="TORA" className="h-6 w-auto block" />
+        <img src="/tora_logo_white.png" alt="TORA" className="h-6 w-auto block" />
       </div>
       {/* Desktop v2: the brand lives in the sidebar, so the bar carries the
           page instead of a hidden logo. Reuses the existing nav.* keys. */}

@@ -19,7 +19,7 @@ import InlineDrawer from './InlineDrawer';
 // pages pass 4). Static class names so Tailwind emits them.
 const COLS = { 3: 'grid-cols-3', 4: 'grid-cols-4', 5: 'grid-cols-5', 6: 'grid-cols-6' };
 
-const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3 }) => {
+const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3, poster = false }) => {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
@@ -44,9 +44,9 @@ const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3 }
       type="button"
       onClick={() => (overlayCount ? setExpanded(true) : onOpenProfile && onOpenProfile(p))}
       className={`group block p-0 bg-transparent border-none text-center cursor-pointer
-                  ${variant === 'scroll' ? 'w-[calc((100%-2rem)/4.4)] flex-none snap-start' : ''}`}
+                  ${variant === 'scroll' ? 'w-[calc((100%-2rem)/4.4)] flex-none snap-start' : ''} ${poster ? 'poster-tile' : ''}`}
     >
-      <span className="relative block aspect-square rounded-xl border border-white/10 bg-[#0a0a0e] overflow-hidden
+      <span className="poster-tile-frame relative block aspect-square rounded-xl border border-white/10 bg-[#0a0a0e] overflow-hidden
                        transition-colors group-hover:border-infrared/40">
         {p.avatar ? (
           <img src={p.avatar} alt={p.name} loading="lazy" className="w-full h-full object-cover" />

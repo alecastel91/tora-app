@@ -18,7 +18,7 @@ export const Label = ({ children, className = '' }) => (
 
 export const Section = ({ title, children, className = '' }) => (
   <section className={`min-w-0 ${className}`}>
-    {title && <Label>{title}</Label>}
+    {title && <h2 className="poster-h2">{title}</h2>}
     {children}
   </section>
 );

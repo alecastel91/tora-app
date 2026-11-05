@@ -853,6 +853,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
     return (
       <>
+        {prof.avatar && <img src={prof.avatar} alt="" aria-hidden className="d3-mat-banner" />}
         <div className="d3-mat-head">
           <div className={`match-avatar avatar-${(prof.role || 'artist').toLowerCase()} clickable`}
                onClick={() => handleProfileClick(prof.id)}>
@@ -975,13 +976,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
             <button
               className="btn btn-primary"
-              style={{
-                backgroundColor: '#FFD700',
-                color: '#000',
-                fontWeight: '600',
-                border: 'none',
-                cursor: 'pointer'
-              }}
               onClick={() => onOpenPremium && onOpenPremium()}
             >
               {t('tour.upgradeToPremium')}
@@ -1997,13 +1991,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </div>
             <button
               className="btn btn-primary"
-              style={{
-                backgroundColor: '#FFD700',
-                color: '#000',
-                fontWeight: '600',
-                border: 'none',
-                cursor: 'pointer'
-              }}
               onClick={() => onOpenPremium && onOpenPremium()}
             >
               {t('tour.upgradeToPremium')}
@@ -2225,6 +2212,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <div className="tour-cards-list">
                 {filteredTours.map(tour => (
                   <div key={tour.id} className="tour-card">
+                    {tour.artist?.avatar && (
+                      <div className="tour-poster">
+                        <img src={tour.artist.avatar} alt="" aria-hidden />
+                        <h3 className="tour-poster-title">{t('tour.tourTitle', { location: tour.country || tour.zone })}</h3>
+                      </div>
+                    )}
                     <div className="tour-card-header">
                       {/* Artist identity links to the profile (replaces the old
                           View Artist CTA in the footer) */}

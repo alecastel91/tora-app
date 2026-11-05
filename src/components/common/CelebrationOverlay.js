@@ -23,6 +23,7 @@ import { drawBadgeGlyph, BADGE_ACCENTS } from '../../utils/badgeArt';
 const AUTO_DISMISS_MS = 3200;
 
 const CelebrationOverlay = ({
+  photo,
   badgeKey,          // when celebrating a badge
   icon,              // when celebrating an action moment
   eyebrow,           // small label above the title
@@ -63,7 +64,14 @@ const CelebrationOverlay = ({
       aria-live="polite"
       aria-label={title}
     >
-      <div className="celebration-card flex flex-col items-center text-center">
+      {photo && (
+        <>
+          <img src={photo} alt="" aria-hidden className="celebration-photo" />
+          <div aria-hidden className="celebration-photo-fade" />
+        </>
+      )}
+      <div className={`celebration-card relative flex flex-col ${photo ? 'celebration-card-poster' : 'items-center text-center'}`}>
+        {!photo && (
         <span
           className="celebration-glow block"
           style={{ '--celebration-accent': glyphAccent }}
@@ -82,6 +90,7 @@ const CelebrationOverlay = ({
             </span>
           )}
         </span>
+        )}
 
         {eyebrow && (
           <p className="mt-6 mb-0 text-[10px] uppercase tracking-[0.28em] font-tech"
@@ -89,12 +98,12 @@ const CelebrationOverlay = ({
             {eyebrow}
           </p>
         )}
-        <h2 className="mt-2 mb-0 text-2xl font-bold text-white font-space-grotesk">{title}</h2>
+        <h2 className="celebration-title mt-2 mb-0 font-bold text-white font-space-grotesk">{title}</h2>
         {subtitle && (
-          <p className="mt-3 mb-0 max-w-xs text-sm leading-relaxed text-white/55">{subtitle}</p>
+          <p className="mt-3 mb-0 max-w-xs text-sm leading-relaxed text-white/80">{subtitle}</p>
         )}
 
-        <p className="mt-8 mb-0 text-[10px] uppercase tracking-[0.2em] text-white/30 font-tech">
+        <p className="mt-8 mb-0 text-[10px] uppercase tracking-[0.2em] text-white/60 font-tech">
           {t('celebration.tapToContinue')}
         </p>
       </div>

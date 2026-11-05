@@ -55,6 +55,7 @@ const CelebrationHost = () => {
       key={current.id}
       icon={art.icon}
       accent={art.accent}
+      photo={current.vars?.photo}
       eyebrow={t(`celebration.${current.moment}.eyebrow`)}
       title={t(`celebration.${current.moment}.title`)}
       subtitle={t(`celebration.${current.moment}.subtitle`, {

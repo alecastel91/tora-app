@@ -1,4 +1,7 @@
-import React from 'react';
+import PosterHero from '../common/PosterHero';
+import JumpTabs from '../common/JumpTabs';
+import ProfileActions from '../common/ProfileActions';
+import React, { useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel, roleChipClass } from '../../utils/roles';
 import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
@@ -32,9 +35,9 @@ const LinkRow = ({ href, icon, label }) => (
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="flex items-center gap-3 rounded-lg border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 no-underline transition-colors hover:border-white/25"
+    className="poster-link no-underline"
   >
-    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-infrared text-white [&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</span>
+    <span className="poster-link-icon">{icon}</span>
     <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-white">{label}</span>
     <span className="text-[11px] text-white/30">↗</span>
   </a>
@@ -46,6 +49,7 @@ const ProfilePage = ({
   onClose, onLike, onMessage, onConnect, onRemove, onOpenGigs, onOpenList, onOpenNested,
   onToggleTourInterest, onTourOffer, onOpenTourKickstart, onOpenPremium,
 }) => {
+  const pageRef = useRef(null);
   const { t } = useLanguage();
   const locale = t('dateFormat.locale');
   const role = profile.role;
@@ -63,82 +67,52 @@ const ProfilePage = ({
   const networkStrips = networkSectionsForRole(role, profile.network).filter(([, items]) => items.length > 0);
 
   return (
-    <div className="d3-vp">
+    <div className="d3-vp poster-page" ref={pageRef}>
       <div className="d3-vp-inner">
         {/* ---- identity band ---- */}
         <header className="d3-vp-head d3-panel">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit]"
-            style={{
-              background: `radial-gradient(60% 120% at 12% 0%, ${
-                { ARTIST: 'rgba(102,126,234,0.22)', VENUE: 'rgba(245,87,108,0.18)', PROMOTER: 'rgba(255,193,7,0.14)', AGENT: 'rgba(67,233,123,0.14)' }[role]
-                || 'rgba(255,255,255,0.08)'}, transparent 70%)`,
-            }}
-          />
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t('common.back')}
-            className="absolute left-4 top-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-black/40 text-white transition-colors hover:border-white/40 [&>svg]:h-4 [&>svg]:w-4"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-          </button>
-
-          <div className="flex items-start gap-6">
-            <Avatar profile={profile} alt={profile.name} className="h-[112px] w-[112px] text-4xl ring-1 ring-white/15" />
-            <div className="min-w-0 flex-1 pt-1">
-              <h1 className="m-0 flex items-center gap-2 font-futuristic text-[28px] font-semibold leading-tight tracking-tight text-white">
-                <span className="truncate">{profile.name}</span>
-                {profile.verifyStatus === 'VERIFIED' && <VerifiedBadge size={18} channel={profile.verifyChannel} />}
-              </h1>
-              {role === 'AGENT' && (
-                <AgencyBadge
-                  profileId={profile.id}
-                  align="left"
-                  onOpenProfile={onOpenNested}
-                  fallback={profile.agencyName ? <p className="m-0 mt-0.5 text-[13px] text-white/50">{profile.agencyName}</p> : null}
-                />
-              )}
-              <p className="m-0 mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-white/60">
-                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${roleChipClass(role)}`}>
-                  {roleLabel(role, t)}
-                </span>
-                {profile.location && <span className="inline-flex items-center gap-1 [&>svg]:h-3.5 [&>svg]:w-3.5"><LocationIcon />{profile.location}</span>}
-                {memberSince && <span className="text-white/35">· {memberSince}</span>}
-              </p>
-              {Array.isArray(profile.genres) && profile.genres.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {profile.genres.map((g) => (
-                    <span key={g} className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10.5px] uppercase tracking-[0.1em] text-white/65">{g}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {!isOwn && (
+          <PosterHero
+            wide
+            profile={profile}
+            top={(
+              <button type="button" onClick={onClose} aria-label={t('common.back')} className="poster-icon-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+              </button>
+            )}
+            actions={!isOwn && (
               <div className="flex shrink-0 flex-col items-end gap-2">
-                <div className="flex gap-2">
-                  <button className={`btn ${isLiked ? 'btn-primary' : 'btn-outline'}`} onClick={onLike}>
-                    <HeartIcon filled={isLiked} /> {isLiked ? t('search.liked') : t('search.like')}
-                  </button>
-                  {isConnected ? (
-                    <button className="btn btn-message" onClick={onMessage}>{t('search.message')}</button>
-                  ) : (
-                    <button className={`btn ${hasPendingRequest ? 'btn-disabled' : 'btn-primary'}`} onClick={onConnect} disabled={hasPendingRequest || actionBusy}>
-                      {hasPendingRequest ? t('search.pending') : (actionBusy ? '...' : t('search.connect'))}
-                    </button>
-                  )}
-                </div>
+                <ProfileActions
+                  viewerRole={currentUser?.role}
+                  targetRole={role}
+                  isLiked={isLiked}
+                  isConnected={isConnected}
+                  hasPendingRequest={hasPendingRequest}
+                  actionBusy={actionBusy}
+                  onLike={onLike}
+                  onMessage={onMessage}
+                  onConnect={onConnect}
+                  onOffer={onTourOffer}
+                />
                 {isConnected && (
-                  <button onClick={onRemove} className="cursor-pointer bg-transparent text-[11px] text-white/35 hover:text-white/70">{t('viewProfile.removeConnection')}</button>
+                  <button onClick={onRemove} className="cursor-pointer bg-transparent text-[11px] text-white/60 hover:text-white">{t('viewProfile.removeConnection')}</button>
                 )}
               </div>
             )}
-          </div>
+          >
+            {role === 'AGENT' && (
+              <AgencyBadge
+                profileId={profile.id}
+                align="left"
+                onOpenProfile={onOpenNested}
+                fallback={profile.agencyName ? <p className="poster-agency">{profile.agencyName}</p> : null}
+              />
+            )}
+            {memberSince && <p className="poster-agency">{memberSince}</p>}
+            {profile?.genres?.length > 0 && <p className="poster-line">{profile.genres.join(', ')}</p>}
+          </PosterHero>
 
           {/* ---- stats strip ---- */}
-          <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-white/[0.07] pt-3">
+          <div className="d3-poster-stats flex flex-wrap items-center gap-1">
             <Stat value={fmtStat(profile.likesGiven)} label={t('profile.likesGiven')} />
             <Stat value={fmtStat(profile.likesReceived)} label={t('profile.likedByLabel')} onClick={isOwn ? () => onOpenList('likes') : undefined} />
             <Stat value={fmtStat(profile.connectionsCount)} label={t('profile.connections')} onClick={() => onOpenList('connections')} />
@@ -147,8 +121,8 @@ const ProfilePage = ({
             )}
             {role === 'VENUE' && profile.venueCapacity && <Stat value={Number(profile.venueCapacity).toLocaleString()} label={t('profile.capacity')} />}
             {role === 'VENUE' && profile.venueRooms && <Stat value={profile.venueRooms} label={t('profile.rooms')} />}
-            {Array.isArray(profile.badges) && profile.badges.length > 0 && (
-              <div className="ml-auto"><ProfileBadges badges={profile.badges} /></div>
+            {Array.isArray(profile.badges) && (
+              <div className="ml-auto flex items-center gap-3"><JumpTabs scope={pageRef} /><ProfileBadges badges={profile.badges} /></div>
             )}
           </div>
 
@@ -179,8 +153,8 @@ const ProfilePage = ({
         <div className="d3-vp-body">
           <main className="flex min-w-0 flex-col gap-7">
             {profile.bio && (
-              <Section title={t('viewProfile.about') === 'viewProfile.about' ? null : t('viewProfile.about')}>
-                <div className="d3-panel px-5 py-4">
+              <Section title={t('profile.about')}>
+                <div className="poster-bio">
                   <p className="m-0 whitespace-pre-line text-[14px] leading-relaxed text-white/75">{profile.bio}</p>
                   <div className="mt-1"><BioTranslate text={profile.bio} /></div>
                 </div>

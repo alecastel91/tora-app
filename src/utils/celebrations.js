@@ -144,6 +144,7 @@ export function celebrateDealMilestones(profileId, deals, ownedProfileIds = []) 
     celebrateMoment(m.moment, {
       name: m.deal.eventName || m.deal.venueName || '',
       counterpart: (onArtistSide ? m.deal.venue?.name : m.deal.artist?.name) || '',
+      photo: (onArtistSide ? m.deal.venue?.avatar : m.deal.artist?.avatar) || '',
     });
   }
 }

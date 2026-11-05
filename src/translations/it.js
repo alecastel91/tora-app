@@ -886,6 +886,8 @@ const it = {
   },
 
   pitch: {
+
+    send: 'Invia una proposta',
     emptyTitle: 'Invia una proposta a',
     hintVenue: 'Le venue valutano le proposte via messaggio e inviano un\'offerta se interessate.',
     hintPromoter: 'I promoter valutano le proposte via messaggio e inviano un\'offerta se interessati.',
@@ -1364,6 +1366,10 @@ const it = {
   },
 
   profile: {
+
+    about: 'Info',
+
+    changePhoto: 'Cambia foto',
     techSpecs: 'Sale e tecnica',
     capacityShort: 'pers.',
     adminAccount: "Account amministratore",

@@ -886,6 +886,8 @@ const en = {
   },
 
   pitch: {
+
+    send: 'Send a pitch',
     emptyTitle: 'Send a pitch to',
     hintVenue: 'Venues review pitches by message and send an offer if they are interested.',
     hintPromoter: 'Promoters review pitches by message and send an offer if they are interested.',
@@ -1366,6 +1368,8 @@ const en = {
   
   // Profile Screen
   profile: {
+    about: 'About',
+    changePhoto: 'Change photo',
     techSpecs: 'Rooms and tech',
     capacityShort: 'cap.',
     adminAccount: "Admin Account",

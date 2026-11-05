@@ -493,12 +493,21 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
 
             {/* body */}
             {m ? (
+              <>
+              {post.author?.avatar ? (
+                <div className="news-milestone">
+                  <img src={post.author.avatar} alt="" aria-hidden loading="lazy" />
+                  <p>{m.text}</p>
+                </div>
+              ) : (
               <div className="mt-3 flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-3">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-infrared/40 text-infrared [&_svg]:h-4 [&_svg]:w-4">
                   {m.icon}
                 </span>
                 <p className="m-0 text-sm leading-relaxed text-white/80">{m.text}</p>
               </div>
+              )}
+              </>
             ) : (
               <>
                 {isEditing('post', post.id) ? (
