@@ -1377,23 +1377,6 @@
   fill: var(--primary-pink);
 }
 
-.search-result-card .btn-outline {
-  border: 1px solid rgba(255, 51, 102, 0.6);
-  background: transparent;
-}
-
-.search-result-card .btn-liked {
-  background: rgba(255, 51, 102, 0.1);
-  border: 1px solid rgba(255, 51, 102, 0.5);
-  color: var(--primary-pink);
-}
-
-.search-result-card .btn-primary {
-  background: var(--color-crimson-action);
-  border: 1px solid var(--color-crimson-action);
-  color: #fff;
-}
-
 .btn-disabled {
   background: rgba(255, 255, 255, 0.04);
   color: rgba(255, 255, 255, 0.3);
@@ -2317,21 +2300,6 @@
 
 /* Profile Bio and Genres */
 /* Neutral glass chips (matches ProfileScreen's genre chips). */
-.see-more-btn {
-  background: none;
-  border: none;
-  color: var(--primary-pink);
-  font-size: var(--font-xs);
-  cursor: pointer;
-  margin-top: 8px;
-  padding: 4px 8px;
-  transition: opacity 0.2s;
-}
-
-.see-more-btn:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-}
 
 .profile-bio {
   padding: 20px;
@@ -3368,21 +3336,6 @@
 }
 
 /* Obsidian Neon glass card. */
-.search-result-card {
-  position: relative;
-  padding: 12px;
-  background: #0a0a0e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  transition: all 0.3s;
-  margin-bottom: 12px;
-  width: 100%;
-}
-
-.search-result-card:hover {
-  background: #0e0e13; /* opaque brighten — rgba hover let the pink grid bleed through */
-  border-color: rgba(255, 51, 102, 0.4);
-}
 
 .result-avatar {
   position: relative;
@@ -3427,36 +3380,6 @@
   border: 2px solid var(--bg-card);
 }
 
-.result-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.result-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-top: 2px;
-}
-
-.result-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.result-info h3 {
-  color: var(--text-white);
-  font-size: 15px;
-  font-weight: 400;
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  line-height: 1.2;
-}
-
 .result-location {
   color: rgba(255, 255, 255, 0.5);
   font-size: 12px;
@@ -3467,100 +3390,7 @@
   letter-spacing: 0.05em;
 }
 
-.result-genres {
-  display: none;
-}
-
 /* Outline pills using the shared --color-role-* tokens (matches ProfileScreen). */
-.search-result-card .role-badge {
-  padding: 3px 10px;
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  border-radius: 9999px;
-  margin: 0;
-  line-height: 1.4;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.search-result-card .role-badge.badge-artist {
-  border-color: color-mix(in srgb, var(--color-role-artist) 60%, transparent);
-  color: var(--color-role-artist);
-}
-
-.search-result-card .role-badge.badge-venue {
-  border-color: color-mix(in srgb, var(--color-role-venue) 60%, transparent);
-  color: var(--color-role-venue);
-}
-
-.search-result-card .role-badge.badge-promoter {
-  border-color: color-mix(in srgb, var(--color-role-promoter) 60%, transparent);
-  color: var(--color-role-promoter);
-}
-
-.search-result-card .role-badge.badge-agent {
-  border-color: color-mix(in srgb, var(--color-role-agent) 60%, transparent);
-  color: var(--color-role-agent);
-}
-
-.result-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  width: 100%;
-}
-
-.search-result-card .btn-like {
-  flex: 1;
-  height: 28px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
-.search-result-card .btn-like svg {
-  width: 14px;
-  height: 14px;
-}
-
-.search-result-card .btn-connect {
-  flex: 1;
-  padding: 0 14px;
-  font-size: 10px;
-  height: 28px;
-  white-space: nowrap;
-  border-radius: 20px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
-.search-result-card .btn-message {
-  flex: 1;
-  padding: 0 14px;
-  font-size: 10px;
-  height: 28px;
-  white-space: nowrap;
-  border-radius: 20px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  background: rgba(255, 51, 102, 0.1);
-  border: 1px solid rgba(255, 51, 102, 0.5);
-  color: var(--primary-pink);
-}
 
 /* Messages Screen */
 .messages-screen {
@@ -5446,72 +5276,6 @@
 }
 
 /* Matches Results */
-.matches-count {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  margin-bottom: 14px;
-  text-align: left;
-}
-
-.match-card {
-  background: #0a0a0e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.match-info {
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-dark);
-}
-
-.match-type-badge {
-  background: rgba(255, 51, 102, 0.1);
-  color: var(--primary-pink);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  display: inline-block;
-  margin-bottom: 8px;
-}
-
-.match-dates {
-  color: var(--text-light);
-  font-size: 12px;
-  font-weight: 500;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.02em;
-  margin-bottom: 6px;
-}
-
-.match-reason {
-  color: var(--text-secondary);
-  font-size: 11px;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.02em;
-  margin: 0;
-}
-
-.match-profile-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.match-content {
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
 
 .match-avatar {
   width: 40px;
@@ -5545,44 +5309,8 @@
   object-fit: cover;
 }
 
-.match-info-content {
-  flex: 1;
-}
-
-.match-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.match-header h3 {
-  color: var(--text-white);
-  font-size: 17px;
-  margin: 0;
-  font-weight: 400;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.2;
-}
-
 .premium-indicator {
   font-size: 14px;
-}
-
-.match-location {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 13px;
-  margin: 4px 0 8px 0;
-  line-height: 1.4;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
-.match-genres {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
 }
 
 .genre-tag-small {
@@ -5597,74 +5325,7 @@
   text-transform: uppercase;
 }
 
-.match-actions {
-  margin-left: 16px;
-}
-
-.btn-match {
-  padding: 10px 20px;
-  font-size: 11px;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  min-width: 100px;
-  background: #0a0a0e;
-  color: var(--text-white);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.btn-match:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
 /* Simplified Match Cards */
-.match-card-simple {
-  background: #0a0a0e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: border-color 0.3s;
-}
-
-.match-card-simple:hover {
-  border-color: rgba(255, 51, 102, 0.35);
-}
-
-.match-date-location {
-  display: flex;
-  gap: 14px;
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.4);
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.match-profile-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.match-info {
-  flex: 1;
-}
-
-.match-info.clickable {
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.match-info.clickable:hover {
-  opacity: 0.8;
-}
 
 .match-name-role {
   display: flex;
@@ -5680,23 +5341,6 @@
   font-family: 'Space Grotesk', sans-serif;
   color: var(--text-white);
   line-height: 1.2;
-}
-
-.match-base-location {
-  margin: 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.4;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
-.btn-match-full {
-  width: 100%;
-  padding: 9px;
-  font-size: 10px;
-  margin-top: 4px;
 }
 
 .match-genres-simple {
@@ -7234,27 +6878,6 @@
   margin: 0;
 }
 
-.add-artist-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  color: var(--text-white);
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s;
-  flex-shrink: 0;
-}
-
-.add-artist-btn:hover {
-  background: #ff1744;
-  transform: scale(1.05);
-}
-
 .represented-artists-content {
   padding: 20px;
 }
@@ -7297,15 +6920,6 @@
 }
 
 /* Artist Card Row Layout */
-.artist-card-row {
-  background: #0a0a0e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
 .artist-avatar-small {
   width: 40px;
@@ -7329,63 +6943,6 @@
 }
 
 /* Whole card body is the tap target → artist profile */
-.artist-card-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-}
-.artist-card-main:focus-visible {
-  outline: 2px solid rgba(255, 51, 102, 0.5);
-  outline-offset: 4px;
-  border-radius: 10px;
-}
-
-.artist-card-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.artist-row-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.artist-name-inline {
-  color: var(--text-white);
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artist-location-inline {
-  color: var(--text-secondary);
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artist-row-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.artist-row-actions .btn-sm {
-  padding: 4px 10px;
-  font-size: 11px;
-}
 
 .artist-avatar {
   width: 44px;
@@ -11777,34 +11334,6 @@ textarea.form-textarea:focus {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-.tour-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.tour-artist-info {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  flex: 1;
-}
-
-.tour-artist-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.tour-artist-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .avatar-placeholder {
   width: 100%;
   height: 100%;
@@ -11817,60 +11346,6 @@ textarea.form-textarea:focus {
   font-weight: 600;
 }
 
-.tour-artist-details {
-  flex: 1;
-}
-
-.tour-artist-details h4 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #fff;
-  margin: 0 0 4px 0;
-}
-
-.tour-artist-role {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 6px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.tour-location-info {
-  font-size: 13px;
-  color: var(--primary-pink);
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 0;
-}
-
-.tour-location-info svg {
-  width: 14px;
-  height: 14px;
-  stroke: var(--primary-pink);
-}
-
-.tour-dates-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.tour-dates-section svg {
-  width: 16px;
-  height: 16px;
-  stroke: rgba(255, 255, 255, 0.5);
-  flex-shrink: 0;
-}
-
 .tour-info h4 {
   font-size: 18px;
   font-weight: 600;
@@ -11878,27 +11353,9 @@ textarea.form-textarea:focus {
   margin-bottom: 4px;
 }
 
-.tour-artist-name {
-  font-size: 13px;
-  color: var(--primary-pink);
-  font-weight: 500;
-  margin: 2px 0 4px 0;
-}
-
 .tour-dates {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.6);
-}
-
-.tour-genres {
-  margin-top: 12px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.tour-genres .genres-label {
-  color: rgba(255, 255, 255, 0.5);
-  margin-right: 6px;
 }
 
 .tour-status-badge {
@@ -11914,10 +11371,6 @@ textarea.form-textarea:focus {
   background: rgba(67,233,123,0.2);
   color: #43E97B;
   border: 1px solid rgba(67,233,123,0.3);
-}
-
-.tour-card-body {
-  margin-bottom: 16px;
 }
 
 .tour-stat {
@@ -11957,35 +11410,6 @@ textarea.form-textarea:focus {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
-}
-
-.tour-progress-amount {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 600;
-}
-
-.tour-progress-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.tour-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #FF3366, #FF6B9D);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-  box-shadow: 0 0 8px rgba(255, 51, 102, 0.4);
-}
-
-.tour-progress-percentage {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  text-align: right;
 }
 
 .tour-stats-row {
@@ -12034,18 +11458,6 @@ textarea.form-textarea:focus {
 }
 
 /* Match Date Location Icons */
-.match-date-location span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.match-date-location svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  flex-shrink: 0;
-}
 
 /* No Matches Simple */
 .no-matches-simple {
@@ -13248,8 +12660,6 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .agency-team-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: rgba(255, 255, 255, 0.6); text-align: center; }
 
 /* Free agent plan: dormant roster artists (greyed, still listed for the agent) */
-.artist-card-row.is-dormant .artist-card-main { opacity: 0.45; }
-.artist-dormant-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.6); font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
 
 /* Calendars on Tour → Calendar: the subscribe link card + imported calendars */
 .calendar-link-intro { margin: 0 0 14px; }
@@ -13425,10 +12835,6 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 /* Agency sheet: agents, then each agent's artists. Search card above results. */
 .agency-team-tap { width: 100%; background: none; border-left: 0; border-right: 0; border-top: 0; text-align: left; cursor: pointer; }
 .agency-team-tap:hover { background: rgba(255, 255, 255, 0.03); }
-.agency-team-artists { list-style: none; margin: 2px 0 6px; padding: 0 0 0 22px; display: flex; flex-direction: column; }
-.agency-team-artist { display: flex; align-items: center; gap: 10px; padding: 6px 4px; }
-.agency-team-artist.agency-team-tap { border: 0; }
-.agency-team-artist .agency-team-name { font-size: 13px; font-weight: 500; }
 .agency-search-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 10px; width: 100%; margin: 0 0 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(0, 200, 117, 0.35); background: rgba(0, 200, 117, 0.07); color: #fff; text-align: left; cursor: pointer; }
 .agency-search-card:hover { background: rgba(0, 200, 117, 0.13); }
 .agency-search-card:focus-visible { outline: 2px solid rgba(0, 200, 117, 0.7); outline-offset: 2px; }
@@ -13621,8 +13027,7 @@ div.poster-stat { cursor: default; }
 .photo-card-foot { position: absolute; left: 12px; right: 12px; top: 0; bottom: 12px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; pointer-events: none; }
 .photo-card--tile .photo-card-foot { left: 10px; right: 10px; bottom: 10px; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 7px; }
 .photo-card-id { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.photo-card-name { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
-.photo-card--row .photo-card-name, .photo-card--match .photo-card-name { font-size: 24px; }
+.photo-card-name { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 24px; line-height: 1; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
 .photo-card--tile .photo-card-name { font-size: 20px; line-height: 1.02; }
 .photo-card-meta { margin: 0; font-size: 12px; color: rgba(255,255,255,0.82); }
 .photo-card-meta .poster-role { font-weight: 600; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -13631,10 +13036,9 @@ div.poster-stat { cursor: default; }
 .photo-card-actions { flex: none; pointer-events: auto; }
 .photo-card-actions .btn { min-height: 44px; height: 44px; padding: 0 14px; border-radius: 8px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .photo-card-actions .btn-outline { background: rgba(4,4,7,0.5); border-color: rgba(255,255,255,0.34); color: #fff; font-weight: 600; letter-spacing: 0; }
-.photo-card--tile .photo-card-actions { display: block; }
 .photo-card--tile .photo-card-actions .btn { width: 100%; }
 .photo-card--row .photo-card-actions { display: flex; gap: 6px; }
-.photo-card-like { position: absolute; right: -2px; top: 10px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.22); background: rgba(4,4,7,0.55); color: #fff; cursor: pointer; pointer-events: auto; }
+.photo-card-like { position: absolute; right: -2px; top: 10px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.22); background: rgba(4,4,7,0.55); color: #fff; cursor: pointer; }
 .photo-card-like svg { width: 18px; height: 18px; }
 .photo-card-like span { display: none; }
 .photo-card-like.is-on { color: #FF3366; }
@@ -13643,14 +13047,8 @@ div.poster-stat { cursor: default; }
 .tour-page-title { margin: 0 0 6px; text-align: left; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 28px; line-height: 1.05; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
 .travel-feed-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; text-align: left; }
 
-/* Sub-tabs: words, white when on, a crimson line under them */
-.tour-tab svg { display: none; }
-.tour-tab { color: rgba(255,255,255,0.65); }
-.tour-tab.active { color: #fff; border-bottom-color: #FF3366; }
-
 /* Tour cards */
 .tour-card--poster { padding: 0; overflow: hidden; border-radius: 10px; background: #101015; border: 1px solid rgba(255,255,255,0.1); text-align: left; }
-.tour-card--poster:hover { transform: none; }
 .tour-poster { position: relative; height: 300px; overflow: hidden; background: #101015; }
 .tour-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
 .tour-poster::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 64%; background: linear-gradient(to bottom, rgba(16,16,21,0), #101015); pointer-events: none; }
@@ -13700,13 +13098,12 @@ div.poster-stat { cursor: default; }
 .d3-mat-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
 .d3-mat-hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 72%; background: linear-gradient(to bottom, rgba(16,16,21,0), #101015); pointer-events: none; }
 .d3-mat-hero-text { position: absolute; left: 20px; right: 20px; bottom: 10px; z-index: 1; pointer-events: none; }
-.d3-mat-hero .d3-mat-hero-name { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 50px; line-height: 1; letter-spacing: -0.025em; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+.d3-mat-hero-name { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 50px; line-height: 1; letter-spacing: -0.025em; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
 .d3-mat-hero-meta { margin: 5px 0 0; font-size: 14px; color: rgba(255,255,255,0.84); }
 .d3-mat-hero-meta .poster-role { font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
 
 /* Upgrade gate on Matches and Tour Kickstart */
 .tour-gate { max-width: 560px; padding: 24px 16px; text-align: left; }
-.tour-gate .coming-soon-icon { display: none; }
 .tour-gate h2 { margin: 0 0 8px; text-align: left; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 34px; line-height: 1.02; letter-spacing: -0.02em; text-transform: uppercase; color: #fff; }
 .tour-gate > p { margin: 0 0 20px; max-width: none; text-align: left; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.78); }
 .tour-gate .feature-preview { margin: 0 0 20px; max-width: none; padding: 0; border: 0; background: none; text-align: left; }
@@ -13737,9 +13134,8 @@ div.poster-stat { cursor: default; }
 .agency-team-artist-name { font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
 
 /* One tab style: words, white when on, a crimson line under them */
-.bookings-tab svg, .tab-button svg { display: none; }
-.bookings-tab, .tab-button { color: rgba(255,255,255,0.65); }
-.bookings-tab.active, .tab-button.active { color: #fff; border-bottom-color: #FF3366; }
+.tour-tab, .bookings-tab, .tab-button { color: rgba(255,255,255,0.65); }
+.tour-tab.active, .bookings-tab.active, .tab-button.active { color: #fff; border-bottom-color: #FF3366; }
 
 /* Bookings: the month is a title */
 .cluster-header h2 { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 22px; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
@@ -13747,7 +13143,7 @@ div.poster-stat { cursor: default; }
 /* Manage: big left title, flat action rows */
 .manage-artist-header h1 { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 24px; letter-spacing: -0.01em; text-transform: uppercase; text-align: left; color: #fff; }
 .actions-required-section .action-items { gap: 0; }
-.actions-required-section .action-item { min-height: 68px; padding: 10px 0; border: 0; border-bottom: 1px solid rgba(255,255,255,0.1); border-radius: 0; background: none; box-shadow: none; }
+.actions-required-section .action-item { min-height: 68px; padding: 10px 0; border: 0; border-bottom: 1px solid rgba(255,255,255,0.1); border-radius: 0; background: none; }
 .actions-required-section .action-item:hover { background: none; }
 .actions-required-section .action-item.urgent { padding-left: 10px; border-color: rgba(255,255,255,0.1); box-shadow: inset 2px 0 0 #FF3366; }
 .actions-required-section .action-item .btn { min-height: 44px; min-width: 76px; padding: 0 12px; border: 1px solid rgba(255,255,255,0.28); background: transparent; color: #fff; font-family: inherit; font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none; }

@@ -7,3 +7,11 @@
 export function isVerificationGate(error) {
   return error?.response?.data?.code === 'VERIFICATION_REQUIRED';
 }
+
+// A free member out of monthly connections: the details LimitReachedModal shows, else null.
+export function connectionLimitOf(error) {
+  const data = error?.response?.data;
+  return error?.response?.status === 403 && data?.error === 'CONNECTION_LIMIT_EXCEEDED'
+    ? { limit: data.limit, tier: data.tier }
+    : null;
+}

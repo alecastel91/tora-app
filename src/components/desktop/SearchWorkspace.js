@@ -7,10 +7,10 @@ import { isPremiumViewer } from '../../utils/subscription';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { ROLES, roleLabel } from '../../utils/roles';
 import { appAlert } from '../../utils/dialogs';
-import { HeartIcon, SearchIcon } from '../../utils/icons';
+import { SearchIcon } from '../../utils/icons';
 import LoadingGlobe from '../common/LoadingGlobe';
 import ConnectAction from '../common/ConnectAction';
-import PhotoCard from '../common/PhotoCard';
+import PhotoCard, { PhotoCardLike } from '../common/PhotoCard';
 import OverlayPortal from '../common/OverlayPortal';
 import FilterSheet, { FilterButton } from '../common/FilterSheet';
 
@@ -191,15 +191,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
                   onOpen={() => onOpenProfile(profile)}
                   actions={(
                     <>
-                      <button
-                        type="button"
-                        className={`photo-card-like${liked ? ' is-on' : ''}`}
-                        aria-label={liked ? t('search.liked') : t('search.like')}
-                        aria-pressed={liked}
-                        onClick={() => like(profile)}
-                      >
-                        <HeartIcon filled={liked} /><span>{liked ? t('search.liked') : t('search.like')}</span>
-                      </button>
+                      <PhotoCardLike liked={liked} onClick={() => like(profile)} />
                       <ConnectAction profile={profile} onMessage={onOpenChat} onOpenPremium={onOpenPremium} />
                     </>
                   )}

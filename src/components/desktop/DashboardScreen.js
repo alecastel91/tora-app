@@ -11,7 +11,6 @@ import { Avatar } from './primitives';
 import InviteFriendsSection from '../common/InviteFriendsSection';
 import { useExternalEventsRange } from '../../hooks/useExternalEvents';
 import { BOOKING_ACTIONS, localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
-import { HandshakeIcon, MessageIcon, CalendarCheckIcon, BookingsIcon } from '../../utils/icons';
 import {
   statusLabel, statusChipClass, counterpartFor, isConsentOnlyFor, bookedArtistName,
   feeText, startOfToday, dayKey, dealDayKey,

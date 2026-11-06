@@ -295,6 +295,23 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     }
   };
 
+  // A booking the artist runs themselves can go to one of their agents.
+  const canHandOver = (deal) => currentUser?.role === 'ARTIST' && deal.artistId === currentUser.id
+    && !deal.bookedArtistId && !deal.agentId && ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status);
+  // Only the owner's own profile says which agent links are dormant.
+  const [dormantAgentIds, setDormantAgentIds] = useState(() => new Set());
+  const checkDormant = toRepEntries(currentUser?.representedBy).length > 0 && deals.some(canHandOver);
+  useEffect(() => {
+    if (!checkDormant) return undefined;
+    let cancelled = false;
+    apiService.getProfile(currentUser.id)
+      .then((full) => {
+        if (!cancelled) setDormantAgentIds(new Set((full?.representedByProfiles || []).filter((a) => a.dormant).map((a) => a.id)));
+      })
+      .catch(() => { /* the server still refuses a dormant agent */ });
+    return () => { cancelled = true; };
+  }, [currentUser?.id, checkDormant]);
+
   const handleHandToAgent = async (deal, agent) => {
     if (actionBusy) return;
     const name = repEntryName(agent);
@@ -305,7 +322,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       await fetchDeals();
       reloadProfileData();
     } catch (err) {
-      appAlert(t(err.code === 'OWN_OFFER_PENDING' ? 'bookings.handOwnOffer' : 'bookings.handFailed'));
+      const refusal = { OWN_OFFER_PENDING: 'bookings.handOwnOffer', CONTRACT_IN_PROGRESS: 'bookings.handContractOpen', NOT_ACTIVE_AGENT: 'bookings.handAgentUnavailable', AGENT_UNAVAILABLE: 'bookings.handAgentUnavailable', ALREADY_AGENT_LED: 'bookings.handAlreadyLed' }[err.code];
+      appAlert(t(refusal || 'bookings.handFailed', { name }));
+      if (refusal) fetchDeals();
     } finally {
       setActionBusy(false);
     }
@@ -779,10 +798,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         !deal.bookedArtistId
       );
     const hideWorkflow = delegateToAgent || agentReadOnly;
-    // A booking the artist runs themselves can go to one of their agents.
-    const handOverAgents = currentUser.role === 'ARTIST' && deal.artistId === currentUser.id
-      && !deal.bookedArtistId && !deal.agentId && ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status)
-      ? toRepEntries(currentUser.representedBy).filter((a) => !a.dormant && repEntryId(a))
+    const handOverAgents = canHandOver(deal)
+      ? toRepEntries(currentUser.representedBy).filter((a) => repEntryId(a) && !dormantAgentIds.has(repEntryId(a)))
       : [];
     // An artist can have several — often regional — agents, but exactly one
     // runs this deal (`deal.agentId`). Name that one; only fall back to
@@ -1851,7 +1868,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           className={`bookings-tab ${activeTab === 'upcoming' ? 'active' : ''}`}
           onClick={() => selectTab('upcoming')}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           {t('bookings.tabUpcoming')}
           {actionCounts.upcoming > 0 && (
             <span className="tab-badge">{actionCounts.upcoming}</span>
@@ -1861,7 +1877,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           className={`bookings-tab ${activeTab === 'past' ? 'active' : ''}`}
           onClick={() => selectTab('past')}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           {t('bookings.tabPast')}
           {actionCounts.past > 0 && (
             <span className="tab-badge">{actionCounts.past}</span>
@@ -1871,7 +1886,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           className={`bookings-tab ${activeTab === 'declined' ? 'active' : ''}`}
           onClick={() => selectTab('declined')}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
           {t('bookings.tabDeclined')}
           {actionCounts.declined > 0 && (
             <span className="tab-badge">{actionCounts.declined}</span>

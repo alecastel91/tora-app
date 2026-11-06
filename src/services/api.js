@@ -1443,13 +1443,7 @@ class ApiService {
       headers: this.getHeaders(),
       body: JSON.stringify({ profileId, agentId })
     });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const error = new Error(data.error || 'Failed to hand over booking');
-      error.code = data.code;
-      throw error;
-    }
-    return data;
+    return this.handleResponse(response);
   }
 
   // The gig happened. Artist side only, and only once the date has passed.

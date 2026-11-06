@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel } from '../../utils/roles';
 import VerifiedBadge from './VerifiedBadge';
+import { HeartIcon } from '../../utils/icons';
 
 /* A person as a photo: Search results, Matches and the roster all draw this.
    The whole card opens the profile; `actions` and `topRight` stay their own
@@ -36,6 +37,16 @@ const PhotoCard = ({ profile, variant = 'row', place, chip = null, note = null, 
         {actions && <div className="photo-card-actions">{actions}</div>}
       </div>
     </article>
+  );
+};
+
+export const PhotoCardLike = ({ liked, onClick }) => {
+  const { t } = useLanguage();
+  const label = liked ? t('search.liked') : t('search.like');
+  return (
+    <button type="button" className={`photo-card-like${liked ? ' is-on' : ''}`} aria-label={label} aria-pressed={liked} onClick={onClick}>
+      <HeartIcon filled={liked} /><span>{label}</span>
+    </button>
   );
 };
 

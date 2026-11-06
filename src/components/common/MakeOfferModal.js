@@ -413,7 +413,9 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
       const code = err.response?.data?.code;
       // OFFER_LIMIT / VERIFICATION_REQUIRED are handled by the global
       // dialogs (api.js events) — no second error inside the modal.
-      if (code !== 'OFFER_LIMIT' && !isVerificationGate(err)) {
+      if (code === 'NOT_CONNECTED') {
+        setError(t('offer.notConnected'));
+      } else if (code !== 'OFFER_LIMIT' && !isVerificationGate(err)) {
         setError(err.message || t('offer.createFailed'));
       }
       setLoading(false);

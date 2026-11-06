@@ -11,12 +11,12 @@ const SILENT_BLOCKERS = new Set(['ORG_AGENT_PROFILE_REQUIRED']);
 
 const place = (p) => [p.city, p.country].filter(Boolean).join(', ');
 
-const Person = ({ person, role, onOpen }) => {
+const Person = ({ person, onOpen }) => {
   const { t } = useLanguage();
   const where = place(person);
   return (
-    <button type="button" className={`${role === 'AGENT' ? 'agency-team-row' : 'agency-team-artist'} agency-team-tap`} onClick={() => onOpen(person, role)}>
-      <Avatar profile={{ name: person.name, avatar: person.avatar, role }} alt={person.name} className={role === 'AGENT' ? 'h-9 w-9 text-sm' : 'h-7 w-7 text-[11px]'} />
+    <button type="button" className="agency-team-row agency-team-tap" onClick={() => onOpen(person, 'AGENT')}>
+      <Avatar profile={{ name: person.name, avatar: person.avatar, role: 'AGENT' }} alt={person.name} className="h-9 w-9 text-sm" />
       <div className="min-w-0 flex-1">
         <p className="agency-team-name">
           {person.name}
@@ -51,8 +51,7 @@ const TeamFooter = ({ org, viewer, busy, onRequest }) => {
 };
 
 /**
- * The whole agency: its agents, and under each one the artists they publicly
- * represent. Opened from a profile's agency badge or a search card. Never
+ * The whole agency: its agents, then the artists they publicly represent. Opened from a profile's agency badge or a search card. Never
  * prices. Tapping a name opens that profile. A colleague at the agency's
  * verified email domain can ask to join from here; anyone else is told why not.
  */
@@ -103,7 +102,7 @@ const AgencyTeamSheet = ({ organisationId, onClose, onOpenProfile }) => {
               <h3 className="agency-team-heading">{t('agency.agentsHeading')}</h3>
               <ul className="agency-team-list">
                 {org.members.map((m) => (
-                  <li key={m.profileId}><Person person={m} role="AGENT" onOpen={open} /></li>
+                  <li key={m.profileId}><Person person={m} onOpen={open} /></li>
                 ))}
               </ul>
               {artists.length > 0 && (

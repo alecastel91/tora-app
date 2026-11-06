@@ -274,7 +274,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                 )}
                 actions={dormant ? (
                   <button
-                    className="btn btn-outline photo-card-cta"
+                    className="btn btn-outline"
                     disabled={!!switchingId}
                     title={t('agentPlan.dormantHint')}
                     onClick={() => makeActive(artist)}
@@ -283,7 +283,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
                   </button>
                 ) : (
                   <button
-                    className="btn btn-outline photo-card-cta"
+                    className="btn btn-outline"
                     onClick={() => handleManageArtist(artist)}
                     style={{ position: 'relative' }}
                   >

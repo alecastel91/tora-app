@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
-import { isVerificationGate } from '../../utils/errors';
+import { isVerificationGate, connectionLimitOf } from '../../utils/errors';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 import OverlayPortal from './OverlayPortal';
 import ConnectionChoiceModal from './ConnectionChoiceModal';
@@ -30,12 +30,9 @@ const ConnectAction = ({ profile, onMessage, onOpenPremium }) => {
   // A 403 limit answer is the one error worth its own modal; the verification
   // gate is handled globally by api.js.
   const report = (error, fallbackKey) => {
-    const data = error.response?.data;
-    if (error.response?.status === 403 && data?.error === 'CONNECTION_LIMIT_EXCEEDED') {
-      setLimit({ limit: data.limit, tier: data.tier });
-      return;
-    }
-    if (!isVerificationGate(error)) appAlert(t(fallbackKey));
+    const reached = connectionLimitOf(error);
+    if (reached) setLimit(reached);
+    else if (!isVerificationGate(error)) appAlert(t(fallbackKey));
   };
 
   const start = () => {

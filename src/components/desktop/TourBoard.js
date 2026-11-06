@@ -11,13 +11,13 @@ import LoadingGlobe from '../common/LoadingGlobe';
    shipped code. Owners (artists, agents) see their tours; bookers (venues,
    promoters) see the tours open to them. */
 
-const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, toolbar, detail }) => {
+const TourBoard = ({ tours, loading, owner, selectedId, onSelect, onPick, statusLabel, toolbar, detail }) => {
   const { t } = useLanguage();
   const locale = t('dateFormat.locale');
   const range = (tour) => `${formatEventDate(tour.startDate, locale, { month: 'short', day: 'numeric', year: undefined })} – ${formatEventDate(tour.endDate, locale, { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   useEffect(() => {
-    if (!loading && tours.length > 0 && !tours.some((tour) => tour.id === selectedId)) onSelect(tours[0].id);
+    if (!loading && !tours.some((tour) => tour.id === selectedId)) onSelect(tours[0]?.id ?? null);
   }, [loading, tours, selectedId, onSelect]);
 
   return (
@@ -32,7 +32,7 @@ const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, t
             return (
               <button
                 key={tour.id}
-                onClick={() => onSelect(tour.id)}
+                onClick={() => onPick(tour.id)}
                 className={`d3-tour-pick${tour.id === selectedId ? ' is-on' : ''}`}
               >
                 {!owner && <Avatar profile={{ ...tour.artist, role: 'ARTIST' }} className="h-10 w-10 shrink-0 text-[13px]" />}
@@ -42,9 +42,7 @@ const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, t
                     <span className={`tour-status tour-status--${String(tour.status).toLowerCase()}`}>{statusLabel(tour.status)}</span>
                   </span>
                   <span className="d3-tour-pick-sub">
-                    {[!owner && title, range(tour), (tour.confirmedGigs === 1 ? t('tour.gigConfirmedCountOne') : t('tour.gigsConfirmedCount', { n: tour.confirmedGigs || 0 })), t('tour.interestedCountPublic', { n: tour.interestsCount || 0 })].filter(Boolean).join(' · ')}
-                    {tour.closedToOffers && tour.status === 'ACTIVE' ? ` · ${t('tour.fullyBooked')}` : ''}
-                    {!owner && tour.myProposal ? ` · ${t('tour.viewSentProposal')}` : ''}
+                    {[!owner && title, range(tour), (tour.confirmedGigs === 1 ? t('tour.gigConfirmedCountOne') : t('tour.gigsConfirmedCount', { n: tour.confirmedGigs || 0 })), t('tour.interestedCountPublic', { n: tour.interestsCount || 0 }), tour.closedToOffers && tour.status === 'ACTIVE' && t('tour.fullyBooked'), !owner && tour.myProposal && t('tour.viewSentProposal')].filter(Boolean).join(' · ')}
                   </span>
                 </span>
               </button>
@@ -53,7 +51,6 @@ const TourBoard = ({ tours, loading, owner, selectedId, onSelect, statusLabel, t
         </div>
       </div>
       <div className="d3-panel relative overflow-y-auto p-3">
-        {!selectedId && !loading && tours.length > 0 && <p className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-8 text-center text-[13px] text-white/35">{t('desktop.selectTour')}</p>}
         {selectedId && detail}
       </div>
     </div>

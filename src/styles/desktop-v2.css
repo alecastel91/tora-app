@@ -20,7 +20,7 @@
    `!important` is used in exactly two places, matching the two in
    responsive.css (.chat-screen left, .md-drawer .modal-body max-height).
 
-   Dev note: Vite HMR can re-inject a mutated <style> out of cascade order. If
+   Dev note: Vite HMR can re-inject a mutated \3c style> out of cascade order. If
    a rule here suddenly "stops winning" mid-session, hard-reload first.
    ========================================================================= */
 
@@ -474,14 +474,15 @@
     border-radius: var(--d2-r-ctl);
   }
 
-  html.desktop-v2 .app-content h1,
+  /* Poster titles set their own size. */
+  html.desktop-v2 .app-content h1:not(:where(.d3-dash-name)),
   html.desktop-v2 .settings-screen h1,
   html.desktop-v2 .premium-screen h1 {
     font-size: 28px;
     letter-spacing: -0.02em;
   }
 
-  html.desktop-v2 .app-content h2 {
+  html.desktop-v2 .app-content h2:not(:where(.d3-mat-hero-name)) {
     font-size: 22px;
     letter-spacing: -0.015em;
   }
@@ -490,7 +491,6 @@
     font-size: 17px;
   }
 
-  html.desktop-v2 .search-result-card,
   html.desktop-v2 .artist-item,
   html.desktop-v2 .booking-card {
     border-radius: var(--d2-r-card);
@@ -498,12 +498,10 @@
     transition: background 0.15s, border-color 0.15s;
   }
 
-  html.desktop-v2 .search-result-card,
   html.desktop-v2 .booking-card {
     padding: 14px 16px;
   }
 
-  html.desktop-v2 .search-result-card:hover,
   html.desktop-v2 .artist-item:hover,
   html.desktop-v2 .booking-card:hover {
     background: var(--d2-surface-2);

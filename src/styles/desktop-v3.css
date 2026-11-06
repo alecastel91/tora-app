@@ -115,7 +115,7 @@
   /* ---- Search workspace: list left, map right ---- */
   html.desktop-v3 .d3-ws {
     display: grid;
-    grid-template-columns: 440px minmax(0, 1fr);
+    grid-template-columns: 470px minmax(0, 1fr);
     gap: var(--d2-gap);
   }
 
@@ -391,12 +391,6 @@
   html.desktop-v3 .d3-tour-modes button.is-on { background: rgba(255, 255, 255, 0.08); color: #fff; }
 
   /* tours pipeline rows: tour · dates · gigs · interest · revenue/fee · status */
-  html.desktop-v3 .d3-tour-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) 92px 100px minmax(0, 1.2fr) minmax(0, 0.9fr);
-    gap: 12px;
-    align-items: center;
-  }
 
   html.desktop-v3 .d3-tours { height: calc(100dvh - var(--d2-top) - var(--d2-gutter) * 2 - 62px); }
 
@@ -416,7 +410,7 @@
        is 40% of (viewport - sidebar - both gutters), floored at 400px, and its
        right edge is one gutter in from the viewport. */
     right: var(--d2-gutter);
-    width: calc(100vw - var(--d2-sidebar) - var(--d2-gutter) * 2 - var(--d2-gap) - 460px);
+    width: max(400px, calc((100vw - var(--d2-sidebar) - var(--d2-gutter) * 2) * 0.4));
     padding: 0;
     background: var(--d2-surface);
     justify-content: stretch;
@@ -988,9 +982,6 @@
 }
 
 @media (min-width: 1600px) {
-  html.desktop-v3 .d3-ws {
-    grid-template-columns: 480px minmax(0, 1fr);
-  }
 
   html.desktop-v3 .d3-board {
     grid-template-columns: minmax(0, 1fr) minmax(440px, 38%);
@@ -1182,8 +1173,6 @@
   html.desktop-v3 .d3-agents .results-header, html.desktop-v3 .d3-agents .info-banner { margin-left: 0; margin-right: 0; }
 
   /* Roster: one thin row per artist — avatar · name · city · manage · remove */
-  html.desktop-v3 .represented-artists-header .add-artist-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; }
-  html.desktop-v3 .represented-artists-header .add-artist-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
   html.desktop-v3 .represented-artists-screen > .rounded-2xl { margin: 0 0 14px; padding: 10px 14px; border-radius: var(--d2-r-card); }
   html.desktop-v3 .represented-artists-content { padding: 0; }
 
@@ -1614,22 +1603,18 @@
   html.desktop-v3 .d3-mat-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
   html.desktop-v3 .d3-mat-tags .d3-mat-count { margin-top: 0; }
   html.desktop-v3 .d3-mat-row > .d3-mat-rel { margin-top: 5px; }
-  html.desktop-v3 .d3-mat-loc .d3-mat-rel { margin-right: 8px; vertical-align: 1px; }
 
 }
 
 /* ===== Poster: Search, Matches, Tour, Roster ===== */
 @media (min-width: 1024px) {
-  html.desktop-v3 .d3-ws { grid-template-columns: 470px minmax(0, 1fr); }
   html.desktop-v3 .d3-ws > .d3-panel:first-child { border: 0; background: none; }
   html.desktop-v3 .d3-ws > .d3-panel:first-child > :first-child { padding: 0 0 8px; border: 0; }
   html.desktop-v3 .d3-ws > .d3-panel:first-child > .text-white\/45 { padding: 0 0 8px; }
   html.desktop-v3 .d3-ws-list { display: flex; flex-direction: column; gap: 10px; }
   html.desktop-v3 .photo-card--row { height: 158px; }
   html.desktop-v3 .photo-card .photo-card-name { font-size: 26px; line-height: 1; font-weight: 700; letter-spacing: -0.01em; }
-  html.desktop-v3 .d3-mat-hero .d3-mat-hero-name { font-size: 50px; line-height: 1; font-weight: 700; letter-spacing: -0.025em; margin: 0; }
   html.desktop-v3 .photo-card--row .photo-card-fade { top: 0; height: auto; background: linear-gradient(to right, rgba(4,4,7,0.92) 35%, rgba(4,4,7,0.2)); }
-  html.desktop-v3 .photo-card--row .photo-card-actions { display: flex; }
   html.desktop-v3 .photo-card-like { position: static; width: auto; height: 40px; padding: 0 12px; border-radius: 8px; border-color: rgba(255,255,255,0.32); background: rgba(4,4,7,0.45); font-size: 12px; font-weight: 600; }
   html.desktop-v3 .photo-card-like svg { display: none; }
   html.desktop-v3 .photo-card-like span { display: inline; }
@@ -1656,12 +1641,19 @@
   html.desktop-v3 .d3-mat-actions { flex-direction: column; gap: 8px; margin-top: 4px; }
   html.desktop-v3 .d3-mat-actions .btn { flex: none; width: 100%; min-height: 48px; }
 
-  html.desktop-v3 .d3-tours { grid-template-columns: 460px minmax(0, 1fr); }
+  /* The list narrows on small windows; the Tour screen stops at 1360px and centres.
+     A drawer on Tour covers exactly the detail column beside the list. */
+  html.desktop-v3 { --d3-tour-list: clamp(300px, 32vw, 460px); --d3-tour-canvas: min(1360px, calc(100vw - var(--d2-sidebar) - var(--d2-gutter) * 2)); }
+  html.desktop-v3 .d3-tours { grid-template-columns: var(--d3-tour-list) minmax(0, 1fr); }
+  html.desktop-v3 body:has(.tab-tour .d3-tours) .md-drawer {
+    right: calc((100vw - var(--d2-sidebar) - var(--d3-tour-canvas)) / 2);
+    width: calc(var(--d3-tour-canvas) - var(--d3-tour-list) - var(--d2-gap));
+  }
   html.desktop-v3 .d3-tours > .d3-panel { border: 0; background: none; padding: 0; }
   html.desktop-v3 .d3-tours > .d3-panel:first-child > :first-child { padding: 0 0 12px; border: 0; }
   html.desktop-v3 .d3-tours > .d3-panel:first-child > .overflow-y-auto { padding: 0; display: flex; flex-direction: column; gap: 8px; }
   html.desktop-v3 .d3-tours .tour-poster { height: 400px; }
-  html.desktop-v3 .d3-tours .tour-poster-title { font-size: 56px; letter-spacing: -0.025em; }
+  html.desktop-v3 .d3-tours .tour-poster-title { font-size: clamp(32px, 3.9vw, 56px); letter-spacing: -0.025em; overflow-wrap: anywhere; }
   html.desktop-v3 .d3-tours .tour-poster-text { left: 20px; right: 20px; bottom: 12px; }
   html.desktop-v3 .d3-tours .tour-poster-sub { font-size: 15px; }
   html.desktop-v3 .d3-tours .tour-body { padding: 16px 20px 20px; gap: 16px; }

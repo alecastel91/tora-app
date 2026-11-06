@@ -841,6 +841,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     if (!pickedMatch) return <p className="d3-mat-blank">{t('desktop.matPick')}</p>;
 
     const prof = pickedMatch.kind === 'match' ? pickedMatch.match.profile : pickedMatch.group.profile;
+    const heroPhoto = prof.avatarLarge || prof.avatar;
     const isRequested = sentRequests.has(prof.id);
     const isConnected = connectedUsers.has(prof.id);
     const marks = dayMarks(pickedMatch);
@@ -856,9 +857,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
     return (
       <>
-        <div className={`d3-mat-hero poster-role-${String(prof.role || 'artist').toLowerCase()}${prof.avatarLarge || prof.avatar ? '' : ' poster-empty'}`}>
-          {(prof.avatarLarge || prof.avatar)
-            ? <img src={prof.avatarLarge || prof.avatar} alt="" aria-hidden />
+        <div className={`d3-mat-hero poster-role-${String(prof.role || 'artist').toLowerCase()}${heroPhoto ? '' : ' poster-empty'}`}>
+          {heroPhoto
+            ? <img src={heroPhoto} alt="" aria-hidden />
             : <span aria-hidden className="photo-card-initial">{(prof.name || '?').charAt(0).toUpperCase()}</span>}
           <button type="button" className="photo-card-open" aria-label={prof.name} onClick={() => handleProfileClick(prof.id)} />
           <div className="d3-mat-hero-text">
@@ -954,9 +955,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       return (
         <div className="tour-kickstart-content">
           <div className="coming-soon-placeholder tour-gate">
-            <div className="coming-soon-icon">
-              <StarIcon />
-            </div>
             <h2>{t('tour.unlockCalendarMatching')}</h2>
             <p>{t('tour.unlockCalendarMatchingDesc')}</p>
             <div className="feature-preview">
@@ -1061,14 +1059,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       onOpen={() => handleProfileClick(profileId)}
                       actions={isConnected ? (
                         <button
-                          className="btn btn-outline photo-card-cta"
+                          className="btn btn-outline"
                           onClick={() => handleMessage(match.profile, t('tour.matchDraft', { name: match.profile.name, dates: match.dates }))}
                         >
                           {t('search.message')}
                         </button>
                       ) : (
                         <button
-                          className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'} photo-card-cta`}
+                          className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
                           onClick={() => handleConnect(match.profile)}
                           disabled={isRequested}
                         >
@@ -1929,9 +1927,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       return (
         <div className="tour-kickstart-content">
           <div className="coming-soon-placeholder tour-gate">
-            <div className="coming-soon-icon">
-              <StarIcon />
-            </div>
             <h2>{t('tour.unlockTourKickstart')}</h2>
             <p>{t('tour.unlockTourKickstartDesc')}</p>
             <div className="feature-preview">
@@ -2178,7 +2173,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                             'btn-primary'
                           }`}
                           onClick={() => handleViewMyProposal(tour)}
-                          style={{ flex: 1 }}
                         >
                           {tour.myProposal.status === 'ACCEPTED' ? `✓ ${t('tour.proposalAccepted')}` :
                            tour.myProposal.status === 'DECLINED' ? t('tour.proposalDeclined') :
@@ -2188,14 +2182,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         // Full: the artist side stopped taking offers. The tour
                         // stays listed and interest stays open, so a promoter
                         // can still put their hand up for the next run.
-                        <button className="btn btn-secondary btn-small" style={{ flex: 1 }} disabled>
+                        <button className="btn btn-secondary btn-small" disabled>
                           {t('tour.fullyBooked')}
                         </button>
                       ) : (
                         // No proposal sent yet
                         <button
                           className="btn btn-primary btn-small"
-                          style={{ flex: 1 }}
                           onClick={() => handleMakeOffer(tour)}
                         >
                           {t('tour.makeAnOffer')}
@@ -2204,7 +2197,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       {/* Lightweight appetite signal — free, precedes an offer */}
                       <button
                         className={`btn btn-small ${tour.myInterest ? 'btn-liked' : 'btn-outline'}`}
-                        style={{ flex: 1 }}
                         onClick={() => handleToggleInterest(tour)}
                       >
                         <HeartIcon filled={!!tour.myInterest} />{' '}
@@ -2295,13 +2287,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         const modeTabs = (
           <div className="d3-tour-modes">
             <button type="button" className={d3Mode === 'calendar' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('calendar'); }}>
-              <CalendarIcon /><span>{t('profile.calendar')}</span>
+              <span>{t('profile.calendar')}</span>
             </button>
             <button type="button" className={d3Mode === 'matches' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('matches'); }}>
-              <TargetIcon /><span>{t('tour.calendarMatches')}</span>
+              <span>{t('tour.calendarMatches')}</span>
             </button>
             <button type="button" className={d3Mode === 'tours' ? 'is-on' : ''} onClick={() => { closeTourPanes(); setD3Mode('tours'); }}>
-              <PlaneIcon /><span>{t('tour.tourKickstart')}</span>
+              <span>{t('tour.tourKickstart')}</span>
             </button>
           </div>
         );
@@ -2322,6 +2314,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                 owner={owner}
                 selectedId={d3TourId}
                 onSelect={setD3TourId}
+                onPick={(id) => { closeTourPanes(); setD3TourId(id); }}
                 statusLabel={tourStatusLabel}
                 toolbar={(
                   <>
@@ -2358,21 +2351,18 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           className={`tour-tab ${activeTab === 'calendar' ? 'active' : ''}`}
           onClick={() => { closeTourPanes(); setActiveTab('calendar'); }}
         >
-          <CalendarIcon />
           <span>{t('tour.myDates')}</span>
         </button>
         <button
           className={`tour-tab ${activeTab === 'matches' ? 'active' : ''}`}
           onClick={() => { closeTourPanes(); setActiveTab('matches'); }}
         >
-          <TargetIcon />
           <span>{t('tour.calendarMatches')}</span>
         </button>
         <button
           className={`tour-tab ${activeTab === 'kickstart' ? 'active' : ''}`}
           onClick={() => { closeTourPanes(); setActiveTab('kickstart'); }}
         >
-          <PlaneIcon />
           <span>{t('tour.tourKickstart')}</span>
         </button>
       </div>
@@ -2434,6 +2424,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
       {/* Make Offer Modal (for tours) */}
       <OfferFlow
+        onOpenPremium={onOpenPremium}
         isOpen={showMakeOfferModal}
         dockAsDrawer
         onClose={() => {

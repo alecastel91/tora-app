@@ -8,7 +8,7 @@ import OverlayPortal from '../common/OverlayPortal';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
 import { useAppContext } from '../../contexts/AppContext';
-import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon, HandshakeIcon } from '../../utils/icons';
+import { BookingsIcon, GlobeIcon, LinkIcon, HeartIcon } from '../../utils/icons';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import LimitReachedModal from '../common/LimitReachedModal';
 import apiService from '../../services/api';
@@ -1062,6 +1062,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
       {/* Message Modal */}
         <OfferFlow
+        onOpenPremium={onOpenPremium}
         isOpen={showTourOffer}
         onClose={() => setShowTourOffer(false)}
         recipientProfile={profile}

@@ -2,19 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Modal from './Modal';
 import MakeOfferModal from './MakeOfferModal';
+import LimitReachedModal from './LimitReachedModal';
 import { HandshakeIcon, InfoIcon, UserIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAppContext } from '../../contexts/AppContext';
 import { appAlert } from '../../utils/dialogs';
-import { isVerificationGate } from '../../utils/errors';
+import { isVerificationGate, connectionLimitOf } from '../../utils/errors';
 import { toRepEntries } from '../../utils/representation';
 import apiService from '../../services/api';
 
 /* Make an Offer, for every entry point. An artist with an agent first asks who
    the offer is for: some artists book certain regions themselves and have
-   different agents elsewhere, so the booker chooses. An agent they aren't
-   connected to gets a connection request first. */
-const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer = false, preferCountry = null }) => {
+   different agents elsewhere, so the booker chooses. Offers only go between
+   connected members, so anyone not yet connected gets a connection request
+   first (the server refuses the offer otherwise). */
+const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, onOpenPremium, dockAsDrawer = false, preferCountry = null }) => {
   const { t } = useLanguage();
   const { connectedUsers, sentRequests, receivedRequests, sendConnectionRequest } = useAppContext();
   const [agents, setAgents] = useState(null);
@@ -22,8 +24,21 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer 
   const [connectTo, setConnectTo] = useState(null);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [limit, setLimit] = useState(null);
 
   const recipientId = recipientProfile?.id;
+
+  // Offer if connected, else ask to connect; a pending request just waits.
+  const offerOrConnect = (profile, artist, { closeIfPending = false } = {}) => {
+    if (connectedUsers.has(profile.id)) {
+      setOfferTo({ profile, artist });
+    } else if (sentRequests.has(profile.id) || receivedRequests.has(profile.id)) {
+      appAlert(t('offerRoute.requestPending'));
+      if (closeIfPending) onClose();
+    } else {
+      setConnectTo(profile);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen || !recipientProfile) {
@@ -31,29 +46,24 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer 
       setOfferTo(null);
       setConnectTo(null);
       setMessage('');
+      setLimit(null);
       return undefined;
     }
-    const direct = () => setOfferTo({ profile: recipientProfile });
-    if (recipientProfile.role !== 'ARTIST') { direct(); return undefined; }
-    const known = recipientProfile.representedByProfiles;
-    if (known) {
-      const live = known.filter((a) => !a.dormant);
-      if (live.length) setAgents(live); else direct();
-      return undefined;
-    }
+    const route = (list) => {
+      const live = list.filter((a) => !a.dormant);
+      if (live.length) setAgents(live); else offerOrConnect(recipientProfile, undefined, { closeIfPending: true });
+    };
+    if (recipientProfile.role !== 'ARTIST') { route([]); return undefined; }
+    if (recipientProfile.representedByProfiles) { route(recipientProfile.representedByProfiles); return undefined; }
     // Some lists carry no representation at all, so an empty list isn't proof.
     if (Array.isArray(recipientProfile.representedBy) && !toRepEntries(recipientProfile.representedBy).length) {
-      direct();
+      route([]);
       return undefined;
     }
     let cancelled = false;
     apiService.getProfile(recipientProfile.id)
-      .then((full) => {
-        if (cancelled) return;
-        const live = (full?.representedByProfiles || []).filter((a) => !a.dormant);
-        if (live.length) setAgents(live); else direct();
-      })
-      .catch(() => { if (!cancelled) direct(); });
+      .then((full) => { if (!cancelled) route(full?.representedByProfiles || []); })
+      .catch(() => { if (!cancelled) route([]); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, recipientId]);
@@ -81,11 +91,15 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer 
     }
     setBusy(true);
     try {
-      await sendConnectionRequest(connectTo.id, message);
-      appAlert(t('offerRoute.connectSent', { name: connectTo.name, artist: recipientProfile.name }));
+      await sendConnectionRequest(connectTo.id, message.trim());
+      appAlert(agents && connectTo.id !== recipientProfile.id
+        ? t('offerRoute.connectSent', { name: connectTo.name, artist: recipientProfile.name })
+        : t('search.connectionRequestSent', { name: connectTo.name }));
       onClose();
     } catch (error) {
-      if (!isVerificationGate(error)) appAlert(t('search.failedToSendRequest'));
+      const reached = connectionLimitOf(error);
+      if (reached) setLimit(reached);
+      else if (!isVerificationGate(error)) appAlert(t('search.failedToSendRequest'));
     } finally {
       setBusy(false);
     }
@@ -102,23 +116,28 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer 
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows="5"
+            maxLength={500}
             className="message-textarea-bottom"
           />
           <div className="message-modal-actions">
-            <button type="button" className="btn btn-outline btn-modal-cancel" onClick={() => setConnectTo(null)}>
-              {t('offerRoute.back')}
+            <button type="button" className="btn btn-outline btn-modal-cancel" onClick={() => (agents ? setConnectTo(null) : onClose())}>
+              {t(agents ? 'offerRoute.back' : 'editProfile.cancel')}
             </button>
             <button type="button" className="btn btn-primary btn-modal-send" disabled={busy} onClick={sendRequest}>
               {busy ? '...' : t('search.connect')}
             </button>
           </div>
         </div>
+        {limit && <LimitReachedModal type="connections" data={limit} onClose={() => setLimit(null)} onOpenPremium={onOpenPremium} />}
       </div>,
       document.body,
     );
   }
 
   if (!agents) return null;
+
+  const artistConnected = connectedUsers.has(recipientProfile.id);
+  const artistPending = !artistConnected && (sentRequests.has(recipientProfile.id) || receivedRequests.has(recipientProfile.id));
 
   return (
     <Modal isOpen onClose={onClose}>
@@ -140,16 +159,10 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer 
               type="button"
               className="connection-option agent-option"
               disabled={pending}
-              onClick={() => {
-                if (connected) {
-                  setOfferTo({
-                    profile: { ...agent, location: place },
-                    artist: { profileId: recipientProfile.id, name: recipientProfile.name },
-                  });
-                } else {
-                  setConnectTo(agent);
-                }
-              }}
+              onClick={() => offerOrConnect(
+                { ...agent, location: place },
+                { profileId: recipientProfile.id, name: recipientProfile.name },
+              )}
             >
               <div className="option-icon"><HandshakeIcon /></div>
               <div className="option-content">
@@ -164,11 +177,12 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, dockAsDrawer 
         <button
           type="button"
           className="connection-option artist-option"
-          onClick={() => setOfferTo({ profile: recipientProfile })}
+          disabled={artistPending}
+          onClick={() => offerOrConnect(recipientProfile)}
         >
           <div className="option-icon"><UserIcon /></div>
           <div className="option-content">
-            <div className="option-title">{t('offerRoute.sendDirect')}</div>
+            <div className="option-title">{t(artistConnected ? 'offerRoute.sendDirect' : artistPending ? 'offerRoute.requestPending' : 'offerRoute.connectArtistFirst')}</div>
             <div className="option-name">{recipientProfile.name}</div>
             <div className="option-description">{t('offerRoute.directHint')}</div>
           </div>

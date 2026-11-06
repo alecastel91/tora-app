@@ -9,11 +9,9 @@ import { HeartIcon } from '../../utils/icons';
    while a request is open. */
 export function mainProfileAction(viewerRole, targetRole, targetHasRoster = false) {
   const books = viewerRole === 'VENUE' || viewerRole === 'PROMOTER';
-  const booked = targetRole === 'ARTIST' || targetRole === 'AGENT';
   // The offer form asks which of the agent's artists, so an empty roster has no way through it.
   if (books && (targetRole === 'ARTIST' || (targetRole === 'AGENT' && targetHasRoster))) return 'offer';
-  if (books && booked) return 'connect';
-  if (!books && !booked && viewerRole) return 'pitch';
+  if (!books && targetRole !== 'ARTIST' && targetRole !== 'AGENT' && viewerRole) return 'pitch';
   return 'connect';
 }
 

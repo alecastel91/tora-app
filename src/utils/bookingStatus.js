@@ -2,6 +2,11 @@ import { isArtistSideForDeal } from './contractSigner.js';
 import { summarizeDealPayment } from './paymentSummary.js';
 import { OFF_STATUSES } from './dealStatus.js';
 
+/** An artist on an agent-led deal: their agent holds the buttons. */
+export function isArtistViaAgent(deal, viewer) {
+  return !!deal.bookedArtistId && viewer.role === 'ARTIST';
+}
+
 /**
  * One sentence per booking card, written from the viewer's side: what is
  * waiting, and on whom. Mirrors the backend action-summary rules (which drive
@@ -12,11 +17,6 @@ import { OFF_STATUSES } from './dealStatus.js';
  * Returns { text, mine } or null when nothing is pending (mine = the next move
  * is the viewer's).
  */
-/** An artist on an agent-led deal: their agent holds the buttons. */
-export function isArtistViaAgent(deal, viewer) {
-  return !!deal.bookedArtistId && viewer.role === 'ARTIST';
-}
-
 export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = {}) {
   if (!deal || !viewer) return null;
   // A roster artist's gig this agent isn't running: say so instead of leaving a blank.

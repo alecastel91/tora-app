@@ -6,7 +6,7 @@ import { isVerificationGate } from '../../utils/errors';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon, GlobeIcon, ListIcon } from '../../utils/icons';
 import ViewProfileScreen from './ViewProfileScreen';
-import PhotoCard from '../common/PhotoCard';
+import PhotoCard, { PhotoCardLike } from '../common/PhotoCard';
 import Modal from '../common/Modal';
 import ConnectionChoiceModal from '../common/ConnectionChoiceModal';
 import { useAppContext } from '../../contexts/AppContext';
@@ -722,25 +722,17 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 onOpen={() => handleProfileClick(profile)}
                 actions={(
                   <>
-                    <button
-                      type="button"
-                      className={`photo-card-like${isLiked ? ' is-on' : ''}`}
-                      aria-label={isLiked ? t('search.liked') : t('search.like')}
-                      aria-pressed={isLiked}
-                      onClick={() => handleLike(profileId, profile)}
-                    >
-                      <HeartIcon filled={isLiked} /><span>{isLiked ? t('search.liked') : t('search.like')}</span>
-                    </button>
+                    <PhotoCardLike liked={isLiked} onClick={() => handleLike(profileId, profile)} />
                     {isConnected ? (
-                      <button className="btn btn-primary photo-card-cta" onClick={() => handleMessage(profile)}>
+                      <button className="btn btn-primary" onClick={() => handleMessage(profile)}>
                         {t('search.message')}
                       </button>
                     ) : hasReceivedRequest || isRequested ? (
-                      <button className="btn btn-disabled photo-card-cta" disabled>
+                      <button className="btn btn-disabled" disabled>
                         {t('search.pending')}
                       </button>
                     ) : (
-                      <button className="btn btn-primary photo-card-cta" onClick={() => handleConnect(profile)}>
+                      <button className="btn btn-primary" onClick={() => handleConnect(profile)}>
                         {t('search.connect')}
                       </button>
                     )}
