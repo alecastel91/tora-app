@@ -30,7 +30,7 @@ const en = {
     freeRule: "Without the Agent plan you keep one active artist. The others stay on your roster, inactive and hidden from other members, until you subscribe again. Nothing is deleted.",
     coveredByMembership: "Your membership covers this profile with one active artist. The Agent plan makes every artist active.",
     switchToAgent: "Switch to the Agent plan",
-    agencyDeals: "Agency with more than 10 agents? Ask about a yearly agency deal:",
+    agencyDeals: "Agencies get a discount on every agent's plan, monthly or yearly: 5–9 agents 10% off, 10 or more 20% off. To set it up, write to",
     checkoutLine: "Unlimited artists on your agent profile for as long as the plan runs.",
     manage: "Manage",
     choose: "Choose plan",

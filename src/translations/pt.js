@@ -30,7 +30,7 @@ const pt = {
     freeRule: "Sem o Plano Agente você mantém um artista ativo. Os outros continuam no seu roster, inativos e ocultos para outros membros, até você assinar de novo. Nada é apagado.",
     coveredByMembership: "Sua assinatura cobre este perfil com um artista ativo. O Plano Agente ativa todos os artistas.",
     switchToAgent: "Mudar para o Plano Agente",
-    agencyDeals: "Agência com mais de 10 agentes? Pergunte sobre um acordo anual de agência:",
+    agencyDeals: "As agências têm desconto no plano de cada agente, mensal ou anual: de 5 a 9 agentes 10%, 10 ou mais 20%. Para ativar, escreva para",
     checkoutLine: "Artistas ilimitados no seu perfil de agente enquanto o plano estiver ativo.",
     manage: "Gerenciar",
     choose: "Escolher plano",

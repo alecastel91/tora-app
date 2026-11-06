@@ -30,7 +30,7 @@ const fr = {
     freeRule: "Sans l'offre Agent, vous gardez un artiste actif. Les autres restent dans votre roster, inactifs et masqués pour les autres membres, jusqu'à votre prochain abonnement. Rien n'est supprimé.",
     coveredByMembership: "Votre abonnement couvre ce profil avec un artiste actif. L'offre Agent active tous vos artistes.",
     switchToAgent: "Passer à l'offre Agent",
-    agencyDeals: "Agence de plus de 10 agents ? Demandez un accord d'agence annuel :",
+    agencyDeals: "Les agences bénéficient d'une remise sur le plan de chaque agent, mensuel ou annuel : de 5 à 9 agents 10 %, 10 ou plus 20 %. Pour l'activer, écrivez à",
     checkoutLine: "Artistes illimités sur votre profil d'agent tant que l'offre est active.",
     manage: "Gérer",
     choose: "Choisir une offre",
