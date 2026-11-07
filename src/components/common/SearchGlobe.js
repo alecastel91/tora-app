@@ -123,10 +123,6 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const starsRef = useRef([]);
 
   useEffect(() => { roleOnRef.current = roleOn; }, [roleOn]);
-  // The host's list follows the role legend too (desktop workspace).
-  const onRolesChangeRef = useRef(onRolesChange);
-  onRolesChangeRef.current = onRolesChange;
-  useEffect(() => { onRolesChangeRef.current?.(roleOn); }, [roleOn]);
   useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
   // Visible-member counts change only when the data or the role toggles do —
   // precompute them here instead of reducing per pin per animation frame.
@@ -773,7 +769,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           {ROLES.map((r) => (
             <button
               key={r}
-              onClick={() => setRoleOn((s) => ({ ...s, [r]: !s[r] }))}
+              onClick={() => {
+                // The host's list follows the role legend too (desktop workspace).
+                const next = { ...roleOn, [r]: !roleOn[r] };
+                setRoleOn(next);
+                onRolesChange?.(next);
+              }}
               className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] backdrop-blur-md transition
                 ${roleOn[r] ? 'border-white/15 bg-black/45 text-white/80' : 'border-white/5 bg-black/30 text-white/30'}`}
             >

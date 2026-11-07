@@ -18,7 +18,8 @@ import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import LockedPane from '../common/LockedPane';
 import { isPremiumViewer } from '../../utils/subscription';
-import AgencySection, { useAgency, agencyAttention } from '../common/AgencySection';
+import AgencySection from '../common/AgencySection';
+import useAgency, { agencyActionRows } from '../../hooks/useAgency';
 import { UserIcon } from '../../utils/icons';
 
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = () => {}, initialTab = null }) => {
@@ -37,15 +38,15 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   );
   // 'actions' | 'dashboard' (= Insights) | 'agency' (agents) | 'documents'.
   // 'dashboard' keeps its value so deep links that open Manage on it keep working.
-  const [activeTab, setActiveTab] = useState(initialTab || 'actions');
   const isAgent = user?.role === 'AGENT';
+  // An agency deep link can land while a non-agent profile is active: the
+  // Agency tab does not exist there, so open on Actions instead of a blank pane.
+  const [activeTab, setActiveTab] = useState((initialTab === 'agency' && !isAgent ? null : initialTab) || 'actions');
   const [agency, reloadAgency] = useAgency(isAgent);
-  const agencyTodo = agencyAttention(agency);
   // Agency items that need this agent, shown with the booking actions.
-  const agencyRows = [
-    agencyTodo.invite && { id: 'agency-invite', title: t('agency.invitedYou', { agency: agencyTodo.invite.name }) },
-    agencyTodo.requests > 0 && { id: 'agency-requests', title: t('agency.actionRequests', { n: agencyTodo.requests, agency: agencyTodo.agency }) },
-  ].filter(Boolean);
+  const agencyRows = agencyActionRows(agency, t);
+  const [actionItems, setActionItems] = useState(null); // null until loaded: never a false "nothing to do"
+  const totalActions = (actionItems?.length || 0) + agencyRows.length;
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
   const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
@@ -57,7 +58,6 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const [thisYearGigs, setThisYearGigs] = useState(null);
   const [expectedRevenue, setExpectedRevenue] = useState(null);
   const [deals, setDeals] = useState([]);
-  const [actionItems, setActionItems] = useState(null); // null until loaded: never a false "nothing to do"
 
   // Documents state - different for different roles
   const isPromoterOrVenue = user?.role === 'PROMOTER' || user?.role === 'VENUE';
@@ -566,7 +566,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
       {/* Actions Required Section */}
       {showActions && <div className="dashboard-section actions-required-section">
-        <h3><AlertIcon /> {t('manage.actionsRequired')} {(actionItems?.length || 0) + agencyRows.length > 0 && <span className="action-count">({(actionItems?.length || 0) + agencyRows.length})</span>}</h3>
+        <h3><AlertIcon /> {t('manage.actionsRequired')} {totalActions > 0 && <span className="action-count">({totalActions})</span>}</h3>
         <div className="action-items">
           {agencyRows.map((row) => (
             <div key={row.id} className="action-item">
@@ -577,7 +577,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           ))}
           {actionItems === null ? (
             <div className="action-empty">...</div>
-          ) : actionItems.length === 0 ? (agencyRows.length > 0 ? null :
+          ) : totalActions === 0 ? (
             <div className="action-empty">{t('manage.nothingNeedsAttention')}</div>
           ) : (
             actionItems.map((item) => {

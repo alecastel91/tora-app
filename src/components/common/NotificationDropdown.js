@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { renderNotificationText } from '../../utils/notificationText';
 import { useAppContext } from '../../contexts/AppContext';
+import { goManageTab } from '../../utils/navigation';
 
 // Notification type → which tab to navigate to when the user clicks the row.
 // Types whose target sits on a sub-tab, not the tab's default view. Without
@@ -83,7 +84,7 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
     // Agency notifications (invite, request, approved, member left, dissolved)
     // land on Manage → Agency, where the matching action lives.
     if (isAgencyNotification(notif)) {
-      window.dispatchEvent(new CustomEvent('tora:open-settings', { detail: { section: 'agency' } }));
+      goManageTab('agency');
       if (onClose) onClose();
       return;
     }

@@ -12617,6 +12617,8 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .blocked-who small { font-size: 11px; color: rgba(255, 255, 255, 0.45); }
 
 /* ---- Agency (Manage → Agency, join prompt, checkout line) ---------- */
+/* Still used by IssueInvoiceModal and DraftContractModal. */
+.agency-card { margin-top: 12px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); background: #101015; }
 /* The tab speaks the poster language: the agency as a photo with its name,
    then flat rows like Actions Required. */
 .agency-panel { display: flex; flex-direction: column; gap: 6px; padding-bottom: 24px; }
@@ -12950,7 +12952,7 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .poster-tile .poster-tile-frame::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 52%; background: linear-gradient(to bottom, rgba(4,4,7,0), rgba(4,4,7,0.92)); pointer-events: none; }
 .poster-tile-name { position: absolute; left: 8px; right: 6px; bottom: 7px; z-index: 1; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 13px; line-height: 1.1; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
 .poster-tile-meta { display: block; margin-top: 3px; font-family: var(--font-inter, inherit); font-weight: 500; font-size: 10px; line-height: 1.25; letter-spacing: 0; text-transform: none; color: rgba(255,255,255,0.78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.poster-tile-meta > span { font-weight: 600; }
+.poster-tile-meta .poster-role { font-size: 9.5px; letter-spacing: 0.1em; }
 
 /* Agency team sheet */
 .agency-team .message-modal-title { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 26px; line-height: 1.05; text-transform: uppercase; }

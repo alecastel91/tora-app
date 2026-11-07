@@ -58,6 +58,7 @@ import InstallSheet, { InstallSettingsSection } from './components/common/Instal
 import ToastHost from './components/common/ToastHost';
 import { isStandalone } from './services/install';
 import { appConfirm, appAlert } from './utils/dialogs';
+import { goManageTab } from './utils/navigation';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -743,19 +744,14 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Open Settings at a named section. Fired by agency notifications in the
-  // bell, and by push taps, which arrive as /?settings=agency. The section is
-  // scrolled into view once Settings has rendered it.
+  // Open Settings at a named section (/?settings=<section> or the
+  // tora:open-settings event); the section is scrolled into view once Settings
+  // has rendered it. Agency pushes arrive as /?manage=agency; older ones as
+  // /?settings=agency — both land on Manage → Agency.
   useEffect(() => {
     if (!user?.id) return undefined;
     const open = (section) => {
-      // The agency moved to Manage → Agency; old links (push taps, emails) land there.
-      if (section === 'agency') {
-        switchTab('profile');
-        window.__toraPendingManageTab = 'agency';
-        setTimeout(() => window.dispatchEvent(new CustomEvent('tora:open-manage', { detail: { tab: 'agency' } })), 80);
-        return;
-      }
+      if (section === 'agency') { goManageTab('agency'); return; }
       goSettings();
       if (!section) return;
       let tries = 0;
@@ -767,6 +763,13 @@ function App() {
       setTimeout(seek, 50);
     };
     const params = new URLSearchParams(window.location.search);
+    const manageTab = params.get('manage');
+    if (manageTab) {
+      goManageTab(manageTab.replace(/[^a-z-]/g, ''));
+      params.delete('manage');
+      const qs = params.toString();
+      window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''));
+    }
     const fromUrl = params.get('settings');
     if (fromUrl) {
       open(fromUrl.replace(/[^a-z-]/g, ''));

@@ -46,6 +46,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
   const [mapSel, setMapSel] = useState(null);
   // The globe's role legend narrows the list the same way (null = all on).
   const [mapRoles, setMapRoles] = useState(null);
+  const roleShown = (role) => mapRoles?.[role] !== false;
   const seq = useRef(0); // only the newest request may paint
   const suggestedProfiles = useProfileSuggestions(user?.id);
 
@@ -101,7 +102,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
     const base = premium ? results
       // FREE discovery spans the country but leads with the member's own city.
       : [...results].sort((a, b) => (a.city === user?.city ? 0 : 1) - (b.city === user?.city ? 0 : 1));
-    const byRole = mapRoles ? base.filter((p) => mapRoles[p.role] !== false) : base;
+    const byRole = base.filter((p) => mapRoles?.[p.role] !== false);
     if (mapSel?.city) return byRole.filter((p) => p.city === mapSel.city);
     if (mapSel?.country) return byRole.filter((p) => p.country === mapSel.country);
     return byRole;
@@ -115,6 +116,9 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
       : filters.country !== 'all' ? [{ key: 'country', label: filters.country, clear: () => setFilters((f) => ({ ...f, country: 'all', city: 'all' })) }]
       : filters.zone !== 'all' ? [{ key: 'zone', label: filters.zone, clear: () => setFilters(EMPTY) }] : []),
   ];
+
+  // Agencies are agents: the legend's Agent toggle hides them too.
+  const shownAgencies = roleShown('AGENT') ? agencies : [];
 
   // The filter drawer sits over the profile that opens behind it.
   const onOpenProfile = (p) => { setShowFilters(false); openProfile(p); };
@@ -187,12 +191,12 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
             {!query.trim() && activeChips.length === 0 && suggestedProfiles.length > 0 && (
               <div className="mb-4 text-left">
                 <p className="m-0 mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">{t('search.suggestedForYou')}</p>
-                <ProfileMiniGrid variant="scroll" poster showMeta profiles={mapRoles ? suggestedProfiles.filter((p) => mapRoles[p.role] !== false) : suggestedProfiles} onOpenProfile={onOpenProfile} />
+                <ProfileMiniGrid variant="scroll" poster showMeta profiles={suggestedProfiles.filter((p) => roleShown(p.role))} onOpenProfile={onOpenProfile} />
               </div>
             )}
-            {(mapRoles?.AGENT === false ? [] : agencies).map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
+            {shownAgencies.map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
             {openAgencyId && <AgencyTeamSheet organisationId={openAgencyId} onClose={() => setOpenAgencyId(null)} onOpenProfile={onOpenProfile} />}
-            {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? agencies.length > 0 ? null : (
+            {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? shownAgencies.length > 0 ? null : (
               <p className="py-14 text-center text-[13px] text-white/35">{t('search.noResults')}</p>
             ) : list.map((profile) => {
               const liked = likedProfiles.has(profile.id);
@@ -220,11 +224,12 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
             <SearchGlobe
               profiles={results}
               loading={loading}
-              onSelectProfile={onOpenProfile}
+              // The full-screen map sits above the profile/Premium layer, so leave it first.
+              onSelectProfile={(p) => { setFull(false); onOpenProfile(p); }}
               locked={!premium}
               userCity={user?.city}
               userCountry={user?.country}
-              onLockedCity={() => onOpenPremium?.()}
+              onLockedCity={() => { setFull(false); onOpenPremium?.(); }}
               // Full screen hides the list, so the globe shows the place's people itself.
               listTakesOver={!full}
               onRolesChange={setMapRoles}

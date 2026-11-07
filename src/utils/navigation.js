@@ -11,6 +11,13 @@ export const goProfileThen = (event) => {
   setTimeout(() => window.dispatchEvent(new CustomEvent(event)), 200);
 };
 
+/** Open Manage on a tab (e.g. 'agency') from anywhere, even if Profile is not mounted yet. */
+export const goManageTab = (tab) => {
+  sessionStorage.setItem('tora:manage-intent', tab);
+  goTab('profile');
+  window.dispatchEvent(new CustomEvent('tora:open-manage', { detail: { tab } }));
+};
+
 /** Switch to the Tour tab on a given sub-tab, even if Tour is not mounted yet. */
 export const goTourSubTab = (subTab) => {
   sessionStorage.setItem(`tora:tour-${subTab}-intent`, '1');

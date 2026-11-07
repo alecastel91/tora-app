@@ -354,22 +354,27 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // Onboarding-checklist deep links: open Edit Profile / the roster directly
   // (the checklist first navigates to the Profile tab, then fires).
   const [manageInitialTab, setManageInitialTab] = useState(null);
+  const [manageOpenSeq, setManageOpenSeq] = useState(0); // remount key for Manage deep links
   useEffect(() => {
     const openEdit = () => { closeSubScreens(); setShowEditProfile(true); };
     const openRoster = () => { closeSubScreens(); setShowRepresentedArtists(true); };
-    const openManage = (e) => {
-      window.__toraPendingManageTab = null;
-      closeSubScreens(); setManageInitialTab(e?.detail?.tab || null); setShowManageProfile(true);
+    const openManage = (tab) => {
+      sessionStorage.removeItem('tora:manage-intent');
+      // Bump the key so a link that lands while Manage is already open
+      // re-opens it on that tab with fresh data (agency requests, invites).
+      closeSubScreens(); setManageInitialTab(tab || null); setManageOpenSeq((n) => n + 1); setShowManageProfile(true);
     };
-    // A Manage deep link fired before this screen first mounted.
-    if (window.__toraPendingManageTab) openManage({ detail: { tab: window.__toraPendingManageTab } });
+    const onOpenManage = (e) => openManage(e?.detail?.tab);
+    // A goManageTab() fired before this screen first mounted.
+    const pending = sessionStorage.getItem('tora:manage-intent');
+    if (pending) openManage(pending);
     window.addEventListener('tora:open-edit-profile', openEdit);
     window.addEventListener('tora:open-roster', openRoster);
-    window.addEventListener('tora:open-manage', openManage);
+    window.addEventListener('tora:open-manage', onOpenManage);
     return () => {
       window.removeEventListener('tora:open-edit-profile', openEdit);
       window.removeEventListener('tora:open-roster', openRoster);
-      window.removeEventListener('tora:open-manage', openManage);
+      window.removeEventListener('tora:open-manage', onOpenManage);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1141,7 +1146,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
 
   if (showManageProfile) {
     return renderSplit(
-      <ManageProfileScreen key={manageInitialTab || 'manage'} onClose={() => { setShowManageProfile(false); setManageInitialTab(null); }} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} initialTab={manageInitialTab} />
+      <ManageProfileScreen key={manageOpenSeq} onClose={() => { setShowManageProfile(false); setManageInitialTab(null); }} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} initialTab={manageInitialTab} />
     );
   }
 

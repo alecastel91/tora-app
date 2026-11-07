@@ -4,6 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import useBusyAction from '../../hooks/useBusyAction';
 import OverlayPortal from './OverlayPortal';
 import { Avatar } from '../desktop/primitives';
+import { agencyHeroPhoto } from '../../utils/agency';
 
 // Blockers that mean "this viewer could never ask to join" — say nothing
 // rather than tell a venue to add an agent profile.
@@ -71,7 +72,7 @@ const AgencyTeamSheet = ({ organisationId, onClose, onOpenProfile }) => {
 
   const org = data?.organisation;
   const viewer = data?.viewer;
-  const heroPhoto = org?.imageUrl || org?.members?.find((m) => m.avatar)?.avatar || null;
+  const heroPhoto = agencyHeroPhoto(org);
   const artists = org ? [...new Map(org.members.flatMap((m) => m.artists).map((a) => [a.profileId, a])).values()] : [];
 
   const request = () => run(async () => {

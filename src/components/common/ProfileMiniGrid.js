@@ -62,8 +62,8 @@ const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3, 
           <span className="poster-tile-name">
             {p.name}
             {showMeta && (
-              <span className="poster-tile-meta">
-                <span style={{ color: ROLE_COLOR[p.role] || undefined }}>{roleLabel(p.role, t)}</span>
+              <span className={`poster-tile-meta poster-role-${String(p.role || '').toLowerCase()}`}>
+                <span className="poster-role">{roleLabel(p.role, t)}</span>
                 {p.city ? ` · ${p.city}` : ''}
               </span>
             )}
