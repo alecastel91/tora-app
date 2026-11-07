@@ -81,7 +81,14 @@ function App() {
   // three tabs for desktop-native screens; the phone never takes this branch.
   const nativeDesktop = useNativeDesktop();
   const HOME_TAB = nativeDesktop ? 'home' : 'news';
-  const [activeTab, setActiveTab] = useState(HOME_TAB);
+  // A reload (app update, iOS reclaiming a backgrounded tab) reopens the tab
+  // the member was on; a fresh launch still starts at home.
+  const [activeTab, setActiveTab] = useState(() => {
+    try { return sessionStorage.getItem('tora:tab') || HOME_TAB; } catch { return HOME_TAB; }
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem('tora:tab', activeTab); } catch { /* private mode */ }
+  }, [activeTab]);
 
   // Narrowing the window (or turning v3 off) unmounts the Dashboard and drops
   // Home from the tab bar; without this the main area is left blank with no
@@ -132,7 +139,7 @@ function App() {
   // hidden with display:none, so switching back is instant — no refetch,
   // no rebuild. Realtime subscriptions (deals, inbox) and the context poll
   // keep hidden tabs fresh. Scroll position is saved per tab.
-  const [mountedTabs, setMountedTabs] = useState([HOME_TAB]);
+  const [mountedTabs, setMountedTabs] = useState(() => [...new Set([HOME_TAB, activeTab])]);
   const appContentRef = useRef(null);
   const tabScrollPositions = useRef({});
   const switchTab = (tab) => {

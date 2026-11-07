@@ -6,6 +6,16 @@ import { showToast } from '../utils/toast';
 
 const AppContext = createContext();
 
+// The profile last switched to on this device, so a reload or a new launch
+// reopens it instead of the account's first profile.
+const ACTIVE_PROFILE_KEY = 'tora:active-profile';
+const rememberedProfile = (profiles) => {
+  try {
+    const id = localStorage.getItem(ACTIVE_PROFILE_KEY);
+    return id ? profiles.find((p) => p.id === id) : undefined;
+  } catch { return undefined; }
+};
+
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {
@@ -148,7 +158,7 @@ export const AppProvider = ({ children }) => {
       setUserProfiles(userData);
       // Keep the active profile when it is still in the list (a billing
       // refresh); otherwise the first one — the server puts the default first.
-      setUser((prev) => userData.find((p) => p.id === prev?.id) || userData[0]);
+      setUser((prev) => userData.find((p) => p.id === prev?.id) || rememberedProfile(userData) || userData[0]);
     }
     // Case 2: userData has a profiles property (object with profiles array)
     else if (userData.profiles && Array.isArray(userData.profiles)) {
@@ -156,7 +166,7 @@ export const AppProvider = ({ children }) => {
       console.log('🔍 [AppContext updateUser] Profiles:', userData.profiles.map(p => p.name));
       setUserProfiles(userData.profiles);
       // Set the first profile as active or find the active one
-      const activeProfile = userData.profiles.find(p => p.isActive) || userData.profiles[0];
+      const activeProfile = rememberedProfile(userData.profiles) || userData.profiles.find(p => p.isActive) || userData.profiles[0];
       setUser(activeProfile);
     }
     // Case 3: Single profile object
@@ -200,6 +210,7 @@ export const AppProvider = ({ children }) => {
       activeProfileIdRef.current = profileId;
       clearProfileGraph();
       setUser(newProfile);
+      try { localStorage.setItem(ACTIVE_PROFILE_KEY, profileId); } catch { /* private mode */ }
       // Profile data reloads via the user?.id effect.
     }
   };

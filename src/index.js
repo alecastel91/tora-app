@@ -39,14 +39,10 @@ root.render(
 // (skipWaiting + clientsClaim) but the open page keeps its old bundle until
 // a reload — testers had to hard-refresh twice. Only a page that ALREADY had
 // a controller at load can be stale (a first install has nothing to replace).
-// Reload once when control changes, unless the member is typing; then wait
-// until the tab is next brought back to the front.
+// Reload once when control changes, but never under the member's fingers:
+// wait until the app has been in the background and is brought back.
 if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
   let pendingReload = false;
-  const typing = () => {
-    const el = document.activeElement;
-    return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
-  };
   const onVisible = () => {
     if (document.visibilityState !== 'visible') return;
     document.removeEventListener('visibilitychange', onVisible);
@@ -55,7 +51,7 @@ if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (pendingReload) return;
     pendingReload = true;
-    if (!typing()) { window.location.reload(); return; }
+    if (document.visibilityState !== 'visible') { window.location.reload(); return; }
     document.addEventListener('visibilitychange', onVisible);
   });
 }
