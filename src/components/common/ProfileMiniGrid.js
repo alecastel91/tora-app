@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
+import { getAvatarClass, ROLE_COLOR, roleLabel } from '../../utils/roles';
 import { ROLE_GLYPHS } from '../../utils/icons';
 import InlineDrawer from './InlineDrawer';
 
@@ -17,9 +17,10 @@ import InlineDrawer from './InlineDrawer';
 // role color (language-independent, Artist/Agent stay distinct).
 // cols — tiles per row in the grid variant (3 on the phone; the desktop
 // pages pass 4). Static class names so Tailwind emits them.
+// showMeta — poster tiles add "Role · City" under the name (Suggested for you).
 const COLS = { 3: 'grid-cols-3', 4: 'grid-cols-4', 5: 'grid-cols-5', 6: 'grid-cols-6' };
 
-const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3, poster = false }) => {
+const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3, poster = false, showMeta = false }) => {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
@@ -57,7 +58,17 @@ const ProfileMiniGrid = ({ profiles, onOpenProfile, variant = 'grid', cols = 3, 
           </span>
         )}
         {withRoleChip && !poster && roleChip(p.role)}
-        {poster && <span className="poster-tile-name">{p.name}</span>}
+        {poster && (
+          <span className="poster-tile-name">
+            {p.name}
+            {showMeta && (
+              <span className="poster-tile-meta">
+                <span style={{ color: ROLE_COLOR[p.role] || undefined }}>{roleLabel(p.role, t)}</span>
+                {p.city ? ` · ${p.city}` : ''}
+              </span>
+            )}
+          </span>
+        )}
         {overlayCount ? (
           <span className="absolute inset-0 flex items-center justify-center bg-black/60
                            text-xl font-bold text-white font-space-grotesk">

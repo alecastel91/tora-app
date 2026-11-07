@@ -46,7 +46,7 @@ const SettingsNav = ({
       found.forEach((s) => io.observe(s.el));
     };
 
-    // Sections can arrive after this mounts — AgencySection fetches its state
+    // Sections can arrive after this mounts — some fetch their state
     // first, so a one-shot scan missed it entirely. Re-scan when the subtree
     // changes (childList only: assigning ids below must not retrigger it).
     const mo = new MutationObserver(() => observeAll(scan()));
@@ -58,7 +58,7 @@ const SettingsNav = ({
       return new IntersectionObserver((entries) => {
       const visible = entries.filter((e) => e.isIntersecting)
         .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-      // Sections can nest (Agency inside Agent plan). A container is in view
+      // Sections can nest. A container is in view
       // whenever its child is, so highlight the innermost one instead.
       const inner = visible.filter((e) => !visible.some((o) => o !== e && e.target.contains(o.target)));
       const pick = inner[0] || visible[0];

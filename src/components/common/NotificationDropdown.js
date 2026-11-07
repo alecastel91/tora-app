@@ -81,7 +81,7 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
 
   const handleNotificationClick = (notif) => {
     // Agency notifications (invite, request, approved, member left, dissolved)
-    // land on Settings → Agency, where the matching action lives.
+    // land on Manage → Agency, where the matching action lives.
     if (isAgencyNotification(notif)) {
       window.dispatchEvent(new CustomEvent('tora:open-settings', { detail: { section: 'agency' } }));
       if (onClose) onClose();

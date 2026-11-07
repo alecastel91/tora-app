@@ -65,9 +65,12 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    overscroll-behavior: none;
   }
 
+  /* No bounce or pull-to-refresh on the frame. Never on `*`: every
+   * overflow:hidden element (photo cards) is a scroll container, and
+   * overscroll-behavior:none on it stops a swipe that starts there from
+   * reaching .app-content, so lists would not scroll on touch. */
   html {
     overscroll-behavior: none;
     overscroll-behavior-y: none;

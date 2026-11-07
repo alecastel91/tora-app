@@ -46,7 +46,7 @@ function groupByCity(profiles) {
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, loading = false, onSelectionChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
   const { t } = useLanguage();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
@@ -122,6 +122,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const starsRef = useRef([]);
 
   useEffect(() => { roleOnRef.current = roleOn; }, [roleOn]);
+  // The host's list follows the role legend too (desktop workspace).
+  const onRolesChangeRef = useRef(onRolesChange);
+  onRolesChangeRef.current = onRolesChange;
+  useEffect(() => { onRolesChangeRef.current?.(roleOn); }, [roleOn]);
   useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
   // Visible-member counts change only when the data or the role toggles do —
   // precompute them here instead of reducing per pin per animation frame.

@@ -1852,6 +1852,7 @@ const pt = {
     promptTitle: 'Alguém da {{agency}} já está no TORA',
     promptBody: "Entre na {{agency}} para aparecer como uma só equipe no TORA, no perfil de cada membro.",
     promptDomain: 'Verificado em {{domain}}',
+    actionRequests: '{{n}} agente(s) pediram para entrar em {{agency}}',
     promptMembers: '{{n}} agente(s) · {{total}} artistas no TORA',
     join: 'Entrar na {{agency}}',
     notNow: 'Agora não',

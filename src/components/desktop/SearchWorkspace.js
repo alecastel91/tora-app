@@ -13,6 +13,8 @@ import ConnectAction from '../common/ConnectAction';
 import PhotoCard, { PhotoCardLike } from '../common/PhotoCard';
 import OverlayPortal from '../common/OverlayPortal';
 import FilterSheet, { FilterButton } from '../common/FilterSheet';
+import ProfileMiniGrid from '../common/ProfileMiniGrid';
+import useProfileSuggestions from '../../hooks/useProfileSuggestions';
 
 const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 
@@ -42,7 +44,10 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
   // A city/country tapped on the globe narrows the LIST only. It must stay out
   // of `filters`, which drive the fetch the globe's own pins come from.
   const [mapSel, setMapSel] = useState(null);
+  // The globe's role legend narrows the list the same way (null = all on).
+  const [mapRoles, setMapRoles] = useState(null);
   const seq = useRef(0); // only the newest request may paint
+  const suggestedProfiles = useProfileSuggestions(user?.id);
 
   const run = useCallback(async () => {
     if (!user?.id) return;
@@ -96,10 +101,11 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
     const base = premium ? results
       // FREE discovery spans the country but leads with the member's own city.
       : [...results].sort((a, b) => (a.city === user?.city ? 0 : 1) - (b.city === user?.city ? 0 : 1));
-    if (mapSel?.city) return base.filter((p) => p.city === mapSel.city);
-    if (mapSel?.country) return base.filter((p) => p.country === mapSel.country);
-    return base;
-  }, [results, premium, user?.city, mapSel]);
+    const byRole = mapRoles ? base.filter((p) => mapRoles[p.role] !== false) : base;
+    if (mapSel?.city) return byRole.filter((p) => p.city === mapSel.city);
+    if (mapSel?.country) return byRole.filter((p) => p.country === mapSel.country);
+    return byRole;
+  }, [results, premium, user?.city, mapSel, mapRoles]);
 
   const activeChips = [
     ...(mapSel?.city || mapSel?.country ? [{ key: 'map', label: mapSel.city || mapSel.country, clear: () => setMapSel(null) }] : []),
@@ -177,7 +183,14 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
           <div className="px-3 py-2 text-[11px] text-white/45">{t('desktop.results', { n: list.length })}</div>
 
           <div className="d3-ws-list min-h-0 flex-1 overflow-y-auto">
-            {agencies.map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
+            {/* Suggested for you — same strip as the phone, on the untouched search */}
+            {!query.trim() && activeChips.length === 0 && suggestedProfiles.length > 0 && (
+              <div className="mb-4 text-left">
+                <p className="m-0 mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">{t('search.suggestedForYou')}</p>
+                <ProfileMiniGrid variant="scroll" poster showMeta profiles={mapRoles ? suggestedProfiles.filter((p) => mapRoles[p.role] !== false) : suggestedProfiles} onOpenProfile={onOpenProfile} />
+              </div>
+            )}
+            {(mapRoles?.AGENT === false ? [] : agencies).map((agency) => <AgencySearchCard key={agency.id} agency={agency} onOpen={setOpenAgencyId} />)}
             {openAgencyId && <AgencyTeamSheet organisationId={openAgencyId} onClose={() => setOpenAgencyId(null)} onOpenProfile={onOpenProfile} />}
             {loading && results.length === 0 ? <LoadingGlobe label={t('search.loadingProfiles')} /> : list.length === 0 ? agencies.length > 0 ? null : (
               <p className="py-14 text-center text-[13px] text-white/35">{t('search.noResults')}</p>
@@ -213,6 +226,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
               userCountry={user?.country}
               onLockedCity={() => onOpenPremium?.()}
               listTakesOver
+              onRolesChange={setMapRoles}
               onSelectionChange={(sel, meta) => setMapSel(sel || (meta?.empty ? { country: meta.country, empty: true } : null))}
               topInset={premium ? 16 : 64}
               bottomInset={16}

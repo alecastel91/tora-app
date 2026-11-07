@@ -482,7 +482,7 @@
     letter-spacing: -0.02em;
   }
 
-  html.desktop-v2 .app-content h2:not(:where(.d3-mat-hero-name)) {
+  html.desktop-v2 .app-content h2:not(:where(.d3-mat-hero-name, .agency-team-hero-name)) {
     font-size: 22px;
     letter-spacing: -0.015em;
   }

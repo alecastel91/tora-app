@@ -1852,6 +1852,7 @@ const ko = {
     promptTitle: '{{agency}}의 멤버가 이미 TORA에 있습니다',
     promptBody: "{{agency}}에 참여하면 TORA에서 하나의 팀으로 모든 멤버의 프로필에 표시됩니다.",
     promptDomain: '{{domain}}에서 인증됨',
+    actionRequests: '에이전트 {{n}}명이 {{agency}} 가입을 요청했습니다',
     promptMembers: '에이전트 {{n}}명 · TORA의 아티스트 {{total}}명',
     join: '{{agency}}에 참여',
     notNow: '나중에',

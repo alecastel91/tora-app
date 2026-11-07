@@ -12616,23 +12616,44 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .blocked-who strong { font-size: 14px; color: #fff; }
 .blocked-who small { font-size: 11px; color: rgba(255, 255, 255, 0.45); }
 
-/* ---- Agency (Settings → Agency, join prompt, checkout line) ---------- */
-.agency-section .form-hint { line-height: 1.5; }
-.agency-card { margin-top: 12px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); background: #101015; }
-.agency-members { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.agency-member { display: flex; align-items: center; gap: 12px; }
-.agency-member-avatar { width: 36px; height: 36px; border-radius: 999px; overflow: hidden; flex-shrink: 0; background: #1a1a22; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; }
-.agency-member-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.agency-member-who { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.agency-member-who strong { font-size: 14px; color: #fff; }
-.agency-member-who small { font-size: 11px; color: rgba(255, 255, 255, 0.45); }
-.agency-sub { margin: 14px 0 6px; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); }
-.agency-ladder { width: 100%; margin-top: 18px; border-collapse: collapse; font-size: 12.5px; }
-.agency-ladder caption { text-align: left; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); padding-bottom: 6px; }
-.agency-ladder td { padding: 6px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.75); }
-.agency-ladder-price { text-align: right; color: #fff; font-variant-numeric: tabular-nums; }
-.agency-ladder-price small { color: #ff3366; margin-left: 6px; font-size: 11px; }
-.agency-facts { margin: 12px 0 0; padding-left: 18px; font-size: 12px; line-height: 1.5; color: rgba(255, 255, 255, 0.55); }
+/* ---- Agency (Manage → Agency, join prompt, checkout line) ---------- */
+/* The tab speaks the poster language: the agency as a photo with its name,
+   then flat rows like Actions Required. */
+.agency-panel { display: flex; flex-direction: column; gap: 6px; padding-bottom: 24px; }
+.agency-panel .agency-panel-hero { margin: 0; height: 220px; border-radius: 10px; background: #101015; text-align: left; }
+.agency-panel .agency-panel-hero::after { background: linear-gradient(to bottom, rgba(4,4,7,0), rgba(4,4,7,0.94)); }
+.agency-panel .agency-panel-hero.poster-empty::before { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 90% at 100% 0%, rgba(0,200,117,0.22), transparent 60%); }
+.agency-panel .agency-team-hero-name { font-size: 36px; text-align: left; }
+.agency-panel .agency-team-summary { text-align: left; }
+@media (min-width: 1024px) { .agency-panel { max-width: 760px; } .agency-panel .agency-panel-hero { height: 260px; } }
+.agency-panel-intro { padding: 4px 0 6px; text-align: left; }
+.agency-panel-title { margin: 0 0 8px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 32px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; color: #fff; }
+.agency-panel-lede { margin: 0 0 6px; max-width: 60ch; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.75); }
+.agency-panel-card { margin-top: 10px; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: #101015; text-align: left; }
+.agency-panel-card-title { margin: 0 0 4px; font-size: 15px; font-weight: 600; line-height: 1.35; color: #fff; }
+.agency-panel-card-meta { margin: 0 0 2px; font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.68); }
+.agency-panel-buttons { display: flex; gap: 8px; margin-top: 12px; }
+.agency-panel-buttons .btn { min-height: 44px; flex: 1; }
+.agency-panel-list { list-style: none; margin: 0; padding: 0; }
+.agency-panel-row { display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.agency-panel-row.is-urgent { padding-left: 10px; box-shadow: inset 2px 0 0 #FF3366; }
+.agency-panel-who { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; text-align: left; }
+.agency-panel-who strong { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 15px; font-weight: 600; color: #fff; overflow-wrap: anywhere; }
+.agency-panel-who small { font-size: 12px; color: rgba(255,255,255,0.6); }
+.agency-panel-row-actions { display: flex; flex: none; gap: 6px; }
+.agency-panel-row-actions .btn { min-height: 44px; min-width: 76px; padding: 0 12px; font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.agency-panel-row-actions .btn-outline { border: 1px solid rgba(255,255,255,0.28); background: transparent; color: #fff; }
+.agency-panel-field { display: flex; gap: 8px; }
+.agency-panel-field .form-input { flex: 1; min-width: 0; min-height: 48px; }
+.agency-panel-field .btn { min-height: 48px; padding: 0 16px; white-space: nowrap; }
+.agency-panel-exit { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); }
+.agency-panel-quiet { min-height: 44px; padding: 0; border: 0; background: none; font-size: 13px; font-weight: 600; color: #FF8A8A; cursor: pointer; }
+.agency-panel-quiet:hover { color: #FF5C5C; }
+.agency-panel-quiet:disabled { opacity: 0.5; cursor: default; }
+@media (max-width: 420px) {
+  .agency-panel-row { flex-wrap: wrap; }
+  .agency-panel-row-actions { margin-left: auto; }
+}
 .agency-prompt { text-align: left; margin: 0 0 14px; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(255, 51, 102, 0.35); background: rgba(255, 51, 102, 0.06); }
 .agency-prompt-title { margin: 0 0 4px; font-size: 14px; font-weight: 600; color: #fff; }
 .agency-prompt-body { margin: 0; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.75); }
@@ -12923,6 +12944,8 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .poster-tile .poster-tile-frame { aspect-ratio: 104 / 136; border: 0; border-radius: 8px; }
 .poster-tile .poster-tile-frame::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 52%; background: linear-gradient(to bottom, rgba(4,4,7,0), rgba(4,4,7,0.92)); pointer-events: none; }
 .poster-tile-name { position: absolute; left: 8px; right: 6px; bottom: 7px; z-index: 1; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 13px; line-height: 1.1; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+.poster-tile-meta { display: block; margin-top: 3px; font-family: var(--font-inter, inherit); font-weight: 500; font-size: 10px; line-height: 1.25; letter-spacing: 0; text-transform: none; color: rgba(255,255,255,0.78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.poster-tile-meta > span { font-weight: 600; }
 
 /* Agency team sheet */
 .agency-team .message-modal-title { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 26px; line-height: 1.05; text-transform: uppercase; }

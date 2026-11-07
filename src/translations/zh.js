@@ -1852,6 +1852,7 @@ const zh = {
     promptTitle: '{{agency}} 的成员已在 TORA 上',
     promptBody: "加入 {{agency}}，在 TORA 上作为一个团队显示在每位成员的档案上。",
     promptDomain: '已验证 {{domain}}',
+    actionRequests: '{{n}} 位经纪人申请加入 {{agency}}',
     promptMembers: '{{n}} 位经纪人 · TORA 上 {{total}} 位艺人',
     join: '加入 {{agency}}',
     notNow: '暂不',

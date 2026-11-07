@@ -1852,6 +1852,7 @@ const fr = {
     promptTitle: 'Quelqu\'un de {{agency}} est déjà sur TORA',
     promptBody: "Rejoignez {{agency}} pour apparaître comme une seule équipe sur TORA, sur le profil de chaque membre.",
     promptDomain: 'Vérifié sur {{domain}}',
+    actionRequests: '{{n}} agent(s) demandent à rejoindre {{agency}}',
     promptMembers: '{{n}} agent(s) · {{total}} artistes sur TORA',
     join: 'Rejoindre {{agency}}',
     notNow: 'Pas maintenant',

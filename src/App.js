@@ -48,7 +48,6 @@ import AppDialogHost from './components/common/AppDialogHost';
 import CelebrationHost from './components/common/CelebrationHost';
 import BlockedMembers from './components/common/BlockedMembers';
 import StripeCheckout from './components/common/StripeCheckout';
-import AgencySection from './components/common/AgencySection';
 import BetaTools from './components/common/BetaTools';
 import AssistantChat from './components/common/AssistantChat';
 import GuideScreen from './components/common/GuideScreen';
@@ -750,6 +749,13 @@ function App() {
   useEffect(() => {
     if (!user?.id) return undefined;
     const open = (section) => {
+      // The agency moved to Manage → Agency; old links (push taps, emails) land there.
+      if (section === 'agency') {
+        switchTab('profile');
+        window.__toraPendingManageTab = 'agency';
+        setTimeout(() => window.dispatchEvent(new CustomEvent('tora:open-manage', { detail: { tab: 'agency' } })), 80);
+        return;
+      }
       goSettings();
       if (!section) return;
       let tries = 0;
@@ -1048,7 +1054,6 @@ function App() {
                       {t('premium.manageBilling')}
                     </button>
                   )}
-                  <AgencySection />
                 </>
               ) : (
                 <>

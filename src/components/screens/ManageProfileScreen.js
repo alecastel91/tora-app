@@ -18,6 +18,8 @@ import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import LockedPane from '../common/LockedPane';
 import { isPremiumViewer } from '../../utils/subscription';
+import AgencySection, { useAgency, agencyAttention } from '../common/AgencySection';
+import { UserIcon } from '../../utils/icons';
 
 const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = () => {}, initialTab = null }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -33,9 +35,17 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const renderLockedPane = (content, message) => (
     <LockedPane message={message} onUnlock={onOpenPremium}>{content}</LockedPane>
   );
-  // 'actions' | 'dashboard' (= Insights) | 'documents'. 'dashboard' keeps its
-  // value so deep links that open Manage on it keep working.
+  // 'actions' | 'dashboard' (= Insights) | 'agency' (agents) | 'documents'.
+  // 'dashboard' keeps its value so deep links that open Manage on it keep working.
   const [activeTab, setActiveTab] = useState(initialTab || 'actions');
+  const isAgent = user?.role === 'AGENT';
+  const [agency, reloadAgency] = useAgency(isAgent);
+  const agencyTodo = agencyAttention(agency);
+  // Agency items that need this agent, shown with the booking actions.
+  const agencyRows = [
+    agencyTodo.invite && { id: 'agency-invite', title: t('agency.invitedYou', { agency: agencyTodo.invite.name }) },
+    agencyTodo.requests > 0 && { id: 'agency-requests', title: t('agency.actionRequests', { n: agencyTodo.requests, agency: agencyTodo.agency }) },
+  ].filter(Boolean);
   const [upcomingGigs, setUpcomingGigs] = useState(null);
   const [ytdRevenue, setYtdRevenue] = useState(null);
   const [revenueEvents, setRevenueEvents] = useState([]); // [{date, amount}] in preferred currency
@@ -556,11 +566,18 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
 
       {/* Actions Required Section */}
       {showActions && <div className="dashboard-section actions-required-section">
-        <h3><AlertIcon /> {t('manage.actionsRequired')} {actionItems?.length > 0 && <span className="action-count">({actionItems.length})</span>}</h3>
+        <h3><AlertIcon /> {t('manage.actionsRequired')} {(actionItems?.length || 0) + agencyRows.length > 0 && <span className="action-count">({(actionItems?.length || 0) + agencyRows.length})</span>}</h3>
         <div className="action-items">
+          {agencyRows.map((row) => (
+            <div key={row.id} className="action-item">
+              <div className="action-icon"><UserIcon /></div>
+              <div className="action-content"><div className="action-title">{row.title}</div></div>
+              <button className="btn btn-sm btn-primary" onClick={() => setActiveTab('agency')}>{t('manage.actionReview')}</button>
+            </div>
+          ))}
           {actionItems === null ? (
             <div className="action-empty">...</div>
-          ) : actionItems.length === 0 ? (
+          ) : actionItems.length === 0 ? (agencyRows.length > 0 ? null :
             <div className="action-empty">{t('manage.nothingNeedsAttention')}</div>
           ) : (
             actionItems.map((item) => {
@@ -976,6 +993,15 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           {t('manage.actionsRequired')}
           {actionItems?.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
         </button>
+        {isAgent && (
+          <button
+            className={`tab-button ${activeTab === 'agency' ? 'active' : ''}`}
+            onClick={() => handleTabChange('agency')}
+          >
+            {t('agency.title')}
+            {agencyRows.length > 0 && <span className="tab-attention-dot" aria-hidden="true" />}
+          </button>
+        )}
         {/* An agent's numbers are per artist, in that artist's Manage. */}
         {user?.role !== 'AGENT' && (
           <button
@@ -1007,6 +1033,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         {activeTab === 'dashboard' && (manageLocked
           ? renderLockedPane(renderDashboardTab({ part: 'insights' }), t('manage.dashboardLockedMsg'))
           : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'insights' })}</>)}
+        {activeTab === 'agency' && isAgent && <AgencySection data={agency} reload={reloadAgency} fallbackPhoto={user?.avatarLarge || user?.avatar} />}
         {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}
       </div>
 

@@ -16,6 +16,7 @@ import LoadingGlobe from '../common/LoadingGlobe';
 import FilterList from '../common/FilterList';
 import LimitReachedModal from '../common/LimitReachedModal';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
+import useProfileSuggestions from '../../hooks/useProfileSuggestions';
 import { isPremiumViewer } from '../../utils/subscription';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 // The globe pulls in d3-geo + a world topojson (~150KB) — only load it when the
@@ -32,16 +33,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   const [viewMode, setViewMode] = useState('globe'); // 'globe' | 'list' — the globe IS the search landing
   // "Suggested for you" — complementary-role recommendations shown on the
   // list view's empty state (no query, no filters).
-  const [suggestedProfiles, setSuggestedProfiles] = useState([]);
-  useEffect(() => {
-    let cancelled = false;
-    setSuggestedProfiles([]);
-    if (!user?.id) return undefined;
-    apiService.getProfileSuggestions(user.id)
-      .then((d) => { if (!cancelled) setSuggestedProfiles(d.profiles || []); })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [user?.id]);
+  const suggestedProfiles = useProfileSuggestions(user?.id);
   const [globeUpsellCity, setGlobeUpsellCity] = useState(null); // FREE member tapped a locked city
   const stageRef = useRef(null);
   const [stageH, setStageH] = useState(0);
@@ -694,6 +686,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           <ProfileMiniGrid
             variant="scroll"
             poster
+            showMeta
             profiles={suggestedProfiles}
             onOpenProfile={handleProfileClick}
           />

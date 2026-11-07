@@ -1852,6 +1852,7 @@ const ja = {
     promptTitle: '{{agency}}のメンバーがすでにTORAにいます',
     promptBody: "{{agency}}に参加すると、TORA上で1つのチームとして各メンバーのプロフィールに表示されます。",
     promptDomain: '{{domain}}で認証済み',
+    actionRequests: 'エージェント{{n}}名が{{agency}}への参加を申請しています',
     promptMembers: 'エージェント{{n}}名・TORA上のアーティスト{{total}}名',
     join: '{{agency}}に参加',
     notNow: '後で',

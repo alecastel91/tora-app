@@ -357,11 +357,19 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   useEffect(() => {
     const openEdit = () => { closeSubScreens(); setShowEditProfile(true); };
     const openRoster = () => { closeSubScreens(); setShowRepresentedArtists(true); };
+    const openManage = (e) => {
+      window.__toraPendingManageTab = null;
+      closeSubScreens(); setManageInitialTab(e?.detail?.tab || null); setShowManageProfile(true);
+    };
+    // A Manage deep link fired before this screen first mounted.
+    if (window.__toraPendingManageTab) openManage({ detail: { tab: window.__toraPendingManageTab } });
     window.addEventListener('tora:open-edit-profile', openEdit);
     window.addEventListener('tora:open-roster', openRoster);
+    window.addEventListener('tora:open-manage', openManage);
     return () => {
       window.removeEventListener('tora:open-edit-profile', openEdit);
       window.removeEventListener('tora:open-roster', openRoster);
+      window.removeEventListener('tora:open-manage', openManage);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1133,7 +1141,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
 
   if (showManageProfile) {
     return renderSplit(
-      <ManageProfileScreen onClose={() => { setShowManageProfile(false); setManageInitialTab(null); }} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} initialTab={manageInitialTab} />
+      <ManageProfileScreen key={manageInitialTab || 'manage'} onClose={() => { setShowManageProfile(false); setManageInitialTab(null); }} onSwitchTab={onSwitchTab} onOpenPremium={onOpenPremium} initialTab={manageInitialTab} />
     );
   }
 
