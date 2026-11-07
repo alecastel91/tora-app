@@ -485,6 +485,10 @@ class ApiService {
     const response = await fetch(`${API_URL}/organisations/me`, { method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify({ name }) });
     return this.handleResponse(response);
   }
+  async setOrganisationImage(image) {
+    const response = await fetch(`${API_URL}/organisations/me/image`, { method: 'PUT', headers: this.getHeaders(), body: JSON.stringify({ image }) });
+    return this.handleResponse(response);
+  }
   async dissolveOrganisation() {
     const response = await fetch(`${API_URL}/organisations/me`, { method: 'DELETE', headers: this.getHeaders() });
     return this.handleResponse(response);

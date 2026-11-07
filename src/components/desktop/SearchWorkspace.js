@@ -225,10 +225,11 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
               userCity={user?.city}
               userCountry={user?.country}
               onLockedCity={() => onOpenPremium?.()}
-              listTakesOver
+              // Full screen hides the list, so the globe shows the place's people itself.
+              listTakesOver={!full}
               onRolesChange={setMapRoles}
               onSelectionChange={(sel, meta) => setMapSel(sel || (meta?.empty ? { country: meta.country, empty: true } : null))}
-              topInset={premium ? 16 : 64}
+              topInset={full ? 80 : premium ? 16 : 64}
               bottomInset={16}
             />
           </Suspense>

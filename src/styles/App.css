@@ -12626,6 +12626,11 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .agency-panel .agency-team-hero-name { font-size: 36px; text-align: left; }
 .agency-panel .agency-team-summary { text-align: left; }
 @media (min-width: 1024px) { .agency-panel { max-width: 760px; } .agency-panel .agency-panel-hero { height: 260px; } }
+.agency-panel-photo-actions { position: absolute; right: 10px; top: 10px; z-index: 2; display: flex; gap: 6px; }
+.agency-panel-photo-btn { min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.28); background: rgba(4,4,7,0.6); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; backdrop-filter: blur(6px); }
+.agency-panel-photo-btn:hover { border-color: rgba(255,255,255,0.6); }
+.agency-panel-photo-btn:disabled { opacity: 0.5; cursor: default; }
+.agency-panel-photo-hint { margin: 2px 0 4px; font-size: 12px; line-height: 1.45; color: rgba(255,255,255,0.55); text-align: left; }
 .agency-panel-intro { padding: 4px 0 6px; text-align: left; }
 .agency-panel-title { margin: 0 0 8px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 32px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; color: #fff; }
 .agency-panel-lede { margin: 0 0 6px; max-width: 60ch; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.75); }
@@ -13180,3 +13185,4 @@ div.poster-stat { cursor: default; }
 .d3-dash-title { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 22px; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
 .d3-dash-action { min-height: 62px; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .d3-dash-cta { flex: none; display: flex; align-items: center; justify-content: center; height: 40px; min-width: 84px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.28); color: #fff; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+.globe-panel-tiles .photo-card--tile { height: 216px; }

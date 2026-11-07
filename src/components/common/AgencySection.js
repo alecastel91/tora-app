@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { showToast } from '../../utils/toast';
 import { Avatar } from '../desktop/primitives';
+import { downscaleImageToDataUrl } from '../../utils/image';
 
 /**
  * Manage → Agency (agents only). Agents of one agency link up to appear as
@@ -16,6 +17,7 @@ const AgencySection = ({ data, reload, fallbackPhoto = null }) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState(data?.organisation?.name || '');
   const [busy, setBusy] = useState(false);
+  const fileRef = useRef(null);
   const orgName = data?.organisation?.name || '';
   useEffect(() => { setName(orgName); }, [orgName]);
 
@@ -30,19 +32,40 @@ const AgencySection = ({ data, reload, fallbackPhoto = null }) => {
   const isAdmin = org?.role === 'ADMIN';
   const requested = isAdmin ? org.pending.filter((p) => p.status === 'REQUESTED') : [];
   const invited = isAdmin ? org.pending.filter((p) => p.status === 'INVITED') : [];
-  const heroPhoto = org?.members?.find((m) => m.role === 'ADMIN' && m.avatar)?.avatar || org?.members?.find((m) => m.avatar)?.avatar || fallbackPhoto;
+  // The agency's own photo first; until an admin adds one, an agent's portrait.
+  const heroPhoto = org?.imageUrl || org?.members?.find((m) => m.role === 'ADMIN' && m.avatar)?.avatar || org?.members?.find((m) => m.avatar)?.avatar || fallbackPhoto;
+  const pickPhoto = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    run(async () => apiService.setOrganisationImage(await downscaleImageToDataUrl(file, { maxDimension: 1600, quality: 0.85 })), 'agency.photoSaved');
+  };
   const me = org?.members?.find((m) => m.isMe);
 
   return (
     <div className="agency-section agency-panel">
       {org ? (
+        <>
         <div className={`agency-team-hero agency-panel-hero poster-role-agent${heroPhoto ? '' : ' poster-empty'}`}>
           {heroPhoto && <img src={heroPhoto} alt="" aria-hidden />}
           <div className="agency-team-hero-text">
             <h2 className="agency-team-hero-name">{org.name}</h2>
             <p className="agency-team-summary">{t('agency.teamSummary', { n: org.members.length, total: org.artistTotal })}</p>
           </div>
+          {isAdmin && (
+            <div className="agency-panel-photo-actions">
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={pickPhoto} />
+              <button type="button" className="agency-panel-photo-btn" disabled={busy} onClick={() => fileRef.current?.click()}>
+                {org.imageUrl ? t('agency.changePhoto') : t('agency.addPhoto')}
+              </button>
+              {org.imageUrl && (
+                <button type="button" className="agency-panel-photo-btn" disabled={busy} onClick={() => run(() => apiService.setOrganisationImage(null))}>{t('agency.removePhoto')}</button>
+              )}
+            </div>
+          )}
         </div>
+        {isAdmin && !org.imageUrl && <p className="agency-panel-photo-hint">{t('agency.photoHint')}</p>}
+        </>
       ) : (
         <header className="agency-panel-intro">
           <h2 className="agency-panel-title">{t('agency.title')}</h2>

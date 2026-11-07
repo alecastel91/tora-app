@@ -6,6 +6,7 @@ import { coordsForCity, normalizeCity, atlasCountryName, FEATURED_HUBS, CITY_COO
 import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
 import LoadingGlobe from './LoadingGlobe';
+import PhotoCard from './PhotoCard';
 
 // Country geometry is decoded once at module load (shared across mounts).
 const LAND = feature(worldData, worldData.objects.countries);
@@ -831,7 +832,15 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
               <button onClick={closeCity} aria-label="Close" className="text-2xl leading-none text-white/40 hover:text-white/70">×</button>
             </div>
             <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
-              {panelProfiles.map((p) => (
+              {/* Desktop: the people as photos, like the roster; the phone keeps compact rows. */}
+              {isDesktop && panelProfiles.length > 0 && (
+                <div className="globe-panel-tiles grid grid-cols-2 gap-2.5">
+                  {panelProfiles.map((p) => (
+                    <PhotoCard key={p.id} profile={p} variant="tile" place={cityNameOf(p)} onOpen={() => onSelectProfile(p)} />
+                  ))}
+                </div>
+              )}
+              {!isDesktop && panelProfiles.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => onSelectProfile(p)}

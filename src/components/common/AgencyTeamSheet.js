@@ -71,7 +71,7 @@ const AgencyTeamSheet = ({ organisationId, onClose, onOpenProfile }) => {
 
   const org = data?.organisation;
   const viewer = data?.viewer;
-  const heroPhoto = org?.members?.find((m) => m.avatar)?.avatar || null;
+  const heroPhoto = org?.imageUrl || org?.members?.find((m) => m.avatar)?.avatar || null;
   const artists = org ? [...new Map(org.members.flatMap((m) => m.artists).map((a) => [a.profileId, a])).values()] : [];
 
   const request = () => run(async () => {
