@@ -78,6 +78,37 @@ const LinkPreview = ({ url }) => {
   );
 };
 
+// TORA News stories (type NEWS): headline, summary, the article's own image
+// and a link out to the source. Area keys follow the brief's area tags.
+const NEWS_AREA_KEY = {
+  'Asia': 'asia', 'Australia & NZ': 'oceania', 'Europe': 'europe', 'North America': 'northAmerica',
+  'Latin America': 'latinAmerica', 'Middle East & Africa': 'mea', 'Global': 'global',
+};
+
+const NewsStory = ({ post, t }) => {
+  const d = post.data || {};
+  let domain = '';
+  try { domain = new URL(d.url).hostname.replace(/^www\./, ''); } catch { /* keep empty */ }
+  return (
+    <a href={d.url} target="_blank" rel="noopener noreferrer"
+       className="mt-3 block overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] no-underline transition-colors hover:border-white/25"
+       onClick={(e) => e.stopPropagation()}>
+      {d.imageUrl && (
+        <img src={d.imageUrl} alt="" loading="lazy"
+             className="aspect-[1.91/1] w-full object-cover"
+             onError={(e) => { e.target.style.display = 'none'; }} />
+      )}
+      <div className="px-3.5 py-3">
+        <div className="text-[15px] font-semibold leading-snug text-white">{d.headline}</div>
+        {post.text && <p className="m-0 mt-1.5 text-[13px] leading-relaxed text-white/70">{post.text}</p>}
+        <div className="mt-2 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40">
+          {t('news.readOn', { source: d.source || domain })}
+        </div>
+      </div>
+    </a>
+  );
+};
+
 const Avatar = ({ profile, size = 'h-10 w-10', onClick }) => (
   profile?.avatar ? (
     <img src={profile.avatar} alt="" onClick={onClick}
@@ -413,7 +444,8 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
       {(posts || []).map((post) => {
         const m = milestone(post);
         const isOwn = myProfileIds.has(post.author?.id);
-        const official = !!post.author?.isOfficial;
+        const isNews = post.type === 'NEWS';
+        const official = !!post.author?.isOfficial && !isNews;
         const thread = openComments[post.id];
         return (
           <div key={post.id} className={`mb-3 rounded-2xl border bg-[#0c0c11] p-4 ${official ? 'border-infrared/40' : 'border-white/10'}`}>
@@ -440,7 +472,11 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                       {t('news.suggested')}
                     </span>
                   )}
-                  {official ? (
+                  {isNews ? (
+                    <span className="shrink-0 rounded-full border border-white/25 px-2 py-0.5 text-[9px] font-tech uppercase tracking-[0.15em] text-white/70">
+                      {t('news.industryNews')}
+                    </span>
+                  ) : official ? (
                     <span className="shrink-0 rounded-full border border-infrared/60 bg-infrared/10 px-2 py-0.5 text-[9px] font-tech uppercase tracking-[0.15em] text-infrared">
                       {t('news.official')}
                     </span>
@@ -452,7 +488,9 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                   )}
                 </div>
                 <div className="text-[11px] text-white/35">
-                  {official
+                  {isNews
+                    ? `${t(`news.areas.${NEWS_AREA_KEY[post.data?.area] || 'global'}`)} · ${relativeTime(post.createdAt, t)}`
+                    : official
                     ? relativeTime(post.createdAt, t)
                     : `${[post.author?.city, post.author?.country].filter(Boolean).join(', ')} · ${relativeTime(post.createdAt, t)}`}
                 </div>
@@ -492,7 +530,9 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
             </div>
 
             {/* body */}
-            {m ? (
+            {isNews ? (
+              <NewsStory post={post} t={t} />
+            ) : m ? (
               <>
               {post.author?.avatar ? (
                 <div className="news-milestone">
