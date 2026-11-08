@@ -1014,29 +1014,7 @@ function App() {
                 lays the screen out as a grid when the nav is present). */}
             {nativeDesktop && <SettingsNav />}
             <div className="settings-content">
-            {/* Account Section */}
-            <div className="settings-section">
-              <h3>{t('settings.account')}</h3>
-              {(accountUser?.firstName || accountUser?.lastName) && (
-                <div className="settings-item">
-                  <span>{t('settingsExtra.name')}</span>
-                  <span className="settings-value">{[accountUser.firstName, accountUser.lastName].filter(Boolean).join(' ')}</span>
-                </div>
-              )}
-              {accountUser?.phone && (
-                <div className="settings-item">
-                  <span>{t('settingsExtra.phone')}</span>
-                  <span className="settings-value">{accountUser.phone}</span>
-                </div>
-              )}
-              <div className="settings-item">
-                <span>{t('settings.email')}</span>
-                <span className="settings-value">{accountUser?.email || user?.email || 'Not available'}</span>
-              </div>
-              <button className="btn btn-outline btn-change-password" onClick={() => setShowPasswordChange(true)}>{t('settings.changePassword')}</button>
-            </div>
-
-            {/* Subscription & Usage Section */}
+            {/* Subscription & Usage Section — first: the plan is what members open Settings for */}
             <div className="settings-section subscription-section">
               <h3>{user?.role === 'AGENT' ? t('settingsExtra.agentPlan') : t('settingsExtra.subscriptionUsage')}</h3>
               {/* The Premium page left the header (2026-09-06); this card is
@@ -1233,7 +1211,52 @@ function App() {
               </div>
             </div>
 
-            <BlockedMembers />
+            {/* Account Section */}
+            <div className="settings-section">
+              <h3>{t('settings.account')}</h3>
+              {(accountUser?.firstName || accountUser?.lastName) && (
+                <div className="settings-item">
+                  <span>{t('settingsExtra.name')}</span>
+                  <span className="settings-value">{[accountUser.firstName, accountUser.lastName].filter(Boolean).join(' ')}</span>
+                </div>
+              )}
+              {accountUser?.phone && (
+                <div className="settings-item">
+                  <span>{t('settingsExtra.phone')}</span>
+                  <span className="settings-value">{accountUser.phone}</span>
+                </div>
+              )}
+              <div className="settings-item">
+                <span>{t('settings.email')}</span>
+                <span className="settings-value">{accountUser?.email || user?.email || 'Not available'}</span>
+              </div>
+              <button className="btn btn-outline btn-change-password" onClick={() => setShowPasswordChange(true)}>{t('settings.changePassword')}</button>
+            </div>
+
+            <div className="settings-section">
+              <h3>{t('push.settingsSection')}</h3>
+              <PushSettingsToggle />
+            </div>
+
+            <div className="settings-section">
+              <h3>{t('settingsExtra.emailPreferences')}</h3>
+              <div className="settings-item">
+                <label className="settings-toggle">
+                  <input
+                    type="checkbox"
+                    checked={accountUser?.marketingConsent === true}
+                    onChange={(e) => handleMarketingConsentChange(e.target.checked)}
+                  />
+                  <span>{t('settingsExtra.marketingToggle')}</span>
+                </label>
+              </div>
+              <div className="settings-item">
+                <label className="settings-toggle settings-toggle-locked">
+                  <input type="checkbox" checked disabled readOnly />
+                  <span>{t('settingsExtra.transactionalToggle')}</span>
+                </label>
+              </div>
+            </div>
 
             <div className="settings-section">
               <h3>{t('settings.language')}</h3>
@@ -1268,6 +1291,11 @@ function App() {
             <InviteFriendsSection />
 
             <div className="settings-section">
+              <h3>{t('install.settingsSection')}</h3>
+              <InstallSettingsSection />
+            </div>
+
+            <div className="settings-section">
               <h3>{t('onboarding.helpSection')}</h3>
               <button
                 type="button"
@@ -1278,35 +1306,7 @@ function App() {
               </button>
             </div>
 
-            <div className="settings-section">
-              <h3>{t('push.settingsSection')}</h3>
-              <PushSettingsToggle />
-            </div>
-
-            <div className="settings-section">
-              <h3>{t('settingsExtra.emailPreferences')}</h3>
-              <div className="settings-item">
-                <label className="settings-toggle">
-                  <input
-                    type="checkbox"
-                    checked={accountUser?.marketingConsent === true}
-                    onChange={(e) => handleMarketingConsentChange(e.target.checked)}
-                  />
-                  <span>{t('settingsExtra.marketingToggle')}</span>
-                </label>
-              </div>
-              <div className="settings-item">
-                <label className="settings-toggle settings-toggle-locked">
-                  <input type="checkbox" checked disabled readOnly />
-                  <span>{t('settingsExtra.transactionalToggle')}</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="settings-section">
-              <h3>{t('install.settingsSection')}</h3>
-              <InstallSettingsSection />
-            </div>
+            <BlockedMembers />
 
             <div className="settings-section">
               <h3>{t('settings.about')}</h3>

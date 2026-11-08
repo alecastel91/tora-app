@@ -13,6 +13,7 @@ import MakeOfferModal from '../common/MakeOfferModal';
 import SignContractModal from '../common/SignContractModal';
 import ContractViewer from '../common/ContractViewer';
 import AddContractModal from '../common/AddContractModal';
+import DraftContractModal from '../common/DraftContractModal';
 import ShareDocumentsModal from '../common/ShareDocumentsModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
@@ -106,6 +107,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   const [selectedContractData, setSelectedContractData] = useState(null);
   const [showAddContractModal, setShowAddContractModal] = useState(false);
   const [pendingContractToSign, setPendingContractToSign] = useState(null);
+  const [draftContractDeal, setDraftContractDeal] = useState(null);
   const [pdfViewerUrl, setPdfViewerUrl] = useState(null);
   const [imageViewerUrl, setImageViewerUrl] = useState(null);
   // When the user opens a contract from a chat card (not from the sign modal),
@@ -3250,6 +3252,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
               setSelectedArtistForDocs(null);
             }
           }}
+          onDraftFromTemplate={() => {
+            setShowAddContractModal(false);
+            setDraftContractDeal(selectedOffer);
+          }}
           existingContracts={
             selectedOffer?.artistId && selectedArtistForDocs
               ? selectedArtistForDocs?.documents?.contracts || []
@@ -3272,6 +3278,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
           }}
         />
       )}
+
+      <DraftContractModal
+        isOpen={!!draftContractDeal}
+        deal={draftContractDeal}
+        currentUser={currentUser}
+        onClose={() => setDraftContractDeal(null)}
+        onReady={(documentData) => setPendingContractToSign({ documentData, deal: draftContractDeal })}
+      />
 
       <ShareDocumentsModal
         isOpen={!!shareDocsDeal}

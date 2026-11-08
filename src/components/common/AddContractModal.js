@@ -27,6 +27,7 @@ const AddContractModal = ({
   existingContracts = [],
   submitLabel = null, // override to "Add" when used from manage-library screens
   submittingLabel = null,
+  onDraftFromTemplate = null, // booking flows: offer the member's own template too
 }) => {
   const { t } = useLanguage();
   const displayLabel = {
@@ -129,6 +130,11 @@ const AddContractModal = ({
 
         <div className="modal-body" style={{ padding: '20px' }}>
           <form onSubmit={handleSubmit}>
+            {onDraftFromTemplate && (
+              <button type="button" className="btn btn-outline" style={{ width: '100%', marginBottom: '20px' }} onClick={onDraftFromTemplate}>
+                {t('contracts.draftButton')}
+              </button>
+            )}
             {existingContracts.length > 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '10px', fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>

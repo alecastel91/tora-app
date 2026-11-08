@@ -6,13 +6,9 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
 
 /**
- * Beta-only chrome: the floating feedback widget and the task sheet behind
- * it. Renders nothing outside beta (VITE_TORA_ENV !== 'beta'), so prod builds
- * carry zero visual footprint.
- * The "test environment" banner that used to sit across the top was removed
- * deliberately — the BETA button is now the only marker that this is not
- * production.
- * Deliberately English-only — beta tooling, not product surface.
+ * Beta-only chrome: the BETA speech bubble and the Tell Us form behind it —
+ * the one thing beta shows that production does not. Renders nothing outside
+ * beta (VITE_TORA_ENV !== 'beta'), so prod builds carry zero visual footprint.
  */
 const BetaTools = () => {
   const { language } = useLanguage();
@@ -83,8 +79,12 @@ const BetaTools = () => {
         } : undefined}
         onPointerDown={onFabPointerDown}
         onClick={() => { if (!dragMovedRef.current) setOpen(true); }}
-        aria-label="Beta tasks and feedback"
+        aria-label="Beta feedback"
       >
+        {/* Comic-book speech bubble: tail bottom-left, the word inside. */}
+        <svg className="beta-fab-bubble" viewBox="0 0 64 44" aria-hidden="true">
+          <path d="M14 2h36a12 12 0 0 1 12 12v8a12 12 0 0 1-12 12H24l-12 8 2-8a12 12 0 0 1-12-12v-8A12 12 0 0 1 14 2z" />
+        </svg>
         <span className="beta-fab-label">BETA</span>
       </button>
 

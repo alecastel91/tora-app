@@ -1,32 +1,22 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import OverlayPortal from './OverlayPortal';
 import { useAppContext } from '../../contexts/AppContext';
 import apiService from '../../services/api';
 import { downscaleImageToDataUrl } from '../../utils/image';
 import { isStandalone } from '../../services/install';
-import { BETA_TASKS_EN, BETA_TASKS_BY_LANG, betaUi } from '../../beta/tasks-strings';
+import { betaUi } from '../../beta/tasks-strings';
 
 /**
- * Beta Tasks & Feedback sheet (TORA_BETA_BRIEF Build Item 2) — the two tabs
- * behind the floating button. Beta-only; English-first (JA overrides arrive
- * with the beta i18n pass). Deliberately outside the main i18n catalog.
- *
- * YOUR LIST: grouped task rows that tick themselves from real state (the
- * list polls while open, so auto-detected work flips without a reload).
- * TELL US: type + severity + text + up to five screenshots; everything
- * else (route, screen, commit, device, last API error, Sentry event) is
- * captured silently.
+ * Beta feedback sheet — the only beta-only surface in the app (behind the
+ * BETA bubble), so beta otherwise looks exactly like production. The task
+ * checklist lives in the admin cockpit, ticked from what testers do.
+ * TELL US: type + severity + text + up to five screenshots; everything else
+ * (route, screen, commit, device, last API error, Sentry event) is captured
+ * silently. Deliberately outside the main i18n catalog.
  */
 const TYPES = ['Bug', 'Confusing', 'Missing', 'Idea', 'Copy', 'Performance'];
 const SEVERITY_KEYS = ['blocked', 'annoyed', 'noting'];
-
-// Role-specific wording overrides use a `CODE@ROLE` key (e.g. T07@AGENT).
-const taskText = (code, lang, role) => {
-  const pick = (dict) => (role && dict[`${code}@${role}`]) || dict[code];
-  const localized = BETA_TASKS_BY_LANG[lang];
-  return (localized && pick(localized)) || pick(BETA_TASKS_EN) || { title: code, hint: '' };
-};
 
 const currentTab = () => {
   const container = document.querySelector('.app-container');
@@ -45,86 +35,22 @@ const SentScreen = ({ title, sub, cta, onClick }) => (
 const BetaSheet = ({ open, onClose, language = 'en' }) => {
   const { user } = useAppContext();
   const ui = betaUi(language);
-  const [tab, setTab] = useState('list');
-  const [data, setData] = useState(null);
-  const [openHint, setOpenHint] = useState(null);
-  const [skipFor, setSkipFor] = useState(null);
-  const [skipReason, setSkipReason] = useState('');
-
-  // Feedback state
   const [type, setType] = useState('Bug');
   const [severity, setSeverity] = useState('annoyed');
   const [body, setBody] = useState('');
-  const [taskCode, setTaskCode] = useState(null);
   const [shots, setShots] = useState([]);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const shotInputRef = useRef(null);
 
-  // Final Check (debrief): a sub-view of YOUR LIST, not a third tab and not
-  // the Tell Us form. Own busy/error so a failed answer never bleeds into
-  // the report form.
-  const [listView, setListView] = useState('rows'); // 'rows' | 'debrief'
-  const [debriefCode, setDebriefCode] = useState(null);
-  const [answer, setAnswer] = useState(null);
-  const [why, setWhy] = useState('');
-  const [debriefBusy, setDebriefBusy] = useState(false);
-  const [debriefSent, setDebriefSent] = useState(false);
-  const [debriefError, setDebriefError] = useState('');
-
-  // The sheet stays mounted while closed — reopen on the list, not on a
-  // stale thank-you screen or a half-written report's error.
+  // The sheet stays mounted while closed: reopen on the form, not on a stale
+  // thank-you screen or an old error.
   useEffect(() => {
-    if (open) { showTab('list'); setDebriefError(''); }
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const mutationSeq = useRef(0);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const loadTasks = useCallback(async (fresh = false) => {
-    if (!user?.id) return;
-    const seq = mutationSeq.current;
-    try {
-      const d = await apiService.betaGetTasks(user.id, fresh);
-      // A poll that started BEFORE a tick/skip must not clobber the
-      // optimistic update with pre-mutation server state.
-      if (seq === mutationSeq.current) { setData(d); setLoadFailed(false); }
-    } catch {
-      setLoadFailed(true); // keep last data; only first-load shows the error
-    }
-  }, [user?.id]);
-
-  // Poll while open: auto-detected ticks appear without a reload.
-  useEffect(() => {
-    if (!open || tab !== 'list') return undefined;
-    loadTasks(true); // opening = actively checking: evaluate NOW, no debounce
-    const timer = setInterval(() => loadTasks(false), 15000);
-    return () => clearInterval(timer);
-  }, [open, tab, loadTasks]);
-
-  // Optimistic local status; server truth arrives on the next poll. Bumping
-  // the sequence discards polls that were already in flight.
-  const markLocal = (code, status) => {
-    mutationSeq.current += 1;
-    setData((d) => d && { ...d, tasks: d.tasks.map((t) => (t.code === code ? { ...t, status } : t)) });
-  };
-  const showTab = (k) => {
-    setTab(k); setSent(false); setError('');
-    if (k === 'list') setListView('rows');
-  };
+    if (open) { setSent(false); setError(''); }
+  }, [open]);
 
   if (!open) return null;
-
-  const setStatus = async (code, status, reason) => {
-    markLocal(code, status);
-    try { await apiService.betaUpdateTask(code, { profileId: user.id, status, skipReason: reason }); } catch { /* next poll corrects */ }
-    loadTasks();
-  };
-
-  const openHintFor = (code) => {
-    setOpenHint(openHint === code ? null : code);
-    if (openHint !== code) apiService.betaUpdateTask(code, { profileId: user.id, hintOpened: true }).catch(() => {});
-  };
 
   // Silent context attached to every feedback row — screen, device, last
   // error — so the tester never has to describe them.
@@ -141,48 +67,6 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
     sentryEventId: (Sentry.lastEventId && Sentry.lastEventId()) || null,
     lastApiError: window.__toraLastApiError || null,
   });
-
-  // The Final Check has its own space: one yes/no question plus a reason,
-  // stored as type 'Debrief' (answer in the severity slot) so the cockpit
-  // tracks it apart from reports. The server marks the debrief task done
-  // when the answer arrives. A draft for the same question survives leaving
-  // and coming back; a different question or a sent answer starts fresh.
-  const openDebrief = (code) => {
-    if (code !== debriefCode || debriefSent) { setDebriefCode(code); setAnswer(null); setWhy(''); setDebriefSent(false); }
-    setDebriefError('');
-    setListView('debrief');
-  };
-  const submitDebrief = async () => {
-    if (!answer || !why.trim() || debriefBusy) return;
-    setDebriefBusy(true); setDebriefError('');
-    try {
-      await apiService.betaSendFeedback({
-        profileId: user?.id || null,
-        taskCode: debriefCode,
-        type: 'Debrief',
-        severity: answer, // 'yes' | 'no'
-        body: why.trim(),
-        attachments: [],
-        ...silentContext(),
-      });
-      setDebriefSent(true);
-      markLocal(debriefCode, 'done');
-    } catch (e2) {
-      setDebriefError(e2.message || 'Could not send — try again.');
-    } finally {
-      setDebriefBusy(false);
-    }
-  };
-
-  // Jump to TELL US with a task attached — any row can use it to report
-  // confusion.
-  const openFeedback = (code, kind) => {
-    setTab('tell');
-    setType(kind);
-    setTaskCode(code);
-    setBody('');
-    setSent(false);
-  };
 
   const pickShots = async (e) => {
     const files = Array.from(e.target.files || []).slice(0, 5 - shots.length);
@@ -205,7 +89,6 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
     try {
       await apiService.betaSendFeedback({
         profileId: user?.id || null,
-        taskCode,
         type,
         severity,
         body: body.trim(),
@@ -213,23 +96,13 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
         ...silentContext(),
       });
       setSent(true);
-      setBody(''); setShots([]); setTaskCode(null);
+      setBody(''); setShots([]);
     } catch (e2) {
       setError(e2.message || 'Could not send — try again.');
     } finally {
       setBusy(false);
     }
   };
-
-  // Chapter order is the server's call (utils/betaTaskPolicy.js) so the sheet,
-  // the cockpit preview and the roster can't drift apart. Fallback: derive
-  // from the tasks themselves (older backend during a deploy window).
-  const order = data?.groupOrder?.length
-    ? data.groupOrder
-    : [...new Set((data?.tasks || []).map((t) => t.group))];
-  const groups = order
-    .map((g) => [g, (data?.tasks || []).filter((t) => t.group === g)])
-    .filter(([, rows]) => rows.length);
 
   return (
     <OverlayPortal>
@@ -242,167 +115,15 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1>BETA TEST</h1>
+          <h1>{ui.tellUs}</h1>
           <div style={{ width: '24px' }}></div>
         </div>
 
-        <div
-          className="mx-4 flex shrink-0 rounded-full border border-white/10 bg-white/[0.04] p-1"
-          style={{ marginTop: 22, marginBottom: 16 }}
-        >
-          {[['list', ui.yourList], ['tell', ui.tellUs]].map(([k, label]) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => showTab(k)}
-              className={`flex-1 rounded-full py-2 text-[12px] font-semibold tracking-wider ${tab === k ? 'bg-infrared text-white' : 'text-white/60'}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+24px)]">
-          {tab === 'list' && listView === 'rows' && (
-            <>
-              <p className="m-0 mb-4 text-[13px] text-white/60">
-                {ui.intro}
-                {data ? ` ${data.done}/${data.total}` : ''}
-              </p>
-              {!data && !loadFailed && <p className="text-white/50">{ui.loading}</p>}
-              {!data && loadFailed && (
-                <p className="text-white/50">
-                  {ui.loadError}{' '}
-                  <button type="button" className="border-0 bg-transparent p-0 text-white/70 underline" onClick={loadTasks}>{ui.retry}</button>
-                </p>
-              )}
-              {groups.map(([g, rows]) => (
-                <div key={g} className="mb-5">
-                  <h3 className="m-0 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">{g}</h3>
-                  {rows.map((t) => {
-                    const s = taskText(t.code, language, user?.role);
-                    const done = t.status === 'done';
-                    const skipped = t.status === 'skipped';
-                    return (
-                      <div key={t.code} className="mb-2 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                        <div className="flex items-start gap-3">
-                          <button
-                            type="button"
-                            aria-label={done ? 'Done' : 'Mark done'}
-                            onClick={() => { if (!t.autoDetected && !t.debrief) setStatus(t.code, done ? 'todo' : 'done'); }}
-                            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] ${done ? 'border-[#43E97B]/70 bg-[#43E97B]/20 text-[#43E97B]' : skipped ? 'border-white/20 text-white/30' : 'border-white/25 text-transparent'} ${t.autoDetected || t.debrief ? 'cursor-default' : 'cursor-pointer'}`}
-                          >
-                            {done ? '✓' : skipped ? '–' : '·'}
-                          </button>
-                          <div className="min-w-0 flex-1">
-                            <p className={`m-0 text-[13.5px] leading-snug ${done ? 'text-white/40 line-through' : 'text-white/90'}`}>
-                              {s.title}
-                              {t.counterparty && !['None', 'n/a'].includes(t.counterparty) && !done && (
-                                <span className="ml-1 text-white/40">· {t.counterparty}</span>
-                              )}
-                            </p>
-                            {openHint === t.code && s.hint && (
-                              <p className="m-0 mt-2 rounded-lg border border-white/10 bg-white/[0.04] p-2.5 text-[12.5px] leading-relaxed text-white/70">{s.hint}</p>
-                            )}
-                            {!done && (
-                              <div className="mt-1.5 flex flex-wrap gap-3">
-                                {t.debrief && (
-                                  <button type="button" className="border-0 bg-transparent p-0 text-[12px] font-semibold text-[#FF3366] underline" onClick={() => openDebrief(t.code)}>
-                                    {ui.answer}
-                                  </button>
-                                )}
-                                {s.hint && (
-                                  <button type="button" className="border-0 bg-transparent p-0 text-[12px] text-white/50 underline" onClick={() => openHintFor(t.code)}>
-                                    {ui.showMeHow}
-                                  </button>
-                                )}
-                                {!t.debrief && (
-                                  <button type="button" className="border-0 bg-transparent p-0 text-[12px] text-white/50 underline" onClick={() => openFeedback(t.code, 'Confusing')}>
-                                    {ui.confusing}
-                                  </button>
-                                )}
-                                {!skipped && !t.autoDetected && (
-                                  <button type="button" className="border-0 bg-transparent p-0 text-[12px] text-white/35 underline" onClick={() => { setSkipFor(t.code); setSkipReason(''); }}>
-                                    {ui.skip}
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                            {skipFor === t.code && (
-                              <div className="mt-2">
-                                <input
-                                  className="form-input w-full text-[13px]"
-                                  placeholder={ui.skipWhy}
-                                  value={skipReason}
-                                  onChange={(e) => setSkipReason(e.target.value)}
-                                />
-                                <div className="mt-2 flex gap-2">
-                                  <button type="button" className="btn btn-outline btn-sm" onClick={() => setSkipFor(null)}>{ui.cancel}</button>
-                                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setStatus(t.code, 'skipped', skipReason); setSkipFor(null); }}>
-                                    {ui.skipIt}
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </>
-          )}
-
-          {tab === 'list' && listView === 'debrief' && (
-            debriefSent ? (
-              <SentScreen title={ui.finalDone} sub={ui.finalDoneSub} cta={ui.backToList} onClick={() => setListView('rows')} />
-            ) : (
-              <>
-                <p className="m-0 mb-1 text-[11px] font-semibold uppercase tracking-wider text-[#FF3366]">{ui.finalCheck}</p>
-                <p className="m-0 mb-4 text-[12.5px] text-white/50">{ui.finalIntro}</p>
-                <p className="m-0 mb-4 rounded-xl border border-white/10 bg-white/[0.04] p-3.5 text-[15px] font-semibold leading-snug text-white">
-                  {taskText(debriefCode, language, user?.role).title}
-                </p>
-                <div className="mb-4 flex gap-2">
-                  {[['yes', ui.yes], ['no', ui.no]].map(([k, label]) => (
-                    <button key={k} type="button" onClick={() => setAnswer(k)}
-                      className={`flex-1 rounded-full border py-2.5 text-[14px] font-semibold ${answer === k ? 'border-infrared bg-infrared/20 text-white' : 'border-white/15 text-white/60'}`}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <p className="m-0 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{ui.whyQ}</p>
-                <textarea
-                  className="message-textarea-bottom w-full"
-                  placeholder={ui.whyPlaceholder}
-                  value={why}
-                  onChange={(e) => setWhy(e.target.value)}
-                  maxLength={2000}
-                  rows={4}
-                />
-                {debriefError && <p className="m-0 mb-3 text-sm text-infrared">{debriefError}</p>}
-                <button className="btn btn-primary btn-full" onClick={submitDebrief} disabled={debriefBusy || !answer || !why.trim()}>
-                  {debriefBusy ? '…' : ui.finalSend}
-                </button>
-                <button type="button" className="mt-3 w-full border-0 bg-transparent p-0 text-center text-[12px] text-white/40 underline" onClick={() => setListView('rows')}>
-                  {ui.backToList}
-                </button>
-              </>
-            )
-          )}
-
-          {tab === 'tell' && (
-            sent ? (
+          {sent ? (
               <SentScreen title={ui.received} sub={ui.receivedSub} cta={ui.sendAnother} onClick={() => setSent(false)} />
             ) : (
               <>
-                {taskCode && (
-                  <p className="m-0 mb-3 rounded-lg border border-white/10 bg-white/[0.04] p-2.5 text-[12.5px] text-white/60">
-                    {ui.aboutTask}: {taskText(taskCode, language, user?.role).title}
-                    <button type="button" className="ml-2 border-0 bg-transparent p-0 text-white/40 underline" onClick={() => setTaskCode(null)}>{ui.remove}</button>
-                  </p>
-                )}
                 <p className="m-0 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{ui.typeQ}</p>
                 <div className="mb-3 flex flex-wrap gap-1.5">
                   {TYPES.map((tp) => (
@@ -453,7 +174,6 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
                   {busy ? '…' : ui.send}
                 </button>
               </>
-            )
           )}
         </div>
       </div>

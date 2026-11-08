@@ -6,16 +6,13 @@ import { useLanguage } from '../../contexts/LanguageContext';
  * First-login "Getting started" carousel — six swipeable slides that explain
  * the app in the user's language. Reopenable from Settings; skippable always.
  */
-// Final slide adapts to the environment: beta builds close on the tester
-// note; production builds close on the "you're all set" send-off.
-const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
 const SLIDES = [
   { key: 'welcome' },
   { key: 'profile' },
   { key: 'discover' },
   { key: 'book' },
   { key: 'tourKickstart' },
-  { key: IS_BETA ? 'beta' : 'ready' },
+  { key: 'ready' },
 ];
 
 const GettingStartedSheet = ({ open, onClose }) => {

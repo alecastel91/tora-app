@@ -728,11 +728,6 @@ class ApiService {
   }
 
   // ---- Beta tasks & feedback (routes 404 outside the beta env) ----
-  async betaGetTasks(profileId, fresh = false) {
-    const response = await fetch(`${API_URL}/beta/tasks?profileId=${profileId}${fresh ? '&fresh=1' : ''}`, { headers: this.getHeaders() });
-    return this.handleResponse(response);
-  }
-
   async betaUpdateTask(code, payload) {
     const response = await fetch(`${API_URL}/beta/tasks/${code}`, {
       method: 'PUT',
@@ -881,21 +876,6 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  // Beta feedback viewer (official/admin account only). Sends the auth token
-  // like other authed calls; backend gates on isOfficial.
-  async getAdminFeedback({ before, page } = {}) {
-    const url = new URL(`${API_URL}/admin/feedback`);
-    if (before) url.searchParams.set('before', before);
-    if (page && page !== 'all') url.searchParams.set('page', page);
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: this.getHeaders()
-    });
-
-    return this.handleResponse(response);
-  }
-
-  // CONNECTION ENDPOINTS
   async toggleLike(fromProfileId, toProfileId) {
     const response = await fetch(`${API_URL}/connections/like/${toProfileId}`, {
       method: 'POST',
