@@ -13202,3 +13202,10 @@ div.poster-stat { cursor: default; }
 .like-tip-plus { font-weight: 700; font-size: 16px; line-height: 1; }
 .like-tip-close { justify-self: end; background: none; border: 0; padding: 2px 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); cursor: pointer; }
 .like-tip-close:hover { color: #fff; }
+
+/* News: area filter chips (TORA News stories; member posts always show) */
+.news-area-chips { display: flex; gap: 6px; overflow-x: auto; margin: 0 -20px 16px; padding: 0 20px; scrollbar-width: none; }
+.news-area-chips::-webkit-scrollbar { display: none; }
+.news-area-chip { flex: none; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.7); border-radius: 999px; padding: 6px 12px; font-size: 12px; white-space: nowrap; cursor: pointer; transition: border-color .15s, color .15s; }
+.news-area-chip:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.news-area-chip.active { border-color: #ff3366; background: rgba(255,51,102,0.12); color: #fff; }

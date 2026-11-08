@@ -1169,7 +1169,7 @@ const fr = {
   },
   likeTip: {
     likeArtist: 'Likez les profils que vous respectez. Pour un promoteur ou un lieu, c\'est un signe d\'intérêt : il est notifié, pas besoin de message.',
-    likeBooker: 'Likez un artiste pour montrer votre intérêt et le garder en vue. Avec l\'offre Annuelle, vous recevez aussi une alerte voyage quand il annonce des dates près de chez vous.',
+    likeBooker: 'Likez les profils que vous respectez. Vous gardez l\'artiste dans votre radar, et avec Yearly vous recevez une alerte quand il annonce des dates près de chez vous.',
     connectArtist: 'Se connecter envoie une demande avec un court message. Une fois acceptée, vous pouvez écrire et proposer votre projet.',
     connectBooker: 'Se connecter envoie une demande avec un court message. Une fois acceptée, vous pouvez écrire et envoyer des offres.',
     gotIt: 'Compris',
@@ -2570,6 +2570,7 @@ const fr = {
     official: "TORA · Officiel",
     industryNews: 'Actus du secteur',
     readOn: 'Lire sur {{source}}',
+    allAreas: 'Toutes',
     areas: {
       asia: 'Asie',
       oceania: 'Australie et NZ',

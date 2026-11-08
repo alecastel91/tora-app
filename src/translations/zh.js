@@ -1169,7 +1169,7 @@ const zh = {
   },
   likeTip: {
     likeArtist: '为你欣赏的档案点赞。对主办方或场地来说，这是一种兴趣的信号：对方会收到通知，无需发消息。',
-    likeBooker: '点赞艺人表示你的兴趣，并持续关注。年度会员还会在对方公布你附近的日期时收到巡演提醒。',
+    likeBooker: '为你欣赏的档案点赞。这样能持续关注一位艺人；开通 Yearly 后，当他们宣布在你附近的演出日期时，你会收到提醒。',
     connectArtist: '「连接」会发送一条附短信的请求。对方接受后，你就可以发消息和自荐。',
     connectBooker: '「连接」会发送一条附短信的请求。对方接受后，你就可以发消息和发出邀约。',
     gotIt: '知道了',
@@ -2570,6 +2570,7 @@ const zh = {
     official: "TORA · 官方",
     industryNews: '行业新闻',
     readOn: '在 {{source}} 阅读',
+    allAreas: '全部',
     areas: {
       asia: '亚洲',
       oceania: '澳大利亚和新西兰',

@@ -1169,7 +1169,7 @@ const pt = {
   },
   likeTip: {
     likeArtist: 'Curta os perfis que você respeita. Para um promotor ou casa, é um sinal de interesse: eles são notificados, sem precisar de mensagem.',
-    likeBooker: 'Curta um artista para mostrar interesse e mantê-lo no radar. No plano Anual você também recebe um alerta de viagem quando ele anunciar datas perto de você.',
+    likeBooker: 'Curta os perfis que você respeita. Assim você mantém um artista no seu radar, e no Yearly recebe um alerta quando ele anunciar datas perto de você.',
     connectArtist: 'Conectar envia um pedido com uma nota curta. Depois de aceito, você pode conversar e apresentar sua proposta.',
     connectBooker: 'Conectar envia um pedido com uma nota curta. Depois de aceito, você pode conversar e enviar ofertas.',
     gotIt: 'Entendi',
@@ -2570,6 +2570,7 @@ const pt = {
     official: "TORA · Oficial",
     industryNews: 'Notícias do setor',
     readOn: 'Ler em {{source}}',
+    allAreas: 'Todas',
     areas: {
       asia: 'Ásia',
       oceania: 'Austrália e NZ',

@@ -85,6 +85,11 @@ const NEWS_AREA_KEY = {
   'Latin America': 'latinAmerica', 'Middle East & Africa': 'mea', 'Global': 'global',
 };
 
+const AREA_STORE_KEY = 'tora:news-area';
+const readArea = () => {
+  try { const a = localStorage.getItem(AREA_STORE_KEY); return NEWS_AREA_KEY[a] ? a : ''; } catch { return ''; }
+};
+
 const NewsStory = ({ post, t }) => {
   const d = post.data || {};
   let domain = '';
@@ -222,10 +227,19 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     return out;
   };
 
+  // News area filter ('' = all). Global stories show under every area.
+  const [area, setArea] = useState(readArea);
+  const pickArea = (next) => {
+    if (next === area) return;
+    try { localStorage.setItem(AREA_STORE_KEY, next); } catch { /* private mode: this visit only */ }
+    setPosts(null);
+    setArea(next);
+  };
+
   const load = useCallback(async () => {
     if (!user?.id) return;
     try {
-      const data = await apiService.getFeed({ profileId: user.id, lang: language });
+      const data = await apiService.getFeed({ profileId: user.id, lang: language, area });
       if (suggestedRef.current === null) suggestedRef.current = data.suggested || [];
       setPosts(interleaveSuggestions(data.posts, suggestedRef.current));
       setCursor(data.nextCursor);
@@ -233,7 +247,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     } catch {
       setPosts([]);
     }
-  }, [user?.id]);
+  }, [user?.id, area]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -241,7 +255,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     if (loadingMore || !cursor) return;
     setLoadingMore(true);
     try {
-      const data = await apiService.getFeed({ profileId: user.id, cursor, lang: language });
+      const data = await apiService.getFeed({ profileId: user.id, cursor, lang: language, area });
       setPosts((prev) => {
         const incomingIds = new Set(data.posts.map((p) => p.id));
         const kept = (prev || []).filter((p) => !(p.suggested && incomingIds.has(p.id)));
@@ -432,6 +446,21 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
             {posting ? '...' : t('news.postCta')}
           </button>
         </div>
+      </div>
+
+      <div className="news-area-chips" role="tablist" aria-label={t('news.industryNews')}>
+        {['', ...Object.keys(NEWS_AREA_KEY).filter((a) => a !== 'Global')].map((a) => (
+          <button
+            key={a || 'all'}
+            type="button"
+            role="tab"
+            aria-selected={area === a}
+            className={`news-area-chip${area === a ? ' active' : ''}`}
+            onClick={() => pickArea(a)}
+          >
+            {a ? t(`news.areas.${NEWS_AREA_KEY[a]}`) : t('news.allAreas')}
+          </button>
+        ))}
       </div>
 
       {posts === null && (
