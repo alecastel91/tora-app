@@ -7,7 +7,7 @@ const readDismissed = () => { try { return localStorage.getItem(DISMISS_KEY) ===
 
 /**
  * One-time explainer next to the Like / Connect buttons, worded for who is
- * looking: an artist's like says "I'd love to play there", a booker's like
+ * looking: an artist's like says "I rate you and I'm open to playing there", a booker's like
  * keeps the artist on their radar (travel alerts on Yearly). Closing it on
  * any screen closes it everywhere; the full answer lives in Questions.
  */

@@ -8,11 +8,13 @@ import { useLanguage } from '../../contexts/LanguageContext';
  * page reads the same.
  *
  * features: [{ icon: <Icon />, text }]
+ * compact: tighter spacing for gates that sit under a tab row (Manage) so
+ * the whole pitch fits one phone screen.
  */
-const PremiumGate = ({ title, description, features = [], onUpgrade }) => {
+const PremiumGate = ({ title, description, features = [], onUpgrade, compact = false }) => {
   const { t } = useLanguage();
   return (
-    <div className="tour-kickstart-content">
+    <div className={`tour-kickstart-content${compact ? ' premium-gate-compact' : ''}`}>
       <div className="coming-soon-placeholder tour-gate">
         <h2>{title}</h2>
         <p>{description}</p>

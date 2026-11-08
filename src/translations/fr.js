@@ -1168,7 +1168,7 @@ const fr = {
     unavailable: 'L\'assistant n\'est pas disponible pour le moment — réessayez plus tard.',
   },
   likeTip: {
-    likeArtist: 'Likez un lieu ou un promoteur pour montrer que vous aimeriez y jouer. Il est notifié, pas besoin de message.',
+    likeArtist: 'Likez un lieu ou un promoteur pour montrer que vous appréciez son travail et que vous seriez partant pour y jouer. Il est notifié, pas besoin de message.',
     likeBooker: 'Likez un artiste pour montrer votre intérêt et le garder en vue. Avec l\'offre Annuelle, vous recevez aussi une alerte voyage quand il annonce des dates près de chez vous.',
     connectArtist: 'Se connecter envoie une demande avec un court message. Une fois acceptée, vous pouvez écrire et proposer votre projet.',
     connectBooker: 'Se connecter envoie une demande avec un court message. Une fois acceptée, vous pouvez écrire et envoyer des offres.',

@@ -13137,6 +13137,13 @@ div.poster-stat { cursor: default; }
 .tour-gate .feature-preview h4 { margin: 0 0 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.68); }
 .tour-gate .feature-preview li { padding: 12px 0; margin: 0; border: 0; border-bottom: 1px solid rgba(255,255,255,0.1); background: none; color: rgba(255,255,255,0.86); text-align: left; }
 .tour-gate > .btn { width: 100%; min-height: 52px; }
+/* Manage → Insights: the gate sits under the tab row, so it drops the page padding and tightens its rhythm to fit one phone screen. */
+.premium-gate-compact { padding: 0; }
+.premium-gate-compact .tour-gate { padding: 4px 0 8px; }
+.premium-gate-compact .tour-gate h2 { font-size: 28px; }
+.premium-gate-compact .tour-gate > p { margin-bottom: 12px; }
+.premium-gate-compact .tour-gate .feature-preview { margin-bottom: 14px; }
+.premium-gate-compact .tour-gate .feature-preview li { padding: 9px 0; }
 
 /* Roster */
 .represented-artists-header { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "back add" "title title"; align-items: center; gap: 14px; padding: 14px 16px; position: static; background: none; border: 0; }

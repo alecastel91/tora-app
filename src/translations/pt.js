@@ -1168,7 +1168,7 @@ const pt = {
     unavailable: 'O assistente não está disponível agora — tente novamente mais tarde.',
   },
   likeTip: {
-    likeArtist: 'Curta uma casa ou promotor para mostrar que você adoraria tocar lá. Eles são notificados, sem precisar de mensagem.',
+    likeArtist: 'Curta uma casa ou promotor para mostrar que você valoriza o trabalho deles e toparia tocar lá. Eles são notificados, sem precisar de mensagem.',
     likeBooker: 'Curta um artista para mostrar interesse e mantê-lo no radar. No plano Anual você também recebe um alerta de viagem quando ele anunciar datas perto de você.',
     connectArtist: 'Conectar envia um pedido com uma nota curta. Depois de aceito, você pode conversar e apresentar sua proposta.',
     connectBooker: 'Conectar envia um pedido com uma nota curta. Depois de aceito, você pode conversar e enviar ofertas.',

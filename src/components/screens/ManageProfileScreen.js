@@ -1027,6 +1027,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
         {activeTab === 'dashboard' && (insightsLocked
           ? (
             <PremiumGate
+              compact
               title={t('manage.unlockInsights')}
               description={t('manage.unlockInsightsDesc')}
               onUpgrade={onOpenPremium}
