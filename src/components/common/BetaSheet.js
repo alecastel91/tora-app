@@ -106,10 +106,13 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
 
   return (
     <OverlayPortal>
-      <div className="fixed inset-0 z-[1100] flex flex-col bg-[#0a0a0a]">
+      {/* Phone: a full page. Desktop: a centred panel over a dimmed app, above
+          the desktop header (which otherwise covered the page title). */}
+      <div className="fixed inset-0 z-[3000] flex flex-col bg-[#0a0a0a] lg:items-center lg:justify-center lg:bg-black/70 lg:p-8" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+       <div className="flex min-h-0 flex-1 flex-col lg:w-full lg:max-w-[600px] lg:flex-none lg:max-h-[88vh] lg:overflow-hidden lg:rounded-2xl lg:border lg:border-white/10 lg:bg-[#0c0c11] lg:shadow-2xl">
         {/* Same header structure as the Premium page: back arrow left,
             centered title, symmetric spacer. */}
-        <div className="premium-header shrink-0" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 34px)' }}>
+        <div className="premium-header beta-sheet-header shrink-0">
           <button className="back-button" onClick={onClose}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -119,7 +122,7 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
           <div style={{ width: '24px' }}></div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom)+24px)]">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-6 pb-[calc(env(safe-area-inset-bottom)+24px)] lg:px-6 lg:pb-6">
           {sent ? (
               <SentScreen title={ui.received} sub={ui.receivedSub} cta={ui.sendAnother} onClick={() => setSent(false)} />
             ) : (
@@ -133,7 +136,7 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
                     </button>
                   ))}
                 </div>
-                <p className="m-0 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/40">{ui.howBad}</p>
+                <p className="m-0 mb-1.5 mt-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">{ui.howBad}</p>
                 <div className="mb-3 flex flex-wrap gap-1.5">
                   {SEVERITY_KEYS.map((sv) => (
                     <button key={sv} type="button" onClick={() => setSeverity(sv)}
@@ -176,6 +179,7 @@ const BetaSheet = ({ open, onClose, language = 'en' }) => {
               </>
           )}
         </div>
+       </div>
       </div>
     </OverlayPortal>
   );

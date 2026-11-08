@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { isPremiumViewer, openPremium } from '../../utils/subscription';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { showToast } from '../../utils/toast';
@@ -25,7 +26,7 @@ const dealMoney = (n, cur) => `${formatFee(n)} ${cur}`;
  */
 const FIELD_KEYS = ['billToName', 'billToAddress', 'description', 'issueDate', 'dueDate'];
 const EMPTY_FIELDS = Object.fromEntries(FIELD_KEYS.map((k) => [k, '']));
-const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => {
+const IssueInvoiceForm = ({ isOpen, deal, currentUser, onClose, onIssued }) => {
   const { t } = useLanguage();
   const [kind, setKind] = useState('deposit');
   const [amount, setAmount] = useState('');
@@ -197,6 +198,16 @@ const IssueInvoiceModal = ({ isOpen, deal, currentUser, onClose, onIssued }) => 
       )}
     </DocModal>
   );
+};
+
+// Templates are Premium: a free member who taps Draft / Issue lands on the
+// Premium page instead, whichever screen the button sits on.
+const IssueInvoiceModal = (props) => {
+  const locked = props.isOpen && !isPremiumViewer(props.currentUser);
+  useEffect(() => {
+    if (locked) { props.onClose(); openPremium(); }
+  }, [locked]); // eslint-disable-line react-hooks/exhaustive-deps
+  return locked ? null : <IssueInvoiceForm {...props} />;
 };
 
 export default IssueInvoiceModal;

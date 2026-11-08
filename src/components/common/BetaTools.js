@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 const IS_BETA = import.meta.env.VITE_TORA_ENV === 'beta';
 
 /**
- * Beta-only chrome: the BETA speech bubble and the Tell Us form behind it —
+ * Beta-only chrome: the round feedback button and the Tell Us form behind it —
  * the one thing beta shows that production does not. Renders nothing outside
  * beta (VITE_TORA_ENV !== 'beta'), so prod builds carry zero visual footprint.
  */
@@ -66,6 +66,7 @@ const BetaTools = () => {
 
   return (
     <>
+      {!open && (
       <button
         type="button"
         className="beta-fab"
@@ -73,20 +74,24 @@ const BetaTools = () => {
         style={fabPos ? {
           // Clamp to the CURRENT viewport — a position saved on desktop
           // could otherwise park the FAB off-screen on a phone, unrecoverable.
-          left: Math.min(Math.max(4, fabPos.x), (typeof window !== 'undefined' ? window.innerWidth : 9999) - 72),
-          top: Math.min(Math.max(4, fabPos.y), (typeof window !== 'undefined' ? window.innerHeight : 9999) - 48),
+          left: Math.min(Math.max(4, fabPos.x), (typeof window !== 'undefined' ? window.innerWidth : 9999) - 52),
+          top: Math.min(Math.max(4, fabPos.y), (typeof window !== 'undefined' ? window.innerHeight : 9999) - 52),
           right: 'auto', bottom: 'auto',
         } : undefined}
         onPointerDown={onFabPointerDown}
         onClick={() => { if (!dragMovedRef.current) setOpen(true); }}
         aria-label="Beta feedback"
       >
-        {/* Comic-book speech bubble: tail bottom-left, the word inside. */}
-        <svg className="beta-fab-bubble" viewBox="0 0 64 44" aria-hidden="true">
-          <path d="M14 2h36a12 12 0 0 1 12 12v8a12 12 0 0 1-12 12H24l-12 8 2-8a12 12 0 0 1-12-12v-8A12 12 0 0 1 14 2z" />
+        {/* Same round icon button as the header's Questions entry: a speech
+            cloud with three dots, the universal "tell us something". */}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          <circle cx="8.2" cy="11.6" r="1.1" fill="currentColor" stroke="none" />
+          <circle cx="12.2" cy="11.6" r="1.1" fill="currentColor" stroke="none" />
+          <circle cx="16.2" cy="11.6" r="1.1" fill="currentColor" stroke="none" />
         </svg>
-        <span className="beta-fab-label">BETA</span>
       </button>
+      )}
 
       <BetaSheet open={open} onClose={() => setOpen(false)} language={language} />
     </>

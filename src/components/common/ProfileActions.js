@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { HeartIcon } from '../../utils/icons';
+import LikeConnectTip from './LikeConnectTip';
 
 /* The buttons on someone else's profile. The main one depends on who is looking:
    a venue or promoter can make an offer to an artist or agent; an artist or
@@ -51,6 +52,7 @@ const ProfileActions = ({
   }
 
   return (
+    <>
     <div className={`poster-actions ${className}`}>
       {main}
       {side}
@@ -58,6 +60,8 @@ const ProfileActions = ({
         <HeartIcon filled={isLiked} />
       </button>
     </div>
+    <LikeConnectTip viewerRole={viewerRole} />
+    </>
   );
 };
 

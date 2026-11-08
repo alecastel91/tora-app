@@ -199,7 +199,7 @@ const GuideScreen = ({ onClose }) => {
                 )}
               </div>
             ) : (
-              // Four groups, collapsed, so the whole index plus the Assistant
+              // Five groups, collapsed, so the whole index plus the Assistant
               // fits one screen. Tapping one opens it in place rather than
               // navigating — the point of the index is seeing the shape of the
               // thing without leaving it.

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { getCurrencySymbol } from '../../utils/currencies';
-import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon } from '../../utils/icons';
+import { CloseIcon, CalendarIcon, DollarIcon, TrendingUpIcon, ImageIcon, SlidersIcon, FileTextIcon, FileIcon, AlertIcon, LocationIcon, EyeIcon } from '../../utils/icons';
 import RevenueChart from '../common/RevenueChart';
 import AddContractModal from '../common/AddContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
@@ -16,7 +16,7 @@ import { uploadDocument } from '../../services/contractService';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import LockedPane from '../common/LockedPane';
+import PremiumGate from '../common/PremiumGate';
 import { isPremiumViewer } from '../../utils/subscription';
 import AgencySection from '../common/AgencySection';
 import useAgency, { agencyActionRows } from '../../hooks/useAgency';
@@ -27,15 +27,10 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
   const { t } = useLanguage();
   // Desktop v3 lays this screen out as a panel grid (desktop-v3.css .d3-manage).
   const nativeDesktop = useNativeDesktop();
-  // Free tier sees the Dashboard as a blurred teaser that opens Premium.
-  // Documents stays open — riders/press kits feed accepted deals and gating
-  // them would break bookings already in motion. (Availability + travel
-  // moved to Tour > My dates, next to the matches they drive.)
-  const manageLocked = !isPremiumViewer(user);
-
-  const renderLockedPane = (content, message) => (
-    <LockedPane message={message} onUnlock={onOpenPremium}>{content}</LockedPane>
-  );
+  // Free tier: Actions and Documents stay open — they serve bookings already
+  // in motion. Insights, invoice and contract templates are Premium.
+  // (Availability + travel moved to Tour > Calendar.)
+  const insightsLocked = !isPremiumViewer(user);
   // 'actions' | 'dashboard' (= Insights) | 'agency' (agents) | 'documents'.
   // 'dashboard' keeps its value so deep links that open Manage on it keep working.
   const isAgent = user?.role === 'AGENT';
@@ -1027,11 +1022,22 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
-        {activeTab === 'actions' && (manageLocked
-          ? renderLockedPane(renderDashboardTab({ part: 'actions' }), t('manage.dashboardLockedMsg'))
-          : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'actions' })}</>)}
-        {activeTab === 'dashboard' && (manageLocked
-          ? renderLockedPane(renderDashboardTab({ part: 'insights' }), t('manage.dashboardLockedMsg'))
+        {/* Actions are the to-do list of bookings already in motion: open on every plan. */}
+        {activeTab === 'actions' && <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'actions' })}</>}
+        {activeTab === 'dashboard' && (insightsLocked
+          ? (
+            <PremiumGate
+              title={t('manage.unlockInsights')}
+              description={t('manage.unlockInsightsDesc')}
+              onUpgrade={onOpenPremium}
+              features={[
+                { icon: <EyeIcon />, text: t('manage.featureWhoViewed') },
+                { icon: <DollarIcon />, text: t('manage.featureRevenue') },
+                { icon: <LocationIcon />, text: t('manage.featureTopCities') },
+                { icon: <CalendarIcon />, text: t('manage.featureBookingsYear') },
+              ]}
+            />
+          )
           : <><PrivacyNote>{t('manage.privateDashboard')}</PrivacyNote>{renderDashboardTab({ part: 'insights' })}</>)}
         {activeTab === 'agency' && isAgent && <AgencySection data={agency} reload={reloadAgency} fallbackPhoto={user?.avatarLarge || user?.avatar} />}
         {activeTab === 'documents' && <><PrivacyNote>{t('manage.privateDocuments')}</PrivacyNote>{renderDocumentsTab()}</>}

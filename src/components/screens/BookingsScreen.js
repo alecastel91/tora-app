@@ -2491,6 +2491,10 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             setShowAddContractModal(false);
             setSelectedDealForWorkflow(null);
           }}
+          onDraftFromTemplate={() => {
+            setShowAddContractModal(false);
+            setDraftContractDeal(selectedDealForWorkflow);
+          }}
           onSave={async (contractData) => {
             // Sign-and-send: hand the chosen contract to the sign modal.
             // Submission there fires the combined send + signature in one call.

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import apiService from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
-import { isYearlyViewer, openPremium } from '../../utils/subscription';
+import { isPremiumViewer, isYearlyViewer, openPremium } from '../../utils/subscription';
 import useBusyAction from '../../hooks/useBusyAction';
 import usePdfPreview from '../../hooks/usePdfPreview';
 import { TemplatePicker, usableTemplates } from './TemplatesSection';
@@ -20,7 +20,7 @@ import DocModal, { previewPaneVisible } from './DocModal';
  * existing sign-and-send step via onReady({ id, title, url }) — the same
  * shape AddContractModal produces.
  */
-const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => {
+const DraftContractForm = ({ isOpen, deal, currentUser, onClose, onReady }) => {
   const { t } = useLanguage();
   const [templates, setTemplates] = useState([]);
   const [templateId, setTemplateId] = useState(null);
@@ -237,6 +237,16 @@ const DraftContractModal = ({ isOpen, deal, currentUser, onClose, onReady }) => 
       )}
     </DocModal>
   );
+};
+
+// Templates are Premium: a free member who taps Draft / Issue lands on the
+// Premium page instead, whichever screen the button sits on.
+const DraftContractModal = (props) => {
+  const locked = props.isOpen && !isPremiumViewer(props.currentUser);
+  useEffect(() => {
+    if (locked) { props.onClose(); openPremium(); }
+  }, [locked]); // eslint-disable-line react-hooks/exhaustive-deps
+  return locked ? null : <DraftContractForm {...props} />;
 };
 
 export default DraftContractModal;

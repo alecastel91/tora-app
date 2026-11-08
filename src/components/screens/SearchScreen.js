@@ -5,6 +5,7 @@ import { appAlert } from '../../utils/dialogs';
 import { isVerificationGate } from '../../utils/errors';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { HeartIcon, FilterIcon, SlashCircleIcon, SearchIcon, GlobeIcon, ListIcon } from '../../utils/icons';
+import LikeConnectTip from '../common/LikeConnectTip';
 import ViewProfileScreen from './ViewProfileScreen';
 import PhotoCard, { PhotoCardLike } from '../common/PhotoCard';
 import Modal from '../common/Modal';
@@ -692,6 +693,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
           />
         </div>
       )}
+
+      <LikeConnectTip viewerRole={user?.role} className="mb-4" />
 
       {/* Search Results */}
       <div className="search-results">

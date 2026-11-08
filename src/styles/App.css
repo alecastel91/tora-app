@@ -11986,37 +11986,24 @@ textarea.form-textarea:focus {
   bottom: calc(92px + env(safe-area-inset-bottom)); /* clears the tab bar incl. iPhone safe area */
   touch-action: none; /* hold-and-drag repositioning must not scroll the page */
   z-index: var(--z-fab);
-  width: 64px;
-  height: 44px;
-  padding: 0 0 8px;
+  /* The header's round icon button, one size up so it reads as a floating control. */
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
-  border: 0;
+  color: #fff;
+  background: #111117;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6));
-  transition: transform 0.15s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
-.beta-fab:hover { transform: scale(1.06) rotate(-3deg); }
-.beta-fab-bubble {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  fill: #fff;
-  stroke: #0a0a0e;
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-}
-.beta-fab-label {
-  position: relative;
-  font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--primary-pink);
-}
+.beta-fab:hover { border-color: rgba(255, 51, 102, 0.4); background: #1a1a22; }
+
+.beta-sheet-header { padding-top: calc(env(safe-area-inset-top) + 34px); }
+@media (min-width: 1024px) { .beta-sheet-header { padding-top: 16px; } }
 
 .beta-shot-attach {
   width: 100%;
@@ -12974,7 +12961,7 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .onboarding-sheet > *:not(.auth-cover) { position: relative; }
 .onboarding-title { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 44px; line-height: 0.98; letter-spacing: -0.02em; text-transform: uppercase; }
 
-.poster-like svg { width: 20px; height: 20px; flex: none; }
+.poster-like svg { width: 20px; height: 20px; flex: none; margin: 0; } /* .btn svg adds an 8px right margin that pushed the heart off-centre */
 
 /* Upgrade buttons are main actions: crimson like the rest */
 .btn-upgrade, .btn-upgrade-small, .btn-premium, .btn-upgrade:hover, .btn-upgrade-small:hover, .btn-premium:hover {
@@ -13198,3 +13185,13 @@ div.poster-stat { cursor: default; }
 .d3-dash-action { min-height: 62px; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .d3-dash-cta { flex: none; display: flex; align-items: center; justify-content: center; height: 40px; min-width: 84px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.28); color: #fff; font-size: 12px; font-weight: 600; text-transform: capitalize; }
 .globe-panel-tiles .photo-card--tile { height: 216px; }
+
+/* One-time Like / Connect explainer (LikeConnectTip) */
+.like-tip { display: grid; gap: 8px; margin-top: 12px; padding: 12px 14px; text-align: left; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: rgba(255, 51, 102, 0.06); }
+.like-tip-row { display: flex; gap: 10px; align-items: flex-start; }
+.like-tip-row p { margin: 0; font-size: 13px; line-height: 1.45; color: rgba(255, 255, 255, 0.82); }
+.like-tip-icon { flex: none; width: 18px; display: flex; justify-content: center; padding-top: 1px; color: var(--primary-pink); }
+.like-tip-icon svg { width: 16px; height: 16px; }
+.like-tip-plus { font-weight: 700; font-size: 16px; line-height: 1; }
+.like-tip-close { justify-self: end; background: none; border: 0; padding: 2px 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); cursor: pointer; }
+.like-tip-close:hover { color: #fff; }

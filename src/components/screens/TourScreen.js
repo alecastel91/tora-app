@@ -17,7 +17,7 @@ import { isVerificationGate } from '../../utils/errors';
 import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
 import CalendarScreen from './CalendarScreen';
-import LockedPane from '../common/LockedPane';
+import PremiumGate from '../common/PremiumGate';
 import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
@@ -178,7 +178,21 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
   // Calendar sub-tab: own availability + travel, or one represented artist's.
   const renderMyDates = () => {
-    const premium = isPremiumViewer(user); // the teaser renders a preview: no fetches
+    if (!isPremiumViewer(user)) {
+      return (
+        <PremiumGate
+          title={t('tour.unlockCalendar')}
+          description={t('tour.unlockCalendarDesc')}
+          onUpgrade={onOpenPremium}
+          features={[
+            { icon: <CalendarIcon />, text: t('tour.featureMarkDates') },
+            { icon: <PlaneIcon />, text: t('tour.featureTravelSchedule') },
+            { icon: <SlidersIcon />, text: t('tour.featureImportCalendar') },
+            { icon: <EyeIcon />, text: t('tour.featureCalendarVisibility') },
+          ]}
+        />
+      );
+    }
     let pane;
     if (isAgent && !roster.length) {
       pane = (
@@ -192,10 +206,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
       );
     } else if (isAgent) {
       pane = calendarArtist && (
-        <CalendarScreen key={calendarArtist.id} embedded={true} targetProfile={calendarArtist} preview={!premium} onSeeMatches={() => setActiveTab('matches')} />
+        <CalendarScreen key={calendarArtist.id} embedded={true} targetProfile={calendarArtist} onSeeMatches={() => setActiveTab('matches')} />
       );
     } else {
-      pane = <CalendarScreen embedded={true} preview={!premium} onSeeMatches={() => setActiveTab('matches')} />;
+      pane = <CalendarScreen embedded={true} onSeeMatches={() => setActiveTab('matches')} />;
     }
     return (
       <div className="tour-kickstart-content">
@@ -204,9 +218,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           {/* The placeholder centres text for the header; the calendar's own
               tiles (travel schedule, upcoming events) read left-aligned. */}
           <div className="text-left">
-            {premium
-              ? pane
-              : <LockedPane message={t('manage.calendarLockedMsg')} onUnlock={onOpenPremium}>{pane}</LockedPane>}
+            {pane}
           </div>
         </div>
       </div>
@@ -953,39 +965,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     // Show upgrade prompt for basic users
     if (!isPremiumUser()) {
       return (
-        <div className="tour-kickstart-content">
-          <div className="coming-soon-placeholder tour-gate">
-            <h2>{t('tour.unlockCalendarMatching')}</h2>
-            <p>{t('tour.unlockCalendarMatchingDesc')}</p>
-            <div className="feature-preview">
-              <h4>{t('tour.premiumFeatures')}</h4>
-              <ul className="feature-list">
-                <li>
-                  <span className="feature-icon"><CalendarIcon /></span>
-                  <span>{t('tour.featureMatchingAvailability')}</span>
-                </li>
-                <li>
-                  <span className="feature-icon"><LocationIcon /></span>
-                  <span>{t('tour.featureSearchGlobally')}</span>
-                </li>
-                <li>
-                  <span className="feature-icon"><TargetIcon /></span>
-                  <span>{t('tour.featureArtistsTouring')}</span>
-                </li>
-                <li>
-                  <span className="feature-icon"><EyeIcon /></span>
-                  <span>{t('tour.featureCalendarVisibility')}</span>
-                </li>
-              </ul>
-            </div>
-            <button
-              className="btn btn-primary"
-              onClick={() => onOpenPremium && onOpenPremium()}
-            >
-              {t('tour.upgradeToPremium')}
-            </button>
-          </div>
-        </div>
+        <PremiumGate
+          title={t('tour.unlockCalendarMatching')}
+          description={t('tour.unlockCalendarMatchingDesc')}
+          onUpgrade={onOpenPremium}
+          features={[
+            { icon: <CalendarIcon />, text: t('tour.featureMatchingAvailability') },
+            { icon: <LocationIcon />, text: t('tour.featureSearchGlobally') },
+            { icon: <TargetIcon />, text: t('tour.featureArtistsTouring') },
+            { icon: <EyeIcon />, text: t('tour.featureCalendarVisibility') },
+          ]}
+        />
       );
     }
 
@@ -1925,39 +1915,17 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     // Show upgrade prompt for basic users
     if (!isPremiumUser()) {
       return (
-        <div className="tour-kickstart-content">
-          <div className="coming-soon-placeholder tour-gate">
-            <h2>{t('tour.unlockTourKickstart')}</h2>
-            <p>{t('tour.unlockTourKickstartDesc')}</p>
-            <div className="feature-preview">
-              <h4>{t('tour.premiumFeatures')}</h4>
-              <ul className="feature-list">
-                <li>
-                  <span className="feature-icon"><LocationIcon /></span>
-                  <span>{t('tour.featureSetTourGoals')}</span>
-                </li>
-                <li>
-                  <span className="feature-icon"><HandshakeIcon /></span>
-                  <span>{t('tour.featureCollaborate')}</span>
-                </li>
-                <li>
-                  <span className="feature-icon"><DollarIcon /></span>
-                  <span>{t('tour.featureShareCosts')}</span>
-                </li>
-                <li>
-                  <span className="feature-icon"><TargetIcon /></span>
-                  <span>{t('tour.featureRegionalTours')}</span>
-                </li>
-              </ul>
-            </div>
-            <button
-              className="btn btn-primary"
-              onClick={() => onOpenPremium && onOpenPremium()}
-            >
-              {t('tour.upgradeToPremium')}
-            </button>
-          </div>
-        </div>
+        <PremiumGate
+          title={t('tour.unlockTourKickstart')}
+          description={t('tour.unlockTourKickstartDesc')}
+          onUpgrade={onOpenPremium}
+          features={[
+            { icon: <LocationIcon />, text: t('tour.featureSetTourGoals') },
+            { icon: <HandshakeIcon />, text: t('tour.featureCollaborate') },
+            { icon: <DollarIcon />, text: t('tour.featureShareCosts') },
+            { icon: <TargetIcon />, text: t('tour.featureRegionalTours') },
+          ]}
+        />
       );
     }
 

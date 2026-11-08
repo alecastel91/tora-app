@@ -3,7 +3,7 @@ import OverlayPortal from './OverlayPortal';
 import PdfViewerModal from './PdfViewerModal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import { isYearlyViewer, openPremium } from '../../utils/subscription';
+import { isPremiumViewer, isYearlyViewer, openPremium } from '../../utils/subscription';
 
 const KINDS = ['docx', 'pdf', 'basic'];
 
@@ -137,6 +137,19 @@ const TemplatesSection = ({ ns, icon, store, profile, viewer, renderDetails }) =
       store.remove(tpl.id);
     }
   };
+
+  // Templates are a Premium tool (any paid plan); AI reading stays Yearly.
+  if (!isPremiumViewer(viewer || profile)) {
+    return (
+      <div className={`dashboard-section templates-section templates-${ns}`}>
+        <div className="section-header">
+          <h3>{icon} {t(`${ns}.setupTitle`)}</h3>
+        </div>
+        <p className="form-hint mt-0">{t(`${ns}.premiumOnly`)}</p>
+        <button type="button" className="btn btn-primary btn-sm" onClick={openPremium}>{t('tour.upgradeToPremium')}</button>
+      </div>
+    );
+  }
 
   return (
     <div className={`dashboard-section templates-section templates-${ns}`}>
