@@ -1168,7 +1168,7 @@ const es = {
     unavailable: 'El asistente no está disponible ahora mismo; inténtalo más tarde.',
   },
   likeTip: {
-    likeArtist: 'Dale like a un venue o promotor para mostrar que valoras lo que hace y que estarías abierto a tocar allí. Recibe un aviso, sin necesidad de mensaje.',
+    likeArtist: 'Dale like a los perfiles que respetas. Para un promotor o venue es una señal de interés: recibe un aviso, sin necesidad de mensaje.',
     likeBooker: 'Dale like a un artista para mostrar tu interés y tenerlo en el radar. Con el plan Anual también recibes una alerta de viaje cuando anuncie fechas cerca de ti.',
     connectArtist: 'Conectar envía una solicitud con una nota breve. Cuando la acepten, podrás escribir y presentar tu propuesta.',
     connectBooker: 'Conectar envía una solicitud con una nota breve. Cuando la acepten, podrás escribir y enviar ofertas.',

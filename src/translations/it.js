@@ -1168,7 +1168,7 @@ const it = {
     unavailable: 'L\'assistente non è disponibile al momento — riprova più tardi.',
   },
   likeTip: {
-    likeArtist: 'Metti like a un locale o promoter per dire che apprezzi quello che fa e che saresti aperto a suonare lì. Riceve una notifica, senza bisogno di messaggi.',
+    likeArtist: 'Metti like ai profili che rispetti. Per un promoter o un locale è un segnale di interesse: riceve una notifica, senza bisogno di messaggi.',
     likeBooker: 'Metti like a un artista per mostrare interesse e tenerlo d\'occhio. Con l\'Annuale ricevi anche un avviso viaggio quando annuncia date vicino a te.',
     connectArtist: 'Connetti invia una richiesta con una breve nota. Una volta accettata, puoi scrivere e proporti.',
     connectBooker: 'Connetti invia una richiesta con una breve nota. Una volta accettata, puoi scrivere e inviare offerte.',

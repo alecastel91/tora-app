@@ -1168,7 +1168,7 @@ const en = {
     unavailable: 'The assistant isn\'t available right now — please try again later.',
   },
   likeTip: {
-    likeArtist: 'Like a venue or promoter to show you rate what they do and you\'re open to playing there. They\'re notified, no message needed.',
+    likeArtist: 'Like profiles you respect. To a promoter or venue it\'s a sign of interest: they\'re notified, no message needed.',
     likeBooker: 'Like an artist to show your interest and keep them on your radar. On Yearly you also get a travel alert when they announce dates near you.',
     connectArtist: 'Connect sends a request with a short note. Once accepted, you can message and pitch.',
     connectBooker: 'Connect sends a request with a short note. Once accepted, you can message and send offers.',
