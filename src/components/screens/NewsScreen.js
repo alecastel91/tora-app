@@ -41,6 +41,10 @@ const linkify = (text) => {
   );
 };
 
+const domainOf = (url) => {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; }
+};
+
 const firstUrl = (text) => {
   if (!text) return null;
   const m = text.match(URL_RE);
@@ -58,8 +62,7 @@ const LinkPreview = ({ url }) => {
     return () => { cancelled = true; };
   }, [url]);
   if (!meta || (!meta.title && !meta.image)) return null;
-  let domain = '';
-  try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch { /* keep empty */ }
+  const domain = domainOf(url);
   return (
     <a href={url} target="_blank" rel="noopener noreferrer"
        className="mt-3 flex overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] no-underline transition-colors hover:border-white/25"
@@ -84,6 +87,8 @@ const NEWS_AREA_KEY = {
   'Asia': 'asia', 'Australia & NZ': 'oceania', 'Europe': 'europe', 'North America': 'northAmerica',
   'Latin America': 'latinAmerica', 'Middle East & Africa': 'mea', 'Global': 'global',
 };
+// '' = all areas; Global stories show under every chip, so it has none.
+const AREA_CHIPS = ['', ...Object.keys(NEWS_AREA_KEY).filter((a) => a !== 'Global')];
 
 const AREA_STORE_KEY = 'tora:news-area';
 const readArea = () => {
@@ -92,8 +97,7 @@ const readArea = () => {
 
 const NewsStory = ({ post, t }) => {
   const d = post.data || {};
-  let domain = '';
-  try { domain = new URL(d.url).hostname.replace(/^www\./, ''); } catch { /* keep empty */ }
+  const domain = domainOf(d.url);
   return (
     <a href={d.url} target="_blank" rel="noopener noreferrer"
        className="mt-3 block overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] no-underline transition-colors hover:border-white/25"
@@ -173,7 +177,6 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   const myProfileIds = new Set([user?.id, ...(userProfiles || []).map((p) => p.id)].filter(Boolean));
   const [posts, setPosts] = useState(null);
   const [cursor, setCursor] = useState(null);
-  const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [draft, setDraft] = useState('');
   const [draftImage, setDraftImage] = useState(null); // data URL, client-downscaled
@@ -186,7 +189,11 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   // The draft lives in InlineEditor; the server row is the truth after save.
   const [editing, setEditing] = useState(null);
   const isEditing = (kind, id) => editing?.kind === kind && editing.id === id;
-  const bumpPostCount = (postId, field, delta) => setPosts((prev) => prev.map((p) => (
+  // Posts is null again while an area switch reloads, and a like/comment/
+  // edit/delete sent before the switch can land then: patch the list only
+  // when there is one (prev.map on null crashed the whole app).
+  const patchPosts = (fn) => setPosts((prev) => (prev ? fn(prev) : prev));
+  const bumpPostCount = (postId, field, delta) => patchPosts((prev) => prev.map((p) => (
     p.id === postId ? { ...p, [field]: Math.max(0, (p[field] || 0) + delta) } : p
   )));
   const patchComments = (postId, fn) => setOpenComments((prev) => (
@@ -199,7 +206,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
         patchComments(post.id, (list) => list.map((c) => (c.id === comment.id ? { ...c, text: saved.text } : c)));
       } else {
         const { post: saved } = await apiService.updatePost(post.id, user.id, text);
-        setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, text: saved.text } : p)));
+        patchPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, text: saved.text } : p)));
       }
       setEditing(null);
     } catch (e) {
@@ -229,40 +236,49 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
 
   // News area filter ('' = all). Global stories show under every area.
   const [area, setArea] = useState(readArea);
+  // Each page-1 load starts a new feed generation; a response (page 1 or a
+  // Load more) from an older one is dropped, so a slow reply for the
+  // previous area can't replace or extend the list under the current chip.
+  const feedGenRef = useRef(0);
   const pickArea = (next) => {
     if (next === area) return;
     try { localStorage.setItem(AREA_STORE_KEY, next); } catch { /* private mode: this visit only */ }
+    feedGenRef.current += 1;
     setPosts(null);
+    // The old area's cursor would page the new filter from the wrong place.
+    setCursor(null);
     setArea(next);
   };
 
   const load = useCallback(async () => {
     if (!user?.id) return;
+    const gen = ++feedGenRef.current;
     try {
       const data = await apiService.getFeed({ profileId: user.id, lang: language, area });
+      if (gen !== feedGenRef.current) return;
       if (suggestedRef.current === null) suggestedRef.current = data.suggested || [];
       setPosts(interleaveSuggestions(data.posts, suggestedRef.current));
       setCursor(data.nextCursor);
-      setHasMore(data.hasMore);
     } catch {
-      setPosts([]);
+      if (gen === feedGenRef.current) setPosts([]);
     }
-  }, [user?.id, area]);
+  }, [user?.id, area, language]);
 
   useEffect(() => { load(); }, [load]);
 
   const loadMore = async () => {
     if (loadingMore || !cursor) return;
+    const gen = feedGenRef.current;
     setLoadingMore(true);
     try {
       const data = await apiService.getFeed({ profileId: user.id, cursor, lang: language, area });
+      if (gen !== feedGenRef.current) return;
       setPosts((prev) => {
         const incomingIds = new Set(data.posts.map((p) => p.id));
         const kept = (prev || []).filter((p) => !(p.suggested && incomingIds.has(p.id)));
         return [...kept, ...data.posts];
       });
       setCursor(data.nextCursor);
-      setHasMore(data.hasMore);
     } finally {
       setLoadingMore(false);
     }
@@ -308,14 +324,14 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     if (busyRef.current) return;
     busyRef.current = true;
     // optimistic
-    setPosts((prev) => prev.map((p) => p.id === post.id
+    patchPosts((prev) => prev.map((p) => p.id === post.id
       ? { ...p, likedByMe: !p.likedByMe, likesCount: p.likesCount + (p.likedByMe ? -1 : 1) }
       : p));
     try {
       const { liked, likesCount } = await apiService.togglePostLike(post.id, user.id);
-      setPosts((prev) => prev.map((p) => p.id === post.id ? { ...p, likedByMe: liked, likesCount } : p));
+      patchPosts((prev) => prev.map((p) => p.id === post.id ? { ...p, likedByMe: liked, likesCount } : p));
     } catch {
-      setPosts((prev) => prev.map((p) => p.id === post.id
+      patchPosts((prev) => prev.map((p) => p.id === post.id
         ? { ...p, likedByMe: post.likedByMe, likesCount: post.likesCount } : p));
     } finally {
       busyRef.current = false;
@@ -352,6 +368,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   // Reporting a post asks for a reason, same as reporting a person. A bare
   // confirmation filed every post in the moderation queue as "other".
   const [reportingPost, setReportingPost] = useState(null);
+  const [reportingComment, setReportingComment] = useState(null);
 
   const deleteComment = async (post, comment) => {
     const ok = await appConfirm(t('news.deleteCommentConfirm'), { confirmLabel: t('common.delete'), danger: true });
@@ -371,7 +388,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
     if (!ok) return;
     try {
       await apiService.deletePost(post.id, user.id);
-      setPosts((prev) => prev.filter((p) => p.id !== post.id));
+      patchPosts((prev) => prev.filter((p) => p.id !== post.id));
     } catch (e) {
       appAlert(e.message || t('news.postFailed'));
     }
@@ -448,13 +465,14 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
         </div>
       </div>
 
-      <div className="news-area-chips" role="tablist" aria-label={t('news.industryNews')}>
-        {['', ...Object.keys(NEWS_AREA_KEY).filter((a) => a !== 'Global')].map((a) => (
+      {/* Filter chips, not tabs: a group of toggle buttons (no tabpanel or
+          arrow-key model behind them). */}
+      <div className="news-area-chips" role="group" aria-label={t('news.industryNews')}>
+        {AREA_CHIPS.map((a) => (
           <button
             key={a || 'all'}
             type="button"
-            role="tab"
-            aria-selected={area === a}
+            aria-pressed={area === a}
             className={`news-area-chip${area === a ? ' active' : ''}`}
             onClick={() => pickArea(a)}
           >
@@ -621,14 +639,16 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                       <div className="flex items-baseline gap-2">
                         <span className="truncate text-xs font-semibold text-white">{c.author?.name}</span>
                         <span className="shrink-0 text-[10px] text-white/30">{relativeTime(c.createdAt, t)}</span>
-                        {/* Edit: your own comment. Delete: yours, or any under your own post. */}
+                        {/* Edit: your own comment. Delete: yours, any under your own post,
+                            or any at all for the official account. Report: everyone else's. */}
                         {(() => {
                           const mine = myProfileIds.has(c.author?.id);
                           const link = 'shrink-0 border-0 bg-transparent p-0 text-[10px] text-white/35 underline hover:text-white/70';
-                          return (mine || isOwn) && !isEditing('comment', c.id) && (
+                          return !isEditing('comment', c.id) && (
                             <span className="ml-auto flex shrink-0 gap-2">
                               {mine && <button type="button" className={link} onClick={() => setEditing({ kind: 'comment', id: c.id })}>{t('common.edit')}</button>}
-                              <button type="button" className={link} onClick={() => deleteComment(post, c)}>{t('common.delete')}</button>
+                              {(mine || isOwn || user?.isOfficial) && <button type="button" className={link} onClick={() => deleteComment(post, c)}>{t('common.delete')}</button>}
+                              {!mine && <button type="button" className={link} onClick={() => setReportingComment(c)}>{t('news.report')}</button>}
                             </span>
                           );
                         })()}
@@ -662,7 +682,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
         );
       })}
 
-      {hasMore && (
+      {cursor && (
         <button className="btn btn-outline mx-auto mt-2 block" disabled={loadingMore} onClick={loadMore}>
           {loadingMore ? '...' : t('news.loadMore')}
         </button>
@@ -676,6 +696,16 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
           title={t('safety.reportPost')}
           intro={t('safety.reportPostIntro')}
           onClose={() => setReportingPost(null)}
+        />
+      )}
+      {reportingComment && (
+        <ReportDialog
+          targetType={REPORT_TARGETS.COMMENT}
+          targetId={reportingComment.id}
+          name={reportingComment.author?.name}
+          title={t('safety.reportComment')}
+          intro={t('safety.reportCommentIntro')}
+          onClose={() => setReportingComment(null)}
         />
       )}
     </div>

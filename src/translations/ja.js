@@ -2246,6 +2246,8 @@ const ja = {
     thisMember: 'このメンバー',
     reportPost: 'この投稿を通報',
     reportPostIntro: 'この投稿のどこに問題があるか教えてください。通報は運営チームにのみ届き、投稿者には伝わりません。',
+    reportComment: 'このコメントを通報',
+    reportCommentIntro: 'このコメントのどこに問題があるか教えてください。通報は運営チームにのみ届き、投稿者には伝わりません。',
     reportIntro: '{{name}}について問題点をお知らせください。報告は運営チームにのみ届き、相手には伝わりません。',
     reasonLabel: '理由',
     reason_spam: 'スパム・詐欺',

@@ -12,7 +12,7 @@
 export const REPORT_REASONS = ['spam', 'harassment', 'impersonation', 'inappropriate', 'other'];
 
 /** What a report is about. */
-export const REPORT_TARGETS = { PROFILE: 'PROFILE', MESSAGE: 'MESSAGE', POST: 'POST' };
+export const REPORT_TARGETS = { PROFILE: 'PROFILE', MESSAGE: 'MESSAGE', POST: 'POST', COMMENT: 'COMMENT' };
 
 /** The four things a block does, spelled out before it is confirmed. */
 export const BLOCK_EFFECT_KEYS = ['blockEffectHidden', 'blockEffectMessages', 'blockEffectRequests', 'blockEffectBookings'];

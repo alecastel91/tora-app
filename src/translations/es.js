@@ -1169,7 +1169,7 @@ const es = {
   },
   likeTip: {
     likeArtist: 'Dale like a los perfiles que respetas. Para un promotor o venue es una señal de interés: recibe un aviso, sin necesidad de mensaje.',
-    likeBooker: 'Dale like a los perfiles que respetas. Así mantienes a un artista en tu radar, y con Yearly recibes un aviso cuando anuncie fechas cerca de ti.',
+    likeBooker: 'Dale like a los perfiles que respetas. Así mantienes a un artista en tu radar, y con Yearly recibes una alerta de viaje cuando anuncie fechas cerca de ti.',
     connectArtist: 'Conectar envía una solicitud con una nota breve. Cuando la acepten, podrás escribir y presentar tu propuesta.',
     connectBooker: 'Conectar envía una solicitud con una nota breve. Cuando la acepten, podrás escribir y enviar ofertas.',
     gotIt: 'Entendido',
@@ -2246,6 +2246,8 @@ const es = {
     thisMember: 'este miembro',
     reportPost: 'Denunciar esta publicación',
     reportPostIntro: 'Cuéntanos qué está mal en esta publicación. Las denuncias llegan a nuestro equipo, nunca al autor.',
+    reportComment: 'Denunciar este comentario',
+    reportCommentIntro: 'Cuéntanos qué está mal en este comentario. Las denuncias llegan a nuestro equipo, nunca al autor.',
     reportIntro: 'Cuéntanos qué ocurre con {{name}}. Las denuncias llegan a nuestro equipo, nunca al miembro.',
     reasonLabel: 'Motivo',
     reason_spam: 'Spam o estafa',

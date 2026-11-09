@@ -2255,6 +2255,8 @@ const en = {
     thisMember: 'this member',
     reportPost: 'Report this post',
     reportPostIntro: 'Tell us what is wrong with this post. Reports go to our team, never to the author.',
+    reportComment: 'Report this comment',
+    reportCommentIntro: 'Tell us what is wrong with this comment. Reports go to our team, never to the author.',
     reportIntro: 'Tell us what is wrong with {{name}}. Reports go to our team, never to the member.',
     reasonLabel: 'Reason',
     reason_spam: 'Spam or scam',

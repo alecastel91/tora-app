@@ -1169,7 +1169,7 @@ const pt = {
   },
   likeTip: {
     likeArtist: 'Curta os perfis que você respeita. Para um promotor ou casa, é um sinal de interesse: eles são notificados, sem precisar de mensagem.',
-    likeBooker: 'Curta os perfis que você respeita. Assim você mantém um artista no seu radar, e no Yearly recebe um alerta quando ele anunciar datas perto de você.',
+    likeBooker: 'Curta os perfis que você respeita. Assim você mantém um artista no seu radar, e no Yearly recebe um alerta de viagem quando ele anunciar datas perto de você.',
     connectArtist: 'Conectar envia um pedido com uma nota curta. Depois de aceito, você pode conversar e apresentar sua proposta.',
     connectBooker: 'Conectar envia um pedido com uma nota curta. Depois de aceito, você pode conversar e enviar ofertas.',
     gotIt: 'Entendi',
@@ -2246,6 +2246,8 @@ const pt = {
     thisMember: 'este membro',
     reportPost: 'Denunciar esta publicação',
     reportPostIntro: 'Conte-nos o que há de errado com esta publicação. As denúncias vão para a nossa equipe, nunca para o autor.',
+    reportComment: 'Denunciar este comentário',
+    reportCommentIntro: 'Conte-nos o que há de errado com este comentário. As denúncias vão para a nossa equipe, nunca para o autor.',
     reportIntro: 'Diga-nos o que se passa com {{name}}. As denúncias vão para a nossa equipa, nunca para o membro.',
     reasonLabel: 'Motivo',
     reason_spam: 'Spam ou burla',

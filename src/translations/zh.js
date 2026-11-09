@@ -1169,7 +1169,7 @@ const zh = {
   },
   likeTip: {
     likeArtist: '为你欣赏的档案点赞。对主办方或场地来说，这是一种兴趣的信号：对方会收到通知，无需发消息。',
-    likeBooker: '为你欣赏的档案点赞。这样能持续关注一位艺人；开通 Yearly 后，当他们宣布在你附近的演出日期时，你会收到提醒。',
+    likeBooker: '为你欣赏的档案点赞。这样能持续关注一位艺人；开通 Yearly 后，当他们宣布在你附近的演出日期时，你会收到巡演提醒。',
     connectArtist: '「连接」会发送一条附短信的请求。对方接受后，你就可以发消息和自荐。',
     connectBooker: '「连接」会发送一条附短信的请求。对方接受后，你就可以发消息和发出邀约。',
     gotIt: '知道了',
@@ -2246,6 +2246,8 @@ const zh = {
     thisMember: '该成员',
     reportPost: '举报此帖子',
     reportPostIntro: '请告诉我们此帖子有什么问题。举报只会发送给我们的团队，作者不会收到。',
+    reportComment: '举报此评论',
+    reportCommentIntro: '请告诉我们此评论有什么问题。举报只会发送给我们的团队，作者不会收到。',
     reportIntro: '请告诉我们 {{name}} 的问题。举报只会发送给我们的团队，不会告知对方。',
     reasonLabel: '原因',
     reason_spam: '垃圾信息或诈骗',

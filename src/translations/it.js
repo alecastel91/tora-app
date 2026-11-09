@@ -1169,7 +1169,7 @@ const it = {
   },
   likeTip: {
     likeArtist: 'Metti like ai profili che rispetti. Per un promoter o un locale è un segnale di interesse: riceve una notifica, senza bisogno di messaggi.',
-    likeBooker: 'Metti like ai profili che rispetti. Così tieni un artista sul tuo radar, e con Yearly ricevi un avviso quando annuncia date vicino a te.',
+    likeBooker: 'Metti like ai profili che rispetti. Così tieni un artista sul tuo radar, e con Yearly ricevi un avviso viaggio quando annuncia date vicino a te.',
     connectArtist: 'Connetti invia una richiesta con una breve nota. Una volta accettata, puoi scrivere e proporti.',
     connectBooker: 'Connetti invia una richiesta con una breve nota. Una volta accettata, puoi scrivere e inviare offerte.',
     gotIt: 'Ok',
@@ -2246,6 +2246,8 @@ const it = {
     thisMember: 'questo membro',
     reportPost: 'Segnala questo post',
     reportPostIntro: 'Dicci cosa non va in questo post. Le segnalazioni arrivano al nostro team, mai all\'autore.',
+    reportComment: 'Segnala questo commento',
+    reportCommentIntro: 'Dicci cosa non va in questo commento. Le segnalazioni arrivano al nostro team, mai all\'autore.',
     reportIntro: 'Dicci cosa non va con {{name}}. Le segnalazioni arrivano al nostro team, mai al membro.',
     reasonLabel: 'Motivo',
     reason_spam: 'Spam o truffa',
