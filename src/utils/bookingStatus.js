@@ -1,6 +1,21 @@
 import { isArtistSideForDeal } from './contractSigner.js';
 import { summarizeDealPayment } from './paymentSummary.js';
 import { OFF_STATUSES } from './dealStatus.js';
+import { DOC_CATEGORY_KEYS, categoryStatus } from './documentCategories.js';
+
+/**
+ * Which booking steps are done. One rule for the timeline and the next-show
+ * card: documents count when every category is shared or skipped, payment
+ * when the artist side has confirmed the full fee.
+ */
+export function bookingStepsDone(deal, summary = summarizeDealPayment(deal)) {
+  return {
+    offerAccepted: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED',
+    contractSigned: deal.contract?.status === 'FULLY_SIGNED',
+    documentsShared: DOC_CATEGORY_KEYS.every((k) => categoryStatus(deal.sharedDocuments, k) !== 'pending'),
+    paymentReceived: summary.isFullyConfirmed,
+  };
+}
 
 /** An artist on an agent-led deal: their agent holds the buttons. */
 export function isArtistViaAgent(deal, viewer) {

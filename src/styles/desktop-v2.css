@@ -334,20 +334,7 @@
     margin-right: auto;
   }
 
-  html.desktop-v2 .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
-    max-width: var(--d2-master);
-    margin-left: 0;
-    margin-right: auto;
-  }
 
-  html.desktop-v2 .bookings-screen .booking-card.expanded {
-    top: var(--d2-top);
-    bottom: 0;
-    width: min(var(--d2-detail-max), calc(100vw - var(--d2-detail-left)));
-    padding: var(--d2-gutter);
-    border-radius: 0;
-    border-left: 1px solid var(--d2-line);
-  }
 
   /* ---- Messages: the list docks, the chat fills the pane beside it ---- */
   html.desktop-v2 .app-content > .tab-panel > .screen.messages-screen {
@@ -394,7 +381,6 @@
     border-left: 1px solid var(--d2-line);
   }
 
-  html.desktop-v2 .bookings-screen .booking-card.expanded,
   html.desktop-v2 .make-offer-modal-overlay:not(.md-drawer) {
     left: var(--d2-detail-left);
   }

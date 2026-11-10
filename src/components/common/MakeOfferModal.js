@@ -30,6 +30,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
   // remounts and reflects the new value.
   const [geoPrefillKey, setGeoPrefillKey] = useState(0);
   const [eventImage, setEventImage] = useState(null); // data URL for the booking page header
+  // A photo picked for one offer must not carry over to the next recipient.
+  useEffect(() => { if (!isOpen) setEventImage(null); }, [isOpen]);
 
   // Form state - simplified for Venue/Promoter initial offer
   const [formData, setFormData] = useState({

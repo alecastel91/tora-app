@@ -8482,32 +8482,6 @@ textarea.form-textarea:focus {
   letter-spacing: 0.02em;
 }
 
-.booking-fee {
-  color: var(--primary-pink);
-  font-weight: 700;
-  font-size: 15px;
-  font-family: 'Space Grotesk', sans-serif;
-}
-
-.booking-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.booking-actions .btn {
-  flex: 1;
-  padding: 10px 12px !important;
-  font-size: 9px;
-  white-space: nowrap;
-  line-height: 1.2;
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
 .btn-decline {
   border-color: rgba(244, 67, 54, 0.5);
   color: #F44336;
@@ -8527,30 +8501,9 @@ textarea.form-textarea:focus {
   background: #FF1E50;
 }
 
-.btn-chat {
-  width: 100%;
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 7px 12px !important;
-  font-size: 11px;
-  line-height: 1.2;
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.btn-chat svg {
-  width: 14px;
-  height: 14px;
-  margin-right: 2px;
-}
-
 /* Two-class selector (matches .btn-outline.btn-remove-connection) so the
    destructive red wins over the later plain .btn-outline rule — otherwise the
-   button rendered grey. Same size as the sibling .btn-chat button. */
+   button rendered grey. */
 .btn-outline.btn-delete-offer-expanded {
   width: 100%;
   margin-top: 8px;
@@ -10852,11 +10805,7 @@ textarea.form-textarea:focus {
    ============================================ */
 
 .workflow-timeline {
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  margin: 12px 0;
+  margin: 0;
 }
 
 /* ============================================
@@ -11597,23 +11546,6 @@ textarea.form-textarea:focus {
 }
 
 /* Mini calendar chip internals */
-.booking-date-month {
-  font-size: 7px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1;
-}
-
-.booking-date-day {
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Space Grotesk', sans-serif;
-  color: #fff;
-  line-height: 1;
-}
-
 /* Manage header identity row: jewel avatar, SG name, tech location */
 .artist-info-bar .artist-avatar-small {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
@@ -12917,23 +12849,18 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .poster-h2, .poster-page .profile-embeds h4 { margin: 0 0 10px; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
 
 /* Booking steps (WorkflowTimeline) */
-.flow-steps { list-style: none; margin: 0; padding: 4px 0 0; text-align: left; }
-.flow-step { display: flex; gap: 12px; }
-.flow-rail { flex: none; width: 28px; display: flex; flex-direction: column; align-items: center; }
-.flow-node { flex: none; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
-.flow-line { flex: 1 1 auto; width: 2px; min-height: 18px; background: rgba(255,255,255,0.16); }
-.flow-done .flow-node { background: #FF3366; color: #fff; }
-.flow-done .flow-line { background: #FF3366; }
+.flow-steps { list-style: none; margin: 0; padding: 0; text-align: left; }
+.flow-step { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.flow-rail { flex: none; width: 24px; display: flex; flex-direction: column; align-items: center; }
+.flow-node { flex: none; width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.flow-done .flow-node { background: var(--color-crimson-action); color: #fff; }
 .flow-now .flow-node { border: 2px solid #FF3366; color: #FF7A9B; }
 .flow-todo .flow-node { border: 2px solid rgba(255,255,255,0.22); color: rgba(255,255,255,0.68); }
-.flow-body { flex: 1 1 auto; min-width: 0; padding: 3px 0 18px; }
-.flow-label { font-size: 14px; font-weight: 600; color: #fff; }
-.flow-date { margin-top: 2px; font-size: 12px; color: rgba(255,255,255,0.65); }
-.flow-actions { margin-top: 10px; }
-.flow-actions:empty { display: none; }
+.flow-body { flex: 1 1 auto; min-width: 0; padding: 2px 0 0; }
+.flow-label { font-size: 14.5px; font-weight: 600; color: #fff; }
+.flow-now .flow-label { color: #FF6B88; }
+.flow-date { margin-top: 2px; font-size: 12px; color: rgba(255,255,255,0.55); }
 
-.flow-actions.workflow-actions { border-top: 0; padding: 0; }
-.flow-actions.workflow-actions .btn { min-height: 44px; }
 
 /* Celebrations with a photo */
 .celebration-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -13001,9 +12928,6 @@ div.poster-stat { cursor: default; }
 .poster-link-icon img { width: 20px; height: auto; }
 
 /* Booking card: event first, then steps, then details */
-.poster-event-title { margin: 0; flex: 1 1 auto; min-width: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 20px; line-height: 1.12; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
-.booking-card .workflow-timeline { margin-top: 12px; padding: 16px 14px 6px; background: #0c0c11; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; }
-.booking-card .workflow-timeline + .booking-details { margin-top: 18px; }
 
 
 /* News milestones */
@@ -13030,7 +12954,6 @@ div.poster-stat { cursor: default; }
 .onboarding-next { min-height: 52px; }
 
 
-@media (min-width: 1024px) { html.desktop-v3 .poster-event-title { font-size: 28px; } }
 
 /* ===== Poster: Search, Matches, Tour, Roster ===== */
 .search-board .poster-h2 { font-family: var(--font-inter, inherit); font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.68); margin: 0 0 10px; }
@@ -13407,21 +13330,6 @@ div.poster-stat { cursor: default; }
 .booking-hero-steps span.is-done { background: #43E97B; }
 .booking-hero-steps span.is-current { background: var(--color-crimson-action); }
 
-.booking-avatar {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  overflow: hidden;
-  font-weight: 700;
-  font-size: 14px;
-  color: #fff;
-}
-.booking-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.booking-avatar-lg { width: 44px; height: 44px; font-size: 17px; }
 
 /* Booking page */
 .booking-page { margin: -20px -20px 0; }
@@ -13535,8 +13443,8 @@ div.poster-stat { cursor: default; }
 .booking-next-text { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 600; }
 
 .booking-page-h {
-  margin: 0 0 10px;
-  font: 700 16px 'Space Grotesk', sans-serif;
+  margin: 0 0 8px;
+  font: 700 18px 'Space Grotesk', sans-serif;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
@@ -13571,20 +13479,6 @@ div.poster-stat { cursor: default; }
   color: rgba(255, 255, 255, 0.86);
 }
 
-/* Progress: a plain ticked list instead of the boxed timeline card */
-.booking-page .workflow-timeline { padding: 0; margin: 0; background: none; border: 0; border-radius: 0; }
-.booking-page .flow-steps { padding: 0; }
-.booking-page .flow-step { gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
-.booking-page .flow-rail { width: 24px; }
-.booking-page .flow-line { display: none; }
-.booking-page .flow-node { width: 24px; height: 24px; font-size: 12px; }
-.booking-page .flow-done .flow-node { background: var(--color-crimson-action); }
-.booking-page .flow-body { padding: 2px 0 0; }
-.booking-page .flow-label { font-size: 14.5px; }
-.booking-page .flow-now .flow-label { color: #FF6B88; }
-.booking-page .flow-date { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
-.booking-page .booking-page-h { font-size: 18px; margin-bottom: 8px; }
-.booking-page .workflow-timeline > .text-center { display: none; }
 
 /* Next step: what is due now, with its buttons */
 .booking-next-actions { margin-top: 4px; border-top: 0; padding: 0; }

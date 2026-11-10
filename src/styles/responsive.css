@@ -279,12 +279,6 @@
     width: 560px;
   }
 
-  /* Bookings: the expanded card becomes the right-hand detail pane while
-     the list stays docked left */
-  .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
-    max-width: 400px;
-    margin-left: 0;
-  }
 
   /* Find Artist / Find Agent are fixed full-screen overlays on the phone;
      on desktop they clear the sidebar like every other overlay. */
@@ -295,21 +289,6 @@
     padding-bottom: 0;
   }
 
-  .bookings-screen .booking-card.expanded {
-    position: fixed;
-    top: 57px;
-    /* sidebar + list 400px + content padding 20px + 16px gap */
-    left: calc(240px + 436px);
-    width: min(800px, calc(100vw - 240px - 436px));
-    bottom: 0;
-    z-index: 50;
-    overflow-y: auto;
-    margin: 0;
-    border: none;
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0;
-    padding: 24px 32px;
-  }
 
   /* Tour docks left like Bookings; opening a create/edit/gigs pane
      docks it left so the pane has room beside it */
@@ -541,14 +520,7 @@
     width: calc(100% - 280px);
   }
 
-  .app-content > .tab-panel > .bookings-screen:has(.booking-card.expanded) {
-    max-width: 420px;
-  }
 
-  .bookings-screen .booking-card.expanded {
-    left: calc(280px + 456px);
-    width: min(800px, calc(100vw - 280px - 456px));
-  }
 
   body:has(> .md-drawer) .app-content > .tab-panel > .screen.tour-screen {
     max-width: 560px;

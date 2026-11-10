@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { DOC_CATEGORY_KEYS, categoryStatus } from '../../utils/documentCategories';
+import { DOC_CATEGORY_KEYS } from '../../utils/documentCategories';
+import { bookingStepsDone } from '../../utils/bookingStatus';
 import { summarizeDealPayment } from '../../utils/paymentSummary';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -7,39 +8,36 @@ import { useLanguage } from '../../contexts/LanguageContext';
  * Step 3 (documents) completes when each category is shared or skipped.
  * Step 4 (payment) ticks only when the artist has confirmed receipt.
  */
-const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
+const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
   const { t } = useLanguage();
-  // Memo keyed on the JSONB blobs that drive every derivation. With many
-  // deal cards on screen this avoids redoing reduces + date parsing on every
-  // unrelated parent render.
+  // Memo keyed on the deal: the reduces and date parsing below run once per
+  // change, not on every parent render.
   const view = useMemo(() => {
     if (!deal) return null;
 
-    const allDocsResolved = DOC_CATEGORY_KEYS.every((k) => categoryStatus(deal.sharedDocuments, k) !== 'pending');
+    const summary = summarizeDealPayment(deal);
+    const done = bookingStepsDone(deal, summary);
     const docTimestamps = DOC_CATEGORY_KEYS
       .map((k) => deal.sharedDocuments?.[k]?.sharedAt || deal.sharedDocuments?.[k]?.skippedAt)
       .filter(Boolean)
       .map((t) => new Date(t).getTime());
     const latestDocTs = docTimestamps.length ? new Date(Math.max(...docTimestamps)).toISOString() : null;
 
-    const summary = summarizeDealPayment(deal);
-
     const steps = [
-      { key: 'offerAccepted', label: t('bookings.stepOfferAccepted'), completed: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED', timestamp: deal.acceptedAt || deal.updatedAt },
-      { key: 'contractSigned', label: t('bookings.stepContractSigned'), completed: deal.contract?.status === 'FULLY_SIGNED', timestamp: deal.contract?.fullySignedAt },
-      { key: 'documentsShared', label: t('bookings.stepDocumentsShared'), completed: allDocsResolved, timestamp: allDocsResolved ? latestDocTs : null },
-      { key: 'paymentReceived', label: t('bookings.stepPaymentReceived'), completed: summary.isFullyConfirmed, timestamp: deal.payment?.fullPaymentProof?.confirmedAt || (summary.isFullyConfirmed ? deal.payment?.fullPaymentDate : null) },
+      { key: 'offerAccepted', label: t('bookings.stepOfferAccepted'), completed: done.offerAccepted, timestamp: deal.acceptedAt || deal.updatedAt },
+      { key: 'contractSigned', label: t('bookings.stepContractSigned'), completed: done.contractSigned, timestamp: deal.contract?.fullySignedAt },
+      { key: 'documentsShared', label: t('bookings.stepDocumentsShared'), completed: done.documentsShared, timestamp: done.documentsShared ? latestDocTs : null },
+      { key: 'paymentReceived', label: t('bookings.stepPaymentReceived'), completed: done.paymentReceived, timestamp: deal.payment?.fullPaymentProof?.confirmedAt || (summary.isFullyConfirmed ? deal.payment?.fullPaymentDate : null) },
     ];
-    const completedSteps = steps.filter((s) => s.completed).length;
     const showPaymentBar = !summary.isFullyConfirmed && (summary.markedDeposit > 0 || summary.fullPaymentMarked) && summary.totalFee > 0;
     const markedPct = showPaymentBar ? Math.min(100, Math.round((summary.totalMarked / summary.totalFee) * 100)) : 0;
     const confirmedPct = showPaymentBar ? Math.min(100, Math.round((summary.totalConfirmed / summary.totalFee) * 100)) : 0;
 
-    return { steps, completedSteps, progressPercentage: (completedSteps / steps.length) * 100, showPaymentBar, markedPct, confirmedPct, summary };
+    return { steps, showPaymentBar, markedPct, confirmedPct, summary };
   }, [deal]);
 
   if (!view) return null;
-  const { steps, completedSteps, progressPercentage, showPaymentBar, markedPct, confirmedPct, summary } = view;
+  const { steps, showPaymentBar, markedPct, confirmedPct, summary } = view;
   const { confirmedDeposit, totalFee, currency, pendingConfirmation, remaining } = summary;
 
   // First not-yet-completed step is "current" — it gets the live crimson ring.
@@ -106,13 +104,12 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
 
   return (
     <div className="workflow-timeline">
-      {/* Vertical steps: each one carries its own actions, so what to do next
-          sits under the step it belongs to. */}
+      {/* Ticked steps with their dates; the buttons for what is due now live
+          in the booking page's Next step box. */}
       <ol className="flow-steps">
         {steps.map((step, index) => {
           const isCurrent = index === currentIndex;
           const state = step.completed ? 'done' : isCurrent ? 'now' : 'todo';
-          const actions = stepActions[step.key];
           return (
             <li key={step.key} className={`flow-step flow-${state}`}>
               <div className="flow-rail">
@@ -125,7 +122,6 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
                     index + 1
                   )}
                 </span>
-                {index < steps.length - 1 && <span className="flow-line" />}
               </div>
               <div className="flow-body">
                 <div className="flow-label">{step.label}</div>
@@ -133,7 +129,6 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
                   <div className="flow-date">{new Date(step.timestamp).toLocaleDateString()}</div>
                 )}
                 {step.key === 'paymentReceived' && paymentBar}
-                {actions && <div className="workflow-actions flow-actions">{actions}</div>}
               </div>
             </li>
           );
@@ -172,18 +167,6 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
           );
         })()}
 
-      {/* Progress caption */}
-      <div className="text-center mt-3.5">
-        {completedSteps === steps.length ? (
-          <span className="text-[9px] font-semibold uppercase tracking-[0.2em] font-tech text-role-agent">
-            {t('bookings.allStepsCompleted')}
-          </span>
-        ) : (
-          <span className="text-[9px] font-medium uppercase tracking-[0.2em] font-tech text-white/25">
-            {t('bookings.stepsCompleted', { n: completedSteps, m: steps.length })}
-          </span>
-        )}
-      </div>
     </div>
   );
 };
