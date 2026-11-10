@@ -1501,18 +1501,27 @@
 .modal-header h2 {
   color: #fff;
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .modal-header h3 {
-  font-size: 15px;
-  font-weight: 600;
+  margin: 0;
   color: var(--text-white);
+  text-align: center;
   font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .modal-close {
@@ -1825,7 +1834,7 @@
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background: #000000;
+  background: #101015;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   width: 300px;
@@ -1843,11 +1852,11 @@
 }
 
 .notifications-header h3 {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   color: var(--text-white);
   margin: 0;
 }
@@ -2048,8 +2057,8 @@
 }
 
 .settings-toggle input[type="checkbox"]:checked {
-  background: var(--primary-pink);
-  border-color: var(--primary-pink);
+  background: var(--color-crimson-action);
+  border-color: var(--color-crimson-action);
 }
 
 .settings-toggle input[type="checkbox"]:checked:before {
@@ -2129,6 +2138,32 @@
   gap: 12px;
 }
 .subscription-tier-badge .btn-upgrade-small {
+  white-space: nowrap;
+}
+.subscription-tier-badge + .manage-billing-btn { margin-top: 0; }
+
+.tier-label {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.tier-label.monthly,
+.tier-label.premium,
+.tier-label.yearly {
+  background: rgba(222, 42, 87, 0.12);
+  color: #FF6B88;
+  border-color: rgba(222, 42, 87, 0.5);
+}
+
+.btn-upgrade-small {
   white-space: nowrap;
 }
 .subscription-tier-badge + .manage-billing-btn { margin-top: 0; }
@@ -2654,14 +2689,14 @@
 }
 
 .btn-danger {
-  background: #F5576C;
+  background: var(--color-crimson-action);
   color: white;
-  border-color: #F5576C;
+  border-color: var(--color-crimson-action);
 }
 
 .btn-danger:hover {
-  background: #ff2222;
-  border-color: #ff2222;
+  background: var(--color-crimson-action-hover);
+  border-color: var(--color-crimson-action-hover);
 }
 
 /* Cancelling a confirmed booking sits in a row of ordinary workflow CTAs.
@@ -2670,13 +2705,13 @@
    Mark as completed beside it. */
 .btn-danger-outline {
   background: transparent;
-  color: #F5576C;
-  border-color: rgba(245, 87, 108, 0.45);
+  color: #FF6B88;
+  border-color: rgba(222, 42, 87, 0.5);
 }
 
 .btn-danger-outline:hover {
-  background: rgba(245, 87, 108, 0.12);
-  border-color: #F5576C;
+  background: rgba(222, 42, 87, 0.12);
+  border-color: var(--color-crimson-action);
 }
 
 /* The reason a booking was cancelled, under the card's action line. */
@@ -4035,13 +4070,15 @@
 }
 
 .message-modal-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
   color: var(--text-white);
   margin: 4px 0 18px 0;
   text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
   text-wrap: balance;
 }
 
@@ -4091,7 +4128,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  border-radius: 19px;
+  border-radius: 10px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.6);
@@ -4109,7 +4146,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  border-radius: 19px;
+  border-radius: 10px;
 }
 
 /* Representation-request modal — surface comes from the shared deep-modal
@@ -5568,7 +5605,7 @@
   width: 38px;
   height: 38px;
   margin: 0 auto 16px;
-  color: #FFD700;
+  color: #FF6B88;
 }
 
 .premium-icon-large svg {
@@ -5748,7 +5785,7 @@
 }
 
 .tier-value-highlight {
-  color: var(--primary-pink);
+  color: #FF6B88;
   font-weight: 600;
 }
 
@@ -5830,14 +5867,14 @@
 /* Featured (Yearly): same deep black, distinguished by an infrared border +
    the faintest crimson wash in the top corner — not a flat pink fill. */
 .price-card.featured {
-  border-color: rgba(255, 51, 102, 0.45);
+  border-color: rgba(222, 42, 87, 0.45);
   background:
-    radial-gradient(140% 90% at 50% 0%, rgba(255, 51, 102, 0.10), transparent 60%),
+    radial-gradient(140% 90% at 50% 0%, rgba(222, 42, 87, 0.10), transparent 60%),
     #060608;
 }
 
 .price-card.featured:hover {
-  border-color: rgba(255, 51, 102, 0.65);
+  border-color: rgba(222, 42, 87, 0.65);
 }
 
 /* Current-plan state: muted, non-actionable */
@@ -5858,8 +5895,8 @@
   top: -10px;
   right: 18px;
   background: #1c0b11;
-  border: 1px solid rgba(255, 51, 102, 0.55);
-  color: var(--primary-pink);
+  border: 1px solid rgba(222, 42, 87, 0.55);
+  color: #FF6B88;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 9px;
@@ -5880,7 +5917,7 @@
 }
 
 .price-card.featured h4 {
-  color: var(--primary-pink);
+  color: #FF6B88;
 }
 
 .price {
@@ -5950,7 +5987,7 @@
 }
 
 .total-value {
-  color: var(--primary-pink);
+  color: #FF6B88;
   font-size: 24px;
 }
 
@@ -5987,8 +6024,8 @@
 }
 
 .payment-option input[type="radio"]:checked + .payment-card {
-  border-color: var(--primary-pink);
-  background: rgba(255, 51, 102, 0.1);
+  border-color: #FF6B88;
+  background: rgba(222, 42, 87, 0.1);
 }
 
 .payment-icon {
@@ -6021,7 +6058,7 @@
 
 .input-field:focus {
   outline: none;
-  border-color: var(--primary-pink);
+  border-color: #FF6B88;
 }
 
 .input-field::placeholder {
@@ -6059,7 +6096,7 @@
   width: 50px;
   height: 50px;
   border: 3px solid var(--border-light);
-  border-top-color: var(--primary-pink);
+  border-top-color: #FF6B88;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 24px;
@@ -7537,7 +7574,8 @@
 
 .currency-select {
   border: none;
-  background-color: #333;
+  background-color: #0a0a0e;
+  color-scheme: dark;
   color: #fff;
   padding: 12px;
   border-right: 1px solid #444;
@@ -7574,7 +7612,7 @@
 
 .requirement-checkbox input[type="checkbox"] {
   margin: 0;
-  accent-color: #FF3366;
+  accent-color: var(--color-crimson-action);
 }
 
 .requirement-checkbox span {
@@ -8504,29 +8542,6 @@ textarea.form-textarea:focus {
 /* Two-class selector (matches .btn-outline.btn-remove-connection) so the
    destructive red wins over the later plain .btn-outline rule — otherwise the
    button rendered grey. */
-.btn-outline.btn-delete-offer-expanded {
-  width: 100%;
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 7px 12px !important;
-  font-size: 11px;
-  line-height: 1.2;
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: normal;
-  color: rgba(244, 67, 54, 0.9);
-  border-color: rgba(244, 67, 54, 0.3);
-}
-
-.btn-outline.btn-delete-offer-expanded:hover {
-  background: rgba(244, 67, 54, 0.1);
-  border-color: rgba(244, 67, 54, 0.6);
-  color: #F44336;
-}
-
 @media (max-width: 768px) {
   .booking-details {
     grid-template-columns: 1fr;
@@ -8980,11 +8995,11 @@ textarea.form-textarea:focus {
 }
 
 .review-modal .modal-header {
-  padding: 20px;
+  padding: 18px 56px;
   border-bottom: 1px solid var(--border-dark);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .review-modal .modal-footer {
@@ -9415,9 +9430,14 @@ textarea.form-textarea:focus {
 
 .delete-modal-header h3 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
   color: var(--text-white);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .delete-modal-content {
@@ -9440,9 +9460,9 @@ textarea.form-textarea:focus {
 .decline-reason-textarea {
   width: 100%;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  background: #0a0a0e;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
   color: var(--text-white);
   font-size: 14px;
   font-family: inherit;
@@ -10625,19 +10645,25 @@ textarea.form-textarea:focus {
 
 .connection-choice-modal h2 {
   margin: 0 0 16px 0;
-  font-size: 20px;
   color: var(--text-white);
   text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .info-banner {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px;
-  background: rgba(255, 193, 7, 0.1);
-  border-left: 3px solid #ffc107;
-  border-radius: 4px;
+  padding: 12px 14px;
+  background: #101015;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   margin-bottom: 16px;
   font-size: 13px;
   color: var(--text-secondary);
@@ -10645,7 +10671,7 @@ textarea.form-textarea:focus {
 
 .info-banner svg {
   flex-shrink: 0;
-  color: #ffc107;
+  color: #FF6B88;
 }
 
 .modal-description {
@@ -12468,7 +12494,7 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .artist-item .artist-location { white-space: normal; overflow: visible; }
 
 /* Type-to-filter box at the top of long filter lists */
-.filter-list-search { width: calc(100% - 32px); box-sizing: border-box; margin: 4px 16px 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); color: #fff; font-size: 13px; }
+.filter-list-search { width: calc(100% - 32px); box-sizing: border-box; margin: 4px 16px 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.14); background: #0a0a0e; color: #fff; font-size: 13px; }
 .filter-list-search:focus { outline: none; border-color: rgba(255,255,255,0.3); }
 
 /* Payment modal: a deposit already marked */
@@ -12532,7 +12558,7 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .chat-header-menu { margin-left: auto; flex-shrink: 0; }
 .chat-header-menu .safety-menu-trigger { width: 36px; height: 36px; background: transparent; border-color: rgba(255, 255, 255, 0.12); }
 .safety-report-modal .safety-reasons { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-.safety-report-modal textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+.safety-report-modal textarea { width: 100%; box-sizing: border-box; resize: vertical; background: #0a0a0e; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 10px; color: #fff; }
 
 .blocked-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .blocked-row { display: flex; align-items: center; gap: 12px; }
@@ -12623,7 +12649,7 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .calendar-sync-sheet { position: fixed; inset: 0; z-index: 1200; background: var(--bg-black, #0a0a0a); overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .calendar-sync-body { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
 .calendar-sync-lead { margin: 0; font-size: 13.5px; }
-.calendar-sync-body .dashboard-section > h3 { color: var(--primary-pink); font-size: 15px; letter-spacing: 0.02em; margin-bottom: 8px; }
+.calendar-sync-body .dashboard-section > h3 { color: #fff; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
 .calendar-sync-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .help-details { margin-top: 12px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px 12px; }
 .help-details summary { cursor: pointer; font-size: 13px; color: #fff; list-style: none; display: flex; align-items: center; gap: 8px; }
@@ -12674,10 +12700,7 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
 .learned-status .btn { flex-shrink: 0; }
 
 /* Document templates (invoices / contracts): kinds, cards, blanks */
-.template-kind { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; white-space: nowrap; }
-.template-kind.is-docx { background: rgba(67, 233, 123, 0.14); color: #7ff0a6; border: 1px solid rgba(67, 233, 123, 0.35); }
-.template-kind.is-pdf { background: rgba(102, 126, 234, 0.16); color: #aab6ff; border: 1px solid rgba(102, 126, 234, 0.4); }
-.template-kind.is-basic { background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.16); }
+.template-kind { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; background: transparent; color: rgba(255, 255, 255, 0.75); border: 1px solid rgba(255, 255, 255, 0.22); }
 .template-kinds { list-style: none; padding: 0; margin: 6px 0 10px; display: flex; flex-direction: column; gap: 6px; }
 .template-kinds li { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.45; color: rgba(255, 255, 255, 0.72); }
 .template-kinds li .template-kind { margin-top: 1px; flex-shrink: 0; }
@@ -12718,8 +12741,10 @@ body > .view-profile-screen { top: calc(57px + var(--beta-banner-h, 0px)); z-ind
    as it will be sent on the right, dimmed under an "Update preview" pill
    once the form changes. */
 .doc-modal { max-width: 560px; width: 95%; display: flex; flex-direction: column; }
-.doc-modal-head { padding: 22px 24px 0; }
-.doc-modal-head .modal-title { margin: 0 0 4px; }
+.doc-modal-head { position: relative; padding: 18px 56px 14px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 16px; }
+.doc-modal-head .modal-title { margin: 0 0 4px; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.15; text-wrap: balance; }
+.doc-modal-head .modal-close { position: absolute; right: 14px; top: 16px; }
+.doc-modal .form-label { display: block; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.55); }
 /* mobile: the whole modal scrolls (overflow on .delete-modal), so nothing
    may shrink — a shrunk body would let the form run under the action row */
 .doc-modal-body { display: flex; flex-direction: column; flex-shrink: 0; }
@@ -13566,7 +13591,9 @@ div.poster-stat { cursor: default; }
   border: 0;
   background: transparent;
   color: rgba(255, 255, 255, 0.75);
-  font: 600 14px Inter, sans-serif;
+  font: 700 12px Inter, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 .booking-page-bar .booking-page-bar-btn {
@@ -13597,3 +13624,15 @@ div.poster-stat { cursor: default; }
 .event-photo-preview { display: flex; flex-direction: column; gap: 8px; }
 .event-photo-preview img { width: 100%; height: 150px; object-fit: cover; border-radius: 12px; }
 .event-photo-preview-actions { display: flex; gap: 8px; }
+
+/* Browser-default form controls follow the palette everywhere: crimson when
+   ticked, dark otherwise (report reasons, filter lists, counter-offer extras,
+   consent boxes, native selects). */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-crimson-action);
+  color-scheme: dark;
+}
+select {
+  color-scheme: dark;
+}

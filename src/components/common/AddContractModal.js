@@ -243,7 +243,7 @@ const AddContractModal = ({
                       <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
                     <p style={{ fontSize: '13px', marginBottom: '8px' }}>{t('docs.dragDrop')}</p>
-                    <label style={{ display: 'inline-block', padding: '7px 14px', backgroundColor: 'var(--primary-pink)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
+                    <label className="btn btn-outline btn-sm" style={{ display: 'inline-flex', cursor: 'pointer' }}>
                       {t('docs.browseFiles')}
                       <input type="file" accept="application/pdf" onChange={(e) => e.target.files[0] && handleFileSelect(e.target.files[0])} style={{ display: 'none' }} disabled={isSubmitting} />
                     </label>

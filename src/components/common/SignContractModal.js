@@ -119,7 +119,7 @@ const SignContractModal = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+          <h2>
             {isSendAndSign ? t('contract.signAndSend') : t('contract.signContract')}
           </h2>
           <button className="modal-close" onClick={onClose}>×</button>
@@ -127,14 +127,14 @@ const SignContractModal = ({
 
         <div className="modal-body" style={{ padding: '20px' }}>
           <div style={{
-            padding: '12px',
-            backgroundColor: 'rgba(138, 43, 226, 0.1)',
-            borderRadius: '8px',
+            padding: '14px',
+            backgroundColor: '#101015',
+            borderRadius: '14px',
             marginBottom: '20px',
-            border: '1px solid rgba(138, 43, 226, 0.2)'
+            border: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'rgba(138, 43, 226, 1)' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: '#FF6B88', flexShrink: 0 }}>
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -153,7 +153,7 @@ const SignContractModal = ({
                     : t('contract.reviewBeforeSigning')}
                 </p>
                 {signerCapacity && (
-                  <p style={{ margin: '6px 0 0 0', fontSize: '12px', color: 'rgba(138, 43, 226, 1)', fontWeight: 600 }}>
+                  <p className="m-0 mt-1.5 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-white/60">
                     Signing {signerCapacity}
                   </p>
                 )}
@@ -189,7 +189,7 @@ const SignContractModal = ({
 
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '16px' }}>
-              <label htmlFor="fullName" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+              <label htmlFor="fullName" className="block mb-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-white/55">
                 Full Legal Name *
               </label>
               <input
@@ -201,9 +201,9 @@ const SignContractModal = ({
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '6px',
+                  backgroundColor: '#0a0a0e',
+                  border: '1px solid rgba(255, 255, 255, 0.14)',
+                  borderRadius: '10px',
                   color: '#fff',
                   fontSize: '14px'
                 }}
@@ -213,7 +213,7 @@ const SignContractModal = ({
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+              <label className="block mb-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-white/55">
                 {t('contract.signatureLabel')}
               </label>
               <div ref={drawWrapRef}>
@@ -250,9 +250,12 @@ const SignContractModal = ({
                       background: 'transparent',
                       color: 'rgba(255,255,255,0.5)',
                       border: '1px solid rgba(255,255,255,0.15)',
-                      borderRadius: '4px',
-                      padding: '4px 12px',
-                      fontSize: '11px',
+                      borderRadius: '8px',
+                      padding: '5px 12px',
+                      fontSize: '10.5px',
+                      fontWeight: 600,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
                       cursor: 'pointer',
                     }}
                   >
@@ -265,9 +268,9 @@ const SignContractModal = ({
             <div style={{
               marginBottom: '20px',
               padding: '12px',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              borderRadius: '6px',
-              border: '1px solid rgba(255, 255, 255, 0.08)'
+              backgroundColor: '#0a0a0e',
+              borderRadius: '12px',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
             }}>
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', fontSize: '13px', lineHeight: '1.5' }}>
                 <input

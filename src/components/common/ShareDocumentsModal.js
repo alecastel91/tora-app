@@ -60,7 +60,7 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                   backgroundColor: 'rgba(255,255,255,0.02)',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: status === 'shared' ? '6px' : '10px', gap: '8px', minWidth: 0 }}>
-                    <strong style={{ fontSize: '14px', flexShrink: 0 }}>{cat.label}</strong>
+                    <strong className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/60" style={{ flexShrink: 0 }}>{cat.label}</strong>
                     {status !== 'pending' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, justifyContent: 'flex-end' }}>
                         {status === 'skipped' && (
@@ -129,8 +129,8 @@ const ShareDocumentsModal = ({ isOpen, deal, currentUser, onClose, onDealUpdated
                     <div
                       title={sharedEntry?.documentTitle || ''}
                       style={{
-                        fontSize: '12px',
-                        color: 'rgba(67,233,123,1)',
+                        fontSize: '13px',
+                        color: 'rgba(255,255,255,0.85)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
@@ -293,12 +293,14 @@ const UploadOnlyPicker = ({ category, actionBusy, profileId, onUploaded }) => {
         style={{
           width: '100%',
           padding: '10px 12px',
-          border: '1px dashed rgba(255,51,102,0.5)',
-          borderRadius: '6px',
-          background: 'rgba(255,51,102,0.05)',
-          color: '#FF3366',
-          fontSize: '13px',
-          fontWeight: 500,
+          border: '1px dashed rgba(255,255,255,0.28)',
+          borderRadius: '10px',
+          background: 'transparent',
+          color: '#fff',
+          fontSize: '11px',
+          fontWeight: 600,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
           cursor: disabled ? 'default' : 'pointer',
           opacity: disabled ? 0.6 : 1,
           textAlign: 'center',

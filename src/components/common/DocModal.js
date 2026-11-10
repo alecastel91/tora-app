@@ -79,22 +79,30 @@ export const DocPreviewPane = ({ url, title, fileName, building, stale, onRefres
  * head, a body that is one column on mobile and form | preview on desktop,
  * and the action row. `preview` takes DocPreviewPane props.
  */
-const DocModal = ({ title, subtitle, onClose, preview, actions, children, className = '' }) => (
-  <OverlayPortal>
-    <div className="delete-modal-overlay" onClick={onClose}>
-      <div className={`delete-modal doc-modal ${className}`} onClick={(e) => e.stopPropagation()}>
-        <div className="doc-modal-head">
-          <h2 className="modal-title">{title}</h2>
-          {subtitle && <p className="form-hint m-0">{subtitle}</p>}
+const DocModal = ({ title, subtitle, onClose, preview, actions, children, className = '' }) => {
+  const { t } = useLanguage();
+  return (
+    <OverlayPortal>
+      <div className="delete-modal-overlay" onClick={onClose}>
+        <div className={`delete-modal doc-modal ${className}`} onClick={(e) => e.stopPropagation()}>
+          <div className="doc-modal-head">
+            <h2 className="modal-title">{title}</h2>
+            {subtitle && <p className="form-hint m-0">{subtitle}</p>}
+            <button type="button" className="modal-close" onClick={onClose} aria-label={t('common.close')}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="doc-modal-body">
+            <div className="doc-form">{children}</div>
+            {preview && <DocPreviewPane {...preview} />}
+          </div>
+          <div className="delete-modal-actions">{actions}</div>
         </div>
-        <div className="doc-modal-body">
-          <div className="doc-form">{children}</div>
-          {preview && <DocPreviewPane {...preview} />}
-        </div>
-        <div className="delete-modal-actions">{actions}</div>
       </div>
-    </div>
-  </OverlayPortal>
-);
+    </OverlayPortal>
+  );
+};
 
 export default DocModal;

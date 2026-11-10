@@ -1696,7 +1696,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           )}
 
           {isOutgoing && !hideWorkflow && deal.status === 'PENDING' && (
-            <button className="btn btn-outline btn-delete-offer-expanded" onClick={() => setDealToDelete(deal.id)}>
+            <button type="button" className="booking-page-cancel" onClick={() => setDealToDelete(deal.id)}>
               {t('bookings.deleteOffer')}
             </button>
           )}
@@ -2212,7 +2212,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                     </button>
                   </div>
                 ) : (
-                  <label style={{ display: 'inline-block', padding: '7px 14px', backgroundColor: '#FF3366', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                  <label className="btn btn-outline btn-sm" style={{ display: 'inline-flex', cursor: 'pointer' }}>
                     {t('bookings.chooseFile')}
                     <input
                       type="file"
@@ -2635,14 +2635,14 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             </div>
             <div className="delete-modal-content">
               <div style={{
-                padding: '12px',
-                backgroundColor: 'rgba(255,193,7,0.1)',
-                borderRadius: '6px',
-                border: '1px solid rgba(255,193,7,0.3)',
+                padding: '12px 14px',
+                backgroundColor: 'rgba(222,42,87,0.1)',
+                borderRadius: '12px',
+                border: '1px solid rgba(222,42,87,0.45)',
                 marginBottom: '16px'
               }}>
                 <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
-                  ⚠️ This will remove the contract from the booking. The other party will be notified.
+                  This will remove the contract from the booking. The other party will be notified.
                 </p>
               </div>
               <p style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(255,255,255,0.6)' }}>
@@ -2666,10 +2666,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                 className="btn btn-primary"
                 onClick={handleWithdrawContract}
                 disabled={actionBusy}
-                style={{
-                  backgroundColor: 'rgba(255,193,7,0.8)',
-                  borderColor: 'rgba(255,193,7,1)'
-                }}
               >
                 {t('bookings.withdrawContract')}
               </button>

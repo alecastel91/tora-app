@@ -3072,7 +3072,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     {currentUser.role === 'AGENT' && selectedArtistForDocs && (
                       <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                        {t('chat.sharingOnBehalfOf')} <strong style={{ color: '#fff' }}>{selectedArtistForDocs.name}</strong> · <button onClick={() => setSelectedArtistForDocs(null)} style={{ background: 'transparent', border: 'none', color: '#FF3366', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>{t('chat.change')}</button>
+                        {t('chat.sharingOnBehalfOf')} <strong style={{ color: '#fff' }}>{selectedArtistForDocs.name}</strong> · <button onClick={() => setSelectedArtistForDocs(null)} style={{ background: 'transparent', border: 'none', color: '#FF6B88', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>{t('chat.change')}</button>
                       </div>
                     )}
                     {categories.map((cat) => {
@@ -3084,7 +3084,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                           padding: '14px',
                           background: 'rgba(255,255,255,0.02)',
                         }}>
-                          <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>{cat.label}</strong>
+                          <strong className="block mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/60">{cat.label}</strong>
                           {docs.length === 0 ? (
                             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
                               {t('chat.noDocsInLibrary', {
@@ -3113,7 +3113,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                                   whiteSpace: 'nowrap',
                                   transition: 'all 0.15s',
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,51,102,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,51,102,0.5)'; }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(222,42,87,0.08)'; e.currentTarget.style.borderColor = 'rgba(222,42,87,0.5)'; }}
                                 onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
                               >
                                 {doc.title}
@@ -3130,7 +3130,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                       padding: '14px',
                       background: 'rgba(255,255,255,0.02)',
                     }}>
-                      <strong style={{ fontSize: '14px', display: 'block', marginBottom: '10px' }}>{t('chat.otherFile')}</strong>
+                      <strong className="block mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/60">{t('chat.otherFile')}</strong>
                       <input
                         type="file"
                         accept="application/pdf,image/*"
@@ -3144,12 +3144,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                         style={{
                           width: '100%',
                           padding: '10px 12px',
-                          border: '1px dashed rgba(255,51,102,0.5)',
-                          borderRadius: '6px',
-                          background: 'rgba(255,51,102,0.05)',
-                          color: '#FF3366',
-                          fontSize: '13px',
-                          fontWeight: 500,
+                          border: '1px dashed rgba(255,255,255,0.28)',
+                          borderRadius: '10px',
+                          background: 'transparent',
+                          color: '#fff',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase',
                           cursor: 'pointer',
                         }}
                       >
