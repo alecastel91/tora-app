@@ -13557,22 +13557,57 @@ div.poster-stat { cursor: default; }
 }
 .booking-page .workflow-actions { margin: 0; }
 
-/* The viewer's move, pinned above the tab bar (bottom of the pane on desktop) */
+/* Details: label / value pairs, as on the mockup */
+.booking-facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.booking-fact {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.booking-fact:last-child { border-bottom: 0; }
+.booking-fact dt { color: rgba(255, 255, 255, 0.55); }
+.booking-fact dd { margin: 0; color: #fff; overflow-wrap: anywhere; }
+.booking-fact-sub { display: block; margin-top: 2px; font-size: 12.5px; color: rgba(255, 255, 255, 0.55); }
+.booking-page-notes {
+  margin: 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: #101015;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* Progress: a plain ticked list instead of the boxed timeline card */
+.booking-page .workflow-timeline { padding: 0; margin: 0; background: none; border: 0; border-radius: 0; }
+.booking-page .flow-steps { padding: 0; }
+.booking-page .flow-step { gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.booking-page .flow-rail { width: 24px; }
+.booking-page .flow-line { display: none; }
+.booking-page .flow-node { width: 24px; height: 24px; font-size: 12px; }
+.booking-page .flow-done .flow-node { background: var(--color-crimson-action); }
+.booking-page .flow-body { padding: 2px 0 0; }
+.booking-page .flow-label { font-size: 14.5px; }
+.booking-page .flow-now .flow-label { color: #FF6B88; }
+.booking-page .flow-date { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.booking-page .booking-page-h { font-size: 18px; margin-bottom: 8px; }
+
+/* The viewer's move, at the end of the page */
 .booking-page-bar {
-  position: sticky;
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  z-index: 5;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
-  background: linear-gradient(to bottom, rgba(4, 4, 7, 0), #040407 30%);
-}
-@media (min-width: 1024px) {
-  .booking-page-bar { bottom: 0; }
+  padding: 4px 16px 28px;
 }
 .bookings-screen--focus .booking-page { margin: 0; }
-.bookings-screen--focus .booking-page-bar { bottom: 0; }
 .booking-page-bar-chat {
   flex: none;
   width: 50px;

@@ -13,7 +13,6 @@ import IssueInvoiceModal from '../common/IssueInvoiceModal';
 import DraftContractModal from '../common/DraftContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
-import EventLogisticsDetails from '../common/EventLogisticsDetails';
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatureIsArtistSide } from '../../utils/contractSigner';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 import { DOC_CATEGORIES, categoryStatus, documentsStillDue } from '../../utils/documentCategories';
@@ -816,6 +815,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       ? (deal.venue.id === currentUser.id ? deal.artist : deal.venue)
       : deal.initiator;
 
+    // Who the card is about. The booker sees the ARTIST being booked, never
+    // the agent who sent or answers the offer (that agent gets the "via"
+    // line); the artist side sees the booker. otherParty stays the chat
+    // counterpart.
+    const shownParty = (isArtistSideForDeal(deal, currentUser) ? deal.venue : deal.artist) || otherParty;
+
     // Visibility + write-access flags for the deal card.
     //   isViaAgent — show the "via agent" sub-line (artist viewer + booker viewer when relevant).
     //   delegateToAgent — ARTIST viewer of an agent-led deal: their agent handles it.
@@ -886,136 +891,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     const pendingDocCategories = pendingDocCategoriesFor(deal);
     const hasPendingDocs = pendingDocCategories.length > 0;
     const statusLine = statusLineById.get(deal.id);
-
-    const detailsSlot = () => (
-      <>
-            <div className="booking-details">
-              {deal.artistName && (
-                <div className="booking-detail-row">
-                  <span className="detail-label">{t('bookings.artistLabel')}</span>
-                  <span className="detail-value">{deal.artistName}</span>
-                </div>
-              )}
-              <div className="booking-detail-row">
-                <span className="detail-label">{t('chat.venueLabel')}</span>
-                <span className="detail-value">
-                  <div>{deal.venueName}</div>
-                  {(deal.city || deal.venue?.location) && (
-                    <div className="detail-subtext">
-                      ({deal.city && deal.country ? `${deal.city}, ${deal.country}` : deal.venue?.location})
-                    </div>
-                  )}
-                </span>
-              </div>
-              {deal.startTime && deal.endTime && (
-                <div className="booking-detail-row">
-                  <span className="detail-label">{t('chat.eventTimeLabel')}</span>
-                  <span className="detail-value">
-                    {deal.startTime === 'TBC' ? t('offer.timeTbc') : `${deal.startTime} - ${deal.endTime}`}
-                  </span>
-                </div>
-              )}
-              {deal.setStartTime && deal.setEndTime && (
-                <div className="booking-detail-row">
-                  <span className="detail-label">{t('chat.setTimeLabel')}</span>
-                  <span className="detail-value">
-                    <div>{deal.setStartTime} - {deal.setEndTime}</div>
-                    {deal.setDuration && (
-                      <div className="detail-subtext">{t('chat.durationMinutes', { n: deal.setDuration })}</div>
-                    )}
-                  </span>
-                </div>
-              )}
-              {formatFee(deal.currentFee) != null && (
-                <div className="booking-detail-row">
-                  <span className="detail-label">{t('chat.feeLabel')}</span>
-                  <span className="detail-value booking-fee">
-                    {formatFee(deal.currentFee)} {deal.currency}
-                  </span>
-                </div>
-              )}
-              <EventLogisticsDetails deal={deal} rowClass="booking-detail-row" />
-              {(() => {
-                // Resolve the current extras: counter-offer additionalTerms (when JSON)
-                // takes precedence over the original deal.extras since counters never
-                // touch deal.extras. Without this, both render under "Extras:" and
-                // we see the section twice.
-                let latestExtras = null;
-                if (deal.additionalTerms) {
-                  try {
-                    const parsed = typeof deal.additionalTerms === 'string'
-                      ? JSON.parse(deal.additionalTerms)
-                      : deal.additionalTerms;
-                    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-                      latestExtras = parsed;
-                    }
-                  } catch (e) { /* fall through to free-text rendering below */ }
-                }
-                if (!latestExtras && deal.extras && Object.keys(deal.extras).length > 0) {
-                  latestExtras = deal.extras;
-                }
-
-                return (
-                  <>
-                    {latestExtras && Object.keys(latestExtras).length > 0 && (
-                      <div className="booking-detail-row full-width">
-                        <span className="detail-label">{t('chat.extrasLabel')}</span>
-                        <div className="detail-value extras-list">
-                          {Object.entries(latestExtras).filter(([, v]) => v).map(([key, value]) => (
-                            <div key={key} className="extra-item">
-                              <div className="extra-content">
-                                <strong style={{ textTransform: 'capitalize' }}>{extraLabel(key)}</strong>
-                                {value !== 'Included' && value !== true && <span className="extra-note">: {value}</span>}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {!latestExtras && deal.additionalTerms && (
-                      <div className="booking-detail-row full-width">
-                        <span className="detail-label">{t('chat.additionalTermsLabel')}</span>
-                        <span className="detail-value">{deal.additionalTerms}</span>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-              {deal.technicalRequirements && (
-                <div className="booking-detail-row full-width">
-                  <span className="detail-label">{t('chat.technicalLabel')}</span>
-                  <span className="detail-value">{deal.technicalRequirements}</span>
-                </div>
-              )}
-              {(() => {
-                const { depositDeadline, finalPaymentDeadline } = dealDeadlines(deal);
-                const fmt = (d) => new Date(d).toLocaleDateString(t('dateFormat.locale'), { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-                return (
-                  <>
-                    {depositDeadline && (
-                      <div className="booking-detail-row">
-                        <span className="detail-label">{t('offer.depositDeadline')}</span>
-                        <span className="detail-value">{fmt(depositDeadline)}</span>
-                      </div>
-                    )}
-                    {finalPaymentDeadline && (
-                      <div className="booking-detail-row">
-                        <span className="detail-label">{t('offer.finalPaymentDeadline')}</span>
-                        <span className="detail-value">{fmt(finalPaymentDeadline)}</span>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-            {deal.notes && (
-              <div className="mb-4 -mt-1">
-                <p className="m-0 mb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30 font-tech">{t('bookings.notes')}</p>
-                <p className="m-0 text-[12px] leading-relaxed text-white/45">{deal.notes}</p>
-              </div>
-            )}
-      </>
-    );
 
     const contractSlot = () => (
       <>
@@ -1491,7 +1366,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     );
 
     const displayStatus = getDealDisplayStatus(deal);
-    const photo = deal.eventImage || otherParty.avatar || null;
+    const photo = deal.eventImage || shownParty.avatar || null;
     const locale = t('dateFormat.locale');
     const feeText = formatFee(deal.currentFee) != null ? `${formatFee(deal.currentFee)} ${deal.currency}` : null;
     const statusPill = <span className={getStatusBadgeClass(displayStatus)}>{statusLabel(displayStatus)}</span>;
@@ -1523,7 +1398,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     // Who the booking is for / run by — the same sub-lines the old card had.
     const partyLines = (
       <>
-        {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && (
+        {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && deal.bookedArtistId !== shownParty.id && (
           <p className="party-via-agent" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('bookings.forArtist', { name: deal.bookedArtistName })}</p>
         )}
         {isViaAgent && agentName && (
@@ -1541,7 +1416,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
     const photoBox = (className) => (photo
       ? <img src={photo} alt="" className={className} loading="lazy" />
-      : <div className={`${className} booking-photo-fallback ${getAvatarClass(otherParty.role)}`} aria-hidden="true">{otherParty.name.charAt(0).toUpperCase()}</div>);
+      : <div className={`${className} booking-photo-fallback ${getAvatarClass(shownParty.role)}`} aria-hidden="true">{shownParty.name.charAt(0).toUpperCase()}</div>);
 
     // ── List row ──
     if (variant === 'row') {
@@ -1561,9 +1436,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               </span>
               {statusPill}
             </span>
-            <span className="booking-row-title">{deal.eventName || otherParty.name}</span>
+            <span className="booking-row-title">{deal.eventName || shownParty.name}</span>
             <span className="booking-row-party">
-              {otherParty.name} · <span className={`booking-role-${otherParty.role.toLowerCase()}`}>{roleLabel(otherParty.role, t)}</span>
+              {shownParty.name} · <span className={`booking-role-${shownParty.role.toLowerCase()}`}>{roleLabel(shownParty.role, t)}</span>
             </span>
             {statusLine && (
               <span className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</span>
@@ -1604,12 +1479,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           </span>
           <span className="booking-hero-body">
             <span className="booking-hero-party">
-              <span className={`booking-avatar ${getAvatarClass(otherParty.role)}`}>
-                {otherParty.avatar ? <img src={otherParty.avatar} alt="" /> : otherParty.name.charAt(0).toUpperCase()}
+              <span className={`booking-avatar ${getAvatarClass(shownParty.role)}`}>
+                {shownParty.avatar ? <img src={shownParty.avatar} alt="" /> : shownParty.name.charAt(0).toUpperCase()}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="booking-hero-party-name">{otherParty.name}</span>
-                <span className={`booking-role-${otherParty.role.toLowerCase()} booking-hero-party-role`}>{roleLabel(otherParty.role, t)}</span>
+                <span className="booking-hero-party-name">{shownParty.name}</span>
+                <span className={`booking-role-${shownParty.role.toLowerCase()} booking-hero-party-role`}>{roleLabel(shownParty.role, t)}</span>
               </span>
               {feeText && <span className="booking-hero-fee">{feeText}</span>}
             </span>
@@ -1634,18 +1509,13 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     // PENDING: the recipient answers. NEGOTIATING: whoever did NOT send the last counter.
     const canRespond = (lastOffer ? lastOffer.offeredBy !== currentUser.id : !isOutgoing)
       && !hideWorkflow && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING');
-    const contractCommitted = ['ARTIST_SIGNED', 'VENUE_SIGNED', 'FULLY_SIGNED'].includes(deal.contract?.status) || deal.contract?.skipped === true;
-    // The move the status sentence names, as one button in the bottom bar.
-    // Steps whose flow lives in the timeline (send / sign a contract) keep
-    // their buttons there.
-    const primary = (!hideWorkflow && statusLine?.mine && !canRespond) ? ({
-      confirmPayment: { label: t('bookings.confirmReceipt'), run: () => setDepositHistoryDeal(deal) },
+    // The move the status sentence names, as one button in the bottom bar —
+    // only where the timeline isn't on the page: on a confirmed booking each
+    // step already carries its own button, and repeating it read as noise.
+    const timelineShown = deal.status === 'ACCEPTED' && !hideWorkflow;
+    const primary = (!hideWorkflow && !timelineShown && statusLine?.mine && !canRespond) ? ({
       settle: { label: t('bookings.confirmReceipt'), run: () => setDepositHistoryDeal(deal) },
       resolve: { label: t('bookings.resolvePayment'), run: () => { setDealToSettle(deal); setSettleNote(''); } },
-      shareDocs: { label: t('chat.shareDocuments'), run: () => { setSelectedDealForWorkflow(deal); setShowDocumentModal(true); } },
-      sendPayment: (deal.venue.id === currentUser.id && contractCommitted)
-        ? { label: t('bookings.updatePayment'), run: () => { setSelectedDealForWorkflow(deal); setShowDepositAgain(false); setShowPaymentModal(true); } }
-        : null,
     }[statusLine.key] || null) : null;
     const showBar = !limitedView || canRespond || !!primary;
 
@@ -1656,6 +1526,42 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         : (deal.startTime && deal.endTime && { label: t('bookings.termEventTime'), value: deal.startTime === 'TBC' ? t('offer.timeTbc') : `${deal.startTime} – ${deal.endTime}` }),
       (deal.eventStage || deal.performanceType) && { label: deal.eventStage ? t('bookings.termStage') : t('bookings.termPerformance'), value: deal.eventStage || deal.performanceType },
       deal.eventCapacity && { label: t('bookings.termCapacity'), value: Number(deal.eventCapacity).toLocaleString(locale) },
+    ].filter(Boolean);
+
+    // The details list, as label / value pairs (labels lose the trailing
+    // colon the older card layout used).
+    const lbl = (key) => t(key).replace(/\s*[:：]\s*$/, '');
+    const extrasText = (() => {
+      let extras = null;
+      if (deal.additionalTerms) {
+        try {
+          const parsed = typeof deal.additionalTerms === 'string' ? JSON.parse(deal.additionalTerms) : deal.additionalTerms;
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) extras = parsed;
+        } catch (e) { /* free text, shown as additional terms */ }
+      }
+      if (!extras && deal.extras && Object.keys(deal.extras).length > 0) extras = deal.extras;
+      if (!extras) return null;
+      return Object.entries(extras).filter(([, v]) => v)
+        .map(([k, v]) => (v === 'Included' || v === true ? extraLabel(k) : `${extraLabel(k)}: ${v}`)).join(', ');
+    })();
+    const freeTerms = !extrasText && deal.additionalTerms && typeof deal.additionalTerms === 'string' ? deal.additionalTerms : null;
+    const lineupNames = Array.isArray(deal.lineup) ? deal.lineup.map((a) => (typeof a === 'string' ? a : a?.name)).filter(Boolean) : [];
+    const { depositDeadline, finalPaymentDeadline } = dealDeadlines(deal);
+    const fmtDay = (d) => new Date(d).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    const facts = [
+      deal.artistName && { label: t('bookings.artistLabel').replace(/\s*[:：]\s*$/, ''), value: deal.artistName },
+      (deal.venueName || deal.city) && { label: lbl('chat.venueLabel'), value: deal.venueName || '', sub: deal.city && deal.country ? `${deal.city}, ${deal.country}` : deal.city },
+      deal.startTime && deal.endTime && { label: lbl('chat.eventTimeLabel'), value: deal.startTime === 'TBC' ? t('offer.timeTbc') : `${deal.startTime} – ${deal.endTime}` },
+      deal.setStartTime && deal.setEndTime && { label: lbl('chat.setTimeLabel'), value: `${deal.setStartTime} – ${deal.setEndTime}`, sub: deal.setDuration ? t('chat.durationMinutes', { n: deal.setDuration }) : null },
+      deal.performanceType && { label: lbl('offer.performanceType'), value: deal.performanceType },
+      deal.eventRoomsCount != null && deal.eventRoomsCount !== '' && { label: lbl('offer.eventRooms'), value: String(deal.eventRoomsCount) },
+      lineupNames.length > 0 && { label: lbl('offer.lineup'), value: lineupNames.join(', ') },
+      deal.entranceFee != null && deal.entranceFee !== '' && { label: lbl('offer.tickets'), value: `${Number(deal.entranceFee).toLocaleString(locale)} ${deal.entranceFeeCurrency || deal.currency}`, sub: deal.entranceFeeNote },
+      extrasText && { label: lbl('chat.extrasLabel'), value: extrasText },
+      freeTerms && { label: lbl('chat.additionalTermsLabel'), value: freeTerms },
+      deal.technicalRequirements && { label: lbl('chat.technicalLabel'), value: deal.technicalRequirements },
+      depositDeadline && { label: lbl('offer.depositDeadline'), value: fmtDay(depositDeadline) },
+      finalPaymentDeadline && { label: lbl('offer.finalPaymentDeadline'), value: fmtDay(finalPaymentDeadline) },
     ].filter(Boolean);
 
     return (
@@ -1686,14 +1592,14 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
         <div className="booking-page-body">
           <div className="booking-page-party">
-            <span className={`booking-avatar booking-avatar-lg ${getAvatarClass(otherParty.role)}`}>
-              {otherParty.avatar ? <img src={otherParty.avatar} alt="" /> : otherParty.name.charAt(0).toUpperCase()}
+            <span className={`booking-avatar booking-avatar-lg ${getAvatarClass(shownParty.role)}`}>
+              {shownParty.avatar ? <img src={shownParty.avatar} alt="" /> : shownParty.name.charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="booking-page-party-name">{otherParty.name}</p>
+              <p className="booking-page-party-name">{shownParty.name}</p>
               <p className="booking-page-party-role">
-                <span className={`booking-role-${otherParty.role.toLowerCase()}`}>{roleLabel(otherParty.role, t)}</span>
-                {otherParty.location ? ` · ${otherParty.location}` : ''}
+                <span className={`booking-role-${shownParty.role.toLowerCase()}`}>{roleLabel(shownParty.role, t)}</span>
+                {shownParty.location ? ` · ${shownParty.location}` : ''}
               </p>
               {partyLines}
             </div>
@@ -1757,10 +1663,28 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             </section>
           )}
 
-          <section>
-            <h3 className="booking-page-h">{t('bookings.detailsHeading')}</h3>
-            {detailsSlot()}
-          </section>
+          {facts.length > 0 && (
+            <section>
+              <h3 className="booking-page-h">{t('bookings.detailsHeading')}</h3>
+              <dl className="booking-facts">
+                {facts.map((f) => (
+                  <div key={f.label} className="booking-fact">
+                    <dt>{f.label}</dt>
+                    <dd>
+                      {f.value}
+                      {f.sub && <span className="booking-fact-sub">{f.sub}</span>}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+          {deal.notes && (
+            <section>
+              <h3 className="booking-page-h">{t('bookings.notes')}</h3>
+              <p className="booking-page-notes">{deal.notes}</p>
+            </section>
+          )}
 
           {/* Why a booking ended, kept visible. A cancellation with no stated
               reason is the thing people argue about later. */}
