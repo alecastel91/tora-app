@@ -26,7 +26,8 @@ import LoadingGlobe from '../common/LoadingGlobe';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatTimestamp, formatEventDate } from '../../utils/dates';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import { roleLabel } from '../../utils/roles';
+import { roleLabel, getAvatarClass } from '../../utils/roles';
+import { downscaleImageToDataUrl } from '../../utils/image';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -100,7 +101,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const [actionBusy, setActionBusy] = useState(false);
   const [error, setError] = useState('');
   const [dealToDelete, setDealToDelete] = useState(null);
-  const [expandedDealId, setExpandedDealId] = useState(null);
+  // The booking open as its own page (phone). null = the list.
+  const [openDealId, setOpenDealId] = useState(null);
+  const listScrollTop = useRef(0);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const photoInputRef = useRef(null);
+  const photoDealRef = useRef(null);
   const [dealToDecline, setDealToDecline] = useState(null);
   const [dealToCancel, setDealToCancel] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
@@ -152,7 +158,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     }
   };
   // A notification row (bell) can ask for one booking: refetch, then once the
-  // list holds it, switch to its tab, expand it and scroll it into view.
+  // list holds it, switch to its tab and open its page.
   const pendingOpenDealId = useRef(null);
   useEffect(() => {
     const onOpen = (e) => { pendingOpenDealId.current = e.detail?.dealId || null; fetchDeals(); };
@@ -170,8 +176,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     const today = new Date(); today.setHours(0, 0, 0, 0);
     selectTab(OFF_STATUSES.includes(deal.status) ? 'declined' : day >= today ? 'upcoming' : 'past');
     setActionFilter('all');
-    setExpandedDealId(id);
-    setTimeout(() => document.getElementById(`booking-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+    openDeal(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deals]);
   useEffect(() => {
@@ -502,8 +507,39 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     }
   };
 
-  const toggleDealExpanded = (dealId) => {
-    setExpandedDealId(expandedDealId === dealId ? null : dealId);
+  // The page replaces the list inside the same scroller: remember where the
+  // list was, start the page at the top, and put the list back on close.
+  const scroller = () => document.querySelector('.app-content');
+  const openDeal = (dealId) => {
+    if (!openDealId) listScrollTop.current = scroller()?.scrollTop || 0;
+    setOpenDealId(dealId);
+    requestAnimationFrame(() => { const el = scroller(); if (el) el.scrollTop = 0; });
+  };
+  const closeDeal = () => {
+    setOpenDealId(null);
+    requestAnimationFrame(() => { const el = scroller(); if (el) el.scrollTop = listScrollTop.current; });
+  };
+
+  // Booker side: set the photo at the top of the booking page.
+  const pickDealPhoto = (deal) => {
+    photoDealRef.current = deal;
+    photoInputRef.current?.click();
+  };
+  const onDealPhotoPicked = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    const deal = photoDealRef.current;
+    if (!file || !deal || photoBusy) return;
+    setPhotoBusy(true);
+    try {
+      const image = await downscaleImageToDataUrl(file, { maxDimension: 1280, quality: 0.82 });
+      const res = await apiService.setDealEventImage(deal.id, currentUser.id, image);
+      setDeals((prev) => prev.map((d) => (d.id === deal.id ? { ...d, eventImage: res.deal?.eventImage ?? null } : d)));
+    } catch (err) {
+      appAlert(err?.message || t('bookings.eventPhotoFailed'));
+    } finally {
+      setPhotoBusy(false);
+    }
   };
 
   const isConsentOnlyDeal = (deal) => isConsentOnlyFor(deal, currentUser);
@@ -631,7 +667,18 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     }), empty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deals, selectedArtistFilter, currentUser?.id, currentUser?.role]);
-  const clusteredDeals = clusterDealsByMonth(filteredDeals);
+  // Next show: the soonest confirmed booking leads the Upcoming list as a
+  // photo card; the rest stay grouped by month.
+  const nextShow = activeTab === 'upcoming' && actionFilter === 'all' && statusFilter === 'all'
+    ? [...filteredDeals]
+        .filter((d) => d.status === 'ACCEPTED' && !isConsentOnlyDeal(d) && !d.redactedForVenue)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))[0] || null
+    : null;
+  const clusteredDeals = clusterDealsByMonth(nextShow ? filteredDeals.filter((d) => d.id !== nextShow.id) : filteredDeals);
+  // Consent-only cards have no page: those stay in the list.
+  const openedDeal = openDealId
+    ? deals.find((d) => d.id === openDealId && !isConsentOnlyDeal(d) && !d.redactedForVenue) || null
+    : null;
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
@@ -755,7 +802,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     );
   };
 
-  const renderDealCard = (deal) => {
+  // variant: 'row' (list), 'hero' (next show) or 'page' (the booking page).
+  const renderDealCard = (deal, variant = 'row') => {
     // A deal the current profile sees ONLY as the tagged event-venue (or any
     // deal the backend redacted for a venue viewer) has no fee/offer/contract
     // data — it must never render the money booking card. Show the minimal
@@ -767,7 +815,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     const otherParty = isOutgoing
       ? (deal.venue.id === currentUser.id ? deal.artist : deal.venue)
       : deal.initiator;
-    const isExpanded = expandedDealId === deal.id || focusDealId === deal.id;
 
     // Visibility + write-access flags for the deal card.
     //   isViaAgent — show the "via agent" sub-line (artist viewer + booker viewer when relevant).
@@ -831,9 +878,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           role: 'AGENT',
         }
       : otherParty;
-
-    const dealDate = new Date(deal.date);
-    const dayNumber = dealDate.getDate();
 
     // Pre-derive once: pending doc categories drive both the Share Documents
     // CTA label and the Skip Documents button render. Used in two separate
@@ -1446,401 +1490,422 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       </>
     );
 
-    return (
-      <div key={deal.id} id={`booking-${deal.id}`} className={`booking-card ${isExpanded ? 'expanded' : ''}`}>
-        <div className="booking-date-badge">
-          <span className="booking-date-month">
-            {formatEventDate(dealDate, t('dateFormat.locale'), { month: 'short', day: undefined, year: undefined })}
+    const displayStatus = getDealDisplayStatus(deal);
+    const photo = deal.eventImage || otherParty.avatar || null;
+    const locale = t('dateFormat.locale');
+    const feeText = formatFee(deal.currentFee) != null ? `${formatFee(deal.currentFee)} ${deal.currency}` : null;
+    const statusPill = <span className={getStatusBadgeClass(displayStatus)}>{statusLabel(displayStatus)}</span>;
+
+    // The tagged TORA venue's consent, shown wherever the booking is.
+    const consentPills = (
+      <>
+        {deal.eventVenueStatus === 'PENDING' && (
+          <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300
+                           text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
+            {t('bookings.awaitingVenue')}
           </span>
-          <span className="booking-date-day">{dayNumber}</span>
-        </div>
-        <div className="booking-compact-view">
-          <div
-            className="party-avatar"
-            onClick={() => toggleDealExpanded(deal.id)}
-            style={{ cursor: 'pointer' }}
-          >
-            {otherParty.avatar ? (
-              <img src={otherParty.avatar} alt={otherParty.name} />
-            ) : (
-              otherParty.name.charAt(0).toUpperCase()
-            )}
-          </div>
+        )}
+        {deal.eventVenueStatus === 'CONFIRMED' && (
+          <span className="px-2 py-0.5 rounded-lg bg-[#43E97B]/15 border border-[#43E97B]/40 text-[#43E97B]
+                           text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
+            {t('bookings.venueConfirmedBadge')}
+          </span>
+        )}
+        {deal.eventVenueStatus === 'DECLINED' && (
+          <span className="px-2 py-0.5 rounded-lg bg-infrared/15 border border-infrared/40 text-infrared
+                           text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
+            {t('bookings.venueDeclinedBadge')}
+          </span>
+        )}
+      </>
+    );
 
-          <div
-            className="party-info"
-            onClick={() => toggleDealExpanded(deal.id)}
-            style={{ cursor: 'pointer', flex: 1 }}
-          >
-            <div className="party-name-role">
-              <h3>{otherParty.name}</h3>
-              <span className={`role-badge ${otherParty.role.toLowerCase()}`}>
-                {roleLabel(otherParty.role, t)}
+    // Who the booking is for / run by — the same sub-lines the old card had.
+    const partyLines = (
+      <>
+        {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && (
+          <p className="party-via-agent" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('bookings.forArtist', { name: deal.bookedArtistName })}</p>
+        )}
+        {isViaAgent && agentName && (
+          <p className="party-via-agent">{t('bookings.viaAgent', { name: agentName })}</p>
+        )}
+        {agentReadOnly && (
+          <p className="party-via-agent">
+            {limitedView && deal.bookedArtistId
+              ? t('bookings.viaOtherAgent', { name: deal.artist?.name || t('chat.theArtistSide') })
+              : t('bookings.viaArtistDirect', { name: deal.artist?.name || t('chat.theArtistSide') })}
+          </p>
+        )}
+      </>
+    );
+
+    const photoBox = (className) => (photo
+      ? <img src={photo} alt="" className={className} loading="lazy" />
+      : <div className={`${className} booking-photo-fallback ${getAvatarClass(otherParty.role)}`} aria-hidden="true">{otherParty.name.charAt(0).toUpperCase()}</div>);
+
+    // ── List row ──
+    if (variant === 'row') {
+      return (
+        <button
+          type="button"
+          key={deal.id}
+          id={`booking-${deal.id}`}
+          className={`booking-row${statusLine?.mine ? ' is-mine' : ''}`}
+          onClick={() => openDeal(deal.id)}
+        >
+          {photoBox('booking-row-photo')}
+          <span className="booking-row-body">
+            <span className="booking-row-top">
+              <span className="booking-row-when">
+                {[formatEventDate(deal.date, locale, { weekday: 'short', day: 'numeric', month: 'short', year: undefined }), deal.city].filter(Boolean).join(' · ')}
               </span>
-            </div>
+              {statusPill}
+            </span>
+            <span className="booking-row-title">{deal.eventName || otherParty.name}</span>
+            <span className="booking-row-party">
+              {otherParty.name} · <span className={`booking-role-${otherParty.role.toLowerCase()}`}>{roleLabel(otherParty.role, t)}</span>
+            </span>
             {statusLine && (
-              <p className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</p>
+              <span className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</span>
             )}
-            {/* Artist label — shown whenever the deal is for a represented
-                artist and the viewer isn't that artist. Agents viewing their
-                roster need this to tell their bookings apart at a glance. */}
-            {deal.bookedArtistId && deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && (
-              <p className="party-via-agent" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('bookings.forArtist', { name: deal.bookedArtistName })}</p>
-            )}
-            {isViaAgent && agentName && (
-              <p className="party-via-agent">{t('bookings.viaAgent', { name: agentName })}</p>
-            )}
-            {agentReadOnly && (
-              <p className="party-via-agent">
-                {limitedView && deal.bookedArtistId
-                  ? t('bookings.viaOtherAgent', { name: deal.artist?.name || t('chat.theArtistSide') })
-                  : t('bookings.viaArtistDirect', { name: deal.artist?.name || t('chat.theArtistSide') })}
-              </p>
-            )}
-            <p className="party-location">
-              {deal.city && deal.country ? `${deal.city}, ${deal.country}` : otherParty.location}
-            </p>
-            {!isExpanded && (
-            <p className="m-0 mb-2 text-[12px] font-space-grotesk font-medium text-white/85 truncate">
-              {deal.eventName || t('bookings.booking')}
-              {formatFee(deal.currentFee) != null && (
-                <>
-                  <span className="text-white/30"> · </span>
-                  <span className="text-infrared font-semibold">
-                    {formatFee(deal.currentFee)} {deal.currency}
-                  </span>
-                </>
-              )}
-            </p>
-            )}
-            <div className="party-status-row">
-              {(() => {
-                const displayStatus = getDealDisplayStatus(deal);
-                return (
-                  <span className={getStatusBadgeClass(displayStatus)}>
-                    {statusLabel(displayStatus)}
-                  </span>
-                );
-              })()}
-              {/* The tagged TORA venue hasn't confirmed yet — the offer is
-                  being HELD and has not been sent to the artist/agent. */}
-              {deal.eventVenueStatus === 'PENDING' && (
-                <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300
-                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
-                  {t('bookings.awaitingVenue')}
-                </span>
-              )}
-              {/* Venue responded — surface the outcome on the initiator's card. */}
-              {deal.eventVenueStatus === 'CONFIRMED' && (
-                <span className="px-2 py-0.5 rounded-lg bg-[#43E97B]/15 border border-[#43E97B]/40 text-[#43E97B]
-                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
-                  {t('bookings.venueConfirmedBadge')}
-                </span>
-              )}
-              {deal.eventVenueStatus === 'DECLINED' && (
-                <span className="px-2 py-0.5 rounded-lg bg-infrared/15 border border-infrared/40 text-infrared
-                                 text-[8px] font-semibold uppercase tracking-[0.15em] font-tech">
-                  {t('bookings.venueDeclinedBadge')}
-                </span>
-              )}
-            </div>
-            {deal.eventVenueStatus === 'PENDING' && (
-              <p className="m-0 mt-1 text-[11px] leading-relaxed text-white/45">
-                {t('bookings.awaitingVenueHint')}
-              </p>
-            )}
-          </div>
+            {feeText && <span className="booking-row-fee">{feeText}</span>}
+            {deal.eventVenueStatus && <span className="flex flex-wrap gap-1.5">{consentPills}</span>}
+          </span>
+        </button>
+      );
+    }
 
-          <button
-            className="btn-expand-arrow"
-            onClick={() => toggleDealExpanded(deal.id)}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </button>
+    // ── Next show: the soonest confirmed booking, as a photo card ──
+    if (variant === 'hero') {
+      const summary = summarizeDealPayment(deal);
+      const steps = [
+        true,
+        deal.contract?.status === 'FULLY_SIGNED',
+        DOC_CATEGORIES.every((c) => categoryStatus(deal.sharedDocuments, c.key) !== 'pending'),
+        summary.isFullyConfirmed,
+      ];
+      const current = steps.indexOf(false);
+      return (
+        <button type="button" key={deal.id} id={`booking-${deal.id}`} className="booking-hero" onClick={() => openDeal(deal.id)}>
+          <span className="booking-hero-media">
+            {photoBox('booking-hero-img')}
+            <span className="booking-hero-shade" />
+            <span className="booking-hero-date">
+              <span>{formatEventDate(deal.date, locale, { month: 'short', day: undefined, year: undefined })}</span>
+              <strong>{new Date(deal.date).getUTCDate()}</strong>
+            </span>
+            <span className="booking-hero-status">{statusPill}</span>
+            <span className="booking-hero-text">
+              <span className="booking-hero-title">{deal.eventName || t('bookings.booking')}</span>
+              <span className="booking-hero-sub">
+                {[deal.city, deal.eventStage, deal.setStartTime && deal.setEndTime ? `${deal.setStartTime} – ${deal.setEndTime}` : null].filter(Boolean).join(' · ')}
+              </span>
+            </span>
+          </span>
+          <span className="booking-hero-body">
+            <span className="booking-hero-party">
+              <span className={`booking-avatar ${getAvatarClass(otherParty.role)}`}>
+                {otherParty.avatar ? <img src={otherParty.avatar} alt="" /> : otherParty.name.charAt(0).toUpperCase()}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="booking-hero-party-name">{otherParty.name}</span>
+                <span className={`booking-role-${otherParty.role.toLowerCase()} booking-hero-party-role`}>{roleLabel(otherParty.role, t)}</span>
+              </span>
+              {feeText && <span className="booking-hero-fee">{feeText}</span>}
+            </span>
+            <span className="booking-hero-steps" aria-label={t('bookings.stepsDone', { n: steps.filter(Boolean).length, total: steps.length })}>
+              {steps.map((done, i) => (
+                <span key={i} className={done ? 'is-done' : i === current ? 'is-current' : ''} />
+              ))}
+            </span>
+            {statusLine && (
+              <span className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</span>
+            )}
+          </span>
+        </button>
+      );
+    }
+
+    // ── The booking page ──
+    const isOff = deal.status === 'DECLINED' || deal.status === 'CANCELLED';
+    const isBooker = deal.venue.id === currentUser.id || deal.initiator.id === currentUser.id;
+    const offerHistory = deal.offerHistory || [];
+    const lastOffer = offerHistory.length > 0 ? offerHistory[offerHistory.length - 1] : null;
+    // PENDING: the recipient answers. NEGOTIATING: whoever did NOT send the last counter.
+    const canRespond = (lastOffer ? lastOffer.offeredBy !== currentUser.id : !isOutgoing)
+      && !hideWorkflow && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING');
+    const contractCommitted = ['ARTIST_SIGNED', 'VENUE_SIGNED', 'FULLY_SIGNED'].includes(deal.contract?.status) || deal.contract?.skipped === true;
+    // The move the status sentence names, as one button in the bottom bar.
+    // Steps whose flow lives in the timeline (send / sign a contract) keep
+    // their buttons there.
+    const primary = (!hideWorkflow && statusLine?.mine && !canRespond) ? ({
+      confirmPayment: { label: t('bookings.confirmReceipt'), run: () => setDepositHistoryDeal(deal) },
+      settle: { label: t('bookings.confirmReceipt'), run: () => setDepositHistoryDeal(deal) },
+      resolve: { label: t('bookings.resolvePayment'), run: () => { setDealToSettle(deal); setSettleNote(''); } },
+      shareDocs: { label: t('chat.shareDocuments'), run: () => { setSelectedDealForWorkflow(deal); setShowDocumentModal(true); } },
+      sendPayment: (deal.venue.id === currentUser.id && contractCommitted)
+        ? { label: t('bookings.updatePayment'), run: () => { setSelectedDealForWorkflow(deal); setShowDepositAgain(false); setShowPaymentModal(true); } }
+        : null,
+    }[statusLine.key] || null) : null;
+    const showBar = !limitedView || canRespond || !!primary;
+
+    const terms = [
+      feeText && { label: t('bookings.termFee'), value: feeText },
+      deal.setStartTime && deal.setEndTime
+        ? { label: t('bookings.termSet'), value: `${deal.setStartTime} – ${deal.setEndTime}` }
+        : (deal.startTime && deal.endTime && { label: t('bookings.termEventTime'), value: deal.startTime === 'TBC' ? t('offer.timeTbc') : `${deal.startTime} – ${deal.endTime}` }),
+      (deal.eventStage || deal.performanceType) && { label: deal.eventStage ? t('bookings.termStage') : t('bookings.termPerformance'), value: deal.eventStage || deal.performanceType },
+      deal.eventCapacity && { label: t('bookings.termCapacity'), value: Number(deal.eventCapacity).toLocaleString(locale) },
+    ].filter(Boolean);
+
+    return (
+      <div key={deal.id} id={`booking-${deal.id}`} className="booking-page">
+        <div className="booking-page-hero">
+          {photoBox('booking-page-hero-img')}
+          <div className="booking-page-hero-shade" />
+          {!focusMode && (
+            <button type="button" className="booking-page-round booking-page-back" aria-label={t('bookings.backToBookings')} onClick={closeDeal}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+            </button>
+          )}
+          {isBooker && !isOff && !deal.redactedForVenue && (
+            <button type="button" className="booking-page-photo-btn" disabled={photoBusy} onClick={() => pickDealPhoto(deal)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><circle cx="12" cy="13" r="3.5" /></svg>
+              {photoBusy ? '...' : deal.eventImage ? t('bookings.changeEventPhoto') : t('bookings.addEventPhoto')}
+            </button>
+          )}
+          <div className="booking-page-hero-text">
+            <div className="flex flex-wrap items-center gap-1.5">{statusPill}{consentPills}</div>
+            <h2 className="booking-page-title">{deal.eventName || t('bookings.booking')}</h2>
+            <p className="booking-page-when">
+              {formatEventDate(deal.date, locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+              {(deal.city || deal.venue?.location) && ` · ${deal.city && deal.country ? `${deal.city}, ${deal.country}` : (deal.city || deal.venue?.location)}`}
+            </p>
+          </div>
         </div>
 
-        {isExpanded && (
-          <>
-            {limitedView && (
-              <p className="mb-3 text-[11px] leading-relaxed text-white/35">
-                {t(deal.agentId ? 'bookings.limitedViewNote' : 'bookings.limitedViewDirect')}
+        <div className="booking-page-body">
+          <div className="booking-page-party">
+            <span className={`booking-avatar booking-avatar-lg ${getAvatarClass(otherParty.role)}`}>
+              {otherParty.avatar ? <img src={otherParty.avatar} alt="" /> : otherParty.name.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="booking-page-party-name">{otherParty.name}</p>
+              <p className="booking-page-party-role">
+                <span className={`booking-role-${otherParty.role.toLowerCase()}`}>{roleLabel(otherParty.role, t)}</span>
+                {otherParty.location ? ` · ${otherParty.location}` : ''}
               </p>
-            )}
-            {handOverAgents.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {handOverAgents.map((agent) => (
-                  <button
-                    key={repEntryId(agent)}
-                    type="button"
-                    className="btn btn-outline btn-sm"
-                    disabled={actionBusy}
-                    onClick={() => handleHandToAgent(deal, agent)}
-                  >
-                    {t('bookings.handToAgent', { name: repEntryName(agent) })}
-                  </button>
-                ))}
-              </div>
-            )}
-            {(deal.eventName || deal.performanceType) && (
-              <div className="flex items-center gap-2.5 mb-2">
-                <h3 className="poster-event-title">
-                  {deal.eventName || t('bookings.booking')}
-                </h3>
-                {deal.performanceType && (
-                  <span className="shrink-0 px-2 py-0.5 rounded-lg bg-[#0c0c11] border border-white/10 text-white/60
-                                   text-[8px] font-medium uppercase tracking-[0.15em] font-tech">
-                    {deal.performanceType}
-                  </span>
-                )}
-              </div>
-            )}
-            {(deal.status !== 'ACCEPTED' || hideWorkflow) && detailsSlot()}
+              {partyLines}
+            </div>
+          </div>
 
-            {/* Workflow Timeline for ACCEPTED deals: each step holds its own actions */}
-            {deal.status === 'ACCEPTED' && !hideWorkflow && (
+          {deal.eventVenueStatus === 'PENDING' && (
+            <p className="m-0 text-[12px] leading-relaxed text-white/45">{t('bookings.awaitingVenueHint')}</p>
+          )}
+          {limitedView && (
+            <p className="m-0 text-[12px] leading-relaxed text-white/40">
+              {t(deal.agentId ? 'bookings.limitedViewNote' : 'bookings.limitedViewDirect')}
+            </p>
+          )}
+          {handOverAgents.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {handOverAgents.map((agent) => (
+                <button key={repEntryId(agent)} type="button" className="btn btn-outline btn-sm" disabled={actionBusy} onClick={() => handleHandToAgent(deal, agent)}>
+                  {t('bookings.handToAgent', { name: repEntryName(agent) })}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {terms.length > 0 && (
+            <dl className="booking-terms">
+              {terms.map((term) => (
+                <div key={term.label} className="booking-term">
+                  <dt>{term.label}</dt>
+                  <dd>{term.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          {statusLine && (
+            <section className={`booking-next${statusLine.mine ? ' is-mine' : ''}`} aria-label={t('bookings.nextStep')}>
+              <span className="booking-next-eyebrow">{statusLine.mine ? t('bookings.nextStepYours') : t('bookings.nextStep')}</span>
+              <p className="booking-next-text">{statusLine.text}</p>
+            </section>
+          )}
+
+          {delegateToAgent && (
+            <div className="via-agent-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="8"></line>
+              </svg>
+              <span>{agentName ? t('bookings.managedByAgentNamed', { name: agentName }) : t('bookings.managedByAgent')}</span>
+            </div>
+          )}
+
+          {deal.status === 'ACCEPTED' && !hideWorkflow && (
+            <section>
+              <h3 className="booking-page-h">{t('bookings.progressHeading')}</h3>
               <WorkflowTimeline
                 deal={deal}
                 onViewPaymentDetails={() => setDepositHistoryDeal(deal)}
                 stepActions={{ contractSigned: contractSlot(), documentsShared: documentsSlot(), paymentReceived: paymentSlot() }}
               />
-            )}
-            {deal.status === 'ACCEPTED' && !hideWorkflow && detailsSlot()}
+            </section>
+          )}
 
-            {/* Workflow Action Buttons for ACCEPTED deals - hidden when the agent handles it */}
-            {deal.status === 'ACCEPTED' && !hideWorkflow && (
-              <div className="workflow-actions">
-                <button
-                  className="btn btn-outline"
-                  onClick={() => onOpenChat && onOpenChat(messageTarget)}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  {t('search.message')}
-                </button>
+          <section>
+            <h3 className="booking-page-h">{t('bookings.detailsHeading')}</h3>
+            {detailsSlot()}
+          </section>
 
-                {/* Closing the booking out. Both live only on a confirmed
-                    booking that hasn't already ended — an offer that was never
-                    accepted is declined or withdrawn, which are other buttons. */}
-                {(() => {
-                  // "Completed" is a claim about something that already
-                  // happened, so the button doesn't exist before the date.
-                  const eventPassed = deal.date && new Date(deal.date) <= new Date();
-                  const artistSide = isArtistSideForDeal(deal, currentUser);
+          {/* Why a booking ended, kept visible. A cancellation with no stated
+              reason is the thing people argue about later. */}
+          {deal.status === 'CANCELLED' && (() => {
+            const settlement = deal.payment?.settlement;
+            const summary = summarizeDealPayment(deal);
+            const isOwedSide = isArtistSideForDeal(deal, currentUser);
+            const isBookerSide = deal.venue.id === currentUser.id;
+            // A fee was agreed or money moved: something for the two of them to settle.
+            const hasMoneyQuestion = summary.hasAnyPayment || summary.totalFee > 0;
+
+            return (
+              <div className="cancelled-settlement">
+                {deal.cancelReason && (
+                  <div className="cancelled-reason-note">
+                    <strong>{t('bookings.cancelledReasonLabel')}</strong> {deal.cancelReason}
+                  </div>
+                )}
+
+                {hasMoneyQuestion && (() => {
+                  // Money marked by the payer but not yet acknowledged.
+                  const awaiting = Math.max(0, summary.totalMarked - summary.totalConfirmed);
+                  const canConfirm = isOwedSide && awaiting > 0;
+
                   return (
-                    <>
-                      {eventPassed && artistSide && (
-                        <button
-                          className="btn btn-primary"
-                          disabled={actionBusy}
-                          onClick={() => handleCompleteDeal(deal)}
-                        >
-                          {actionBusy ? '...' : t('bookings.markCompleted')}
-                        </button>
+                    <div className="cancelled-payment-row">
+                      <span className="cancelled-payment-figure">
+                        {t('bookings.paidSoFar')} {formatFee(summary.totalConfirmed)}
+                        {summary.totalFee > 0 && ` / ${formatFee(summary.totalFee)}`} {summary.currency}
+                        {awaiting > 0 && (
+                          <>
+                            {' · '}
+                            <em className="cancelled-payment-awaiting">
+                              {t('bookings.awaitingConfirmation', { amount: `${formatFee(awaiting)} ${summary.currency}` })}
+                            </em>
+                          </>
+                        )}
+                      </span>
+
+                      {settlement ? (
+                        <span className={`settlement-pill ${settlement.outcome}`}>
+                          {settlement.outcome === 'settled' ? t('bookings.paymentSettled') : t('bookings.paymentWaived')}
+                        </span>
+                      ) : (
+                        <div className="cancelled-payment-actions">
+                          {summary.hasAnyPayment && (
+                            <button className="btn btn-outline btn-sm" onClick={() => setDepositHistoryDeal(deal)}>
+                              {t('bookings.viewDetailsLink')}
+                            </button>
+                          )}
+                          {isBookerSide && (
+                            <button
+                              className="btn btn-outline btn-sm"
+                              onClick={() => {
+                                setSelectedDealForWorkflow(deal);
+                                setShowDepositAgain(false);
+                                setShowPaymentModal(true);
+                              }}
+                            >
+                              {t('bookings.updatePayment')}
+                            </button>
+                          )}
+                          {canConfirm && (
+                            <button className="btn btn-primary btn-sm" onClick={() => setDepositHistoryDeal(deal)}>
+                              {t('bookings.confirmReceipt')}
+                            </button>
+                          )}
+                          {isOwedSide && !canConfirm && (
+                            <button className="btn btn-primary btn-sm" onClick={() => { setDealToSettle(deal); setSettleNote(''); }}>
+                              {t('bookings.resolvePayment')}
+                            </button>
+                          )}
+                        </div>
                       )}
-                      <button
-                        className="btn btn-outline btn-danger-outline"
-                        disabled={actionBusy}
-                        onClick={() => { setDealToCancel(deal); setCancelReason(''); }}
-                      >
-                        {t('bookings.cancelBooking')}
-                      </button>
-                    </>
+                    </div>
                   );
                 })()}
+
+                {settlement?.note && <p className="settlement-note">{settlement.note}</p>}
               </div>
-            )}
+            );
+          })()}
 
-            {/* Why a booking ended, kept visible on the card. A cancellation
-                with no stated reason is the thing people argue about later. */}
-            {deal.status === 'CANCELLED' && (() => {
-              const settlement = deal.payment?.settlement;
-              const summary = summarizeDealPayment(deal);
-              const isOwedSide = isArtistSideForDeal(deal, currentUser);
-              const isBooker = deal.venue.id === currentUser.id;
-              // Whether there is a money question worth showing at all. Not
-              // "money is owed" — the app can't know that — just that a fee
-              // was agreed or a payment moved, either of which leaves
-              // something for the two of them to settle.
-              const hasMoneyQuestion = summary.hasAnyPayment || summary.totalFee > 0;
-
-              return (
-                <div className="cancelled-settlement">
-                  {deal.cancelReason && (
-                    <div className="cancelled-reason-note">
-                      <strong>{t('bookings.cancelledReasonLabel')}</strong> {deal.cancelReason}
-                    </div>
-                  )}
-
-                  {hasMoneyQuestion && (() => {
-                    // Money marked by the payer but not yet acknowledged. The
-                    // proof and the Confirm receipt button used to live only
-                    // inside the ACCEPTED workflow block, so on a cancelled
-                    // booking a deposit could be sent with proof and the
-                    // receiving side had no way to see either — and this
-                    // figure, counting only CONFIRMED money, read zero.
-                    const awaiting = Math.max(0, summary.totalMarked - summary.totalConfirmed);
-                    const canConfirm = isOwedSide && awaiting > 0;
-
-                    return (
-                      <div className="cancelled-payment-row">
-                        <span className="cancelled-payment-figure">
-                          {t('bookings.paidSoFar')} {formatFee(summary.totalConfirmed)}
-                          {summary.totalFee > 0 && ` / ${formatFee(summary.totalFee)}`} {summary.currency}
-                          {awaiting > 0 && (
-                            <>
-                              {' \u00b7 '}
-                              <em className="cancelled-payment-awaiting">
-                                {t('bookings.awaitingConfirmation', { amount: `${formatFee(awaiting)} ${summary.currency}` })}
-                              </em>
-                            </>
-                          )}
-                        </span>
-
-                        {settlement ? (
-                          <span className={`settlement-pill ${settlement.outcome}`}>
-                            {settlement.outcome === 'settled'
-                              ? t('bookings.paymentSettled')
-                              : t('bookings.paymentWaived')}
-                          </span>
-                        ) : (
-                          <div className="cancelled-payment-actions">
-                            {/* Open to both sides: the payer needs to check what
-                                they sent landed, the payee needs the proof. */}
-                            {summary.hasAnyPayment && (
-                              <button
-                                className="btn btn-outline btn-sm"
-                                onClick={() => setDepositHistoryDeal(deal)}
-                              >
-                                {t('bookings.viewDetailsLink')}
-                              </button>
-                            )}
-                            {isBooker && (
-                              <button
-                                className="btn btn-outline btn-sm"
-                                onClick={() => {
-                                  setSelectedDealForWorkflow(deal);
-                                  setShowDepositAgain(false);
-                                  setShowPaymentModal(true);
-                                }}
-                              >
-                                {t('bookings.updatePayment')}
-                              </button>
-                            )}
-                            {canConfirm && (
-                              <button
-                                className="btn btn-primary btn-sm"
-                                onClick={() => setDepositHistoryDeal(deal)}
-                              >
-                                {t('bookings.confirmReceipt')}
-                              </button>
-                            )}
-                            {isOwedSide && !canConfirm && (
-                              <button
-                                className="btn btn-primary btn-sm"
-                                onClick={() => { setDealToSettle(deal); setSettleNote(''); }}
-                              >
-                                {t('bookings.resolvePayment')}
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  {settlement?.note && (
-                    <p className="settlement-note">{settlement.note}</p>
-                  )}
-                </div>
-              );
-            })()}
-
-            {/* Action buttons - show when current user can accept/decline */}
-            {/* For PENDING: recipient (not initiator) can accept/decline */}
-            {/* For NEGOTIATING: the party who did NOT send the last counter-offer can accept/decline */}
-            {(() => {
-              const offerHistory = deal.offerHistory || [];
-              const lastOffer = offerHistory.length > 0 ? offerHistory[offerHistory.length - 1] : null;
-              const canRespond = lastOffer
-                ? lastOffer.offeredBy !== currentUser.id  // Counter-offer: other party can respond
-                : !isOutgoing;  // Initial offer: recipient can respond
-              return canRespond;
-            })() && !hideWorkflow && (deal.status === 'PENDING' || deal.status === 'NEGOTIATING') && (
-              <div className="booking-actions">
-                <button
-                  className="btn btn-outline btn-decline"
-                  onClick={() => setDealToDecline(deal.id)}
-                >
-                  {t('search.decline')}
+          {/* Closing the booking out — only on a confirmed booking. "Completed"
+              is a claim about something that already happened, so it waits
+              for the date. */}
+          {deal.status === 'ACCEPTED' && !hideWorkflow && (
+            <div className="workflow-actions">
+              {deal.date && new Date(deal.date) <= new Date() && isArtistSideForDeal(deal, currentUser) && (
+                <button className="btn btn-primary" disabled={actionBusy} onClick={() => handleCompleteDeal(deal)}>
+                  {actionBusy ? '...' : t('bookings.markCompleted')}
                 </button>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => {
-                    setExpandedDealId(null);
-                    // Open ChatScreen and trigger Review modal — agent if leading.
-                    if (onOpenChat) {
-                      onOpenChat(messageTarget, deal);
-                    }
-                  }}
-                >
-                  {t('chat.review')}
-                </button>
-                <button
-                  className="btn btn-primary btn-accept"
-                  onClick={() => handleAcceptDeal(deal.id)}
-                  disabled={actionBusy}
-                >
-                  {actionBusy ? '...' : t('messages.accept')}
-                </button>
-              </div>
-            )}
-
-            {/* Info message — first-person "your agent" so artist-only */}
-            {delegateToAgent && (
-              <div className="via-agent-info">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12" y2="8"></line>
-                </svg>
-                <span>{agentName ? t('bookings.managedByAgentNamed', { name: agentName }) : t('bookings.managedByAgent')}</span>
-              </div>
-            )}
-
-            {/* Standalone Message button — for ACCEPTED + workflow-visible
-                cards Message lives inside .workflow-actions instead, so this
-                only renders when that row isn't on screen. Never on a
-                limited card: that agent isn't running this booking, and
-                messaging the promoter/venue about it would cut across
-                whoever is. */}
-            {!limitedView && (hideWorkflow || deal.status !== 'ACCEPTED') && (
+              )}
               <button
-                className="btn btn-outline btn-chat"
+                className="btn btn-outline btn-danger-outline"
+                disabled={actionBusy}
+                onClick={() => { setDealToCancel(deal); setCancelReason(''); }}
+              >
+                {t('bookings.cancelBooking')}
+              </button>
+            </div>
+          )}
+
+          {isOutgoing && !hideWorkflow && deal.status === 'PENDING' && (
+            <button className="btn btn-outline btn-delete-offer-expanded" onClick={() => setDealToDelete(deal.id)}>
+              {t('bookings.deleteOffer')}
+            </button>
+          )}
+        </div>
+
+        {/* Your move, always at the bottom of the page */}
+        {showBar && (
+          <div className="booking-page-bar">
+            {!limitedView && (canRespond || primary) && (
+              <button
+                type="button"
+                className="booking-page-bar-chat"
+                aria-label={t('bookings.messageName', { name: messageTarget?.name || otherParty.name })}
                 onClick={() => onOpenChat && onOpenChat(messageTarget)}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+              </button>
+            )}
+            {canRespond ? (
+              <>
+                <button type="button" className="booking-page-bar-text" onClick={() => setDealToDecline(deal.id)}>
+                  {t('search.decline')}
+                </button>
+                <button type="button" className="btn btn-outline booking-page-bar-btn" onClick={() => onOpenChat && onOpenChat(messageTarget, deal)}>
+                  {t('chat.review')}
+                </button>
+                <button type="button" className="btn btn-primary booking-page-bar-btn" disabled={actionBusy} onClick={() => handleAcceptDeal(deal.id)}>
+                  {actionBusy ? '...' : t('messages.accept')}
+                </button>
+              </>
+            ) : primary ? (
+              <button type="button" className="btn btn-primary booking-page-bar-btn" onClick={primary.run}>
+                {primary.label}
+              </button>
+            ) : !limitedView ? (
+              <button type="button" className="btn btn-outline booking-page-bar-btn" onClick={() => onOpenChat && onOpenChat(messageTarget)}>
                 {t('search.message')}
               </button>
-            )}
-
-            {/* Delete offer button (only for outgoing pending offers, not when agent handles it) */}
-            {isOutgoing && !hideWorkflow && deal.status === 'PENDING' && (
-              <button
-                className="btn btn-outline btn-delete-offer-expanded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDealToDelete(deal.id);
-                }}
-              >
-                {t('bookings.deleteOffer')}
-              </button>
-            )}
-          </>
+            ) : null}
+          </div>
         )}
       </div>
     );
@@ -1850,12 +1915,14 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     <div className={`bookings-screen${focusMode ? ' bookings-screen--focus' : ''}`}>
       {focusMode && focusDealId && (() => {
         const deal = deals.find((d) => d.id === focusDealId);
-        if (deal) return renderDealCard(deal);
+        if (deal) return renderDealCard(deal, 'page');
         return loading || !hasLoadedRef.current ? <LoadingGlobe label={t('bookings.loadingBookings')} /> : null;
       })()}
+      <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onDealPhotoPicked} />
+      {!focusMode && openedDeal && renderDealCard(openedDeal, 'page')}
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           overlays (delete modal, etc.) live outside it. */}
-      {!focusMode && (
+      {!focusMode && !openedDeal && (
       <div className="relative isolate">
       {/* faint engineering grid fading from the top (quiet-premium backdrop) */}
       <div
@@ -1895,15 +1962,15 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
       {deals.length > 0 && (
         <div className="bookings-filters">
-          <select
-            value={actionFilter}
-            onChange={(e) => setActionFilter(e.target.value)}
-            className="agent-artist-select bookings-filter-select"
-            aria-label={t('bookings.filterActionNeeded')}
+          <button
+            type="button"
+            className={`bookings-needs-chip${actionFilter === 'needed' ? ' is-on' : ''}`}
+            aria-pressed={actionFilter === 'needed'}
+            onClick={() => setActionFilter(actionFilter === 'needed' ? 'all' : 'needed')}
           >
-            <option value="all">{t('bookings.filterActionAny')}</option>
-            <option value="needed">{t('bookings.filterActionOnly')}</option>
-          </select>
+            <span className="bookings-needs-dot" aria-hidden="true" />
+            {t('bookings.needsYou', { n: actionCounts[activeTab] })}
+          </button>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -1971,13 +2038,19 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           </div>
         ) : (
           <div className="bookings-list">
+            {nextShow && (
+              <section className="bookings-next-show" aria-label={t('bookings.nextShow')}>
+                <h2 className="bookings-next-show-label">{t('bookings.nextShow')}</h2>
+                {renderDealCard(nextShow, 'hero')}
+              </section>
+            )}
             {clusteredDeals.map((cluster, index) => (
               <div key={index} className="bookings-cluster">
                 <div className="cluster-header">
                   <h2>{cluster.monthYear}</h2>
                   <span className="cluster-count">{cluster.deals.length !== 1 ? t('bookings.offersCount', { n: cluster.deals.length }) : t('bookings.offerCount', { n: cluster.deals.length })}</span>
                 </div>
-                {cluster.deals.map(deal => renderDealCard(deal))}
+                {cluster.deals.map(deal => renderDealCard(deal, 'row'))}
               </div>
             ))}
             {hasMoreDeals && (

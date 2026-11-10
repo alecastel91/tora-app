@@ -14,14 +14,14 @@ export function isArtistViaAgent(deal, viewer) {
  * needs the reader to decode chips, buttons and the timeline to know where
  * things stand.
  *
- * Returns { text, mine } or null when nothing is pending (mine = the next move
- * is the viewer's).
+ * Returns { text, mine, key } or null when nothing is pending (mine = the next
+ * move is the viewer's; key = which sentence, so a screen can offer its button).
  */
 export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = {}) {
   if (!deal || !viewer) return null;
   // A roster artist's gig this agent isn't running: say so instead of leaving a blank.
   if (deal.limitedVisibility) {
-    return { text: t(deal.agentId ? 'bookings.viewOnlyCoAgent' : 'bookings.viewOnlyDirect'), mine: false };
+    return { text: t(deal.agentId ? 'bookings.viewOnlyCoAgent' : 'bookings.viewOnlyDirect'), mine: false, key: 'viewOnly' };
   }
   const artistSide = isArtistSideForDeal(deal, viewer);
   // An agent only has a move on deals they lead (same rule as the backend's
@@ -30,7 +30,7 @@ export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = 
   // The artist on an agent-led deal: their agent has the buttons, and the card says so.
   if (isArtistViaAgent(deal, viewer)) return null;
   const name = (artistSide ? deal.venue?.name : deal.artist?.name) || t('bookings.theOtherParty');
-  const line = (key, mine, vars = {}) => ({ text: t(`bookings.line.${key}`, { name, ...vars }), mine });
+  const line = (key, mine, vars = {}) => ({ text: t(`bookings.line.${key}`, { name, ...vars }), mine, key });
   const summary = summarizeDealPayment(deal);
   const amountOf = (n) => `${n} ${summary.currency || deal.currency || ''}`.trim();
   const awaiting = summary.totalMarked - summary.totalConfirmed;

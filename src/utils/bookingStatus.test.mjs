@@ -9,8 +9,8 @@ const base = { artistId: 'A', venueId: 'V', artist: { id: 'A', name: 'Lucio' }, 
 
 test('incoming offer: artist must answer, booker waits', () => {
   const deal = { ...base, status: 'PENDING', offerHistory: [{ offeredBy: 'V', fee: 800 }] };
-  assert.deepEqual(bookingStatusLine(deal, artist, t), { text: 'bookings.line.offerToAnswer|name=CIRCUIT', mine: true });
-  assert.deepEqual(bookingStatusLine(deal, booker, t), { text: 'bookings.line.waitingAnswer|name=Lucio', mine: false });
+  assert.deepEqual(bookingStatusLine(deal, artist, t), { text: 'bookings.line.offerToAnswer|name=CIRCUIT', mine: true, key: 'offerToAnswer' });
+  assert.deepEqual(bookingStatusLine(deal, booker, t), { text: 'bookings.line.waitingAnswer|name=Lucio', mine: false, key: 'waitingAnswer' });
 });
 
 test('counter offer from the artist side flips the turn', () => {
@@ -37,8 +37,8 @@ test('accepted: contract to send, then to sign by the receiver', () => {
 test('payment: marked deposit asks the artist to confirm, booker waits', () => {
   const deal = { ...base, status: 'ACCEPTED', contract: { status: 'FULLY_SIGNED' },
     payment: { depositHistory: [{ amount: 200, confirmedAt: null }], currency: 'EUR' } };
-  assert.deepEqual(bookingStatusLine(deal, artist, t), { text: 'bookings.line.confirmPayment|name=CIRCUIT,amount=200 EUR', mine: true });
-  assert.deepEqual(bookingStatusLine(deal, booker, t), { text: 'bookings.line.waitingConfirm|name=Lucio,amount=200 EUR', mine: false });
+  assert.deepEqual(bookingStatusLine(deal, artist, t), { text: 'bookings.line.confirmPayment|name=CIRCUIT,amount=200 EUR', mine: true, key: 'confirmPayment' });
+  assert.deepEqual(bookingStatusLine(deal, booker, t), { text: 'bookings.line.waitingConfirm|name=Lucio,amount=200 EUR', mine: false, key: 'waitingConfirm' });
 });
 
 test('payment: nothing marked yet → booker must send; docs ask the artist', () => {

@@ -9,6 +9,7 @@ import apiService from '../../services/api';
 import CitySearch from './CitySearch';
 import TimeField from './TimeField';
 import VenueSearch from './VenueSearch';
+import EventPhotoPicker from './EventPhotoPicker';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { CloseIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -28,6 +29,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
   // so the CitySearch input — which reads city/country only on mount —
   // remounts and reflects the new value.
   const [geoPrefillKey, setGeoPrefillKey] = useState(0);
+  const [eventImage, setEventImage] = useState(null); // data URL for the booking page header
 
   // Form state - simplified for Venue/Promoter initial offer
   const [formData, setFormData] = useState({
@@ -323,6 +325,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
         initiatorProfileId: currentUser.id,
         recipientProfileId: recipientProfile.id,
         eventName: formData.eventName,
+        eventImage: eventImage || undefined,
         venueName: formData.venueName || recipientProfile.name,
         zone: formData.zone,
         country: formData.country,
@@ -370,6 +373,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
       }
 
       // Reset form
+      setEventImage(null);
       setFormData({
         eventName: '',
         venueName: '',
@@ -499,6 +503,11 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
                 placeholder={t('offer.eventNamePlaceholder')}
                 className="form-input"
               />
+            </div>
+
+            <div className="form-group">
+              <label>{t('bookings.eventPhoto')}</label>
+              <EventPhotoPicker value={eventImage} onChange={setEventImage} disabled={loading} />
             </div>
 
             <div className="form-group">

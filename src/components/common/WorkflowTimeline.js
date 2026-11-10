@@ -25,7 +25,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails, stepActions = {} }) => {
     const summary = summarizeDealPayment(deal);
 
     const steps = [
-      { key: 'offerAccepted', label: t('bookings.stepOfferAccepted'), completed: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED', timestamp: deal.updatedAt },
+      { key: 'offerAccepted', label: t('bookings.stepOfferAccepted'), completed: deal.status === 'ACCEPTED' || deal.status === 'COMPLETED', timestamp: deal.acceptedAt || deal.updatedAt },
       { key: 'contractSigned', label: t('bookings.stepContractSigned'), completed: deal.contract?.status === 'FULLY_SIGNED', timestamp: deal.contract?.fullySignedAt },
       { key: 'documentsShared', label: t('bookings.stepDocumentsShared'), completed: allDocsResolved, timestamp: allDocsResolved ? latestDocTs : null },
       { key: 'paymentReceived', label: t('bookings.stepPaymentReceived'), completed: summary.isFullyConfirmed, timestamp: deal.payment?.fullPaymentProof?.confirmedAt || (summary.isFullyConfirmed ? deal.payment?.fullPaymentDate : null) },
