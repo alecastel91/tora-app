@@ -1882,6 +1882,24 @@
   border-bottom: none;
 }
 
+/* New since the bell was last opened: a faint crimson wash + dot. */
+.notification-item.unread {
+  position: relative;
+  background: rgba(222, 42, 87, 0.07);
+  padding-left: 28px;
+}
+
+.notification-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 18px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-crimson-action);
+}
+
 .notification-item p {
   font-size: 12px;
   margin-bottom: 4px;
@@ -9211,8 +9229,8 @@ textarea.form-textarea:focus {
 }
 
 .checkbox-label input[type="checkbox"]:checked {
-  border-color: var(--primary-pink);
-  background: rgba(255, 51, 102, 0.15);
+  border-color: var(--color-crimson-action);
+  background: rgba(222, 42, 87, 0.15);
 }
 
 .checkbox-label input[type="checkbox"]:checked::before {
@@ -9220,11 +9238,29 @@ textarea.form-textarea:focus {
   width: 10px;
   height: 10px;
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-  background: var(--primary-pink);
+  background: #FF6B88;
 }
 
 .checkbox-label span {
   user-select: none;
+}
+
+/* Inside a form group the generic `.form-group label { display: block }` and
+   full-width inputs would stack the box above its text. */
+.form-group .checkbox-label {
+  display: flex;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-white);
+}
+.form-group .checkbox-label input[type="checkbox"] {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
 }
 
 .form-textarea {

@@ -1819,6 +1819,7 @@ const en = {
     noNotifications: 'No notifications yet',
     title: 'Notifications',
     clearAll: 'Clear all',
+    markAllRead: 'Mark all read',
     likedProfile: 'liked your profile',
     bookingRequest: 'New booking request from',
     acceptedConnection: 'accepted your connection',

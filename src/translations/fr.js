@@ -1814,6 +1814,7 @@ const fr = {
     noNotifications: 'Aucune notification',
     title: 'Notifications',
     clearAll: 'Tout effacer',
+    markAllRead: 'Tout marquer comme lu',
     likedProfile: 'a liké votre profil',
     bookingRequest: 'Nouvelle demande de booking de',
     acceptedConnection: 'a accepté la connexion',

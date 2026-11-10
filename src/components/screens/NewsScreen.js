@@ -21,7 +21,7 @@ const relativeTime = (iso, t) => {
   if (hours < 24) return t('news.hoursAgo', { n: hours });
   const days = Math.floor(hours / 24);
   if (days < 7) return t('news.daysAgo', { n: days });
-  return new Date(iso).toLocaleDateString();
+  return new Date(iso).toLocaleDateString(t('dateFormat.locale'));
 };
 
 const URL_RE = /(https?:\/\/[^\s<>"']+)/g;

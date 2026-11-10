@@ -1368,7 +1368,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                           </div>
                           <div className="booking-detail-row">
                             <span className="detail-label">Date:</span>
-                            <span className="detail-value">{formatEventDate(event.date)}</span>
+                            <span className="detail-value">{formatEventDate(event.date, t('dateFormat.locale'))}</span>
                           </div>
                           {event.startTime && event.endTime && (
                             <div className="booking-detail-row">

@@ -50,7 +50,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
     } catch (e) {
       const next = e.response?.data?.nextSwitchAt;
       appAlert(next
-        ? t('agentPlan.switchTooSoon', { date: new Date(next).toLocaleDateString() })
+        ? t('agentPlan.switchTooSoon', { date: new Date(next).toLocaleDateString(t('dateFormat.locale')) })
         : (e.message || t('common.error')));
     } finally {
       setSwitchingId(null);

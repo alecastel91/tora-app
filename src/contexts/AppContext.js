@@ -582,6 +582,19 @@ export const AppProvider = ({ children }) => {
     setNotifications(prev => [notification, ...prev]);
   };
 
+  // Marks the given notifications read (all when no ids). Local first so the
+  // bell dot clears at once; the server copy drives the app-icon badge.
+  const markNotificationsRead = async (ids) => {
+    if (!user || !user.id) return;
+    const target = ids ? new Set(ids) : null;
+    setNotifications(prev => prev.map(n => (!target || target.has(n.id) ? { ...n, isRead: true } : n)));
+    try {
+      await apiService.markNotificationsRead(user.id, ids);
+    } catch (error) {
+      console.error('Error marking notifications read:', error);
+    }
+  };
+
   const clearNotifications = async () => {
     if (!user || !user.id) return;
 
@@ -754,6 +767,7 @@ export const AppProvider = ({ children }) => {
     notifications,
     addNotification,
     clearNotifications,
+    markNotificationsRead,
     likedProfiles,
     likedProfilesData, // OPTIMIZED: Full profile objects
     toggleLike,

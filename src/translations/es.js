@@ -1814,6 +1814,7 @@ const es = {
     noNotifications: 'No hay notificaciones',
     title: 'Notificaciones',
     clearAll: 'Borrar todo',
+    markAllRead: 'Marcar todo como leído',
     likedProfile: 'le ha dado like a tu perfil',
     bookingRequest: 'Nueva solicitud de booking de',
     acceptedConnection: 'ha aceptado la conexión',

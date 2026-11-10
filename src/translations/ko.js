@@ -1814,6 +1814,7 @@ const ko = {
     noNotifications: '알림이 없습니다',
     title: '알림',
     clearAll: '모두 지우기',
+    markAllRead: '모두 읽음으로 표시',
     likedProfile: '님이 내 프로필을 좋아합니다',
     bookingRequest: '새 부킹 요청:',
     acceptedConnection: '님이 연결을 수락했습니다',

@@ -2102,7 +2102,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                       >
                         <div style={{ fontWeight: '600', marginBottom: '4px' }}>{doc.title}</div>
                         <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)' }}>
-                          {doc.addedDate ? new Date(doc.addedDate).toLocaleDateString() : t('bookings.noDate')}
+                          {doc.addedDate ? new Date(doc.addedDate).toLocaleDateString(t('dateFormat.locale')) : t('bookings.noDate')}
                         </div>
                       </div>
                     ))
@@ -2515,11 +2515,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                 {label} · {amount} {currency}
               </div>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
-                {date ? new Date(date).toLocaleString(undefined, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                {date ? new Date(date).toLocaleString(t('dateFormat.locale'), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
               </div>
               {confirmedAt && (
                 <div style={{ fontSize: '10px', color: 'rgba(67,233,123,1)', marginTop: '2px' }}>
-                  ✓ Receipt confirmed · {new Date(confirmedAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
+                  ✓ Receipt confirmed · {new Date(confirmedAt).toLocaleDateString(t('dateFormat.locale'), { day: '2-digit', month: 'short' })}
                 </div>
               )}
             </div>

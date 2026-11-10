@@ -62,9 +62,10 @@ const TYPE_TO_TAB = {
 
 const isAgencyNotification = (notif) => String(notif?.type || '').startsWith('ORG_');
 
-const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) => {
+const NotificationDropdown = ({ onClose, freshIds = [], onMarkAllRead, onSwitchTab }) => {
   const { t, language } = useLanguage();
   const { notifications } = useAppContext();
+  const fresh = new Set(freshIds);
 
   const getTimeAgo = (timestamp) => {
     const now = new Date();
@@ -108,7 +109,7 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
     <div className="notifications-dropdown">
       <div className="notifications-header">
         <span>{t('notifications.title')}</span>
-        <button onClick={onClearNotifications}>{t('notifications.clearAll')}</button>
+        {freshIds.length > 0 && <button type="button" onClick={onMarkAllRead}>{t('notifications.markAllRead')}</button>}
       </div>
       <div className="notifications-list">
         {notifications && notifications.length > 0 ? (
@@ -117,7 +118,7 @@ const NotificationDropdown = ({ onClose, onClearNotifications, onSwitchTab }) =>
             return (
               <div
                 key={notif.id}
-                className="notification-item"
+                className={`notification-item${fresh.has(notif.id) ? ' unread' : ''}`}
                 onClick={() => handleNotificationClick(notif)}
                 style={{ cursor: routable ? 'pointer' : 'default' }}
                 role={routable ? 'button' : undefined}

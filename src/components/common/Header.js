@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NotificationDropdown from './NotificationDropdown';
 import { BellIcon, GearIcon } from '../../utils/icons';
 import { useAppContext } from '../../contexts/AppContext';
@@ -6,19 +6,25 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { isDesktopV2, useNativeDesktop } from '../../utils/desktopV2';
 
 const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
-  const { notifications } = useAppContext();
+  const { notifications, markNotificationsRead } = useAppContext();
   const { t } = useLanguage();
   // v3 + desktop-sized: the only case the ⌘K pill exists at all (not hidden — absent)
   const nativeDesktop = useNativeDesktop();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [hasNotificationDot, setHasNotificationDot] = useState(true);
+  const unreadIds = (notifications || []).filter((n) => !n.isRead).map((n) => n.id);
+  // What was unread when the bell opened: highlighted while it stays open,
+  // marked read once it closes (however it closes), so a glance is enough
+  // but nothing goes grey before it has been seen.
+  const [freshIds, setFreshIds] = useState([]);
+  const freshRef = useRef([]);
 
   useEffect(() => {
-    // Reset notification dot when there are new notifications
-    if (notifications && notifications.length > 0) {
-      setHasNotificationDot(true);
-    }
-  }, [notifications]);
+    if (showNotifications) return;
+    if (freshRef.current.length) markNotificationsRead(freshRef.current);
+    freshRef.current = [];
+    setFreshIds([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showNotifications]);
 
   // Close the notification dropdown whenever the user switches tabs/screens —
   // an open dropdown must not linger over unrelated content.
@@ -35,9 +41,17 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   }, [showNotifications]);
 
   const handleNotificationClick = () => {
+    if (!showNotifications) {
+      freshRef.current = unreadIds;
+      setFreshIds(unreadIds);
+    }
     setShowNotifications(!showNotifications);
-    // Remove the dot when notifications are opened
-    if (!showNotifications) setHasNotificationDot(false);
+  };
+
+  const markAllRead = () => {
+    freshRef.current = [];
+    setFreshIds([]);
+    markNotificationsRead();
   };
 
   const handleSettingsClick = () => {
@@ -79,7 +93,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
           onClick={handleNotificationClick}
         >
           <BellIcon />
-          {hasNotificationDot && notifications?.length > 0 && (
+          {unreadIds.length > 0 && (
             <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-infrared
                              shadow-[0_0_6px_rgba(255,51,102,0.7)]" />
           )}
@@ -104,7 +118,8 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
         {showNotifications && (
           <NotificationDropdown
             onClose={() => setShowNotifications(false)}
-            onClearNotifications={() => setHasNotificationDot(false)}
+            freshIds={freshIds}
+            onMarkAllRead={markAllRead}
             onSwitchTab={onSwitchTab}
           />
         )}

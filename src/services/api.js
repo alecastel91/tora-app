@@ -989,6 +989,16 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async markNotificationsRead(profileId, ids) {
+    const response = await fetch(`${API_URL}/connections/notifications/${profileId}/read`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify(ids ? { ids } : {})
+    });
+
+    return this.handleResponse(response);
+  }
+
   async clearNotifications(profileId) {
     const response = await fetch(`${API_URL}/connections/notifications/${profileId}`, {
       method: 'DELETE',

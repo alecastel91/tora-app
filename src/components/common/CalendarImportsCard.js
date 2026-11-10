@@ -31,7 +31,7 @@ const CalendarImportsCard = ({ profileId, settings, onChanged }) => {
                 <small>
                   {i.lastError
                     ? <span className="text-infrared">{t('calendarSync.lastError', { error: i.lastError })}</span>
-                    : t('calendarSync.lastSync', { n: i.eventCount, when: i.lastSyncAt ? new Date(i.lastSyncAt).toLocaleString() : '—' })}
+                    : t('calendarSync.lastSync', { n: i.eventCount, when: i.lastSyncAt ? new Date(i.lastSyncAt).toLocaleString(t('dateFormat.locale')) : '—' })}
                 </small>
               </div>
               <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => run(() => apiService.removeCalendarImport(profileId, i.id))}>{t('calendarSync.remove')}</button>

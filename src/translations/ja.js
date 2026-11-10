@@ -1814,6 +1814,7 @@ const ja = {
     noNotifications: '通知はまだありません',
     title: '通知',
     clearAll: 'すべてクリア',
+    markAllRead: 'すべて既読にする',
     likedProfile: 'があなたのプロフィールにいいねしました',
     bookingRequest: 'から新しい予約リクエスト',
     acceptedConnection: 'がつながりを承認しました',

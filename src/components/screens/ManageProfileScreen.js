@@ -805,7 +805,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
                             color: 'rgba(255,255,255,0.35)',
                             fontSize: '12px'
                           }}>
-                            {t('manage.addedDate', { date: new Date(doc.addedDate).toLocaleDateString() })}
+                            {t('manage.addedDate', { date: new Date(doc.addedDate).toLocaleDateString(t('dateFormat.locale')) })}
                           </div>
                         )}
                       </div>
@@ -902,7 +902,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
                     )}
                     {doc.addedDate && (
                       <div className="text-[10px] uppercase tracking-[0.08em] text-white/30">
-                        {t('manage.addedDate', { date: new Date(doc.addedDate).toLocaleDateString() })}
+                        {t('manage.addedDate', { date: new Date(doc.addedDate).toLocaleDateString(t('dateFormat.locale')) })}
                       </div>
                     )}
                   </div>

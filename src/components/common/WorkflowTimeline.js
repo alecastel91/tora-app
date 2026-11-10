@@ -126,7 +126,7 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
               <div className="flow-body">
                 <div className="flow-label">{step.label}</div>
                 {step.completed && step.timestamp && (
-                  <div className="flow-date">{new Date(step.timestamp).toLocaleDateString()}</div>
+                  <div className="flow-date">{new Date(step.timestamp).toLocaleDateString(t('dateFormat.locale'))}</div>
                 )}
                 {step.key === 'paymentReceived' && paymentBar}
               </div>

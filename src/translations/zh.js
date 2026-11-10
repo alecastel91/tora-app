@@ -1814,6 +1814,7 @@ const zh = {
     noNotifications: '没有通知',
     title: '通知',
     clearAll: '全部清除',
+    markAllRead: '全部标为已读',
     likedProfile: '喜欢了你的档案',
     bookingRequest: '新的预订请求，来自',
     acceptedConnection: '接受了联系请求',

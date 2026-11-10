@@ -707,7 +707,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                     )}
                     {doc.addedDate && (
                       <div className="text-[10px] uppercase tracking-[0.08em] text-white/30">
-                        {t('manageArtist.addedDate', { date: new Date(doc.addedDate).toLocaleDateString() })}
+                        {t('manageArtist.addedDate', { date: new Date(doc.addedDate).toLocaleDateString(t('dateFormat.locale')) })}
                       </div>
                     )}
                   </div>

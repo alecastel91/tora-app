@@ -164,7 +164,7 @@ const MessagesScreen = ({ onOpenChat, onCloseChat, chatOpen = false, isActive = 
     if (diffMins < 60) return t('messages.minutesShort', { n: diffMins });
     if (diffHours < 24) return t('messages.hoursShort', { n: diffHours });
     if (diffDays < 7) return t('messages.daysShort', { n: diffDays });
-    return messageTime.toLocaleDateString();
+    return messageTime.toLocaleDateString(t('dateFormat.locale'));
   };
 
   const getInitial = (name) => {
