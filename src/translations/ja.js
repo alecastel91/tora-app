@@ -412,6 +412,14 @@ const ja = {
 
   bookings: {
     // Booking page + list (2026-11)
+    documentsHeading: "書類",
+    docContract: "契約書",
+    docStatusSigned: "署名済み",
+    docStatusNotSent: "未送信",
+    docStatusAwaitingSignature: "署名待ち",
+    docStatusSkipped: "スキップ",
+    docStatusShared: "共有済み",
+    docStatusPending: "未共有",
     eventPhoto: "イベント写真",
     addEventPhoto: "写真を追加",
     changeEventPhoto: "写真を変更",

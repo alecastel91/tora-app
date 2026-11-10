@@ -412,6 +412,14 @@ const ko = {
 
   bookings: {
     // Booking page + list (2026-11)
+    documentsHeading: "서류",
+    docContract: "계약서",
+    docStatusSigned: "서명 완료",
+    docStatusNotSent: "아직 보내지 않음",
+    docStatusAwaitingSignature: "서명 대기",
+    docStatusSkipped: "건너뜀",
+    docStatusShared: "공유됨",
+    docStatusPending: "대기 중",
     eventPhoto: "이벤트 사진",
     addEventPhoto: "사진 추가",
     changeEventPhoto: "사진 변경",

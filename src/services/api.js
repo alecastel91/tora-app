@@ -1499,16 +1499,6 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  // The booking page's header photo: a data URL to set it, null to remove it.
-  async setDealEventImage(dealId, profileId, image) {
-    const response = await fetch(`${API_URL}/deals/${dealId}/event-image`, {
-      method: 'PUT',
-      headers: this.getHeaders(),
-      body: JSON.stringify({ profileId, image }),
-    });
-    return this.handleResponse(response);
-  }
-
   async resetDocument(dealId, profileId, documentType) {
     const response = await fetch(`${API_URL}/deals/${dealId}/reset-document`, {
       method: 'PUT',

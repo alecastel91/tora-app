@@ -26,7 +26,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { formatTimestamp, formatEventDate } from '../../utils/dates';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { roleLabel, getAvatarClass } from '../../utils/roles';
-import { downscaleImageToDataUrl } from '../../utils/image';
 
 function validatePaymentProof(file) {
   if (!file) return 'A proof of payment is required';
@@ -44,6 +43,8 @@ function validatePaymentProof(file) {
 // as they come; the two dead ends sit last and only ever apply to the
 // Cancelled tab.
 const DEAL_DISPLAY_STATUSES = ['PENDING', 'NEGOTIATING', 'ACCEPTED', 'CONTRACT SIGNED', 'DOCS SHARED', 'PAID', 'COMPLETED', 'DECLINED', 'CANCELLED'];
+// Status sentences about the contract: the Next step box offers the contract step's buttons.
+const CONTRACT_LINE_KEYS = ['sendContract', 'waitingContract', 'signContract', 'waitingSignature'];
 const statusesForTab = (tab) => DEAL_DISPLAY_STATUSES.filter((st) => OFF_STATUSES.includes(st) === (tab === 'declined'));
 
 const getDealDisplayStatus = (deal) => {
@@ -103,9 +104,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   // The booking open as its own page (phone). null = the list.
   const [openDealId, setOpenDealId] = useState(null);
   const listScrollTop = useRef(0);
-  const [photoBusy, setPhotoBusy] = useState(false);
-  const photoInputRef = useRef(null);
-  const photoDealRef = useRef(null);
   const [dealToDecline, setDealToDecline] = useState(null);
   const [dealToCancel, setDealToCancel] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
@@ -519,27 +517,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     requestAnimationFrame(() => { const el = scroller(); if (el) el.scrollTop = listScrollTop.current; });
   };
 
-  // Booker side: set the photo at the top of the booking page.
-  const pickDealPhoto = (deal) => {
-    photoDealRef.current = deal;
-    photoInputRef.current?.click();
-  };
-  const onDealPhotoPicked = async (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    const deal = photoDealRef.current;
-    if (!file || !deal || photoBusy) return;
-    setPhotoBusy(true);
-    try {
-      const image = await downscaleImageToDataUrl(file, { maxDimension: 1280, quality: 0.82 });
-      const res = await apiService.setDealEventImage(deal.id, currentUser.id, image);
-      setDeals((prev) => prev.map((d) => (d.id === deal.id ? { ...d, eventImage: res.deal?.eventImage ?? null } : d)));
-    } catch (err) {
-      appAlert(err?.message || t('bookings.eventPhotoFailed'));
-    } finally {
-      setPhotoBusy(false);
-    }
-  };
 
   const isConsentOnlyDeal = (deal) => isConsentOnlyFor(deal, currentUser);
 
@@ -1143,167 +1120,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   );
                 })()}
 
-                {/* Reopen a skipped contract — artist-side only, before the
-                    booking is completed. Undoes an accidental skip so a real
-                    contract can be sent; documents and payment stay intact. */}
-                {deal.contract?.skipped === true && deal.status !== 'COMPLETED' && isArtistSideForDeal(deal, currentUser) && (
-                  <button
-                    className="btn btn-outline"
-                    disabled={actionBusy}
-                    onClick={async () => {
-                      if (actionBusy) return;
-                      if (!(await appConfirm(t('chat.unskipContractConfirm')))) return;
-                      setActionBusy(true);
-                      try {
-                        await apiService.unskipContract(deal.id, currentUser.id);
-                        fetchDeals();
-                      } catch (err) {
-                        appAlert(err.message || t('chat.failedToUnskipContract'));
-                      } finally {
-                        setActionBusy(false);
-                      }
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 7v6h6"></path>
-                      <path d="M21 17a9 9 0 0 0-15-6.7L3 13"></path>
-                    </svg>
-                    {t('chat.unskipContract')}
-                  </button>
-                )}
-
-      </>
-    );
-
-    const documentsSlot = () => (
-      <>
-                {/* Document Sharing — artist-side only. Stays visible after
-                    everything is shared/skipped so the artist can revisit. */}
-                {deal.contract?.status === 'FULLY_SIGNED' && isArtistSideForDeal(deal, currentUser) && (
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => {
-                      setSelectedDealForWorkflow(deal);
-                      setShowDocumentModal(true);
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                    </svg>
-                    {hasPendingDocs ? t('chat.shareDocuments') : t('bookings.manageDocuments')}
-                  </button>
-                )}
-
-                {/* Invoice — artist side issues it in their own style once the
-                    booking is agreed (deposit, balance or full). */}
-                {['ACCEPTED', 'COMPLETED'].includes(deal.status) && isArtistSideForDeal(deal, currentUser) && (
-                  <button className="btn btn-outline" onClick={() => setInvoiceDeal(deal)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <path d="M14 2v6h6M8 13h8M8 17h5"></path>
-                    </svg>
-                    {deal.sharedDocuments?.invoices?.length ? t('invoices.issueAnother') : t('invoices.issueButton')}
-                  </button>
-                )}
-
-                {/* Documents recap — show what's been shared / skipped /
-                    pending for this booking. Visible to both sides. Shared
-                    categories are clickable and open the document in the
-                    PDF viewer so the booker can actually review them. */}
-                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && (
-                  <div style={{ width: '100%', marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '11px' }}>
-                    {DOC_CATEGORIES.map(cat => {
-                      const status = categoryStatus(deal.sharedDocuments, cat.key);
-                      const entry = deal.sharedDocuments?.[cat.key];
-                      const palette = status === 'shared'
-                        ? { bg: 'rgba(67,233,123,0.15)', fg: 'rgba(67,233,123,1)', symbol: '✓' }
-                        : status === 'skipped'
-                          ? { bg: 'rgba(255,255,255,0.06)', fg: 'rgba(255,255,255,0.4)', symbol: '—' }
-                          : { bg: 'rgba(255,193,7,0.12)', fg: 'rgba(255,193,7,1)', symbol: '·' };
-                      const pillContent = (
-                        <>
-                          <span aria-hidden="true">{palette.symbol}</span>
-                          {docCatLabel(cat)}
-                          {' ' + (status === 'shared' ? t('bookings.suffixShared') : status === 'skipped' ? t('bookings.suffixSkipped') : t('bookings.suffixPending'))}
-                        </>
-                      );
-                      const sharedStyle = {
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '3px 9px',
-                        background: palette.bg,
-                        color: palette.fg,
-                        borderRadius: '12px',
-                        fontWeight: 500,
-                      };
-                      if (status === 'shared' && entry?.documentUrl) {
-                        return (
-                          <button
-                            key={cat.key}
-                            type="button"
-                            onClick={() => setPdfViewerUrl(getFullUrl(entry.documentUrl))}
-                            style={{ ...sharedStyle, border: 'none', cursor: 'pointer', fontSize: '11px' }}
-                            title={t('chat.openDocument')}
-                          >
-                            {pillContent}
-                          </button>
-                        );
-                      }
-                      // Skipped/pending pills open the docs modal for the
-                      // artist side — the direct "go back" path after a skip.
-                      if (isArtistSideForDeal(deal, currentUser)) {
-                        return (
-                          <button
-                            key={cat.key}
-                            type="button"
-                            onClick={() => {
-                              setSelectedDealForWorkflow(deal);
-                              setShowDocumentModal(true);
-                            }}
-                            style={{ ...sharedStyle, border: 'none', cursor: 'pointer', fontSize: '11px' }}
-                            title={t('bookings.manageDocuments')}
-                          >
-                            {pillContent}
-                          </button>
-                        );
-                      }
-                      return (
-                        <span key={cat.key} style={sharedStyle}>
-                          {pillContent}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Skip Documents — sits below the recap pills so it reads
-                    as "and skip the rest" rather than standalone. */}
-                {hasPendingDocs && (
-                  <button
-                    className="btn btn-skip"
-                    disabled={actionBusy}
-                    onClick={async () => {
-                      if (actionBusy) return;
-                      const labels = pendingDocCategories.map(c => docCatLabel(c)).join(', ');
-                      if (!(await appConfirm(t('bookings.skipDocsStagesConfirm', { list: labels })))) return;
-                      setActionBusy(true);
-                      try {
-                        for (const cat of pendingDocCategories) {
-                          // eslint-disable-next-line no-await-in-loop
-                          await apiService.skipDocument(deal.id, currentUser.id, cat.key);
-                        }
-                        fetchDeals();
-                      } catch (err) {
-                        appAlert(err.message || t('chat.failedToSkipDocuments'));
-                      } finally {
-                        setActionBusy(false);
-                      }
-                    }}
-                  >
-                    {t('bookings.skipDocuments')}
-                  </button>
-                )}
 
       </>
     );
@@ -1414,6 +1230,12 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       </>
     );
 
+    // One short line under the party on list rows: who the booking is for
+    // (agent looking at a roster artist's booking), or who is running it.
+    const rowSub = deal.bookedArtistName && deal.bookedArtistId !== currentUser.id && deal.bookedArtistId !== shownParty.id
+      ? t('bookings.forArtist', { name: deal.bookedArtistName })
+      : (isViaAgent && agentName ? t('bookings.viaAgent', { name: agentName }) : null);
+
     const photoBox = (className) => (photo
       ? <img src={photo} alt="" className={className} loading="lazy" />
       : <div className={`${className} booking-photo-fallback ${getAvatarClass(shownParty.role)}`} aria-hidden="true">{shownParty.name.charAt(0).toUpperCase()}</div>);
@@ -1440,6 +1262,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             <span className="booking-row-party">
               {shownParty.name} · <span className={`booking-role-${shownParty.role.toLowerCase()}`}>{roleLabel(shownParty.role, t)}</span>
             </span>
+            {rowSub && <span className="booking-row-sub">{rowSub}</span>}
             {statusLine && (
               <span className={`booking-status-line${statusLine.mine ? ' is-mine' : ''}`}>{statusLine.text}</span>
             )}
@@ -1485,6 +1308,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               <span className="min-w-0 flex-1">
                 <span className="booking-hero-party-name">{shownParty.name}</span>
                 <span className={`booking-role-${shownParty.role.toLowerCase()} booking-hero-party-role`}>{roleLabel(shownParty.role, t)}</span>
+                {rowSub && <span className="booking-row-sub">{rowSub}</span>}
               </span>
               {feeText && <span className="booking-hero-fee">{feeText}</span>}
             </span>
@@ -1503,7 +1327,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
     // ── The booking page ──
     const isOff = deal.status === 'DECLINED' || deal.status === 'CANCELLED';
-    const isBooker = deal.venue.id === currentUser.id || deal.initiator.id === currentUser.id;
     const offerHistory = deal.offerHistory || [];
     const lastOffer = offerHistory.length > 0 ? offerHistory[offerHistory.length - 1] : null;
     // PENDING: the recipient answers. NEGOTIATING: whoever did NOT send the last counter.
@@ -1513,6 +1336,69 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     // only where the timeline isn't on the page: on a confirmed booking each
     // step already carries its own button, and repeating it read as noise.
     const timelineShown = deal.status === 'ACCEPTED' && !hideWorkflow;
+    const artistSide = isArtistSideForDeal(deal, currentUser);
+    // "Completed" is a claim about something that already happened.
+    const eventPassed = !!deal.date && new Date(deal.date) <= new Date();
+    const skipPendingDocs = async () => {
+      if (actionBusy) return;
+      const labels = pendingDocCategories.map((c) => docCatLabel(c)).join(', ');
+      if (!(await appConfirm(t('bookings.skipDocsStagesConfirm', { list: labels })))) return;
+      setActionBusy(true);
+      try {
+        for (const cat of pendingDocCategories) {
+          // eslint-disable-next-line no-await-in-loop
+          await apiService.skipDocument(deal.id, currentUser.id, cat.key);
+        }
+        fetchDeals();
+      } catch (err) {
+        appAlert(err.message || t('chat.failedToSkipDocuments'));
+      } finally {
+        setActionBusy(false);
+      }
+    };
+    // Reopen a skipped contract (artist side): undoes an accidental skip.
+    const unskipContract = async () => {
+      if (actionBusy) return;
+      if (!(await appConfirm(t('chat.unskipContractConfirm')))) return;
+      setActionBusy(true);
+      try {
+        await apiService.unskipContract(deal.id, currentUser.id);
+        fetchDeals();
+      } catch (err) {
+        appAlert(err.message || t('chat.failedToUnskipContract'));
+      } finally {
+        setActionBusy(false);
+      }
+    };
+    // The booking's paperwork, one row each: tap opens what has been shared.
+    const contractStatus = deal.contract?.status || 'NOT_SENT';
+    const docRows = [
+      {
+        key: 'contract',
+        label: t('bookings.docContract'),
+        ...(deal.contract?.skipped
+          ? { status: t('bookings.docStatusSkipped'), tone: 'muted' }
+          : contractStatus === 'FULLY_SIGNED'
+            ? { status: t('bookings.docStatusSigned'), tone: 'done' }
+            : contractStatus === 'NOT_SENT'
+              ? { status: t('bookings.docStatusNotSent'), tone: 'pending' }
+              : { status: t('bookings.docStatusAwaitingSignature'), tone: 'pending' }),
+        open: (deal.contract?.documentUrl && deal.contract.documentUrl !== 'N/A') || deal.contract?.documentId ? () => openContractPdf(deal) : null,
+      },
+      ...DOC_CATEGORIES.map((cat) => {
+        const state = categoryStatus(deal.sharedDocuments, cat.key);
+        const entry = deal.sharedDocuments?.[cat.key];
+        return {
+          key: cat.key,
+          label: docCatLabel(cat),
+          status: state === 'shared' ? t('bookings.docStatusShared') : state === 'skipped' ? t('bookings.docStatusSkipped') : t('bookings.docStatusPending'),
+          tone: state === 'shared' ? 'done' : state === 'skipped' ? 'muted' : 'pending',
+          open: state === 'shared' && entry?.documentUrl
+            ? () => setPdfViewerUrl(getFullUrl(entry.documentUrl))
+            : (artistSide && deal.contract?.status === 'FULLY_SIGNED' ? () => { setSelectedDealForWorkflow(deal); setShowDocumentModal(true); } : null),
+        };
+      }),
+    ];
     const primary = (!hideWorkflow && !timelineShown && statusLine?.mine && !canRespond) ? ({
       settle: { label: t('bookings.confirmReceipt'), run: () => setDepositHistoryDeal(deal) },
       resolve: { label: t('bookings.resolvePayment'), run: () => { setDealToSettle(deal); setSettleNote(''); } },
@@ -1574,12 +1460,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
             </button>
           )}
-          {isBooker && !isOff && !deal.redactedForVenue && (
-            <button type="button" className="booking-page-photo-btn" disabled={photoBusy} onClick={() => pickDealPhoto(deal)}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><circle cx="12" cy="13" r="3.5" /></svg>
-              {photoBusy ? '...' : deal.eventImage ? t('bookings.changeEventPhoto') : t('bookings.addEventPhoto')}
-            </button>
-          )}
           <div className="booking-page-hero-text">
             <div className="flex flex-wrap items-center gap-1.5">{statusPill}{consentPills}</div>
             <h2 className="booking-page-title">{deal.eventName || t('bookings.booking')}</h2>
@@ -1638,6 +1518,27 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             <section className={`booking-next${statusLine.mine ? ' is-mine' : ''}`} aria-label={t('bookings.nextStep')}>
               <span className="booking-next-eyebrow">{statusLine.mine ? t('bookings.nextStepYours') : t('bookings.nextStep')}</span>
               <p className="booking-next-text">{statusLine.text}</p>
+              {timelineShown && (
+                <div className="workflow-actions booking-next-actions">
+                  {CONTRACT_LINE_KEYS.includes(statusLine.key) && contractSlot()}
+                  {statusLine.key === 'shareDocs' && (
+                    <>
+                      <button className="btn btn-primary" onClick={() => { setSelectedDealForWorkflow(deal); setShowDocumentModal(true); }}>
+                        {t('chat.shareDocuments')}
+                      </button>
+                      <button className="btn btn-skip" disabled={actionBusy} onClick={skipPendingDocs}>
+                        {t('bookings.skipDocuments')}
+                      </button>
+                    </>
+                  )}
+                  {paymentSlot()}
+                  {eventPassed && isArtistSideForDeal(deal, currentUser) && (
+                    <button className="btn btn-primary" disabled={actionBusy} onClick={() => handleCompleteDeal(deal)}>
+                      {actionBusy ? '...' : t('bookings.markCompleted')}
+                    </button>
+                  )}
+                </div>
+              )}
             </section>
           )}
 
@@ -1655,11 +1556,41 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
           {deal.status === 'ACCEPTED' && !hideWorkflow && (
             <section>
               <h3 className="booking-page-h">{t('bookings.progressHeading')}</h3>
-              <WorkflowTimeline
-                deal={deal}
-                onViewPaymentDetails={() => setDepositHistoryDeal(deal)}
-                stepActions={{ contractSigned: contractSlot(), documentsShared: documentsSlot(), paymentReceived: paymentSlot() }}
-              />
+              <WorkflowTimeline deal={deal} onViewPaymentDetails={() => setDepositHistoryDeal(deal)} />
+            </section>
+          )}
+
+          {(deal.status === 'ACCEPTED' || deal.status === 'COMPLETED') && !hideWorkflow && (
+            <section>
+              <div className="booking-page-h-row">
+                <h3 className="booking-page-h">{t('bookings.documentsHeading')}</h3>
+                {artistSide && deal.contract?.status === 'FULLY_SIGNED' && (
+                  <button type="button" className="booking-page-link" onClick={() => { setSelectedDealForWorkflow(deal); setShowDocumentModal(true); }}>
+                    {t('bookings.manageDocuments')}
+                  </button>
+                )}
+              </div>
+              <ul className="booking-docs">
+                {docRows.map((row) => (
+                  <li key={row.key}>
+                    <button type="button" className="booking-doc" disabled={!row.open} onClick={row.open || undefined}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6" /></svg>
+                      <span className="booking-doc-name">{row.label}</span>
+                      <span className={`booking-doc-status is-${row.tone}`}>{row.status}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {artistSide && deal.contract?.skipped === true && deal.status !== 'COMPLETED' && (
+                <button className="btn btn-outline btn-sm booking-docs-extra" disabled={actionBusy} onClick={unskipContract}>
+                  {t('chat.unskipContract')}
+                </button>
+              )}
+              {artistSide && (
+                <button className="btn btn-outline btn-sm booking-docs-extra" onClick={() => setInvoiceDeal(deal)}>
+                  {deal.sharedDocuments?.invoices?.length ? t('invoices.issueAnother') : t('invoices.issueButton')}
+                </button>
+              )}
             </section>
           )}
 
@@ -1768,24 +1699,11 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             );
           })()}
 
-          {/* Closing the booking out — only on a confirmed booking. "Completed"
-              is a claim about something that already happened, so it waits
-              for the date. */}
+          {/* Closing a confirmed booking early stays available, quietly. */}
           {deal.status === 'ACCEPTED' && !hideWorkflow && (
-            <div className="workflow-actions">
-              {deal.date && new Date(deal.date) <= new Date() && isArtistSideForDeal(deal, currentUser) && (
-                <button className="btn btn-primary" disabled={actionBusy} onClick={() => handleCompleteDeal(deal)}>
-                  {actionBusy ? '...' : t('bookings.markCompleted')}
-                </button>
-              )}
-              <button
-                className="btn btn-outline btn-danger-outline"
-                disabled={actionBusy}
-                onClick={() => { setDealToCancel(deal); setCancelReason(''); }}
-              >
-                {t('bookings.cancelBooking')}
-              </button>
-            </div>
+            <button type="button" className="booking-page-cancel" disabled={actionBusy} onClick={() => { setDealToCancel(deal); setCancelReason(''); }}>
+              {t('bookings.cancelBooking')}
+            </button>
           )}
 
           {isOutgoing && !hideWorkflow && deal.status === 'PENDING' && (
@@ -1842,7 +1760,6 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
         if (deal) return renderDealCard(deal, 'page');
         return loading || !hasLoadedRef.current ? <LoadingGlobe label={t('bookings.loadingBookings')} /> : null;
       })()}
-      <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onDealPhotoPicked} />
       {!focusMode && openedDeal && renderDealCard(openedDeal, 'page')}
       {/* isolate wraps ONLY in-flow content so the -z-10 backdrop stays visible;
           overlays (delete modal, etc.) live outside it. */}

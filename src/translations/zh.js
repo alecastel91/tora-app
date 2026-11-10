@@ -412,6 +412,14 @@ const zh = {
 
   bookings: {
     // Booking page + list (2026-11)
+    documentsHeading: "文件",
+    docContract: "合同",
+    docStatusSigned: "已签署",
+    docStatusNotSent: "尚未发送",
+    docStatusAwaitingSignature: "等待签署",
+    docStatusSkipped: "已跳过",
+    docStatusShared: "已分享",
+    docStatusPending: "待处理",
     eventPhoto: "活动照片",
     addEventPhoto: "添加照片",
     changeEventPhoto: "更换照片",

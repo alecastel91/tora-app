@@ -412,6 +412,14 @@ const fr = {
 
   bookings: {
     // Booking page + list (2026-11)
+    documentsHeading: "Documents",
+    docContract: "Contrat",
+    docStatusSigned: "Signé",
+    docStatusNotSent: "Pas encore envoyé",
+    docStatusAwaitingSignature: "En attente de signature",
+    docStatusSkipped: "Ignoré",
+    docStatusShared: "Partagé",
+    docStatusPending: "En attente",
     eventPhoto: "Photo de l'événement",
     addEventPhoto: "Ajouter une photo",
     changeEventPhoto: "Changer la photo",

@@ -13317,6 +13317,7 @@ div.poster-stat { cursor: default; }
   overflow-wrap: anywhere;
 }
 .booking-row-party { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+.booking-row-sub { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.5); }
 .booking-row .booking-status-line,
 .booking-hero .booking-status-line { margin: 2px 0 0; font-size: 12.5px; }
 .booking-row-fee {
@@ -13453,22 +13454,6 @@ div.poster-stat { cursor: default; }
   cursor: pointer;
 }
 .booking-page-back { left: 14px; }
-.booking-page-photo-btn {
-  position: absolute;
-  right: 14px;
-  top: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 17px;
-  background: rgba(4, 4, 7, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font: 600 12px Inter, sans-serif;
-  cursor: pointer;
-}
 .booking-page-hero-text {
   position: absolute;
   left: 16px;
@@ -13599,6 +13584,65 @@ div.poster-stat { cursor: default; }
 .booking-page .flow-now .flow-label { color: #FF6B88; }
 .booking-page .flow-date { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
 .booking-page .booking-page-h { font-size: 18px; margin-bottom: 8px; }
+.booking-page .workflow-timeline > .text-center { display: none; }
+
+/* Next step: what is due now, with its buttons */
+.booking-next-actions { margin-top: 4px; border-top: 0; padding: 0; }
+.booking-next-actions:empty { display: none; }
+.booking-next-actions .btn { min-height: 44px; }
+
+/* Documents: one row per paper, tap to open */
+.booking-page-h-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.booking-page-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #FF6B88;
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.booking-docs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.booking-docs li + li { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.booking-doc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 0;
+  background: #0a0a0e;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+.booking-doc:disabled { cursor: default; }
+.booking-doc svg { flex: none; color: #FF6B88; }
+.booking-doc-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; }
+.booking-doc-status { font-size: 12px; font-weight: 600; }
+.booking-doc-status.is-done { color: #43E97B; }
+.booking-doc-status.is-pending { color: #FFB800; }
+.booking-doc-status.is-muted { color: rgba(255, 255, 255, 0.45); }
+.booking-docs-extra { margin-top: 10px; margin-right: 8px; }
+.booking-page-cancel {
+  align-self: center;
+  border: 0;
+  background: none;
+  padding: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font: 600 13px Inter, sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
 
 /* The viewer's move, at the end of the page */
 .booking-page-bar {
