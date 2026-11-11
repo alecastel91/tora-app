@@ -182,14 +182,6 @@
   html.desktop-v2 .app-header .header-icons > button {
     width: 32px;
     height: 32px;
-    border-radius: var(--d2-r-ctl);
-    background: rgba(255, 255, 255, 0.03);
-    border-color: var(--d2-line-strong);
-  }
-
-  html.desktop-v2 .app-header .header-icons > button:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 51, 102, 0.35);
   }
 
   /* responsive.css hides the logo with visibility:hidden, which keeps its box

@@ -61,10 +61,10 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
   };
 
   // Round glass icon button (Obsidian Neon). Base classes shared by all.
-  const iconBtnClasses = `relative w-9 h-9 rounded-full border border-white/10 bg-[#111117]
+  const iconBtnClasses = `relative w-9 h-9 border-0 bg-transparent p-0
                           flex items-center justify-center text-white cursor-pointer
-                          transition-colors hover:border-infrared/40 hover:bg-white/[0.1]
-                          [&>svg]:w-[18px] [&>svg]:h-[18px]`;
+                          transition-colors hover:text-infrared
+                          [&>svg]:w-[20px] [&>svg]:h-[20px]`;
 
   return (
     <header className="app-header sticky top-0 z-[100] flex items-center justify-between
@@ -94,7 +94,7 @@ const Header = ({ onOpenSettings, onSwitchTab, activeTab }) => {
         >
           <BellIcon />
           {unreadIds.length > 0 && (
-            <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-infrared
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-infrared
                              shadow-[0_0_6px_rgba(255,51,102,0.7)]" />
           )}
         </button>
