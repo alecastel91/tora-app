@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import RoomsTechCard from '../common/RoomsTechCard';
+import LinkIcons from '../common/LinkIcons';
+import { ArtistMediaTop, ArtistMediaBottom, PlayLine, NightsList, MiniPlayer, usePlayer } from '../common/ArtistMedia';
 import SafetyMenu from '../common/SafetyMenu';
 import { BLOCK_EFFECT_KEYS } from '../../utils/safety';
 import { confirmUnblock } from '../../utils/blockActions';
@@ -17,7 +19,7 @@ import BioTranslate from '../common/BioTranslate';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatEventDate } from '../../utils/dates';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
-import { raProfileUrl } from '../../utils/urls';
+import { raProfileUrl, safeHttpUrl } from '../../utils/urls';
 import OfferFlow from '../common/OfferFlow';
 import PosterHero from '../common/PosterHero';
 import JumpTabs from '../common/JumpTabs';
@@ -26,6 +28,7 @@ import LockOverlay from '../common/LockOverlay';
 import PhotoGallery from '../common/PhotoGallery';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
+import BubbleStrip from '../common/BubbleStrip';
 import HighlightsList from '../common/HighlightsList';
 import RepresentationSection from '../common/RepresentationSection';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
@@ -102,6 +105,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
   }, [passedProfile?.id, currentUser?.id, reloadKey]);
   const profile = fullProfile ? { ...passedProfile, ...fullProfile } : passedProfile;
   const embeds = profileEmbeds(profile);
+  const player = usePlayer();
 
   // Active tours for artist profiles (Tour Kickstart entry point, roadmap 6a)
   const [artistTours, setArtistTours] = useState([]);
@@ -568,7 +572,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
       {/* Floating back arrow — no header bar, the page starts at the avatar */}
       <BackButton onClose={onClose} label={t('common.back')} />
       <div className="view-profile-content poster-page relative isolate" ref={posterPageRef}>
-        {/* The photo, the name and what you can do here */}
+        {/* The photo, the name, the links and what you can do here (mock-up layout) */}
         <PosterHero
           profile={profile}
           actions={(
@@ -592,10 +596,25 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               profileId={profile.id}
               align="left"
               onOpenProfile={setNestedProfile}
-              fallback={profile.agencyName ? <p className="poster-agency">{profile.agencyName}</p> : null}
+              fallback={profile.agencyName ? <p className="ph-meta">{profile.agencyName}</p> : null}
             />
           )}
-          {profile.genres?.length > 0 && <p className="poster-line">{profile.genres.join(', ')}</p>}
+          {/* Instagram-style social proof: only likers the VIEWER also likes */}
+          {(() => {
+            if (!likers || likers.length === 0) return null;
+            const familiar = likers.filter((l) => likedProfiles.has(l.id)).slice(0, 2);
+            if (familiar.length === 0) return null;
+            const others = (profile.likesReceived ?? likers.length) - familiar.length;
+            return (
+              <button type="button" onClick={() => setListModal('likes')} className="ph-liked">
+                <span>
+                  {t('viewProfile.likedBy')} <strong>{familiar.map((l) => l.name).join(', ')}</strong>
+                  {others > 0 && <> {t('viewProfile.andOthers', { n: others })}</>}
+                </span>
+              </button>
+            );
+          })()}
+          <LinkIcons profile={profile} />
         </PosterHero>
 
         {/* Sender-side alert: counterparty hasn't verified yet */}
@@ -605,9 +624,8 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </p>
         )}
 
-        {/* Stats — same row as the own profile; likes-given is a count only */}
+        {/* Stats card — likes-given is a count only */}
         <div className="poster-stats">
-          {/* Count only — the list of who someone liked stays private to them */}
           <div className="poster-stat">
             <span className="poster-stat-value">{fmtStat(profile.likesGiven)}</span>
             <span className="poster-stat-label">{t('profile.likesGiven')}</span>
@@ -623,31 +641,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           <ProfileBadges badges={profile.badges} />
         </div>
 
-        <JumpTabs scope={posterPageRef} />
-
-        {/* Instagram-style social proof: only likers the VIEWER also likes */}
-        {(() => {
-          if (!likers || likers.length === 0) return null;
-          const familiar = likers.filter((l) => likedProfiles.has(l.id)).slice(0, 2);
-          if (familiar.length === 0) return null;
-          const others = (profile.likesReceived ?? likers.length) - familiar.length;
-          return (
-            <button
-              type="button"
-              onClick={() => setListModal('likes')}
-              className="block w-full bg-transparent border-none px-8 mb-4 text-center text-xs text-white/50 cursor-pointer"
-            >
-              {t('viewProfile.likedBy')}{' '}
-              <span className="text-white/80 font-medium">{familiar.map((l) => l.name).join(', ')}</span>
-              {others > 0 && <> {t('viewProfile.andOthers', { n: others })}</>}
-            </button>
-          );
-        })()}
-
-        {/* Bio — clamped with see-more; authored line breaks preserved */}
+        {/* Bio — clamped with see-more; authored line breaks preserved. How
+            they play and the label follow as one quiet unlabelled line. */}
         {profile.bio && (
           <div className="poster-section">
-            <h2 className="poster-h2">{t('profile.about')}</h2>
+            <h2 className="poster-h2">{t('artistPage.bio')}</h2>
             <p className={`poster-bio whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
             {profile.bio.length > 180 && (
               <button
@@ -659,8 +657,17 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               </button>
             )}
             <div><BioTranslate text={profile.bio} /></div>
+            <PlayLine profile={profile} />
           </div>
         )}
+        {!profile.bio && <div className="mb-5"><PlayLine profile={profile} /></div>}
+
+        {/* Who represents this artist — one card per agent, each addressable. */}
+        <RepresentationSection
+          profiles={profile.representedByProfiles}
+          fallbackEntries={profile.representedBy}
+          onOpenProfile={(p) => setNestedProfile({ id: p.id, name: p.name, role: p.role || 'AGENT' })}
+        />
 
         {/* Agent roster — visual grid, tap opens the artist's profile */}
         {profile.role === 'AGENT' && Array.isArray(profile.representingArtists) && profile.representingArtists.length > 0 && (
@@ -677,91 +684,10 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </div>
         )}
 
-        {/* Network strips — counterparts from completed TORA deals (shared
-            role config: artists ONE combined strip, promoters/venues two). */}
-        {networkSectionsForRole(profile.role, profile.network).map(([key, items, titleKey]) => (
-            items.length > 0 && (
-              <div key={key} className="mb-5 text-left">
-                <p className="poster-h2">{t(titleKey)}</p>
-                <ProfileMiniGrid
-                  profiles={items}
-                  onOpenProfile={(p) => setNestedProfile(p)}
-                />
-              </div>
-            )
-          ))}
+        {profile.role === 'ARTIST' && <ArtistMediaTop profile={profile} onPlay={player.play} />}
 
-        {/* Photo gallery — venue photos / promoter past-event flyers */}
-        {(profile.role === 'VENUE' || profile.role === 'PROMOTER') && (
-          <PhotoGallery
-            photos={profile.photos}
-            title={profile.role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')}
-          />
-        )}
-
-        {/* Venue capacity + rooms — showcased in a box for relevance */}
-        {profile.role === 'VENUE' && (profile.venueCapacity || profile.venueRooms) && (
-          <div className="mb-5 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0e] px-2 py-2.5">
-            {profile.venueCapacity && (
-              <div className="flex-1 px-2 text-center">
-                <div className="text-lg font-semibold text-white">{Number(profile.venueCapacity).toLocaleString()}</div>
-                <div className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.capacity')}</div>
-              </div>
-            )}
-            {profile.venueRooms && (
-              <div className="flex-1 px-2 text-center">
-                <div className="text-lg font-semibold text-white">{profile.venueRooms}</div>
-                <div className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.rooms')}</div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Rooms and tech — public by design: it is the venue's pitch to artists. */}
-        {profile.role === 'VENUE' && <RoomsTechCard rooms={profile.venueRoomsSpec} />}
-
-        {/* Who represents this artist — one card per agent, each addressable. */}
-        <RepresentationSection
-          profiles={profile.representedByProfiles}
-          fallbackEntries={profile.representedBy}
-          onOpenProfile={(p) => setNestedProfile({ id: p.id, name: p.name, role: p.role || 'AGENT' })}
-        />
-
-        {/* Past highlights — free-text career credits (text-styled, distinct
-            from the verified network strips) */}
-        {['ARTIST', 'PROMOTER', 'VENUE'].includes(profile.role) && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0 && (
-          <div className="mb-5 text-left">
-            <p className="poster-h2">{t('viewProfile.pastHighlights')}</p>
-            <HighlightsList highlights={profile.pastHighlights} />
-          </div>
-        )}
-
-        {/* Active tours — Tour Kickstart is premium. Free viewers always see
-            the section as a blurred teaser (tours or not) that opens Premium. */}
-        {profile.role === 'ARTIST' && !isPremiumViewer(currentUser) && (
-          <div className="mb-5 text-left">
-            <p className="poster-h2">{t('viewProfile.activeTours')}</p>
-            <button
-              type="button"
-              onClick={() => onOpenPremium && onOpenPremium()}
-              className="relative block w-full rounded-xl border border-white/10 bg-[#0a0a0e] overflow-hidden
-                         text-left cursor-pointer hover:border-infrared/40 transition-colors"
-            >
-              {/* skeleton tour card under the blur — same silhouette as the real one */}
-              <div className="p-4 blur-[7px] select-none" aria-hidden>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="h-3.5 w-36 rounded bg-white/25 mb-2" />
-                    <div className="h-2.5 w-52 rounded bg-white/15" />
-                  </div>
-                  <div className="h-7 w-24 rounded-full bg-infrared/50 shrink-0" />
-                </div>
-              </div>
-              <LockOverlay message={t('viewProfile.toursLockedMsg')} />
-            </button>
-          </div>
-        )}
-
+        {/* Active tours — Tour Kickstart is premium; free viewers don't see
+            the section at all (founder decision 2026-11-12). */}
         {profile.role === 'ARTIST' && artistTours.length > 0 && isPremiumViewer(currentUser) && (
           <div className="mb-5 text-left">
             <p className="poster-h2">{t('viewProfile.activeTours')}</p>
@@ -824,77 +750,65 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
           </div>
         )}
         
-        {/* Embedded Media Section */}
-        <div className="profile-embeds">
-          {embeds.soundcloud && (
-            <div className="embed-card">
-              <h4>{t('viewProfile.latestMix')}</h4>
-              <iframe
-                src={embeds.soundcloud}
-                frameBorder="0"
-                className="embed-iframe soundcloud-embed"
-                title={t('manageArtist.soundcloudMix')}
-                allow="autoplay"
-              />
-            </div>
-          )}
-          
-          {embeds.spotify && (
-            <div className="embed-card">
-              <h4>{t('viewProfile.spotifyArtist')}</h4>
-              <iframe
-                src={embeds.spotify}
-                frameBorder="0"
-                allowTransparency="true"
-                allow="encrypted-media"
-                className="embed-iframe spotify-embed"
-                title={t('manageArtist.spotifyArtistProfile')}
-              />
-            </div>
-          )}
-          
-        </div>
-
-        {/* ===== Links (same rows as the own profile) ===== */}
-        {(profile.website || profile.instagram || profile.residentAdvisor || profile.linkedin) && (
+        {/* Highlights — the member's own list of gigs and moments (public on
+            an artist's page); distinct from the verified network below. */}
+        {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].includes(profile.role) && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0 && (
           <div className="mb-5 text-left">
-            <p className="poster-h2 px-1">{t('profile.links')}</p>
-            <div className="flex flex-col gap-3">
-              {profile.website && (
-                <a href={profile.website} target="_blank" rel="noopener noreferrer"
-                   className="poster-link">
-                  <span className="poster-link-icon"><GlobeIcon /></span>
-                  <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
-                  <span className="text-white/30 text-xs">↗</span>
-                </a>
-              )}
-              {profile.instagram && (
-                <a href={`https://instagram.com/${profile.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                   className="poster-link">
-                  <span className="poster-link-icon"><InstagramGlyph /></span>
-                  <span className="flex-1 text-sm font-medium text-white">Instagram</span>
-                  <span className="text-white/30 text-xs">↗</span>
-                </a>
-              )}
-              {profile.residentAdvisor && (
-                <a href={raProfileUrl(profile.residentAdvisor)} target="_blank" rel="noopener noreferrer"
-                   className="poster-link">
-                  <span className="poster-link-icon"><RAGlyph /></span>
-                  <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
-                  <span className="text-white/30 text-xs">↗</span>
-                </a>
-              )}
-              {profile.linkedin && (
-                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer"
-                   className="poster-link">
-                  <span className="poster-link-icon">in</span>
-                  <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>
-                  <span className="text-white/30 text-xs">↗</span>
-                </a>
-              )}
-            </div>
+            <p className="poster-h2">{t('artistPage.highlights')}</p>
+            <HighlightsList highlights={profile.pastHighlights} />
           </div>
         )}
+
+        <NightsList profile={profile} onOpenProfile={setNestedProfile} />
+
+        {/* Network strips — counterparts from completed TORA deals (shared
+            role config: artists ONE combined strip, promoters/venues two). */}
+        {networkSectionsForRole(profile.role, profile.network).map(([key, items, titleKey]) => (
+            items.length > 0 && (
+              <div key={key} className="mb-5 text-left">
+                <p className="poster-h2">{t(titleKey)}</p>
+                {profile.role === 'ARTIST' ? (
+                  <BubbleStrip profiles={items} onOpenProfile={(p) => setNestedProfile(p)} />
+                ) : (
+                  <ProfileMiniGrid
+                    profiles={items}
+                    onOpenProfile={(p) => setNestedProfile(p)}
+                  />
+                )}
+              </div>
+            )
+          ))}
+
+        {/* Photo gallery — venue photos / promoter past-event flyers */}
+        {(profile.role === 'VENUE' || profile.role === 'PROMOTER') && (
+          <PhotoGallery
+            photos={profile.photos}
+            title={profile.role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')}
+          />
+        )}
+
+        {/* Venue capacity + rooms — showcased in a box for relevance */}
+        {profile.role === 'VENUE' && (profile.venueCapacity || profile.venueRooms) && (
+          <div className="mb-5 flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0e] px-2 py-2.5">
+            {profile.venueCapacity && (
+              <div className="flex-1 px-2 text-center">
+                <div className="text-lg font-semibold text-white">{Number(profile.venueCapacity).toLocaleString()}</div>
+                <div className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.capacity')}</div>
+              </div>
+            )}
+            {profile.venueRooms && (
+              <div className="flex-1 px-2 text-center">
+                <div className="text-lg font-semibold text-white">{profile.venueRooms}</div>
+                <div className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-white/40 font-tech">{t('profile.rooms')}</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Rooms and tech — public by design: it is the venue's pitch to artists. */}
+        {profile.role === 'VENUE' && <RoomsTechCard rooms={profile.venueRoomsSpec} />}
+
+        {profile.role === 'ARTIST' && <ArtistMediaBottom profile={profile} />}
 
         {/* TORA gig history — tappable, opens the detailed list */}
         {profile.role === 'ARTIST' && profile.gigsCompleted > 0 && (
@@ -953,6 +867,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
             person is gone from this member's app from that moment. */}
         <SafetyMenu variant="footer" profile={profile} onBlocked={onClose} />
       </div>
+      <MiniPlayer item={player.playing} onClose={player.stop} />
       </>
       )}
 

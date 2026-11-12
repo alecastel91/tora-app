@@ -453,14 +453,14 @@
   }
 
   /* Poster titles set their own size. */
-  html.desktop-v2 .app-content h1:not(:where(.d3-dash-name)),
+  html.desktop-v2 .app-content h1:not(:where(.d3-dash-name, .ph-name)),
   html.desktop-v2 .settings-screen h1,
   html.desktop-v2 .premium-screen h1 {
     font-size: 28px;
     letter-spacing: -0.02em;
   }
 
-  html.desktop-v2 .app-content h2:not(:where(.d3-mat-hero-name, .agency-team-hero-name)) {
+  html.desktop-v2 .app-content h2:not(:where(.d3-mat-hero-name, .agency-team-hero-name, .poster-h2)) {
     font-size: 22px;
     letter-spacing: -0.015em;
   }

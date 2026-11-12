@@ -7,6 +7,7 @@ import Modal from '../common/Modal';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
 import EditProfileScreen from './EditProfileScreen';
+import PhotoFocusModal, { FocusIcon } from '../common/PhotoFocusModal';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
 import AddProfileScreen from './AddProfileScreen';
 import ManageArtistScreen from './ManageArtistScreen';
@@ -24,16 +25,20 @@ import VerificationModal from '../common/VerificationModal';
 import PhotoGallery from '../common/PhotoGallery';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
+import BubbleStrip from '../common/BubbleStrip';
 import AvatarCropModal from '../common/AvatarCropModal';
 import PosterHero from '../common/PosterHero';
 import JumpTabs from '../common/JumpTabs';
 import { downscaleImageToBlob } from '../../utils/image';
 import HighlightsList from '../common/HighlightsList';
+import { ArtistMediaTop, ArtistMediaBottom, PlayLine, NightsList, MiniPlayer, usePlayer, SectionTitle } from '../common/ArtistMedia';
+import PublicPageCard from '../common/PublicPageCard';
+import LinkIcons from '../common/LinkIcons';
 import OnboardingChecklist from '../common/OnboardingChecklist';
 import AgencyJoinPrompt from '../common/AgencyJoinPrompt';
 import ProfileListRows from '../common/ProfileListRows';
 import RepresentationSection from '../common/RepresentationSection';
-import { raProfileUrl } from '../../utils/urls';
+import { raProfileUrl, safeHttpUrl } from '../../utils/urls';
 import { networkSectionsForRole } from '../../utils/networkSections';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import OwnProfilePage from '../desktop/OwnProfilePage';
@@ -91,6 +96,8 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // and it still serves as the narrow master column beside a sub-screen.
   const nativeDesktop = useNativeDesktop();
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [editFocus, setEditFocus] = useState(null); // section the editor opens at (the "+" buttons)
+  const [showPhotoFocus, setShowPhotoFocus] = useState(false);
   const [showManageProfile, setShowManageProfile] = useState(false);
   const [showRepresentedArtists, setShowRepresentedArtists] = useState(false);
   const [showFindAgent, setShowFindAgent] = useState(false);
@@ -182,6 +189,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
 
   // Embed URLs derived from the profile links (shared rules in utils/mediaLinks).
   const embeds = profileEmbeds(user);
+  const player = usePlayer();
   
   const [editForm] = useState({
     name: user?.name || 'Your Name',
@@ -321,14 +329,31 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     const updatedProfile = response.profile || response;
     updateUser(updatedProfile);
     setAvatarCropFile(null);
+    // Then choose what the wider crops (header, banner, cards) keep in frame.
+    setShowPhotoFocus(true);
+  };
+
+  const savePhotoFocus = async (avatarFocus) => {
+    const res = await apiService.updateProfile(user.id, { avatarFocus });
+    updateUser(res.profile || res);
+    setShowPhotoFocus(false);
   };
 
   const avatarCropModal = (
-    <AvatarCropModal
-      file={avatarCropFile}
-      onCancel={() => setAvatarCropFile(null)}
-      onApply={handleAvatarCropped}
-    />
+    <>
+      <AvatarCropModal
+        file={avatarCropFile}
+        onCancel={() => setAvatarCropFile(null)}
+        onApply={handleAvatarCropped}
+      />
+      <PhotoFocusModal
+        open={showPhotoFocus}
+        src={user?.avatarLarge || user?.avatar}
+        focus={user?.avatarFocus}
+        onCancel={() => setShowPhotoFocus(false)}
+        onSave={savePhotoFocus}
+      />
+    </>
   );
 
   const getInitial = (name) => {
@@ -346,6 +371,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     setManagingArtist(null);
     setViewingArtistProfile(null);
   };
+  const openEditAt = (section = null) => { closeSubScreens(); setEditFocus(section); setShowEditProfile(true); };
 
   // Onboarding-checklist deep links: open Edit Profile / the roster directly
   // (the checklist first navigates to the Profile tab, then fires).
@@ -506,7 +532,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           trialInfo={getTrialTimeRemaining()}
           fileInputRef={fileInputRef}
           onPickAvatar={(e) => (e && e.target && e.target.files ? handleImageUpload(e) : fileInputRef.current?.click())}
-          onEdit={() => { closeSubScreens(); setShowEditProfile(true); }}
+          onEdit={() => openEditAt(null)}
+          onEditAt={openEditAt}
+          onPositionPhoto={() => setShowPhotoFocus(true)}
           onManage={() => { closeSubScreens(); setShowManageProfile(true); }}
           onRoster={() => { closeSubScreens(); setShowRepresentedArtists(true); }}
           onFindAgent={() => { closeSubScreens(); setShowFindAgent(true); }}
@@ -531,15 +559,21 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         top={(
           <>
             <span />
-            <button type="button" className="poster-icon-btn" onClick={() => fileInputRef.current?.click()} aria-label={t('profile.changePhoto')}>
-              <UploadIcon />
-            </button>
+            <span className="flex gap-2">
+              {(user?.avatarLarge || user?.avatar) && (
+                <button type="button" className="poster-icon-btn" onClick={() => setShowPhotoFocus(true)} aria-label={t('profile.positionPhoto')} title={t('profile.positionPhoto')}>
+                  <FocusIcon />
+                </button>
+              )}
+              <button type="button" className="poster-icon-btn" onClick={() => fileInputRef.current?.click()} aria-label={t('profile.changePhoto')}>
+                <UploadIcon />
+              </button>
+            </span>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
           </>
         )}
       >
         {user?.role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }} />}
-        {user?.genres?.length > 0 && <p className="poster-line">{user.genres.join(', ')}</p>}
       </PosterHero>
 
       {/* Trial Banner */}
@@ -615,6 +649,8 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         <ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} />
       </div>
 
+      <div className="mb-4"><LinkIcons profile={user} onAdd={() => openEditAt('links')} /></div>
+
       {/* ===== Actions (2x2 glass grid) ===== */}
       <div className="poster-own-actions">
         <ActionCard primary icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
@@ -632,7 +668,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         />
       </div>
 
-      <JumpTabs scope={posterPageRef} />
+      {user?.role === 'ARTIST' && <PublicPageCard profile={user} onVerify={() => setShowVerification(true)} onEdit={() => { closeSubScreens(); setShowEditProfile(true); }} />}
 
       {/* Activation checklist — first-session guidance; hides once complete.
           Lives on the profile rather than in the feed: it is about setting
@@ -666,23 +702,16 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         </button>
       )}
 
-      {/* Bio Section */}
+      {/* Bio, then how they play · label as one quiet line */}
       {user?.bio && (
         <div className="poster-section">
-          <h2 className="poster-h2">{t('profile.about')}</h2>
+          <h2 className="poster-h2">{t('artistPage.bio')}</h2>
           <p className="poster-bio whitespace-pre-line">{user.bio}</p>
           <BioTranslate text={user.bio} />
+          <PlayLine profile={user} />
         </div>
       )}
-
-      {/* Past highlights — free-text career credits (text-styled, distinct
-          from the verified network strips) */}
-      {['ARTIST', 'PROMOTER', 'VENUE'].includes(user?.role) && Array.isArray(user?.pastHighlights) && user.pastHighlights.length > 0 && (
-        <div className="mb-5 text-left">
-          <p className="poster-h2">{t('viewProfile.pastHighlights')}</p>
-          <HighlightsList highlights={user.pastHighlights} />
-        </div>
-      )}
+      {!user?.bio && <div className="mb-5"><PlayLine profile={user} /></div>}
 
       {/* Who represents me — one card per agent, each opening their profile. */}
       <RepresentationSection
@@ -690,30 +719,6 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         fallbackEntries={user?.representedBy}
         onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }}
       />
-
-      {/* Network strips — counterparts from completed TORA deals */}
-      {networkSections.map(([key, items, titleKey]) => (
-        items.length > 0 && (
-          <div key={key} className="mb-5 text-left">
-            <p className="poster-h2">{t(titleKey)}</p>
-            <ProfileMiniGrid
-              profiles={items}
-              onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }}
-            />
-          </div>
-        )
-      ))}
-
-      {/* Photo gallery — venue photos / promoter past-event flyers */}
-      {(user?.role === 'VENUE' || user?.role === 'PROMOTER') && (
-        <PhotoGallery
-          photos={user?.photos}
-          title={user.role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')}
-        />
-      )}
-
-      {/* Rooms and tech — what the venue shows artists (public) */}
-      {user?.role === 'VENUE' && <RoomsTechCard rooms={user?.venueRoomsSpec} />}
 
       {/* Agent Artists Representing Section */}
       {user?.role === 'AGENT' && (
@@ -746,116 +751,49 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         </div>
       )}
 
-      {/* Embedded Media Section */}
-      <div className="flex flex-col gap-3 mb-6 text-left">
-        {user?.mixtape && (
-          <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4">
-            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.latestMix')}</h4>
-            {embeds.soundcloud ? (
-              <iframe
-                src={embeds.soundcloud}
-                frameBorder="0"
-                className="w-full h-[320px] rounded-lg"
-                title={t('manageArtist.soundcloudMix')}
-              />
-            ) : (
-              <div className="rounded-lg border border-white/10 bg-[#070709] p-5 text-center">
-                <p className="text-sm text-white/70 mb-1">{t('profile.useFullSoundcloudUrl')}</p>
-                <p className="text-xs text-white/40 mb-3">Example: https://soundcloud.com/artist/track-name</p>
-                <button onClick={() => { closeSubScreens(); setShowEditProfile(true); }} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
-              </div>
-            )}
-          </div>
-        )}
+      {user?.role === 'ARTIST' && <ArtistMediaTop profile={user} onPlay={player.play} onAdd={openEditAt} />}
 
-        {user?.spotify && (
-          <div className="rounded-2xl border border-white/10 bg-[#0a0a0e] p-4">
-            <h4 className="text-xs uppercase tracking-[0.15em] text-white/50 font-tech mb-3">{t('viewProfile.spotifyArtist')}</h4>
-            {embeds.spotify ? (
-              <iframe
-                src={embeds.spotify}
-                frameBorder="0"
-                allowTransparency="true"
-                allow="encrypted-media"
-                className="w-full h-[380px] rounded-lg"
-                title={t('manageArtist.spotifyArtistProfile')}
-              />
-            ) : (
-              <div className="rounded-lg border border-white/10 bg-[#070709] p-5 text-center">
-                <p className="text-sm text-white/70 mb-1">{t('profile.useFullSpotifyUrl')}</p>
-                <p className="text-xs text-white/40 mb-3">Example: https://open.spotify.com/artist/XXXXX</p>
-                <button onClick={() => { closeSubScreens(); setShowEditProfile(true); }} className="px-4 py-2 rounded-lg border border-white/15 text-white text-xs font-semibold uppercase tracking-wider hover:border-infrared/50 hover:text-infrared transition-colors">Update Link</button>
-              </div>
-            )}
-          </div>
-        )}
-
-      </div>
-
-      {/* ===== Links ===== */}
-      <div className="mb-6 text-left">
-        <p className="poster-h2 px-1">{t('profile.links')}</p>
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={() => user?.website && window.open(user.website, '_blank')}
-            disabled={!user?.website}
-            className="poster-link"
-          >
-            <span className="poster-link-icon">
-              <GlobeIcon />
-            </span>
-            <span className="flex-1 text-sm font-medium text-white">{t('profile.officialWebsite')}</span>
-            <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
-          </button>
-
-          {user?.instagram && (
-            <a
-              href={`https://instagram.com/${user.instagram.replace('@', '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="poster-link"
-            >
-              <span className="poster-link-icon">
-                <InstagramGlyph />
-              </span>
-              <span className="flex-1 text-sm font-medium text-white">Instagram</span>
-              <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
-            </a>
-          )}
-
-          {user?.residentAdvisor && (
-            <a
-              href={raProfileUrl(user.residentAdvisor)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="poster-link"
-            >
-              <span className="poster-link-icon">
-                <img src={RA_LOGO_WHITE} alt="RA" className="w-[22px] h-auto" />
-              </span>
-              <span className="flex-1 text-sm font-medium text-white">{t('editProfile.residentAdvisorLabel')}</span>
-              <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
-            </a>
-          )}
-
-          {user?.linkedin && (
-            <a
-              href={user.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="poster-link"
-            >
-              <span className="poster-link-icon">
-                <LinkIcon />
-              </span>
-              <span className="flex-1 text-sm font-medium text-white">LinkedIn</span>
-              <span className="text-white/30 [&>svg]:w-4 [&>svg]:h-4"><ExternalLinkIcon /></span>
-            </a>
-          )}
+      {/* Highlights — the member's own list (public on an artist's page) */}
+      {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].includes(user?.role) && Array.isArray(user?.pastHighlights) && user.pastHighlights.length > 0 && (
+        <div className="mb-5 text-left">
+          <SectionTitle title={t('artistPage.highlights')} onAdd={() => openEditAt('highlights')} />
+          <HighlightsList highlights={user.pastHighlights} />
         </div>
-      </div>
+      )}
 
+      <NightsList profile={user} onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }} />
+
+      {/* Network strips — counterparts from completed TORA deals */}
+      {networkSections.map(([key, items, titleKey]) => (
+        items.length > 0 && (
+          <div key={key} className="mb-5 text-left">
+            <p className="poster-h2">{t(titleKey)}</p>
+            {user?.role === 'ARTIST' ? (
+              <BubbleStrip profiles={items} onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }} />
+            ) : (
+              <ProfileMiniGrid
+                profiles={items}
+                onOpenProfile={(p) => { closeSubScreens(); setViewingArtistProfile(p); }}
+              />
+            )}
+          </div>
+        )
+      ))}
+
+      {/* Photo gallery — venue photos / promoter past-event flyers */}
+      {(user?.role === 'VENUE' || user?.role === 'PROMOTER') && (
+        <PhotoGallery
+          photos={user?.photos}
+          title={user.role === 'VENUE' ? t('profile.venueGalleryTitle') : t('profile.pastEventsTitle')}
+        />
+      )}
+
+      {/* Rooms and tech — what the venue shows artists (public) */}
+      {user?.role === 'VENUE' && <RoomsTechCard rooms={user?.venueRoomsSpec} />}
+
+      {user?.role === 'ARTIST' && <ArtistMediaBottom profile={user} onAdd={openEditAt} />}
+
+      <MiniPlayer item={player.playing} onClose={player.stop} />
       </div>
       )}
 
@@ -1102,7 +1040,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   }
 
   if (showEditProfile) {
-    return renderSplit(<EditProfileScreen onClose={() => setShowEditProfile(false)} />);
+    return renderSplit(<EditProfileScreen focus={editFocus} onClose={() => { setShowEditProfile(false); setEditFocus(null); }} />);
   }
 
 

@@ -12,6 +12,9 @@ import { appAlert } from '../../utils/dialogs';
 import { RA_URL_RE } from '../common/HighlightsList';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
+import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings } from '../common/ProfileMediaEditors';
+
+const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
 
 const MAX_PROFILE_PHOTOS = 8;
 // Plausible highlight years — upper bound derived from today. The three core
@@ -47,13 +50,29 @@ const highlightRowIssue = (h, role) => {
   return null;
 };
 
-const EditProfileScreen = ({ onClose }) => {
+// `focus` opens the form at one section (the "+" on your own profile):
+// 'links' | 'sets' | 'releases' | 'videos' | 'pressPhotos' | 'nights' | 'highlights' | 'photos'.
+const EditProfileScreen = ({ onClose, focus = null }) => {
   const { user, updateUser } = useAppContext();
   const { t } = useLanguage();
   // Desktop v3 wraps the SAME form in editor chrome (components/desktop/
   // EditShell): sticky header with the actions, a section index, a live
   // preview. The fields below are untouched; the phone renders as before.
   const nativeDesktop = useNativeDesktop();
+
+  // Opened from a "+" on the profile: bring that section into view and
+  // flash it once so the member sees where to add.
+  useEffect(() => {
+    if (!focus) return undefined;
+    const timer = setTimeout(() => {
+      const el = document.querySelector(`[data-edit-section="${focus}"]`);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.classList.add('edit-section-focus');
+      setTimeout(() => el.classList.remove('edit-section-focus'), 1600);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [focus]);
 
   // Parse existing location
   const parseLocation = (location) => {
@@ -341,6 +360,20 @@ const EditProfileScreen = ({ onClose }) => {
             />
           </div>
 
+          {editedUser.role === 'ARTIST' && (
+            <div className="form-group">
+              <label>{t('artistPage.pronouns')} <span className="text-white/35">· {t('artistPage.optional')}</span></label>
+              <input
+                type="text"
+                maxLength={40}
+                value={editedUser.pronouns || ''}
+                onChange={(e) => setEditedUser({ ...editedUser, pronouns: e.target.value })}
+                placeholder={t('artistPage.pronounsPlaceholder')}
+              />
+              <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('artistPage.pronounsHint')}</p>
+            </div>
+          )}
+
           {/* A profile's role is fixed at creation (the backend ignores it on
               update anyway); a different role means a second profile. */}
           <div className="form-group">
@@ -353,6 +386,21 @@ const EditProfileScreen = ({ onClose }) => {
             />
             <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('editProfile.roleFixed')}</p>
           </div>
+
+          {/* A person who runs nights lists them; a party brand IS the night. */}
+          {editedUser.role === 'PROMOTER' && (
+            <div className="form-group">
+              <label>{t('artistPage.promoterKind')}</label>
+              <div className="segmented-pick">
+                {['PERSON', 'BRAND'].map((k) => (
+                  <button key={k} type="button" className={editedUser.promoterKind === k ? 'is-on' : ''} onClick={() => setEditedUser({ ...editedUser, promoterKind: k })}>
+                    {t(k === 'PERSON' ? 'artistPage.promoterPerson' : 'artistPage.promoterBrand')}
+                  </button>
+                ))}
+              </div>
+              <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('artistPage.promoterKindHint')}</p>
+            </div>
+          )}
 
           {/* City-first location picker (same UX as the apply form) */}
           <div className="form-group">
@@ -409,6 +457,44 @@ const EditProfileScreen = ({ onClose }) => {
               rows="4"
             />
           </div>
+
+          {editedUser.role === 'ARTIST' && (
+            <>
+              <div className="form-group" style={{ marginTop: '16px' }}>
+                <label>{t('artistPage.howYouPlay')}</label>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {PLAY_STYLES.map((style) => {
+                    const on = (editedUser.playStyles || []).includes(style);
+                    return (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => setEditedUser({
+                          ...editedUser,
+                          playStyles: on ? editedUser.playStyles.filter((x) => x !== style) : [...(editedUser.playStyles || []), style],
+                        })}
+                        className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-[12.5px] transition-colors ${on ? 'border-infrared/70 bg-infrared/[0.14] text-white' : 'border-white/12 bg-transparent text-white/60 hover:border-white/30'}`}
+                      >
+                        {t(`artistPage.play_${style}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('artistPage.howYouPlayHint')}</p>
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>{t('artistPage.label')} <span className="text-white/35">· {t('artistPage.optional')}</span></label>
+                <input
+                  type="text"
+                  maxLength={120}
+                  value={editedUser.label || ''}
+                  onChange={(e) => setEditedUser({ ...editedUser, label: e.target.value })}
+                  placeholder={t('artistPage.labelPlaceholder')}
+                />
+                <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('artistPage.agentNote')}</p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Genres Section */}
@@ -456,9 +542,10 @@ const EditProfileScreen = ({ onClose }) => {
         </div>
 
         {/* Social Links Section */}
-        <div className="edit-section">
+        <div className="edit-section" data-edit-section="links">
           <h3>{t('editProfile.socialLinks')}</h3>
           
+          {editedUser.role !== 'ARTIST' && (
           <div className="form-group">
             <label>{t('editProfile.soundcloudMixtape')}</label>
             <input
@@ -471,6 +558,20 @@ const EditProfileScreen = ({ onClose }) => {
               {t('editProfile.soundcloudHint')}
             </p>
           </div>
+          )}
+
+          {editedUser.role === 'ARTIST' && (
+            <>
+              <div className="form-group">
+                <label>SoundCloud</label>
+                <input type="url" value={editedUser.soundcloud || ''} onChange={(e) => setEditedUser({ ...editedUser, soundcloud: e.target.value })} placeholder="https://soundcloud.com/..." />
+              </div>
+              <div className="form-group">
+                <label>Bandcamp</label>
+                <input type="url" value={editedUser.bandcamp || ''} onChange={(e) => setEditedUser({ ...editedUser, bandcamp: e.target.value })} placeholder="https://yourname.bandcamp.com" />
+              </div>
+            </>
+          )}
 
           {editedUser.role === 'ARTIST' && (
             <div className="form-group">
@@ -532,9 +633,42 @@ const EditProfileScreen = ({ onClose }) => {
           )}
         </div>
 
+        {editedUser.role === 'ARTIST' && (
+          <>
+            <div className="edit-section" data-edit-section="sets">
+              <h3>{t('artistPage.sets')}</h3>
+              <p className="m-0 mb-3 text-xs leading-relaxed text-white/45">{t('artistPage.setsHint')}</p>
+              <MediaLinksEditor profileId={user.id} kind="set" items={editedUser.sets} onChange={(sets) => setEditedUser({ ...editedUser, sets })} />
+            </div>
+            <div className="edit-section" data-edit-section="releases">
+              <h3>{t('artistPage.releases')}</h3>
+              <p className="m-0 mb-3 text-xs leading-relaxed text-white/45">{t('artistPage.releasesHint')}</p>
+              <ReleasesEditor profileId={user.id} items={editedUser.releases} onChange={(releases) => setEditedUser({ ...editedUser, releases })} />
+            </div>
+            <div className="edit-section" data-edit-section="videos">
+              <h3>{t('artistPage.videos')}</h3>
+              <p className="m-0 mb-3 text-xs leading-relaxed text-white/45">{t('artistPage.videosHint')}</p>
+              <MediaLinksEditor profileId={user.id} kind="video" items={editedUser.videos} onChange={(videos) => setEditedUser({ ...editedUser, videos })} />
+            </div>
+            <div className="edit-section" data-edit-section="pressPhotos">
+              <h3>{t('artistPage.pressPhotos')}</h3>
+              <p className="m-0 mb-3 text-xs leading-relaxed text-white/45">{t('artistPage.pressPhotosHint')}</p>
+              <PressPhotosEditor items={editedUser.pressPhotos} onChange={(pressPhotos) => setEditedUser({ ...editedUser, pressPhotos })} />
+            </div>
+          </>
+        )}
+
+        {editedUser.role === 'PROMOTER' && editedUser.promoterKind === 'PERSON' && (
+          <div className="edit-section" data-edit-section="nights">
+            <h3>{t('artistPage.nightsYouRun')}</h3>
+            <p className="m-0 mb-3 text-xs leading-relaxed text-white/45">{t('artistPage.nightsHint')}</p>
+            <NightsEditor items={editedUser.nights} onChange={(nights) => setEditedUser({ ...editedUser, nights })} />
+          </div>
+        )}
+
         {/* Photo gallery — venues show the space, promoters their flyers */}
         {hasPhotoGallery && (
-          <div className="edit-section">
+          <div className="edit-section" data-edit-section="photos">
             <div className="flex items-baseline justify-between">
               <h3>{editedUser.role === 'VENUE' ? t('editProfile.venuePhotos') : t('editProfile.pastFlyers')}</h3>
               <span className="text-[10px] font-tech uppercase tracking-[0.15em] text-white/40">
@@ -624,11 +758,13 @@ const EditProfileScreen = ({ onClose }) => {
 
         {/* Past highlights — free-text career credits, all main roles.
             Artist: gigs · Promoter: past events · Venue: notable nights */}
-        {['ARTIST', 'PROMOTER', 'VENUE'].includes(user?.role) && (
-          <div className="edit-section">
-            <h3>{t('editProfile.pastHighlights')}</h3>
+        {['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].includes(user?.role) && (
+          <div className="edit-section" data-edit-section="highlights">
+            <h3>{t('artistPage.highlights')}</h3>
             <p className="m-0 mb-3 text-xs text-white/40">
-              {user.role === 'PROMOTER'
+              {user.role === 'AGENT'
+                ? t('artistPage.agentHighlightsHint')
+                : user.role === 'PROMOTER'
                 ? t('editProfile.pastHighlightsHintPromoter')
                 : user.role === 'VENUE'
                   ? t('editProfile.pastHighlightsHintVenue')
@@ -729,6 +865,13 @@ const EditProfileScreen = ({ onClose }) => {
                 <p className="m-0 text-xs text-white/40">{t('editProfile.highlightsFull', { max: HIGHLIGHT_MAX })}</p>
               )}
             </div>
+          </div>
+        )}
+
+        {editedUser.role === 'ARTIST' && (
+          <div className="edit-section">
+            <h3>{t('artistPage.publicPage')}</h3>
+            <PublicPageSettings profileId={user.id} />
           </div>
         )}
 

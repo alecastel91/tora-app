@@ -59,7 +59,8 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
       || { id, name: entry?.name, location: entry?.location };
   };
 
-  // Fetch sent requests on mount (but NOT the full agent list — search only)
+  // Fetch sent requests on mount; the agent list loads below so the screen
+  // opens on agents to browse, not an empty search box.
   useEffect(() => {
     if (!currentArtistId) return undefined;
     let cancelled = false;
@@ -79,6 +80,7 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
   useEffect(() => {
     console.log('[SearchAgentsModal] Mounting - fetching request data for artist:', currentArtistId);
     fetchSentRequests();
+    fetchAgents('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run on mount
 
@@ -627,7 +629,10 @@ const SearchAgentsModal = ({ onClose, onSelectAgent, currentArtistId, onOpenChat
             </div>
           )}
 
-          {/* Results */}
+          {/* Results — every agent on TORA until a search narrows it */}
+          {!loading && hasSearched && !searchQuery && agents.length > 0 && (
+            <p className="m-0 mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">{t('findAgent.allAgents')}</p>
+          )}
           {!loading && hasSearched && (
             <div className="artists-list">
               {agents.length === 0 ? (

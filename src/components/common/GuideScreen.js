@@ -143,7 +143,7 @@ const GuideScreen = ({ onClose }) => {
     // it needs its own opaque ground, not the ambient one.
     <div
       className="guide-screen fixed inset-0 z-[10040] overflow-y-auto"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: '#000' }}
     >
       {/* The app's own sub-screen header (Settings, Achievements): sticky bar,
           circular back button, centred uppercase title. An invented class name

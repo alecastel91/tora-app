@@ -1,10 +1,9 @@
 import React, { useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { roleLabel, ROLES } from '../../utils/roles';
-import { fmtStat, Section, Panel, Stat, Avatar, profileLinks } from './primitives';
-import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, StarIcon, ShieldIcon } from '../../utils/icons';
-import PosterHero from '../common/PosterHero';
-import JumpTabs from '../common/JumpTabs';
+import { fmtStat, Section, Panel, Stat, profileLinks } from './primitives';
+import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, ShieldIcon } from '../../utils/icons';
+import PosterBanner from '../common/PosterBanner';
+import BubbleStrip from '../common/BubbleStrip';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
@@ -16,6 +15,9 @@ import HighlightsList from '../common/HighlightsList';
 import OnboardingChecklist from '../common/OnboardingChecklist';
 import AgencyJoinPrompt from '../common/AgencyJoinPrompt';
 import AgencyBadge from '../common/AgencyBadge';
+import PublicPageCard from '../common/PublicPageCard';
+import { FocusIcon } from '../common/PhotoFocusModal';
+import { ArtistMediaTop, ArtistMediaBottom, PlayLine, NightsList, MiniPlayer, usePlayer } from '../common/ArtistMedia';
 
 /* Desktop v3 — your own profile, designed for the desk. ProfileScreen keeps
    every fetch, flow, sub-screen and modal and hands this component its state
@@ -25,7 +27,8 @@ import AgencyBadge from '../common/AgencyBadge';
    the difference that this one is a workbench: the identity band carries the
    things you DO (edit, manage, roster, switch profile), the main column
    carries what needs you (trial, verification, checklist) above your work,
-   and the side column holds your network and your other profiles. */
+   and the side column holds your links. Switching profile lives in the
+   sidebar chip and the band's Switch button. */
 
 const GridIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -49,10 +52,11 @@ const Action = ({ icon, label, onClick, dot, primary }) => (
 const OwnProfilePage = ({
   user, userProfiles, defaultProfileId, embeds, ownBadges, rosterArtists, artistActionsMap, ownHasActions,
   representedByProfiles, networkSections, likedProfilesList, likerProfilesList, connectionsList, trialInfo,
-  fileInputRef, onPickAvatar, onEdit, onManage, onRoster, onFindAgent, onOpenSwitcher, onAddProfile, onSwitchProfile,
+  fileInputRef, onPickAvatar, onPositionPhoto, onEdit, onEditAt, onManage, onRoster, onFindAgent, onOpenSwitcher, onAddProfile, onSwitchProfile,
   onOpenLikes, onOpenLikers, onOpenConnections, onOpenAchievements, onOpenPremium, onVerify, onOpenProfile, onManageArtist,
 }) => {
   const pageRef = useRef(null);
+  const player = usePlayer();
   const { t } = useLanguage();
   const role = user?.role;
 
@@ -60,19 +64,22 @@ const OwnProfilePage = ({
 
   const unverified = user?.verifyStatus !== 'VERIFIED';
   const inReview = user?.verifyStatus === 'PENDING_REVIEW';
-  const hasHighlights = ['ARTIST', 'PROMOTER', 'VENUE'].includes(role) && Array.isArray(user?.pastHighlights) && user.pastHighlights.length > 0;
+  const hasHighlights = ['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].includes(role) && Array.isArray(user?.pastHighlights) && user.pastHighlights.length > 0;
 
   return (
     <div className="d3-op poster-page" ref={pageRef}>
       {/* ---- identity band: who you are, and what you do here ---- */}
       <header className="d3-op-head d3-panel">
-        <PosterHero
+        <PosterBanner
           own
           wide
           profile={user}
           top={(
             <>
-              <button type="button" className="poster-text-btn" onClick={onPickAvatar}><UploadIcon /> {t('profile.changePhoto')}</button>
+              <span className="flex gap-2">
+                <button type="button" className="poster-text-btn" onClick={onPickAvatar}><UploadIcon /> {t('profile.changePhoto')}</button>
+                {(user?.avatarLarge || user?.avatar) && <button type="button" className="poster-text-btn" onClick={onPositionPhoto}><FocusIcon /> {t('profile.positionPhoto')}</button>}
+              </span>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => onPickAvatar(e)} style={{ display: 'none' }} />
             </>
           )}
@@ -91,20 +98,24 @@ const OwnProfilePage = ({
           )}
         >
           {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={onOpenProfile} />}
-          {user?.genres?.length > 0 && <p className="poster-line">{user.genres.join(', ')}</p>}
-        </PosterHero>
+          {(user?.pronouns || user?.genres?.length > 0) && (
+            <p className="poster-line">{[user.pronouns, user.genres?.length ? user.genres.join(', ') : null].filter(Boolean).join(' · ')}</p>
+          )}
+        </PosterBanner>
 
         <div className="d3-poster-stats flex flex-wrap items-center gap-1">
           <Stat value={fmtStat(likedProfilesList.length)} label={t('profile.likesGiven')} onClick={onOpenLikes} />
           <Stat value={fmtStat(likerProfilesList.length)} label={t('profile.likedByLabel')} onClick={onOpenLikers} />
           <Stat value={fmtStat(connectionsList.length)} label={t('profile.connections')} onClick={onOpenConnections} />
-          <div className="ml-auto flex items-center gap-3"><JumpTabs scope={pageRef} /><ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} /></div>
+          <div className="ml-auto flex items-center gap-3"><ProfileBadges badges={ownBadges} onOpenHub={onOpenAchievements} /></div>
         </div>
       </header>
 
       <div className="d3-op-body">
         {/* ---- main: what needs you, then your work ---- */}
         <main className="flex min-w-0 flex-col gap-6">
+          {role === 'ARTIST' && <PublicPageCard compact profile={user} onVerify={onVerify} onEdit={onEdit} />}
+
           {trialInfo && (
             <div className={`flex items-center justify-between gap-3 rounded-xl border p-4 ${trialInfo.expired ? 'border-amber-500/30 bg-amber-500/[0.06]' : 'border-emerald-500/30 bg-emerald-500/[0.06]'}`}>
               <div>
@@ -143,10 +154,13 @@ const OwnProfilePage = ({
               <h2 className="poster-h2">{t('profile.about')}</h2>
               <p className="poster-bio whitespace-pre-line">{user.bio}</p>
               <div className="mt-1"><BioTranslate text={user.bio} /></div>
+              <PlayLine profile={user} />
             </div>
           ) : (
             <button onClick={onEdit} className="d3-panel cursor-pointer px-5 py-4 text-left text-[13px] text-white/40 transition-colors hover:border-white/25">{t('editProfile.bio')} ›</button>
           )}
+
+          <RepresentationSection profiles={representedByProfiles} fallbackEntries={user?.representedBy} onOpenProfile={onOpenProfile} />
 
           {role === 'AGENT' && (
             <Section title={t('profile.artistsRepresenting')}>
@@ -170,7 +184,9 @@ const OwnProfilePage = ({
             </Section>
           )}
 
-          {(user?.mixtape || user?.spotify) && (
+          {role === 'ARTIST' && <ArtistMediaTop profile={user} onPlay={player.play} onAdd={onEditAt} />}
+
+          {role !== 'ARTIST' && (user?.mixtape || user?.spotify) && (
             <Section title={t('viewProfile.latestMix')}>
               <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                 {user?.mixtape && (
@@ -197,54 +213,25 @@ const OwnProfilePage = ({
           {role === 'VENUE' && <RoomsTechCard rooms={user?.venueRoomsSpec} />}
 
           {hasHighlights && (
-            <Section title={t('viewProfile.pastHighlights')}><HighlightsList highlights={user.pastHighlights} /></Section>
+            <Section title={t('viewProfile.pastHighlights')} onAdd={() => onEditAt('highlights')}><HighlightsList highlights={user.pastHighlights} /></Section>
           )}
 
-          <RepresentationSection profiles={representedByProfiles} fallbackEntries={user?.representedBy} onOpenProfile={onOpenProfile} />
+          <NightsList profile={user} onOpenProfile={onOpenProfile} />
 
           {networkSections.map(([key, items, titleKey]) => items.length > 0 && (
-            <Section key={key} title={t(titleKey)}><ProfileMiniGrid profiles={items} onOpenProfile={onOpenProfile} cols={4} /></Section>
+            <Section key={key} title={t(titleKey)}>
+              {role === 'ARTIST'
+                ? <BubbleStrip profiles={items} onOpenProfile={onOpenProfile} />
+                : <ProfileMiniGrid profiles={items} onOpenProfile={onOpenProfile} cols={4} />}
+            </Section>
           ))}
+
+          {role === 'ARTIST' && <ArtistMediaBottom profile={user} onAdd={onEditAt} />}
         </main>
 
         {/* ---- aside: your network, your profiles, your links ---- */}
         <aside className="flex min-w-0 flex-col gap-4">
-          <Panel
-            title={t('desktop.profilesLabel')}
-            action={<button onClick={onOpenSwitcher} className="cursor-pointer text-[11px] text-white/40 hover:text-white">{t('profile.switchProfileLabel')}</button>}
-          >
-            <ul className="m-0 flex list-none flex-col p-0">
-              {userProfiles.map((p) => {
-                const active = p.id === user?.id;
-                return (
-                  <li key={p.id}>
-                    <button
-                      onClick={() => !active && onSwitchProfile(p.id)}
-                      className={`flex w-full items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-left transition-colors ${active ? 'bg-white/[0.05]' : 'cursor-pointer hover:bg-white/[0.04]'}`}
-                    >
-                      <Avatar profile={p} className="h-7 w-7 text-[11px]" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[12.5px] text-white/90">{p.name}</span>
-                        <span className="block truncate text-[10.5px] text-white/40">{roleLabel(p.role, t)}</span>
-                      </span>
-                      {p.id === defaultProfileId && <span className="text-[#FFD700] [&>svg]:h-3 [&>svg]:w-3 [&>svg]:fill-current"><StarIcon /></span>}
-                      {active && <span className="h-1.5 w-1.5 rounded-full bg-infrared" />}
-                    </button>
-                  </li>
-                );
-              })}
-              {userProfiles.length < ROLES.length && (
-                <li>
-                  <button onClick={onAddProfile} className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-left text-[12.5px] text-white/50 transition-colors hover:bg-white/[0.04] hover:text-white">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-dashed border-white/25 [&>svg]:h-3.5 [&>svg]:w-3.5"><AddIcon /></span>
-                    {t('profile.addNewProfile')}
-                  </button>
-                </li>
-              )}
-            </ul>
-          </Panel>
-
-          <Panel title={t('profile.links')} action={<button onClick={onEdit} className="cursor-pointer text-[11px] text-white/40 hover:text-white">{t('common.edit')}</button>}>
+          <Panel title={t('profile.links')} action={<button onClick={() => onEditAt('links')} className="cursor-pointer text-[11px] text-white/40 hover:text-white">{t('common.edit')}</button>}>
             {links.length === 0 ? <p className="m-0 py-2 text-[12px] text-white/30">—</p> : (
               <div className="flex flex-col gap-2">
                 {links.map((l) => (
@@ -259,6 +246,7 @@ const OwnProfilePage = ({
           </Panel>
         </aside>
       </div>
+      <MiniPlayer item={player.playing} onClose={player.stop} />
     </div>
   );
 };

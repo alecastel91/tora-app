@@ -179,6 +179,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   const [cursor, setCursor] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [draft, setDraft] = useState('');
+  const [composerOpen, setComposerOpen] = useState(false);
   const [draftImage, setDraftImage] = useState(null); // data URL, client-downscaled
   const [posting, setPosting] = useState(false);
   const fileInputRef = useRef(null);
@@ -297,6 +298,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
         return [...list.slice(0, afterPinned), post, ...list.slice(afterPinned)];
       });
       setDraft('');
+      setComposerOpen(false);
       setDraftImage(null);
     } catch (e) {
       if (!isVerificationGate(e)) appAlert(e.message || t('news.postFailed'));
@@ -422,17 +424,18 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
 
   return (
     <div className="screen active news-screen px-5 pt-6 pb-24" onClick={() => menuFor && setMenuFor(null)}>
-      {/* composer */}
-      <div className="mb-5 rounded-2xl border border-white/10 bg-[#0c0c11] p-4">
-        <div className="flex gap-3">
+      {/* composer: one quiet line until you tap into it */}
+      <div className={`mb-4 rounded-2xl border border-white/10 bg-[#0c0c11] ${composerOpen ? 'p-4' : 'px-3 py-2.5'}`}>
+        <div className="flex items-center gap-3">
           <Avatar profile={user} />
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
+            onFocus={() => setComposerOpen(true)}
             placeholder={t('news.composerPlaceholder')}
-            rows={2}
+            rows={composerOpen ? 3 : 1}
             maxLength={2000}
-            className="form-input min-h-[52px] w-full resize-y !border-0 !bg-transparent !p-0 text-sm leading-relaxed"
+            className={`form-input w-full !border-0 !bg-transparent !p-0 text-sm leading-relaxed ${composerOpen ? 'min-h-[60px] resize-y' : 'min-h-0 resize-none'}`}
           />
         </div>
         {draftImage && (
@@ -447,6 +450,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
             </button>
           </div>
         )}
+        {composerOpen && (
         <div className="mt-2 flex items-center justify-end gap-3">
           {draft.length > 1800 && (
             <span className="text-[10px] text-white/35">{draft.length} / 2000</span>
@@ -463,6 +467,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
             {posting ? '...' : t('news.postCta')}
           </button>
         </div>
+        )}
       </div>
 
       {/* Filter chips, not tabs: a group of toggle buttons (no tabpanel or

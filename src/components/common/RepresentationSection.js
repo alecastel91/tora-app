@@ -1,15 +1,15 @@
 import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { HandshakeIcon } from '../../utils/icons';
-import ProfileMiniGrid from './ProfileMiniGrid';
+import { getAvatarClass } from '../../utils/roles';
 import { toRepEntries, repEntryName } from '../../utils/representation';
 
 // Who represents this artist.
 //
 // An artist can have several — often regional — agents, so a single sentence
 // listing names doesn't work: it can only ever link to one of them, and it
-// gives no sense of who each agent is. Cards address every agent individually
-// and match the network strips elsewhere on the profile.
+// gives no sense of who each agent is. One slim row per agent (the mock-up):
+// round avatar, name, agency and city.
 //
 // `profiles` is the hydrated `representedByProfiles` from GET /profiles/:id.
 // `fallbackEntries` is the raw `representedBy` JSONB (name only), used when
@@ -40,7 +40,23 @@ const RepresentationSection = ({ profiles, fallbackEntries, onOpenProfile }) => 
         <span className="inline-flex [&>svg]:w-3.5 [&>svg]:h-3.5"><HandshakeIcon /></span>
         {t('profile.representedByTitle')}
       </p>
-      <ProfileMiniGrid profiles={cards} onOpenProfile={onOpenProfile} />
+      <div className="flex flex-col gap-2">
+        {cards.map((p) => {
+          const meta = [p.agencyName, p.city || p.location].filter(Boolean).join(' · ');
+          return (
+            <button key={p.id} type="button" className="rep-row" onClick={() => onOpenProfile && onOpenProfile(p)}>
+              <span className={`rep-avatar ${getAvatarClass(p.role || 'AGENT')}`}>
+                {p.avatar ? <img src={p.avatar} alt="" loading="lazy" /> : (p.name || '?').charAt(0).toUpperCase()}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[14px] font-semibold text-white">{p.name}</span>
+                {meta && <span className="block truncate text-[12px] text-white/50">{meta}</span>}
+              </span>
+              <span aria-hidden className="text-white/35">›</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

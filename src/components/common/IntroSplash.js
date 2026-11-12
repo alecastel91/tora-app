@@ -39,7 +39,7 @@ const IntroSplash = ({ onComplete }) => {
           <img
             src="/tora_logo_white.png"
             alt="TORA"
-            className="w-[320px] md:w-[400px] h-auto"
+            className="w-[240px] md:w-[300px] h-auto"
           />
         </motion.div>
 

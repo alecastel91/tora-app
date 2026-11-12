@@ -81,3 +81,18 @@ export function raProfileUrl(residentAdvisor) {
     .replace(/^-|-$/g, '');
   return `https://ra.co/dj/${slug}`;
 }
+
+/**
+ * A member-typed link as a safe href: http(s) only, a bare "name.bandcamp.com"
+ * gets https:// in front, anything else (javascript:, data:) is null.
+ */
+export function safeHttpUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(/^[a-z][a-z0-9+.-]*:/i.test(raw) ? raw : `https://${raw}`);
+    return u.protocol === 'https:' || u.protocol === 'http:' ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}

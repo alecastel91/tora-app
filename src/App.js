@@ -1038,7 +1038,7 @@ function App() {
                     onManage={goPremium}
                   />
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
-                    <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleOpenBillingPortal}>
+                    <button className="btn btn-outline manage-billing-btn" onClick={handleOpenBillingPortal}>
                       {t('premium.manageBilling')}
                     </button>
                   )}
@@ -1072,14 +1072,15 @@ function App() {
                   </div>
                   {planKind === 'membership' && <p className="premium-note">{t('premium.coversAllProfiles')}</p>}
                   {planKind === 'agency' && <p className="premium-note">{t('premium.coveredByAgency')}</p>}
-                  {/* Full-width by design — must sit OUTSIDE the pill row or
-                      the row overflows the viewport on MONTHLY. */}
+                  {/* Must sit OUTSIDE the pill row or the row overflows the
+                      viewport on MONTHLY. */}
                   {['MONTHLY', 'YEARLY'].includes(user?.subscriptionTier) && (
                     <>
-                      <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleOpenBillingPortal}>
+                      <button className="btn btn-outline manage-billing-btn" onClick={handleOpenBillingPortal}>
                         {t('premium.manageBilling')}
                       </button>
-                      <button className="btn btn-outline btn-full manage-billing-btn" onClick={handleCancelSubscription}>
+                      {/* cancelling is available, never prominent */}
+                      <button type="button" className="settings-quiet-link" onClick={handleCancelSubscription}>
                         {t('premium.cancelSubscription')}
                       </button>
                     </>

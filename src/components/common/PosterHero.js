@@ -1,51 +1,53 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel } from '../../utils/roles';
 import VerifiedBadge from './VerifiedBadge';
 
-/* The top of a profile: one photo, big uppercase name, fading into the page.
-   Uses the large upload when there is one, else the small avatar. A tall photo
-   covers the whole hero; a square one or a logo fills the width and fades, so
-   nothing important is cropped. No photo: the role colour and the initial.
-   `wide` is the desktop banner, where tall photos sit on the right over a
-   blurred copy of themselves because stretching one would cut the face. */
-const PosterHero = ({ profile, own = false, wide = false, top = null, actions = null, children = null }) => {
+/* The top of a profile, as designed in the public-pages mock-ups (2026-11):
+   one photo fading into the page, then a small role · place eyebrow with the
+   role dot, the name in normal case with the seal, one quiet line (pronouns ·
+   genres), and whatever the caller adds below (liked-by line, link icons,
+   the buttons). No photo: the role colour and the initial. Phone only; the
+   desktop pages use PosterBanner. */
+const metaLine = (profile) => [
+  profile?.pronouns,
+  Array.isArray(profile?.genres) && profile.genres.length ? profile.genres.slice(0, 3).join(', ') : null,
+].filter(Boolean).join(' · ');
+
+const placeOf = (profile) => profile?.location || [profile?.city, profile?.country].filter(Boolean).join(', ');
+
+const PosterHero = ({ profile, own = false, top = null, actions = null, children = null }) => {
   const { t } = useLanguage();
-  const [shape, setShape] = useState(null); // tall | square | landscape
   const src = profile?.avatarLarge || profile?.avatar || null;
   const role = profile?.role || 'ARTIST';
+  const place = placeOf(profile) || (own ? t('profile.addLocation') : '');
+  const meta = metaLine(profile);
 
-  const onLoad = (e) => {
-    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
-    if (!w || !h) return;
-    const ratio = w / h;
-    setShape(ratio > 1.15 ? 'landscape' : ratio >= 0.9 ? 'square' : 'tall');
-  };
+  const photo = src
+    ? <img src={src} alt={profile?.name || ''} className="ph-photo" style={profile?.avatarFocus ? { objectPosition: profile.avatarFocus } : undefined} />
+    : <span aria-hidden className="ph-initial">{(profile?.name || '?').charAt(0).toUpperCase()}</span>;
+
+  const identity = (
+    <>
+      <p className="ph-eyebrow"><span className="ph-dot" />{[roleLabel(role, t), place].filter(Boolean).join(' · ')}</p>
+      <h1 className="ph-name">
+        <span>{profile?.name || t('profile.yourName')}</span>
+        {profile?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={22} className="ph-seal" channel={profile?.verifyChannel} />}
+      </h1>
+      {meta && <p className="ph-meta">{meta}</p>}
+      {children}
+    </>
+  );
 
   return (
-    <div className={`poster-hero poster-role-${role.toLowerCase()} ${wide ? 'poster-wide' : ''} ${src ? `poster-${shape || 'tall'}` : 'poster-empty'}`}>
-      {src ? (
-        <>
-          {wide && shape !== 'landscape' && <img src={src} alt="" aria-hidden className="poster-backdrop" />}
-          <img src={src} alt={profile?.name || ''} className="poster-photo" onLoad={onLoad} />
-        </>
-      ) : (
-        <span aria-hidden className="poster-initial">{(profile?.name || '?').charAt(0).toUpperCase()}</span>
-      )}
-      <div aria-hidden className="poster-fade" />
-      {top && <div className="poster-top">{top}</div>}
-      <div className="poster-body">
-        <div className="poster-identity">
-          <h1 className="poster-name">
-            {profile?.name || t('profile.yourName')}
-            {profile?.verifyStatus === 'VERIFIED' && <VerifiedBadge size={wide ? 26 : 20} className="poster-seal" channel={profile?.verifyChannel} />}
-          </h1>
-          <div className="poster-meta">
-            <span>{profile?.location || (own ? t('profile.addLocation') : '')}</span>
-            <span className="poster-role">{roleLabel(role, t)}</span>
-          </div>
-          {children}
-        </div>
+    <div className={`ph ph-role-${role.toLowerCase()}`}>
+      <div className={`ph-cover ${src ? '' : 'ph-empty'}`}>
+        {photo}
+        <div aria-hidden className="ph-fade" />
+        {top && <div className="ph-top">{top}</div>}
+      </div>
+      <div className="ph-body">
+        {identity}
         {actions}
       </div>
     </div>

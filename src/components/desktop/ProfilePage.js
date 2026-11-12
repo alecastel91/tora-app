@@ -1,5 +1,5 @@
-import PosterHero from '../common/PosterHero';
-import JumpTabs from '../common/JumpTabs';
+import PosterBanner from '../common/PosterBanner';
+import BubbleStrip from '../common/BubbleStrip';
 import ProfileActions from '../common/ProfileActions';
 import React, { useRef } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -15,9 +15,9 @@ import PhotoGallery from '../common/PhotoGallery';
 import RoomsTechCard from '../common/RoomsTechCard';
 import RepresentationSection from '../common/RepresentationSection';
 import HighlightsList from '../common/HighlightsList';
-import LockOverlay from '../common/LockOverlay';
 import SafetyMenu from '../common/SafetyMenu';
 import AgencyBadge from '../common/AgencyBadge';
+import { ArtistMediaTop, ArtistMediaBottom, PlayLine, NightsList, MiniPlayer, usePlayer } from '../common/ArtistMedia';
 
 /* Desktop v3 profile page — designed for a desk, not the phone page split
    into columns. ViewProfileScreen keeps every fetch, flow and modal and hands
@@ -26,7 +26,9 @@ import AgencyBadge from '../common/AgencyBadge';
    Structure: an identity band across the top (who, where, what they do, and
    the actions), a stats strip, then the body — the person's WORK in the main
    column (bio, roster, tours, media, gallery, tech), and the reference
-   material in the side column (links, badges, similar profiles, safety). */
+   material in the side column (links, badges, similar profiles, safety).
+   Artists (2026-11): sets and releases lead the main column, then
+   highlights, the members-only Played at strip, videos and press photos. */
 
 const LinkRow = ({ href, icon, label }) => (
   <a
@@ -48,6 +50,7 @@ const ProfilePage = ({
   onToggleTourInterest, onTourOffer, onOpenTourKickstart, onOpenPremium,
 }) => {
   const pageRef = useRef(null);
+  const player = usePlayer();
   const { t } = useLanguage();
   const locale = t('dateFormat.locale');
   const role = profile.role;
@@ -61,7 +64,7 @@ const ProfilePage = ({
     : null;
 
   const hasRoster = role === 'AGENT' && Array.isArray(profile.representingArtists) && profile.representingArtists.length > 0;
-  const hasHighlights = ['ARTIST', 'PROMOTER', 'VENUE'].includes(role) && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0;
+  const hasHighlights = ['ARTIST', 'PROMOTER', 'VENUE', 'AGENT'].includes(role) && Array.isArray(profile.pastHighlights) && profile.pastHighlights.length > 0;
   const networkStrips = networkSectionsForRole(role, profile.network).filter(([, items]) => items.length > 0);
 
   return (
@@ -69,7 +72,7 @@ const ProfilePage = ({
       <div className="d3-vp-inner">
         {/* ---- identity band ---- */}
         <header className="d3-vp-head d3-panel">
-          <PosterHero
+          <PosterBanner
             wide
             profile={profile}
             top={(
@@ -107,8 +110,10 @@ const ProfilePage = ({
               />
             )}
             {memberSince && <p className="poster-agency">{memberSince}</p>}
-            {profile?.genres?.length > 0 && <p className="poster-line">{profile.genres.join(', ')}</p>}
-          </PosterHero>
+            {(profile?.pronouns || profile?.genres?.length > 0) && (
+              <p className="poster-line">{[profile.pronouns, profile.genres?.length ? profile.genres.join(', ') : null].filter(Boolean).join(' · ')}</p>
+            )}
+          </PosterBanner>
 
           {/* ---- stats strip ---- */}
           <div className="d3-poster-stats flex flex-wrap items-center gap-1">
@@ -121,7 +126,7 @@ const ProfilePage = ({
             {role === 'VENUE' && profile.venueCapacity && <Stat value={Number(profile.venueCapacity).toLocaleString()} label={t('profile.capacity')} />}
             {role === 'VENUE' && profile.venueRooms && <Stat value={profile.venueRooms} label={t('profile.rooms')} />}
             {Array.isArray(profile.badges) && (
-              <div className="ml-auto flex items-center gap-3"><JumpTabs scope={pageRef} /><ProfileBadges badges={profile.badges} /></div>
+              <div className="ml-auto flex items-center gap-3"><ProfileBadges badges={profile.badges} /></div>
             )}
           </div>
 
@@ -156,9 +161,17 @@ const ProfilePage = ({
                 <div className="poster-bio">
                   <p className="m-0 whitespace-pre-line text-[14px] leading-relaxed text-white/75">{profile.bio}</p>
                   <div className="mt-1"><BioTranslate text={profile.bio} /></div>
+                  <PlayLine profile={profile} />
                 </div>
               </Section>
             )}
+            {!profile.bio && <PlayLine profile={profile} />}
+
+            <RepresentationSection
+              profiles={profile.representedByProfiles}
+              fallbackEntries={profile.representedBy}
+              onOpenProfile={(p) => onOpenNested({ id: p.id, name: p.name, role: p.role || 'AGENT' })}
+            />
 
             {hasRoster && (
               <Section title={t('profile.artistsRepresenting')}>
@@ -169,17 +182,9 @@ const ProfilePage = ({
               </Section>
             )}
 
-            {role === 'ARTIST' && isBooker && !premiumViewer && (
-              <Section title={t('viewProfile.activeTours')}>
-                <button type="button" onClick={() => onOpenPremium && onOpenPremium()} className="relative block w-full cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0e] text-left transition-colors hover:border-infrared/40">
-                  <div className="select-none p-4 blur-[7px]" aria-hidden>
-                    <div className="mb-2 h-3.5 w-36 rounded bg-white/25" /><div className="h-2.5 w-52 rounded bg-white/15" />
-                  </div>
-                  <LockOverlay message={t('viewProfile.toursLockedMsg')} />
-                </button>
-              </Section>
-            )}
+            {role === 'ARTIST' && <ArtistMediaTop profile={profile} onPlay={player.play} />}
 
+            {/* Tours: premium viewers only — free viewers don't see the section (2026-11-12). */}
             {role === 'ARTIST' && isBooker && premiumViewer && artistTours.length > 0 && (
               <Section title={t('viewProfile.activeTours')}>
                 <div className="flex flex-col gap-2">
@@ -216,7 +221,7 @@ const ProfilePage = ({
               </Section>
             )}
 
-            {(embeds.soundcloud || embeds.spotify) && (
+            {role !== 'ARTIST' && (embeds.soundcloud || embeds.spotify) && (
               <Section title={t('viewProfile.latestMix')}>
                 <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                   {embeds.soundcloud && (
@@ -247,17 +252,17 @@ const ProfilePage = ({
               </Section>
             )}
 
-            <RepresentationSection
-              profiles={profile.representedByProfiles}
-              fallbackEntries={profile.representedBy}
-              onOpenProfile={(p) => onOpenNested({ id: p.id, name: p.name, role: p.role || 'AGENT' })}
-            />
+            <NightsList profile={profile} onOpenProfile={onOpenNested} />
 
             {networkStrips.map(([key, items, titleKey]) => (
               <Section key={key} title={t(titleKey)}>
-                <ProfileMiniGrid profiles={items} onOpenProfile={onOpenNested} cols={4} />
+                {role === 'ARTIST'
+                  ? <BubbleStrip profiles={items} onOpenProfile={onOpenNested} />
+                  : <ProfileMiniGrid profiles={items} onOpenProfile={onOpenNested} cols={4} />}
               </Section>
             ))}
+
+            {role === 'ARTIST' && <ArtistMediaBottom profile={profile} />}
           </main>
 
           <aside className="flex min-w-0 flex-col gap-4">
@@ -282,6 +287,7 @@ const ProfilePage = ({
           </aside>
         </div>
       </div>
+      <MiniPlayer item={player.playing} onClose={player.stop} />
     </div>
   );
 };

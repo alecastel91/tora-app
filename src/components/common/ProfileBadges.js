@@ -8,8 +8,8 @@ import BadgeFlipCard from './BadgeFlipCard';
 // Kept for callers that color by badge accent
 export const BADGE_ACCENT = BADGE_ACCENTS;
 
-// Quiet profile entry point: a small shield pill with the earned-badge
-// count. Tap → overlay with the earned badges as flip cards (locked badges
+// Quiet profile entry point: a small shield pill, name only (founder:
+// the details belong behind the tap). Tap → overlay with the earned badges as flip cards (locked badges
 // are simply absent here — only the owner's Achievements hub greys them).
 // With `onOpenHub` (own profile) the pill always renders and opens that
 // hub instead — it replaced the header shield.
@@ -45,7 +45,7 @@ const ProfileBadges = ({ badges, onOpenHub }) => {
         >
           <ShieldIcon />
           <span className="text-[10px] font-tech uppercase tracking-[0.15em]">
-            {t('badges.sectionTitle')}{items.length > 0 && ` · ${items.length}`}
+            {t('badges.sectionTitle')}
           </span>
         </button>
       </div>

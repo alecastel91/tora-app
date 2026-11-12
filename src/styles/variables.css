@@ -31,6 +31,12 @@
   /* Background Colors — Obsidian Neon: cards are translucent white-on-black
    * glass, not lighter grey tones. --bg-black/--bg-dark stay opaque for
    * page backgrounds and sticky chrome. */
+  /* Button heights (2026-11): one system instead of 44/48/50/52 scattered
+   * through App.css. Main action · inside a card or row · chips and links. */
+  --btn-h: 40px;
+  --btn-h-sm: 34px;
+  --btn-h-xs: 28px;
+
   --bg-black: #000000;
   --bg-dark: #0A0A0A;
   /* Opaque near-black surface scale (matches the app-wide card palette) —

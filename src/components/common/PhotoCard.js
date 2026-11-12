@@ -16,7 +16,7 @@ const PhotoCard = ({ profile, variant = 'row', place, chip = null, note = null, 
   return (
     <article className={`photo-card photo-card--${variant} poster-role-${role.toLowerCase()}${src ? '' : ' poster-empty'}${dim ? ' is-dim' : ''}`}>
       {src
-        ? <img src={src} alt="" loading="lazy" decoding="async" className="photo-card-img" />
+        ? <img src={src} alt="" loading="lazy" decoding="async" className="photo-card-img" style={profile?.avatarFocus ? { objectPosition: profile.avatarFocus } : undefined} />
         : <span aria-hidden className="photo-card-initial">{name.charAt(0).toUpperCase()}</span>}
       <div aria-hidden className="photo-card-fade" />
       <button type="button" className="photo-card-open" aria-label={name} onClick={onOpen} />

@@ -991,7 +991,7 @@
   /* Sits inside the frame, so it must not paint over the header chrome it
      leaves visible — the bell dropdown opened behind it otherwise. */
   html.desktop-v3 .guide-screen { top: var(--d2-top); left: var(--d2-sidebar); z-index: var(--z-screen); }
-  html.desktop-v3 .guide-screen > .settings-header { max-width: 1120px; margin: 0 auto; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; }
+  html.desktop-v3 .guide-screen > .settings-header { max-width: none; margin: 0; padding: 12px var(--d2-gutter); justify-content: flex-start; gap: 14px; } /* same place as the Settings title */
   html.desktop-v3 .guide-screen > .settings-header .back-button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--d2-line); background: var(--d2-surface); color: #fff; display: flex; align-items: center; justify-content: center; position: static; }
   html.desktop-v3 .guide-screen > .settings-header .back-button svg { width: 18px; height: 18px; }
   html.desktop-v3 .guide-screen > .settings-header h1 { flex: 0 0 auto; text-align: left; font-size: 22px; letter-spacing: -0.01em; text-transform: none; }
@@ -1634,4 +1634,56 @@
   html.desktop-v3 .photo-card--tile { height: 400px; }
   html.desktop-v3 .photo-card.photo-card--tile .photo-card-name { font-size: 28px; }
   html.desktop-v3 .photo-card--tile .photo-card-meta { font-size: 13px; }
+}
+
+
+/* Profile pages (2026-11): the new artist sections inside the existing
+   banner + main/side layout. Media sit in grids that fill the main column
+   instead of the phone's swipe rows. */
+@media (min-width: 1024px) {
+  html.desktop-v3 .d3-vp .artist-scroller, html.desktop-v3 .d3-op .artist-scroller { display: grid; gap: 14px; overflow: visible; margin: 0; padding: 0; }
+  html.desktop-v3 .d3-vp .artist-row-sets, html.desktop-v3 .d3-op .artist-row-sets { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html.desktop-v3 .d3-vp .artist-row-releases, html.desktop-v3 .d3-op .artist-row-releases { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  html.desktop-v3 .d3-vp .media-item, html.desktop-v3 .d3-op .media-item { width: auto; min-width: 0; }
+  html.desktop-v3 .d3-vp .artist-art, html.desktop-v3 .d3-op .artist-art { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+  html.desktop-v3 .d3-vp .artist-play:not(.artist-play-video), html.desktop-v3 .d3-op .artist-play:not(.artist-play-video) { width: 40px; height: 40px; right: 10px; bottom: 10px; }
+  html.desktop-v3 .d3-op main .artist-videos, html.desktop-v3 .d3-vp main .artist-videos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  html.desktop-v3 .d3-vp .artist-press, html.desktop-v3 .d3-op .artist-press { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  /* stats: the number centred over its label */
+  html.desktop-v3 .d3-poster-stats > :not(.ml-auto) { text-align: center; }
+  /* banner (2026-11-13): the photo fills the whole banner, whatever its
+     shape; the member picks what stays in frame (Position photo → inline
+     object-position), the same point the search cards use. No side shade:
+     the bottom fade carries the name. */
+  html.desktop-v3 .poster-wide .poster-backdrop { display: none; }
+  html.desktop-v3 .poster-wide .poster-photo,
+  html.desktop-v3 .poster-wide.poster-square .poster-photo,
+  html.desktop-v3 .poster-wide.poster-landscape .poster-photo { left: 0; right: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; object-position: 50% 25%; -webkit-mask-image: none; mask-image: none; }
+  html.desktop-v3 .poster-wide .poster-fade { z-index: 1; }
+  html.desktop-v3 .poster-wide .poster-body, html.desktop-v3 .poster-wide .poster-top { z-index: 2; }
+  /* banner: the name keeps its line; the actions (and the one-time like
+     tip under them) take at most 400px on the right */
+  html.desktop-v3 .poster-wide .poster-identity { flex: 1 1 auto; min-width: 320px; }
+  html.desktop-v3 .poster-wide .poster-body > :not(.poster-identity) { flex: 0 1 400px; min-width: 0; }
+  html.desktop-v3 .poster-wide .like-tip { gap: 6px; padding: 10px 12px; }
+  html.desktop-v3 .poster-wide .like-tip-row p { font-size: 12px; line-height: 1.4; }
+  html.desktop-v3 .poster-wide .like-tip-close { font-size: 11px; }
+}
+
+/* Sub-screen titles on the desk (2026-11): one voice — Manage, Edit profile,
+   Representing agent and the roster all in capitals at the same size, and
+   no sub-screen paints its own background (they sit on the app's black). */
+@media (min-width: 1024px) {
+  html.desktop-v3 .d3-edit-head h1,
+  html.desktop-v3 .d3-manage .manage-artist-header h1,
+  html.desktop-v3 .md-detail .manage-artist-header h1,
+  html.desktop-v3 .d3-agents .search-agents-header h1,
+  html.desktop-v3 .represented-artists-header h1,
+  html.desktop-v3 .md-detail > .edit-profile-screen:not(.d3-edit) .edit-profile-header h1 {
+    font-family: var(--font-space-grotesk), sans-serif; font-size: 28px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; text-transform: uppercase;
+  }
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .manage-artist-screen,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .edit-profile-screen,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .search-agents-screen,
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .represented-artists-screen { background: transparent; }
 }

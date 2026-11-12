@@ -5,7 +5,7 @@ export function networkSectionsForRole(role, network) {
   const n = { promoters: [], venues: [], artists: [], ...(network || {}) };
   switch (role) {
     case 'ARTIST':
-      return [['workedWith', [...n.promoters, ...n.venues], 'viewProfile.workedWith']];
+      return [['workedWith', [...n.promoters, ...n.venues], 'artistPage.playedAt']];
     case 'PROMOTER':
       return [
         ['venues', n.venues, 'viewProfile.venuesWorkedWith'],

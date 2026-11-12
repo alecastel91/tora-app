@@ -828,6 +828,31 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Public page (torahub.io/@slug): settings + exactly what a visitor sees.
+  async getPublicPage(profileId) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/public`, { headers: this.getHeaders() });
+    return this.handleResponse(response);
+  }
+
+  async updatePublicPage(profileId, changes) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/public`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify(changes),
+    });
+    return this.handleResponse(response);
+  }
+
+  // "Paste one link, we fill in the rest" — kind: 'set' | 'release' | 'video'.
+  async previewMediaLink(profileId, url, kind) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/media-preview`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ url, kind }),
+    });
+    return this.handleResponse(response);
+  }
+
   async createProfile(profileData) {
     const response = await fetch(`${API_URL}/profiles`, {
       method: 'POST',

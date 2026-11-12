@@ -46,60 +46,25 @@ const WorkflowTimeline = ({ deal, onViewPaymentDetails }) => {
   // Two tracks: the lighter fill is what the booker marked paid, the darker
   // fill (inside it) is what the artist confirmed. Step 4 ticks on confirmed.
   const paymentBar = showPaymentBar ? (
-
-        <div style={{ marginTop: '14px', padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px', fontSize: '12px' }}>
-            <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>{t('bookings.paymentProgress')}</span>
-            <span style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {confirmedDeposit} {currency} confirmed of {totalFee} {currency} ({confirmedPct}%)
-            </span>
-          </div>
-          <div style={{ position: 'relative', height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
-            {/* Marked-paid track (lighter) */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, height: '100%',
-              width: `${markedPct}%`,
-              background: 'rgba(67,233,123,0.35)',
-              transition: 'width 0.3s ease',
-            }} />
-            {/* Confirmed track (darker, sits on top) */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, height: '100%',
-              width: `${confirmedPct}%`,
-              background: 'linear-gradient(90deg, rgba(67,233,123,1), rgba(67,233,123,0.85))',
-              transition: 'width 0.3s ease',
-            }} />
-          </div>
-          <div style={{ marginTop: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
-            {pendingConfirmation > 0 && (
-              <span><strong style={{ color: 'rgba(67,233,123,0.85)' }}>{pendingConfirmation} {currency}</strong> awaiting confirmation</span>
-            )}
-            {remaining > 0 && (
-              <span>· {t('bookings.remainingLabel')} <strong style={{ color: '#fff' }}>{remaining} {currency}</strong></span>
-            )}
-            {onViewPaymentDetails && (
-              <button
-                type="button"
-                onClick={onViewPaymentDetails}
-                style={{
-                  marginLeft: 'auto',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  fontStyle: 'italic',
-                  fontSize: '11px',
-                  color: 'rgba(255,255,255,0.55)',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '2px',
-                }}
-              >
-                {t('bookings.viewDetailsLink')}
-              </button>
-            )}
-          </div>
+    <div className="pay-box">
+      <div className="pay-box-head">
+        <span>{t('bookings.paidOfTotal', { paid: confirmedDeposit, total: totalFee, currency, pct: confirmedPct })}</span>
+        {onViewPaymentDetails && (
+          <button type="button" onClick={onViewPaymentDetails} className="pay-box-link">{t('bookings.viewDetailsLink')}</button>
+        )}
+      </div>
+      <div className="pay-box-track" aria-hidden>
+        {/* marked paid by the booker (lighter), confirmed by the artist (on top) */}
+        <span className="pay-box-marked" style={{ width: `${markedPct}%` }} />
+        <span className="pay-box-confirmed" style={{ width: `${confirmedPct}%` }} />
+      </div>
+      {(pendingConfirmation > 0 || remaining > 0) && (
+        <div className="pay-box-foot">
+          {pendingConfirmation > 0 && <span><strong className="text-[#43E97B]">{pendingConfirmation} {currency}</strong> {t('bookings.awaitingConfirmationShort')}</span>}
+          {remaining > 0 && <span>{t('bookings.remainingLabel')} <strong className="text-white">{remaining} {currency}</strong></span>}
         </div>
-      
+      )}
+    </div>
   ) : null;
 
   return (
