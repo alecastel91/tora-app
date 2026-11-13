@@ -12335,7 +12335,7 @@ textarea.form-textarea:focus {
 .calendar-weekday .wd-short { display: none; }
 
 /* ===== Phone month grid (Tour → Calendar): the Apple-calendar reading. A
-   day is a tall cell — number top-left, up to two event chips (bookings in
+   day is a square cell — number top-left, one event chip (bookings in
    crimson, the member's own calendar in grey) and "+N" — availability is the
    green tint, a trip the bar along the bottom. The dots above are for the
    other, round grids; here the chips say it. ===== */
@@ -12345,8 +12345,9 @@ textarea.form-textarea:focus {
   .calendar-grid-inline .calendar-day { min-width: 0; }
   .calendar-grid-inline .calendar-weekday { padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
   .calendar-grid-inline .calendar-day {
-    aspect-ratio: auto;
-    min-height: 74px;
+    aspect-ratio: 1;
+    min-height: 46px; /* narrow phones: just taller than wide, so a chip still fits */
+    overflow: hidden;
     border-radius: 0;
     border: 0;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -12354,7 +12355,7 @@ textarea.form-textarea:focus {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    padding: 4px 3px 15px;
+    padding: 3px 2px 12px;
     transition: none;
   }
   .calendar-grid-inline .calendar-day:nth-child(7n) { border-right: 0; }
@@ -12367,7 +12368,7 @@ textarea.form-textarea:focus {
   .calendar-grid-inline .calendar-day.is-today:not(.available) { box-shadow: none; }
   .calendar-grid-inline .calendar-day.has-gig::after,
   .calendar-grid-inline .calendar-day.has-external::before { display: none; }
-  .calendar-grid-inline .calendar-day-events { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; min-width: 0; }
+  .calendar-grid-inline .calendar-day-events { display: flex; flex-direction: column; gap: 2px; margin-top: 3px; min-width: 0; }
   .calendar-grid-inline .calendar-day-chip {
     display: block; width: 100%; padding: 2px 4px; border: none; border-radius: 4px;
     background: rgba(255, 51, 102, 0.22); color: #fff;
@@ -12377,8 +12378,8 @@ textarea.form-textarea:focus {
   .calendar-grid-inline .calendar-day-chip.is-external { background: rgba(255, 255, 255, 0.09); color: rgba(255, 255, 255, 0.78); }
   .calendar-grid-inline .calendar-day-chip.is-external-gig { background: rgba(255, 51, 102, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 51, 102, 0.45); color: #fff; }
   .calendar-grid-inline .calendar-day-chip.is-pending { background: rgba(255, 193, 7, 0.14); box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.45); }
-  .calendar-grid-inline .calendar-day-more { font-size: 9px; color: rgba(255, 255, 255, 0.5); padding-left: 4px; }
-  .calendar-grid-inline .schedule-label { bottom: 0; left: 0; right: 0; height: 13px; font-size: 7px; padding: 0 4px; }
+  .calendar-grid-inline .calendar-day .calendar-day-more { position: absolute; top: 0; right: 0; font-size: 9px; line-height: 15px; color: rgba(255, 255, 255, 0.55); padding: 3px 4px 6px 8px; }
+  .calendar-grid-inline .schedule-label { bottom: 0; left: 0; right: 0; height: 11px; font-size: 7px; padding: 0 4px; }
   .calendar-grid-inline .calendar-day.schedule-single .schedule-label { left: 2px; right: 2px; }
 }
 .calendar-grid-inline .calendar-day.is-today:not(.available) {
@@ -12916,7 +12917,7 @@ button.day-sheet-row:active { background: rgba(255, 255, 255, 0.08); }
 .poster-stats { display: flex; align-items: center; gap: 22px; padding: 10px 0; margin-bottom: 14px; border-top: 1px solid rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.12); }
 .poster-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 0; background: none; border: 0; color: inherit; cursor: pointer; min-height: 44px; justify-content: center; }
 div.poster-stat { cursor: default; }
-.poster-stat-value { font-family: var(--font-space-grotesk); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; color: #fff; }
+.poster-stat-value { font-family: var(--font-space-grotesk); font-weight: 600; font-size: 15px; line-height: 1.2; font-variant-numeric: tabular-nums; color: #fff; }
 .poster-stat-label { font-size: 11px; color: rgba(255,255,255,0.65); }
 .poster-stats .poster-badges { margin-left: auto; }
 .poster-own-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
@@ -13709,7 +13710,6 @@ select {
 /* Stats in a rounded card, Badges pill on the right (mock-up) */
 .poster-stats { gap: 18px; padding: 10px 12px 10px 14px; margin: 8px 0 18px; border: 1px solid #22222b; border-radius: 12px; background: #101015; }
 .poster-stat { min-height: 0; }
-.poster-stat-value { font-size: 19px; }
 
 /* Section titles: small grey uppercase (mock-up), everywhere on profiles */
 .poster-h2, .poster-page .profile-embeds h4 { margin: 0 0 12px; font-family: var(--font-space-grotesk); font-weight: 600; font-size: 13px; line-height: 1.2; letter-spacing: 0.16em; text-transform: uppercase; color: #b9b9c6; }
@@ -13749,6 +13749,8 @@ select {
 .section-title-row .poster-h2 { margin-bottom: 12px; }
 .section-add { width: 26px; height: 26px; margin-bottom: 12px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 999px; border: 1px dashed rgba(255,255,255,0.28); background: transparent; color: rgba(255,255,255,0.7); font-size: 16px; line-height: 1; cursor: pointer; }
 .section-add:hover { border-color: #ff3366; color: #ff3366; }
+/* clears the sticky ~58px editor header */
+[data-edit-section] { scroll-margin-top: 72px; }
 /* the section the editor opened at flashes once */
 .edit-section-focus { animation: editSectionFocus 1.6s ease-out; }
 @keyframes editSectionFocus { 0% { box-shadow: 0 0 0 2px rgba(255,51,102,0.7); } 100% { box-shadow: 0 0 0 2px rgba(255,51,102,0); } }

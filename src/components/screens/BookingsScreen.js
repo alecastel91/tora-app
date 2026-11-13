@@ -17,7 +17,7 @@ import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatu
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 import { DOC_CATEGORIES, categoryStatus, documentsStillDue } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
-import { getAuthedBackendUrl, buildPaymentProofUrl, isPdfFile } from '../../utils/urls';
+import { getAuthedBackendUrl, buildPaymentProofUrl, contractFileUrl, hasContractFile, isPdfFile } from '../../utils/urls';
 import { subscribeToDeals } from '../../services/realtime';
 import { OFF_STATUSES, formatFee, isConsentOnlyFor } from '../../utils/dealStatus';
 import { bookingStatusLine, bookingStepsDone, isArtistViaAgent } from '../../utils/bookingStatus';
@@ -86,13 +86,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const getFullUrl = (url, dealId) => getAuthedBackendUrl(url, currentUser?.id, dealId);
 
   const openContractPdf = (deal) => {
-    let url = null;
-    if (deal?.contract?.documentUrl && deal.contract.documentUrl !== 'N/A') {
-      // Pass the deal id so the file endpoint checks this deal, not every deal (F4-03).
-      url = getFullUrl(deal.contract.documentUrl, deal.id);
-    } else if (deal?.contract?.documentId) {
-      url = getFullUrl(`/api/contracts/view/${deal.contract.documentId}`);
-    }
+    const url = contractFileUrl(deal, currentUser?.id);
     if (url) setPdfViewerUrl(url);
     else appAlert(t('bookings.noContractFile')); // a status without a file must not fail silently
   };
@@ -1086,7 +1080,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                 {/* Once both parties have signed, anyone in the deal can
                     pull up the signed contract for reference. Surfaced
                     first so it's the most prominent post-signing action. */}
-                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && (deal.contract.documentUrl || deal.contract.documentId) && (
+                {deal.contract && deal.contract.status === 'FULLY_SIGNED' && hasContractFile(deal) && (
                   <button
                     type="button"
                     className="btn btn-outline"
@@ -1376,7 +1370,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
             FULLY_SIGNED: { status: t('bookings.docStatusSigned'), tone: 'done' },
             NOT_SENT: { status: t('bookings.docStatusNotSent'), tone: 'pending' },
           }[contractStatus] || { status: t('bookings.docStatusAwaitingSignature'), tone: 'pending' }),
-        open: (deal.contract?.documentUrl && deal.contract.documentUrl !== 'N/A') || deal.contract?.documentId ? () => openContractPdf(deal) : null,
+        open: hasContractFile(deal) ? () => openContractPdf(deal) : null,
       },
       ...DOC_CATEGORIES.map((cat) => {
         const state = categoryStatus(deal.sharedDocuments, cat.key);

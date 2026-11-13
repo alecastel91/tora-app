@@ -764,6 +764,7 @@ const es = {
     submit: 'Enviar',
     review: 'Revisar',
     contractFullySignedNotice: 'Contrato firmado por ambas partes — mira la tarjeta del contrato en el chat.',
+    contractFullySignedSeeBooking: 'Contrato firmado por ambas partes — ábrelo desde la tarjeta de la reserva en Bookings.',
     theOtherParty: 'la otra parte',
     theArtistSide: 'la parte del artista',
     contractSentWaiting: 'Contrato enviado — esperando la contrafirma de {{name}}.',

@@ -66,6 +66,22 @@ export function buildPaymentProofUrl(dealId, profileId, type, index = null) {
   return `${backendBaseUrl()}/api/deals/${dealId}/payment-proof?type=${type}&profileId=${profileId}&token=${localStorage.getItem('token')}${idx}`;
 }
 
+const hasStoredContractUrl = (c) => Boolean(c?.documentUrl && c.documentUrl !== 'N/A');
+
+/** Whether a deal's contract has a file to open. */
+export const hasContractFile = (deal) => hasStoredContractUrl(deal?.contract) || Boolean(deal?.contract?.documentId);
+
+/**
+ * Authed viewer URL for a deal's contract file, or null when the contract
+ * has no file. The deal id lets the file endpoint check this deal only (F4-03).
+ */
+export function contractFileUrl(deal, profileId) {
+  const c = deal?.contract;
+  if (hasStoredContractUrl(c)) return getAuthedBackendUrl(c.documentUrl, profileId, deal.id);
+  if (c?.documentId) return getAuthedBackendUrl(`/api/contracts/view/${c.documentId}`, profileId);
+  return null;
+}
+
 /**
  * Resolve a stored Resident Advisor value (full URL or artist name) to the
  * public RA profile URL. Name form: "DNG (1)" -> https://ra.co/dj/dng-1.

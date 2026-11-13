@@ -764,6 +764,7 @@ const zh = {
     submit: '提交',
     review: '查看',
     contractFullySignedNotice: '合同已由双方签署——请查看聊天中的合同卡片。',
+    contractFullySignedSeeBooking: '合同已由双方签署——可在“预订”页的卡片中打开合同。',
     theOtherParty: '对方',
     theArtistSide: '艺人方',
     contractSentWaiting: '合同已发送——等待{{name}}会签。',

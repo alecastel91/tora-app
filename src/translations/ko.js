@@ -764,6 +764,7 @@ const ko = {
     submit: '보내기',
     review: '검토',
     contractFullySignedNotice: '양측이 계약서에 서명했습니다 — 채팅의 계약서 카드를 확인하세요.',
+    contractFullySignedSeeBooking: '양측이 계약서에 서명했습니다 — 부킹 탭의 카드에서 계약서를 열 수 있습니다.',
     theOtherParty: '상대방',
     theArtistSide: '아티스트 측',
     contractSentWaiting: '계약서 전송 완료 — {{name}} 님의 서명 대기 중.',

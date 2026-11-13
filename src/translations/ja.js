@@ -764,6 +764,7 @@ const ja = {
     submit: '送信',
     review: '確認',
     contractFullySignedNotice: '契約が締結されました — チャット内の契約書カードをご覧ください。',
+    contractFullySignedSeeBooking: '契約が締結されました — 「予約」タブのカードから契約書を開けます。',
     theOtherParty: '相手方',
     theArtistSide: 'アーティスト側',
     contractSentWaiting: '契約書を送付しました — {{name}}の署名待ちです。',

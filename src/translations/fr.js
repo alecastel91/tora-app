@@ -764,6 +764,7 @@ const fr = {
     submit: 'Envoyer',
     review: 'Examiner',
     contractFullySignedNotice: 'Contrat signé par les deux parties — voir la carte du contrat dans la discussion.',
+    contractFullySignedSeeBooking: 'Contrat signé par les deux parties — ouvre-le depuis la carte de la réservation dans Bookings.',
     theOtherParty: "l'autre partie",
     theArtistSide: "la partie de l'artiste",
     contractSentWaiting: 'Contrat envoyé — en attente de la contre-signature de {{name}}.',

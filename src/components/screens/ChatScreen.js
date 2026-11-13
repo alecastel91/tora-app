@@ -2395,9 +2395,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   : (selectedOffer.artist?.name || t('chat.theArtistSide'));
 
                 if (isFullySigned) {
+                  // A member who joined the deal later (an agent taking over)
+                  // has no contract card in this chat: point at the booking.
+                  const hasContractCard = userMessages.some((m) => m.dealId === selectedOffer.id
+                    && (m.documentAttachment?.category === 'contracts' || m.text?.includes('Contract sent') || m.text?.includes('sent and signed a contract')));
                   return (
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', textAlign: 'center', width: '100%' }}>
-                      {t('chat.contractFullySignedNotice')}
+                      {t(hasContractCard ? 'chat.contractFullySignedNotice' : 'chat.contractFullySignedSeeBooking')}
                     </span>
                   );
                 }

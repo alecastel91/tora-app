@@ -808,9 +808,10 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
         }
       }
 
-      // Cells are a fixed height so the grid never reflows around its content:
-      // three chips and a count on the desktop's wide month, two on the phone.
-      const chipLimit = nativeDesktop ? 3 : 2;
+      // Cells are a fixed size so the grid never reflows around its content:
+      // three chips and a count on the desktop's wide month, one on the
+      // phone's square days.
+      const chipLimit = nativeDesktop ? 3 : 1;
       const dayExternal = visibleExternal(dateKey);
       const extraCount = Math.max(0, dayDeals.length + dayExternal.length - chipLimit);
       const externalShown = dayExternal.slice(0, Math.max(0, chipLimit - dayDeals.length));

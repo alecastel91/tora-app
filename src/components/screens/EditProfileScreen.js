@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import RoomGearEditor from '../common/RoomGearEditor';
@@ -60,18 +60,21 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
   // preview. The fields below are untouched; the phone renders as before.
   const nativeDesktop = useNativeDesktop();
 
-  // Opened from a "+" on the profile: bring that section into view and
-  // flash it once so the member sees where to add.
-  useEffect(() => {
+  // Opened from a "+" on the profile: the form opens already at that
+  // section (jumped before the first paint, no visible scroll) and flashes
+  // it once. If media above it loads and pushes it away, jump back once.
+  useLayoutEffect(() => {
     if (!focus) return undefined;
-    const timer = setTimeout(() => {
-      const el = document.querySelector(`[data-edit-section="${focus}"]`);
-      if (!el) return;
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      el.classList.add('edit-section-focus');
-      setTimeout(() => el.classList.remove('edit-section-focus'), 1600);
-    }, 250);
-    return () => clearTimeout(timer);
+    const el = document.querySelector(`[data-edit-section="${focus}"]`);
+    if (!el) return undefined;
+    el.scrollIntoView();
+    const landedAt = el.getBoundingClientRect().top;
+    el.classList.add('edit-section-focus');
+    const settle = setTimeout(() => {
+      if (Math.abs(el.getBoundingClientRect().top - landedAt) > 4) el.scrollIntoView();
+    }, 400);
+    const unflash = setTimeout(() => el.classList.remove('edit-section-focus'), 1600);
+    return () => { clearTimeout(settle); clearTimeout(unflash); };
   }, [focus]);
 
   // Parse existing location

@@ -764,6 +764,7 @@ const pt = {
     submit: 'Enviar',
     review: 'Rever',
     contractFullySignedNotice: 'Contrato assinado por ambas as partes — vê o cartão do contrato na conversa.',
+    contractFullySignedSeeBooking: 'Contrato assinado por ambas as partes — abre-o a partir do cartão da reserva em Bookings.',
     theOtherParty: 'a outra parte',
     theArtistSide: 'o lado do artista',
     contractSentWaiting: 'Contrato enviado — à espera da contra-assinatura de {{name}}.',

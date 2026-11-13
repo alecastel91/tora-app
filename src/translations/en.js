@@ -764,6 +764,7 @@ const en = {
     submit: 'Submit',
     review: 'Review',
     contractFullySignedNotice: 'Contract fully signed — see the contract card in the chat.',
+    contractFullySignedSeeBooking: 'Contract fully signed — open it from the booking card in Bookings.',
     theOtherParty: 'the other party',
     theArtistSide: 'the artist side',
     contractSentWaiting: 'Contract sent — waiting for {{name}} to countersign.',
