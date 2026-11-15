@@ -1638,6 +1638,10 @@ const ja = {
     travelLockedBody: 'メンバーがTORAで共有した渡航スケジュールから、誰がどこへ渡航するかを確認できます。プレミアムにアップグレードすると利用できます。',
   },
   search: {
+    nearCity: '都市の近く',
+    nearAnywhere: 'すべての地域',
+    nearHint: 'この距離内のメンバーを、町の名前に関係なく表示します',
+    kmAway: '{{km}} km',
     typeToFilter: '入力して絞り込む…',
     roleArtist: 'アーティスト',
     roleVenue: 'ベニュー',

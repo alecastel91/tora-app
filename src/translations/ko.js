@@ -1638,6 +1638,10 @@ const ko = {
     travelLockedBody: '멤버들이 TORA에 공유한 이동 일정으로 누가 어디로 가는지 확인하세요. 프리미엄으로 업그레이드하면 열 수 있습니다.',
   },
   search: {
+    nearCity: '도시 근처',
+    nearAnywhere: '어디든',
+    nearHint: '도시 이름과 관계없이 이 거리 안의 모든 멤버',
+    kmAway: '{{km}}km 거리',
     typeToFilter: '입력해서 필터…',
     roleArtist: '아티스트',
     roleVenue: '베뉴',
