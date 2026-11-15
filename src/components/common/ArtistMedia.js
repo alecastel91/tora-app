@@ -211,15 +211,21 @@ export const PressPhotos = ({ photos, onAdd }) => {
   );
 };
 
-/** Quiet unlabelled line under the bio: how they play · label. */
+/** Under the bio: "Format: DJ set · Hybrid" and "Label: …", same as the public page. */
 export const PlayLine = ({ profile }) => {
   const { t } = useLanguage();
-  const parts = [
-    list(profile?.playStyles).map((s) => t(`artistPage.play_${s}`)).join(' · '),
-    profile?.label,
-  ].filter(Boolean);
-  if (!parts.length) return null;
-  return <p className="m-0 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-white/60">{parts.map((p) => <span key={p}>{p}</span>)}</p>;
+  const rows = [
+    [t('artistPage.format'), list(profile?.playStyles).map((s) => t(`artistPage.play_${s}`)).join(' · ')],
+    [t('artistPage.label'), profile?.label],
+  ].filter(([, value]) => value);
+  if (!rows.length) return null;
+  return (
+    <dl className="m-0 mt-2 flex flex-col gap-1 text-[13px]">
+      {rows.map(([key, value]) => (
+        <div key={key} className="flex gap-2"><dt className="text-white/45">{key}:</dt><dd className="m-0 text-white/80">{value}</dd></div>
+      ))}
+    </dl>
+  );
 };
 
 /** A promoter who runs nights (promoterKind PERSON) lists them; a party brand IS the night. */

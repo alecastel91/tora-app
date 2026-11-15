@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import { showToast } from '../../utils/toast';
 import { LinkIcon } from '../../utils/icons';
+import PublicShareSheet, { ShareGlyph } from './PublicShareSheet';
 
 export const PUBLIC_SITE = (import.meta.env.VITE_PUBLIC_SITE_URL || 'https://torahub.io').replace(/\/$/, '');
 export const publicPageUrl = (slug) => `${PUBLIC_SITE}/@${slug}`;
@@ -19,6 +20,7 @@ const PublicPageCard = ({ profile, onVerify, onEdit, compact = false }) => {
   const { t } = useLanguage();
   const [state, setState] = useState(null);
   const [igDone, setIgDone] = useState(() => readIgStep(profile?.id));
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -82,7 +84,11 @@ const PublicPageCard = ({ profile, onVerify, onEdit, compact = false }) => {
         <button type="button" onClick={copy} aria-label={t('artistPage.copyLink')} title={t('artistPage.copyLink')} className="public-page-copy">
           <LinkIcon />
         </button>
+        <button type="button" onClick={() => setSharing(true)} aria-label={t('artistPage.share')} title={t('artistPage.share')} className="public-page-copy">
+          <ShareGlyph />
+        </button>
       </div>
+      {sharing && <PublicShareSheet site={PUBLIC_SITE} slug={state.slug} url={publicPageUrl(state.slug)} onClose={() => setSharing(false)} />}
       {!igDone && (
         <div className="public-page-card items-start">
           <button type="button" onClick={markIgDone} aria-label={t('artistPage.igStepDone')} className="public-page-check" />
