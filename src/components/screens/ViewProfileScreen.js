@@ -16,6 +16,7 @@ import LimitReachedModal from '../common/LimitReachedModal';
 import apiService from '../../services/api';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
+import FullBio from '../common/FullBio';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { formatEventDate } from '../../utils/dates';
 import {roleLabel, getAvatarClass } from '../../utils/roles';
@@ -643,11 +644,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
 
         {/* Bio — clamped with see-more; authored line breaks preserved. How
             they play and the label follow as one quiet unlabelled line. */}
-        {profile.bio && (
+        {(profile.bio || profile.bioLong) && (
           <div className="poster-section">
             <h2 className="poster-h2">{t('artistPage.bio')}</h2>
-            <p className={`poster-bio whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>
-            {profile.bio.length > 180 && (
+            {profile.bio && <p className={`poster-bio whitespace-pre-line ${bioExpanded ? '' : 'line-clamp-4'}`}>{profile.bio}</p>}
+            {profile.bio?.length > 180 && (
               <button
                 type="button"
                 className="mt-1 bg-transparent border-none p-0 text-infrared text-xs cursor-pointer hover:underline"
@@ -657,10 +658,11 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
               </button>
             )}
             <div><BioTranslate text={profile.bio} /></div>
+            <FullBio text={profile.bioLong} name={profile.name} />
             <PlayLine profile={profile} />
           </div>
         )}
-        {!profile.bio && <div className="mb-5"><PlayLine profile={profile} /></div>}
+        {!profile.bio && !profile.bioLong && <div className="mb-5"><PlayLine profile={profile} /></div>}
 
         {/* Who represents this artist — one card per agent, each addressable. */}
         <RepresentationSection

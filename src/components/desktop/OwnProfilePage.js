@@ -6,6 +6,7 @@ import PosterBanner from '../common/PosterBanner';
 import BubbleStrip from '../common/BubbleStrip';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
+import FullBio from '../common/FullBio';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
 import PhotoGallery from '../common/PhotoGallery';
@@ -149,11 +150,12 @@ const OwnProfilePage = ({
 
           <OnboardingChecklist key={user?.id || 'anon'} />
 
-          {user?.bio ? (
+          {user?.bio || user?.bioLong ? (
             <div className="d3-panel px-5 py-4">
               <h2 className="poster-h2">{t('profile.about')}</h2>
-              <p className="poster-bio whitespace-pre-line">{user.bio}</p>
+              {user.bio && <p className="poster-bio whitespace-pre-line">{user.bio}</p>}
               <div className="mt-1"><BioTranslate text={user.bio} /></div>
+              <FullBio text={user.bioLong} name={user.name} />
               <PlayLine profile={user} />
             </div>
           ) : (

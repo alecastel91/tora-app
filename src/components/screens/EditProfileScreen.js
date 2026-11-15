@@ -12,7 +12,7 @@ import { appAlert } from '../../utils/dialogs';
 import { RA_URL_RE } from '../common/HighlightsList';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
-import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings } from '../common/ProfileMediaEditors';
+import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
 
 const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
 
@@ -452,7 +452,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
           )}
 
           <div className="form-group" style={{ marginBottom: '0' }}>
-            <label>{t('profile.bio')}</label>
+            <label>{editedUser.role === 'ARTIST' ? t('artistPage.shortBio') : t('profile.bio')}</label>
             <textarea
               value={editedUser.bio || ''}
               onChange={(e) => setEditedUser({ ...editedUser, bio: e.target.value })}
@@ -460,6 +460,20 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
               rows="4"
             />
           </div>
+
+          {/* Artists: the full bio opens behind "Read full bio" under the short one. */}
+          {editedUser.role === 'ARTIST' && (
+            <div className="form-group" style={{ marginTop: '16px', marginBottom: '0' }}>
+              <label>{t('artistPage.fullBio')}</label>
+              <p className="m-0 mb-2 text-xs text-white/40">{t('artistPage.fullBioHint')}</p>
+              <textarea
+                value={editedUser.bioLong || ''}
+                onChange={(e) => setEditedUser({ ...editedUser, bioLong: e.target.value })}
+                maxLength={8000}
+                rows="8"
+              />
+            </div>
+          )}
 
           {editedUser.role === 'ARTIST' && (
             <>
@@ -827,17 +841,24 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                   </button>
                 </div>
                 {/* optional RA event link — only ra.co / residentadvisor.net URLs are stored */}
-                <input
-                  type="url"
-                  className="form-input !text-xs !py-2"
-                  placeholder={t('editProfile.raEventLink')}
-                  value={h.raUrl || ''}
-                  onChange={(e) => {
-                    const next = [...editedUser.pastHighlights];
-                    next[i] = { ...next[i], raUrl: e.target.value.trim() };
-                    setEditedUser({ ...editedUser, pastHighlights: next });
-                  }}
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    className="form-input min-w-0 flex-1 !text-xs !py-2"
+                    placeholder={t('editProfile.raEventLink')}
+                    value={h.raUrl || ''}
+                    onChange={(e) => {
+                      const next = [...editedUser.pastHighlights];
+                      next[i] = { ...next[i], raUrl: e.target.value.trim() };
+                      setEditedUser({ ...editedUser, pastHighlights: next });
+                    }}
+                  />
+                  <MoveButtons
+                    index={i}
+                    count={editedUser.pastHighlights.length}
+                    onMove={(from, to) => setEditedUser({ ...editedUser, pastHighlights: move(editedUser.pastHighlights, from, to) })}
+                  />
+                </div>
                 {(() => {
                   const issue = highlightIssueFor(h);
                   if (!issue) return null;

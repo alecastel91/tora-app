@@ -18,6 +18,7 @@ import { RA_LOGO_WHITE } from '../../utils/brandAssets';
 import ProfileBadges from '../common/ProfileBadges';
 import RoomsTechCard from '../common/RoomsTechCard';
 import BioTranslate from '../common/BioTranslate';
+import FullBio from '../common/FullBio';
 import ChatScreen from './ChatScreen';
 import apiService from '../../services/api';
 import { getAvatarClass, roleLabel, ROLES } from '../../utils/roles';
@@ -703,15 +704,16 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       )}
 
       {/* Bio, then how they play · label as one quiet line */}
-      {user?.bio && (
+      {(user?.bio || user?.bioLong) && (
         <div className="poster-section">
           <h2 className="poster-h2">{t('artistPage.bio')}</h2>
-          <p className="poster-bio whitespace-pre-line">{user.bio}</p>
+          {user.bio && <p className="poster-bio whitespace-pre-line">{user.bio}</p>}
           <BioTranslate text={user.bio} />
+          <FullBio text={user.bioLong} name={user.name} />
           <PlayLine profile={user} />
         </div>
       )}
-      {!user?.bio && <div className="mb-5"><PlayLine profile={user} /></div>}
+      {!user?.bio && !user?.bioLong && <div className="mb-5"><PlayLine profile={user} /></div>}
 
       {/* Who represents me — one card per agent, each opening their profile. */}
       <RepresentationSection

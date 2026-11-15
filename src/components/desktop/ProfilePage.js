@@ -9,6 +9,7 @@ import { networkSectionsForRole } from '../../utils/networkSections';
 import { HeartIcon } from '../../utils/icons';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
+import FullBio from '../common/FullBio';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
 import PhotoGallery from '../common/PhotoGallery';
@@ -156,16 +157,17 @@ const ProfilePage = ({
         {/* ---- body ---- */}
         <div className="d3-vp-body">
           <main className="flex min-w-0 flex-col gap-7">
-            {profile.bio && (
+            {(profile.bio || profile.bioLong) && (
               <Section title={t('profile.about')}>
                 <div className="poster-bio">
-                  <p className="m-0 whitespace-pre-line text-[14px] leading-relaxed text-white/75">{profile.bio}</p>
+                  {profile.bio && <p className="m-0 whitespace-pre-line text-[14px] leading-relaxed text-white/75">{profile.bio}</p>}
                   <div className="mt-1"><BioTranslate text={profile.bio} /></div>
+                  <FullBio text={profile.bioLong} name={profile.name} />
                   <PlayLine profile={profile} />
                 </div>
               </Section>
             )}
-            {!profile.bio && <PlayLine profile={profile} />}
+            {!profile.bio && !profile.bioLong && <PlayLine profile={profile} />}
 
             <RepresentationSection
               profiles={profile.representedByProfiles}

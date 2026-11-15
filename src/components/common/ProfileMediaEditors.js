@@ -15,7 +15,7 @@ const PROVIDER_LABEL = { soundcloud: 'SoundCloud', mixcloud: 'Mixcloud', youtube
 const NIGHT_FREQUENCIES = ['WEEKLY', 'BIWEEKLY', 'MONTHLY', 'QUARTERLY', 'OCCASIONAL'];
 
 const newId = () => Math.random().toString(36).slice(2, 14);
-const move = (arr, from, to) => {
+export const move = (arr, from, to) => {
   if (to < 0 || to >= arr.length) return arr;
   const next = [...arr];
   const [x] = next.splice(from, 1);
@@ -33,7 +33,7 @@ const Thumb = ({ src, wide }) => (
 
 // Reorder arrows sit on the small line under the title; delete stays on the
 // right. Three round buttons on the right left the title ~120px on a phone.
-const MoveButtons = ({ index, count, onMove }) => {
+export const MoveButtons = ({ index, count, onMove }) => {
   const { t } = useLanguage();
   if (count < 2) return null;
   return (
@@ -191,16 +191,20 @@ export const PressPhotosEditor = ({ items, onChange }) => {
   const { t } = useLanguage();
   const list = Array.isArray(items) ? items : [];
   const inputRef = useRef(null);
-  const addFile = async (e) => {
-    const file = e.target.files[0];
+  // Several photos can be picked at once; anything past the cap is left out.
+  const addFiles = async (e) => {
+    const files = Array.from(e.target.files || []).slice(0, MEDIA_CAPS.pressPhotos - list.length);
     e.target.value = '';
-    if (!file || list.length >= MEDIA_CAPS.pressPhotos) return;
-    try {
-      const url = await downscaleImageToDataUrl(file, { maxDimension: 1600, quality: 0.85 });
-      onChange([...list, { url, credit: '' }]);
-    } catch (err) {
-      appAlert(err.message || t('editProfile.saveFailed'));
+    if (!files.length) return;
+    const added = [];
+    for (const file of files) {
+      try {
+        added.push({ url: await downscaleImageToDataUrl(file, { maxDimension: 1600, quality: 0.85 }), credit: '' });
+      } catch (err) {
+        appAlert(err.message || t('editProfile.saveFailed'));
+      }
     }
+    if (added.length) onChange([...list, ...added]);
   };
   return (
     <div>
@@ -221,7 +225,7 @@ export const PressPhotosEditor = ({ items, onChange }) => {
           </button>
         )}
       </div>
-      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={addFile} style={{ display: 'none' }} />
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={addFiles} style={{ display: 'none' }} />
     </div>
   );
 };
