@@ -1575,6 +1575,8 @@ const zh = {
     agencyName: '经纪公司名称',
     agencyNamePlaceholder: '你的经纪公司名称',
     tapGenres: '点选你演奏的音乐风格',
+    yourGenres: "你的风格 · 拖动排序",
+    genresOrderHint: "前 {{n}} 个显示在你的主页和分享图片最前面，其余点击 +N 查看",
     soundcloudMixtape: 'SoundCloud/混音带',
     residentAdvisorLabel: 'Resident Advisor',
     raArtistName: 'RA 艺人名',

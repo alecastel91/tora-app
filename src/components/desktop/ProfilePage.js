@@ -1,4 +1,5 @@
 import PosterBanner from '../common/PosterBanner';
+import GenrePills from '../common/GenrePills';
 import BubbleStrip from '../common/BubbleStrip';
 import ProfileActions from '../common/ProfileActions';
 import React, { useRef } from 'react';
@@ -111,9 +112,8 @@ const ProfilePage = ({
               />
             )}
             {memberSince && <p className="poster-agency">{memberSince}</p>}
-            {(profile?.pronouns || profile?.genres?.length > 0) && (
-              <p className="poster-line">{[profile.pronouns, profile.genres?.length ? profile.genres.join(', ') : null].filter(Boolean).join(' · ')}</p>
-            )}
+            {profile?.pronouns && <p className="poster-line">{profile.pronouns}</p>}
+            <GenrePills genres={profile?.genres} />
           </PosterBanner>
 
           {/* ---- stats strip ---- */}

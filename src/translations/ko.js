@@ -1575,6 +1575,8 @@ const ko = {
     agencyName: '에이전시 이름',
     agencyNamePlaceholder: '에이전시 이름',
     tapGenres: '플레이하는 장르를 선택하세요',
+    yourGenres: "내 장르 · 드래그해서 순서 변경",
+    genresOrderHint: "처음 {{n}}개가 프로필과 공유 이미지 맨 앞에 표시되고, 나머지는 +N에서 볼 수 있어요",
     soundcloudMixtape: 'SoundCloud/믹스테이프',
     residentAdvisorLabel: 'Resident Advisor',
     raArtistName: 'RA 아티스트명',

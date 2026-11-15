@@ -1575,6 +1575,8 @@ const ja = {
     agencyName: 'エージェンシー名',
     agencyNamePlaceholder: 'エージェンシー名を入力',
     tapGenres: 'プレイするジャンルをタップ',
+    yourGenres: "あなたのジャンル · ドラッグで並べ替え",
+    genresOrderHint: "最初の{{n}}つがプロフィールとシェア画像の先頭に表示され、残りは「+N」から見られます",
     soundcloudMixtape: 'SoundCloud/ミックステープ',
     residentAdvisorLabel: 'Resident Advisor',
     raArtistName: 'RAアーティスト名',

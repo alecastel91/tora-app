@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { fmtStat, Section, Panel, Stat, profileLinks } from './primitives';
 import { UploadIcon, EditIcon, SwitchIcon, AddIcon, HandshakeIcon, ListIcon, ShieldIcon } from '../../utils/icons';
 import PosterBanner from '../common/PosterBanner';
+import GenrePills from '../common/GenrePills';
 import BubbleStrip from '../common/BubbleStrip';
 import ProfileBadges from '../common/ProfileBadges';
 import BioTranslate from '../common/BioTranslate';
@@ -99,9 +100,8 @@ const OwnProfilePage = ({
           )}
         >
           {role === 'AGENT' && <AgencyBadge profileId={user?.id} align="left" onOpenProfile={onOpenProfile} />}
-          {(user?.pronouns || user?.genres?.length > 0) && (
-            <p className="poster-line">{[user.pronouns, user.genres?.length ? user.genres.join(', ') : null].filter(Boolean).join(' · ')}</p>
-          )}
+          {user?.pronouns && <p className="poster-line">{user.pronouns}</p>}
+          <GenrePills genres={user?.genres} />
         </PosterBanner>
 
         <div className="d3-poster-stats flex flex-wrap items-center gap-1">

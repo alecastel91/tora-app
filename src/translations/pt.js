@@ -1575,6 +1575,8 @@ const pt = {
     agencyName: 'Nome da agência',
     agencyNamePlaceholder: 'O nome da sua agência',
     tapGenres: 'Toque nos géneros que tocas',
+    yourGenres: "Seus gêneros · arraste para reordenar",
+    genresOrderHint: "Os {{n}} primeiros abrem seu perfil e a imagem para compartilhar; o resto aparece no +N",
     soundcloudMixtape: 'SoundCloud/Mixtape',
     residentAdvisorLabel: 'Resident Advisor',
     raArtistName: 'Nome de artista no RA',

@@ -1575,6 +1575,8 @@ const fr = {
     agencyName: "Nom de l'agence",
     agencyNamePlaceholder: 'Le nom de votre agence',
     tapGenres: 'Touchez les genres que vous jouez',
+    yourGenres: "Tes genres · glisse pour réordonner",
+    genresOrderHint: "Les {{n}} premiers ouvrent ton profil et ton image à partager ; le reste s'affiche avec +N",
     soundcloudMixtape: 'SoundCloud/Mixtape',
     residentAdvisorLabel: 'Resident Advisor',
     raArtistName: "Nom d'artiste sur RA",

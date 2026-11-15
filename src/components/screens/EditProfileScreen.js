@@ -12,6 +12,7 @@ import { appAlert } from '../../utils/dialogs';
 import { RA_URL_RE } from '../common/HighlightsList';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
+import GenreOrder from '../common/GenreOrder';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
 
 const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
@@ -311,6 +312,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
     }
   };
 
+  // New picks go to the end; the order is set by dragging in "Your genres".
   const handleGenreToggle = (genre) => {
     const newGenres = new Set(selectedGenres);
     if (newGenres.has(genre)) {
@@ -518,6 +520,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
         <div className="edit-section" style={{ marginTop: '8px' }}>
           <div className="form-group">
             <label>{t('editProfile.genres')}</label>
+            <GenreOrder genres={Array.from(selectedGenres)} onChange={(next) => setSelectedGenres(new Set(next))} />
             {/* Chip cloud: every genre is a tappable pill; selected = crimson. */}
             <div className="flex flex-wrap gap-2 mt-1">
               {displayedGenres.map(genre => {
