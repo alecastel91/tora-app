@@ -325,6 +325,8 @@ const fr = {
     sendDirect: 'Envoyer directement à l\'artiste',
     directHint: 'L\'artiste gère lui-même cette réservation.',
     connectHint: 'Une fois votre demande acceptée par {{name}}, vous pourrez lui envoyer l\'offre.',
+    connectDraft: 'Bonjour {{name}}, j\'aimerais vous envoyer une offre. Connectons-nous sur TORA.',
+    connectDraftFor: 'Bonjour {{name}}, j\'aimerais vous envoyer une offre pour {{artist}}. Connectons-nous sur TORA.',
     connectSent: 'Demande envoyée à {{name}}. Une fois acceptée, refaites votre offre pour {{artist}} et choisissez cet agent.',
     back: 'Retour',
   },
@@ -340,6 +342,8 @@ const fr = {
   },
 
   offer: {
+    tourDatesHint: "Dates de la tournée : {{from}} – {{to}}",
+    tourFeeHint: "Cachet attendu par l'artiste : {{fee}}",
     timeTbc: 'Horaire à confirmer',
     timeTbcHint: 'Laissez les horaires ouverts pour l\'instant ; ils se fixent dans le chat.',
     eventLogistics: "Logistique de l'Événement",
@@ -1576,6 +1580,7 @@ const fr = {
     agencyNamePlaceholder: 'Le nom de votre agence',
     tapGenres: 'Touchez les genres que vous jouez',
     yourGenres: "Tes genres · glisse pour réordonner",
+    otherGenre: "Autre genre, absent de la liste",
     genresOrderHint: "Les {{n}} premiers ouvrent ton profil et ton image à partager ; le reste s'affiche avec +N",
     soundcloudMixtape: 'SoundCloud/Mixtape',
     residentAdvisorLabel: 'Resident Advisor',

@@ -325,6 +325,8 @@ const ja = {
     sendDirect: 'アーティストに直接送る',
     directHint: 'このブッキングはアーティスト本人が担当します。',
     connectHint: '{{name}}がリクエストを承認すると、オファーを送れるようになります。',
+    connectDraft: '{{name}}さん、オファーをお送りしたいと考えています。TORAでつながりましょう。',
+    connectDraftFor: '{{name}}さん、{{artist}}へのオファーをお送りしたいと考えています。TORAでつながりましょう。',
     connectSent: '{{name}}にリクエストを送りました。承認されたら、もう一度{{artist}}へのオファーを作成し、このエージェントを選んでください。',
     back: '戻る',
   },
@@ -340,6 +342,8 @@ const ja = {
   },
 
   offer: {
+    tourDatesHint: "ツアー日程：{{from}}〜{{to}}",
+    tourFeeHint: "アーティストの希望ギャラ：{{fee}}",
     timeTbc: '時間は後日確定',
     timeTbcHint: '時間は今は未定のままにして、チャットで決められます。',
     eventLogistics: "イベント詳細",
@@ -1576,6 +1580,7 @@ const ja = {
     agencyNamePlaceholder: 'エージェンシー名を入力',
     tapGenres: 'プレイするジャンルをタップ',
     yourGenres: "あなたのジャンル · ドラッグで並べ替え",
+    otherGenre: "リストにない他のジャンル",
     genresOrderHint: "最初の{{n}}つがプロフィールとシェア画像の先頭に表示され、残りは「+N」から見られます",
     soundcloudMixtape: 'SoundCloud/ミックステープ',
     residentAdvisorLabel: 'Resident Advisor',

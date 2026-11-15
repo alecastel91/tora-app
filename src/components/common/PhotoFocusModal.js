@@ -57,7 +57,10 @@ const PhotoFocusModal = ({ open, src, focus, onCancel, onSave }) => {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[10002] flex items-center justify-center bg-black/80 p-5" onClick={onCancel}>
+    // Scrolls as a whole when the phone is shorter than the dialog, so the
+    // title and the Save button are always reachable.
+    <div className="fixed inset-0 z-[10002] overflow-y-auto bg-black/80" onClick={onCancel}>
+      <div className="flex min-h-full items-center justify-center p-4">
       <div className="photo-focus w-full max-w-[560px] rounded-2xl border border-white/10 bg-[#131315] p-5" onClick={(e) => e.stopPropagation()}>
         <h3 className="m-0 text-center font-space-grotesk text-[13px] font-semibold uppercase tracking-[0.08em] text-white">{t('profile.positionPhoto')}</h3>
         <p className="m-0 mt-1.5 mb-4 text-center text-[12px] text-white/50">{t('profile.positionPhotoHint')}</p>
@@ -75,7 +78,7 @@ const PhotoFocusModal = ({ open, src, focus, onCancel, onSave }) => {
             <span className="photo-focus-dot" style={{ left: `${point.x}%`, top: `${point.y}%` }} />
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="photo-focus-previews">
             <div>
               <p className="m-0 mb-1 text-[10px] uppercase tracking-[0.14em] text-white/40">{t('profile.previewPhone')}</p>
               <div className="photo-focus-preview photo-focus-phone"><img src={src} alt="" style={{ objectPosition: position }} /></div>
@@ -92,6 +95,7 @@ const PhotoFocusModal = ({ open, src, focus, onCancel, onSave }) => {
           <button type="button" className="btn btn-outline" onClick={onCancel} disabled={busy}>{t('editProfile.cancel')}</button>
           <button type="button" className="btn btn-primary" onClick={save} disabled={busy}>{busy ? '...' : t('editProfile.save')}</button>
         </div>
+      </div>
       </div>
     </div>,
     document.body,

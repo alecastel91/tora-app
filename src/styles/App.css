@@ -2836,8 +2836,9 @@
 .edit-profile-screen.screen.active {
   display: flex !important;
   flex-direction: column;
-  height: calc(100vh - 120px) !important;
-  max-height: calc(100vh - 120px);
+  /* --edit-screen-h: the measured phone height (useFitScreenHeight). */
+  height: var(--edit-screen-h, calc(100dvh - 120px)) !important;
+  max-height: var(--edit-screen-h, calc(100dvh - 120px));
   min-height: 0 !important;
   /* Transparent like every other .screen: the ambient depth lives on
      .app-container, and painting an opaque panel over it made this screen read
@@ -13757,13 +13758,20 @@ select {
 @media (prefers-reduced-motion: reduce) { .edit-section-focus { animation: none; } }
 
 /* Position photo (PhotoFocusModal) */
-.photo-focus-source { position: relative; width: 240px; max-width: 100%; border-radius: 12px; overflow: hidden; cursor: crosshair; touch-action: none; user-select: none; background: #000; }
-.photo-focus-source img { display: block; width: 100%; height: auto; pointer-events: none; }
+.photo-focus-source { position: relative; width: fit-content; max-width: 100%; border-radius: 12px; overflow: hidden; cursor: crosshair; touch-action: none; user-select: none; background: #000; }
+.photo-focus-source img { display: block; width: auto; max-width: 240px; max-height: 42vh; pointer-events: none; }
+.photo-focus-previews { display: flex; flex-direction: column; gap: 12px; }
 .photo-focus-dot { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 999px; border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(0,0,0,0.5), 0 0 0 9999px rgba(0,0,0,0.25); pointer-events: none; }
 .photo-focus-preview { overflow: hidden; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: #000; }
 .photo-focus-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .photo-focus-phone { width: 150px; height: 160px; }
 .photo-focus-desk { width: 240px; height: 92px; } /* the desktop banner's shape */
+/* Phones: the two previews side by side, smaller, so the dialog fits one screen. */
+@media (max-width: 560px) {
+  .photo-focus-previews { flex-direction: row; align-items: flex-end; }
+  .photo-focus-phone { width: 104px; height: 112px; }
+  .photo-focus-desk { width: 172px; height: 66px; }
+}
 
 /* Payment progress on a booking (WorkflowTimeline) */
 .pay-box { margin-top: 10px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(255,255,255,0.03); }

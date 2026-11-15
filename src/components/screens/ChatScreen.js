@@ -53,10 +53,31 @@ const TRANSLATE_BUTTON_STYLE = {
 // The final payment can never be due before the deposit (same rule as MakeOffer).
 const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
 
+/* The terms on the table now: a counter writes its extras (JSON in
+   additionalTerms) and deadlines to the newest offerHistory entry, while
+   deal.extras keeps the original offer's. */
+const latestTerms = (deal) => {
+  const history = Array.isArray(deal?.offerHistory) ? deal.offerHistory : [];
+  const last = history[history.length - 1] || {};
+  let extras = deal?.extras || {};
+  const raw = last.additionalTerms ?? deal?.additionalTerms;
+  if (raw) {
+    try {
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (parsed && typeof parsed === 'object') extras = parsed;
+    } catch { /* free-text terms: keep the original extras */ }
+  }
+  return {
+    extras,
+    depositDeadline: last.depositDeadline || deal?.depositDeadline || '',
+    finalPaymentDeadline: last.finalPaymentDeadline || deal?.finalPaymentDeadline || '',
+  };
+};
+
 const isCounterOfferMessage = (m) => !!m?.text && m.text.startsWith('Counter-Offer:');
 
 const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealHandled, initialDraft = null }) => {
-  const { user: currentUser, sendMessage, connectedUsers, reloadProfileData } = useAppContext();
+  const { user: currentUser, sendMessage, connectedUsers, reloadProfileData, preferredCurrency } = useAppContext();
   const { t, language } = useLanguage();
   // Per-message translation state, keyed by message id:
   //   { text, showing, loading }  — translated text, whether it's currently
@@ -93,7 +114,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   const [selectedRepresentationRequest, setSelectedRepresentationRequest] = useState(null);
   const [reviewData, setReviewData] = useState({
     fee: '',
-    currency: 'USD',
+    currency: preferredCurrency || 'EUR',
     extras: {},
     depositDeadline: '',
     finalPaymentDeadline: '',
@@ -602,15 +623,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
     if (!selectedOffer) return;
 
     // Pre-fill review form with current offer values
-    const lastEntry = (selectedOffer.offerHistory || [])[
-      (selectedOffer.offerHistory || []).length - 1
-    ] || {};
+    const latest = latestTerms(selectedOffer);
     const newReviewData = {
       fee: selectedOffer.currentFee || '',
-      currency: selectedOffer.currency || 'USD',
-      extras: selectedOffer.extras || {},
-      depositDeadline: lastEntry.depositDeadline || '',
-      finalPaymentDeadline: lastEntry.finalPaymentDeadline || '',
+      currency: selectedOffer.currency || preferredCurrency || 'EUR',
+      extras: latest.extras,
+      depositDeadline: latest.depositDeadline,
+      finalPaymentDeadline: latest.finalPaymentDeadline,
       notes: ''
     };
     setReviewData(newReviewData);
@@ -757,9 +776,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
 
   const handleReviewCounterOffer = async () => {
     // Fetch the full deal so handleSubmitReview has selectedOffer.id available
+    let deal;
     try {
       const response = await apiService.getDeal(counterOfferData.dealId, currentUser.id);
-      const deal = response.deal || response;
+      deal = response.deal || response;
       setSelectedOffer(deal);
     } catch (error) {
       console.error('Error fetching deal for counter-offer review:', error);
@@ -767,15 +787,17 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
       return;
     }
 
-    // Open review modal with counter-offer data pre-filled
-    setReviewData((prev) => ({
+    // Open review modal with the counter-offer pre-filled, payment deadlines
+    // included: countering a counter used to drop them unless retyped.
+    const latest = latestTerms(deal);
+    setReviewData({
       fee: counterOfferData.fee.replace(/,/g, ''),
       currency: counterOfferData.currency,
       extras: counterOfferData.extras,
-      depositDeadline: prev.depositDeadline || '',
-      finalPaymentDeadline: prev.finalPaymentDeadline || '',
+      depositDeadline: latest.depositDeadline,
+      finalPaymentDeadline: latest.finalPaymentDeadline,
       notes: ''
-    }));
+    });
     setShowCounterOfferDetails(false);
     setShowReviewModal(true);
   };
@@ -881,7 +903,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
 
       setShowReviewModal(false);
       setShowOfferDetails(false);
-      setReviewData({ fee: '', currency: 'USD', extras: {}, depositDeadline: '', finalPaymentDeadline: '', notes: '' });
+      setReviewData({ fee: '', currency: preferredCurrency || 'EUR', extras: {}, depositDeadline: '', finalPaymentDeadline: '', notes: '' });
 
       fetchMessages();
     } catch (error) {

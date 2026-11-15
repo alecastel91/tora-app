@@ -8,8 +8,9 @@ import { showToast } from '../../utils/toast';
    channels, and the link. Every share is a TORA ad, so the header says why. */
 
 // The cards are fetched cross-origin; the apex redirects to www, so ask www directly.
-// ?v=me: the artist's own share, so the card says "Find me on TORA".
-const cardUrl = (site, slug, kind) => `${site.replace('://torahub.io', '://www.torahub.io')}/p/${slug}/card/${kind}?v=me`;
+// ?v=me: the artist's own share, so the card says "Find me on TORA". ?t= is the
+// profile's last save: a new URL after every save, so no cache serves an old card.
+const cardUrl = (site, slug, kind, version) => `${site.replace('://torahub.io', '://www.torahub.io')}/p/${slug}/card/${kind}?v=me&t=${version}`;
 
 const Glyph = ({ d, stroke }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"
@@ -27,8 +28,9 @@ const MAIL = 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1
 export const SHARE_GLYPH = 'M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13';
 export const ShareGlyph = () => <Glyph d={SHARE_GLYPH} stroke />;
 
-const PublicShareSheet = ({ site, slug, url, onClose }) => {
+const PublicShareSheet = ({ site, slug, url, updatedAt, onClose }) => {
   const { t } = useLanguage();
+  const [version] = useState(() => Date.parse(updatedAt) || Date.now());
   const [busy, setBusy] = useState(null);
   const [note, setNote] = useState(null);
   const text = t('artistPage.shareMyText');
@@ -44,7 +46,7 @@ const PublicShareSheet = ({ site, slug, url, onClose }) => {
     // tap) so it is one paste into the Link sticker.
     const linkCopied = await navigator.clipboard?.writeText(url).then(() => true, () => false);
     try {
-      const res = await fetch(cardUrl(site, slug, kind));
+      const res = await fetch(cardUrl(site, slug, kind, version));
       if (!res.ok) throw new Error(String(res.status));
       const file = new File([await res.blob()], `${slug}-tora-${kind}.png`, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
@@ -97,7 +99,7 @@ const PublicShareSheet = ({ site, slug, url, onClose }) => {
               <button key={kind} type="button" onClick={() => shareImage(kind)} disabled={busy !== null}
                 className="flex cursor-pointer flex-col items-stretch gap-2 border-0 bg-transparent p-0 text-left disabled:opacity-60">
                 <span className="flex h-[190px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#15151b]">
-                  <img src={cardUrl(site, slug, kind)} alt="" loading="lazy" className={`block h-full object-cover ${kind === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'}`} />
+                  <img src={cardUrl(site, slug, kind, version)} alt="" loading="lazy" className={`block h-full object-cover ${kind === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'}`} />
                 </span>
                 <span className="text-[13px] font-semibold text-white">
                   {busy === kind ? '…' : t(kind === 'story' ? 'artistPage.igStory' : 'artistPage.igPost')}
@@ -128,7 +130,7 @@ const PublicShareSheet = ({ site, slug, url, onClose }) => {
             <button type="button" onClick={copy} aria-label={t('artistPage.copyLink')} className="btn btn-primary btn-sm shrink-0">{t('calendarSync.copy')}</button>
           </div>
 
-          <div className="message-modal-actions">
+          <div className="message-modal-actions mt-6">
             <button type="button" className="btn btn-outline btn-modal-cancel" onClick={onClose}>{t('common.close')}</button>
           </div>
         </div>

@@ -13,6 +13,7 @@ import { RA_URL_RE } from '../common/HighlightsList';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
 import GenreOrder from '../common/GenreOrder';
+import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
 
 const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
@@ -312,6 +313,18 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
     }
   };
 
+  // A genre that isn't on the list, typed in "Other": kept as written
+  // (deduped against the list and the picks, case-insensitive) so new scenes
+  // show up in the data and can join the main list later.
+  const [otherGenre, setOtherGenre] = useState('');
+  const addOtherGenre = () => {
+    const typed = otherGenre.trim().replace(/\s+/g, ' ').slice(0, 40);
+    if (!typed) return;
+    const known = [...genresList, ...selectedGenres].find((g) => g.toLowerCase() === typed.toLowerCase());
+    setSelectedGenres(new Set([...selectedGenres, known || typed]));
+    setOtherGenre('');
+  };
+
   // New picks go to the end; the order is set by dragging in "Your genres".
   const handleGenreToggle = (genre) => {
     const newGenres = new Set(selectedGenres);
@@ -329,8 +342,11 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
     ? genresList
     : genresList.filter((g, i) => i < 12 || selectedGenres.has(g));
 
+  const screenRef = useRef(null);
+  useFitScreenHeight(screenRef, '--edit-screen-h');
+
   return (
-    <div className={`screen active edit-profile-screen${nativeDesktop ? ' d3-edit' : ''}`}>
+    <div ref={screenRef} className={`screen active edit-profile-screen${nativeDesktop ? ' d3-edit' : ''}`}>
       {nativeDesktop ? (
         <EditHeader title={t('profile.editProfile')} onCancel={onClose} onSave={handleSave} saving={saving} blocked={highlightsBlocked} />
       ) : (
@@ -552,6 +568,18 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                   {showAllGenres ? t('manageArtist.showLess') : t('manageArtist.showAllGenres', { count: genresList.length })}
                 </button>
               )}
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                type="text"
+                className="form-input min-w-0 flex-1 !py-2 !text-[13px]"
+                maxLength={40}
+                value={otherGenre}
+                onChange={(e) => setOtherGenre(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addOtherGenre(); } }}
+                placeholder={t('editProfile.otherGenre')}
+              />
+              <button type="button" className="btn btn-outline btn-sm shrink-0" onClick={addOtherGenre} disabled={!otherGenre.trim()}>+ {t('artistPage.add')}</button>
             </div>
             <p className="mt-2 mb-0 text-[10px] text-white/30">
               {selectedGenres.size > 0

@@ -325,6 +325,8 @@ const ko = {
     sendDirect: '아티스트에게 직접 보내기',
     directHint: '이 부킹은 아티스트가 직접 진행합니다.',
     connectHint: '{{name}}님이 요청을 수락하면 오퍼를 보낼 수 있습니다.',
+    connectDraft: '{{name}}님, 오퍼를 보내드리고 싶습니다. TORA에서 연결해요.',
+    connectDraftFor: '{{name}}님, {{artist}} 관련 오퍼를 보내드리고 싶습니다. TORA에서 연결해요.',
     connectSent: '{{name}}님에게 요청을 보냈습니다. 수락되면 {{artist}} 오퍼를 다시 만들고 이 에이전트를 선택하세요.',
     back: '뒤로',
   },
@@ -340,6 +342,8 @@ const ko = {
   },
 
   offer: {
+    tourDatesHint: "투어 일정: {{from}} – {{to}}",
+    tourFeeHint: "아티스트 희망 출연료: {{fee}}",
     timeTbc: '시간 추후 확정',
     timeTbcHint: '시간은 비워 두고 채팅에서 정할 수 있습니다.',
     eventLogistics: "이벤트 상세",
@@ -1576,6 +1580,7 @@ const ko = {
     agencyNamePlaceholder: '에이전시 이름',
     tapGenres: '플레이하는 장르를 선택하세요',
     yourGenres: "내 장르 · 드래그해서 순서 변경",
+    otherGenre: "목록에 없는 다른 장르",
     genresOrderHint: "처음 {{n}}개가 프로필과 공유 이미지 맨 앞에 표시되고, 나머지는 +N에서 볼 수 있어요",
     soundcloudMixtape: 'SoundCloud/믹스테이프',
     residentAdvisorLabel: 'Resident Advisor',

@@ -1,4 +1,4 @@
-import { clampDateRange } from '../../utils/dates';
+import { clampDateRange, formatEventDate } from '../../utils/dates';
 import React, { useState, useEffect } from 'react';
 import { CURRENCY_OPTIONS } from './CurrencyOptions';
 import ReactDOM from 'react-dom';
@@ -17,10 +17,14 @@ import { useLanguage } from '../../contexts/LanguageContext';
 // The final payment can never be due before the deposit.
 const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
 
-const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null, onSuccess, dockAsDrawer = false, preferCountry = null }) => {
+const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null, onSuccess, dockAsDrawer = false, preferCountry = null, tour = null, suggestedDate = null }) => {
   const { t } = useLanguage();
 
-  const { user: currentUser } = useAppContext();
+  const { user: currentUser, preferredCurrency } = useAppContext();
+  // An offer made on a Tour Kickstart tour: its dates bound the date picker.
+  const tourDay = (d) => (d ? String(d).slice(0, 10) : '');
+  const tourFrom = tour ? tourDay(tour.startDate) : '';
+  const tourTo = tour ? tourDay(tour.endDate) : '';
   const [loading, setLoading] = useState(false);
   const nativeDesktop = useNativeDesktop(); // desktop-v3.css docks this as a drawer
   const [error, setError] = useState('');
@@ -32,6 +36,30 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
   const [eventImage, setEventImage] = useState(null); // data URL for the booking page header
   // A photo picked for one offer must not carry over to the next recipient.
   useEffect(() => { if (!isOpen) setEventImage(null); }, [isOpen]);
+  // The rooms the venue listed (Edit profile → rooms): its own for a venue,
+  // the picked TORA venue's for a promoter. Picking one fills stage + capacity.
+  const [pickedVenueRooms, setPickedVenueRooms] = useState(null);
+  const venueRoomList = ((currentUser?.role === 'VENUE' ? currentUser.venueRoomsSpec : pickedVenueRooms) || [])
+    .filter((r) => r && String(r.name || '').trim());
+  // The nights a promoter runs (Edit profile → nights): one tap fills the
+  // event name and venue they retyped on every offer, and the city when it
+  // is the promoter's own.
+  const myNights = (Array.isArray(currentUser?.nights) ? currentUser.nights : []).filter((n) => n && String(n.name || '').trim());
+  const pickNight = (night) => {
+    const ownCity = night.city && currentUser.city && night.city.trim().toLowerCase() === currentUser.city.toLowerCase();
+    setFormData((prev) => ({
+      ...prev,
+      eventName: night.name,
+      ...(night.venue && currentUser.role !== 'VENUE' ? { venueName: night.venue, eventVenueId: '' } : {}),
+      ...(ownCity ? { city: currentUser.city, country: currentUser.country, zone: currentUser.zone || '' } : {}),
+    }));
+    if (ownCity) setGeoPrefillKey((k) => k + 1);
+  };
+  const pickRoom = (room) => setFormData((prev) => ({
+    ...prev,
+    eventStage: room.name,
+    ...(room.capacity ? { eventCapacity: String(room.capacity) } : {}),
+  }));
 
   // Form state - simplified for Venue/Promoter initial offer
   const [formData, setFormData] = useState({
@@ -83,7 +111,16 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
         try {
           // Fetch the full profile data to get representingArtists array
           const profileData = await apiService.getProfile(recipientProfile.id);
-          setRepresentedArtists(profileData.representingArtists || []);
+          const roster = profileData.representingArtists || [];
+          setRepresentedArtists(roster);
+          // An agent with one artist: that is who the offer is for.
+          if (roster.length === 1 && roster[0].profileId) {
+            setFormData((prev) => (prev.selectedArtistId ? prev : {
+              ...prev,
+              selectedArtistId: roster[0].profileId,
+              selectedArtistName: roster[0].name || '',
+            }));
+          }
         } catch (error) {
           console.error('Error fetching represented artists:', error);
           setRepresentedArtists([]);
@@ -114,13 +151,30 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
         if (!next.venueName) next.venueName = currentUser.name;
         if (next.eventCapacity === '' && currentUser.venueCapacity != null) next.eventCapacity = String(currentUser.venueCapacity);
         if (next.eventRoomsCount === '' && currentUser.venueRooms != null) next.eventRoomsCount = String(currentUser.venueRooms);
+        // One listed room is the room.
+        const named = (currentUser.venueRoomsSpec || []).filter((r) => r && String(r.name || '').trim());
+        if (named.length === 1 && !next.eventStage) next.eventStage = named[0].name;
       }
-      // Geography prefill from the initiator's own profile location.
-      if (!next.city && !next.country && currentUser.city && currentUser.country) {
+      // Geography prefill from the initiator's own profile location — unless
+      // this offer is for a tour somewhere else: then the tour's country.
+      const tourElsewhere = tour && (tour.country ? tour.country !== currentUser.country : tour.zone && tour.zone !== currentUser.zone);
+      if (!next.city && !next.country && tourElsewhere) {
+        next.country = tour.country || '';
+        next.zone = tour.zone || '';
+      } else if (!next.city && !next.country && currentUser.city && currentUser.country) {
         next.city = currentUser.city;
         next.country = currentUser.country;
         next.zone = currentUser.zone || '';
       }
+      // A one-day tour has its date; any tour has its currency (the artist's,
+      // the one their minimum is in). Otherwise the member's own currency.
+      if (tour && !next.date && tourFrom && tourFrom === tourTo) next.date = tourFrom;
+      // From Calendar Matches: the first night both sides have open.
+      if (!next.date && suggestedDate) next.date = suggestedDate;
+      next.currency = (tour && tour.revenueCurrency) || preferredCurrency || next.currency;
+      // An artist who only plays live is booked for a live performance.
+      const styles = recipientProfile.role === 'ARTIST' ? recipientProfile.playStyles || [] : [];
+      if (styles.length && styles.every((s) => s === 'LIVE')) next.performanceType = 'Live Performance';
       // Lineup row 0 = the booked artist (direct recipient, or the agent's
       // chosen artist once picked).
       const bookedName = recipientProfile.role === 'ARTIST' ? recipientProfile.name : '';
@@ -176,6 +230,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
 
   // A promoter picking a TORA venue prefills capacity/rooms/location from it.
   const handleVenuePick = (name, id, venue) => {
+    setPickedVenueRooms(Array.isArray(venue?.venueRoomsSpec) ? venue.venueRoomsSpec : null);
     setFormData((prev) => {
       const next = { ...prev, venueName: name, eventVenueId: id || '' };
       if (venue) {
@@ -498,6 +553,16 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
 
             <div className="form-group">
               <label>{t('offer.eventName')}</label>
+              {myNights.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {myNights.map((night) => (
+                    <button key={night.name} type="button" onClick={() => pickNight(night)}
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-[12px] ${formData.eventName === night.name ? 'border-infrared bg-infrared/15 text-white' : 'border-white/15 bg-transparent text-white/70'}`}>
+                      {night.name}
+                    </button>
+                  ))}
+                </div>
+              )}
               <input
                 type="text"
                 value={formData.eventName}
@@ -557,10 +622,15 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               <input className="form-input"
                 type="date"
                 value={formData.date}
+                min={tourFrom || undefined}
+                max={tourTo || undefined}
                 onChange={(e) => handleChange('date', e.target.value)}
                 className="form-input"
                 required
               />
+              {tour && tourFrom && (
+                <span className="form-hint">{t('offer.tourDatesHint', { from: formatEventDate(tourFrom, t('dateFormat.locale')), to: formatEventDate(tourTo, t('dateFormat.locale')) })}</span>
+              )}
             </div>
 
             <div className="form-group">
@@ -608,9 +678,12 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
                   className="form-input"
                   required
                 />
+                {tour && !tour.hideFee && tour.feeExpectation && (
+                  <span className="form-hint">{t('offer.tourFeeHint', { fee: tour.feeExpectation })}</span>
+                )}
               </div>
 
-              <div className="form-group" style={{ flex: 1 }}>
+              <div className="form-group" style={{ flex: 1, alignSelf: 'flex-start' }}>
                 <label>{t('chat.currency')}</label>
                 <select
                   value={formData.currency}
@@ -821,6 +894,16 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
 
             <div className="form-group">
               <label>{t('offer.eventStage')} *</label>
+              {venueRoomList.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {venueRoomList.map((room) => (
+                    <button key={room.name} type="button" onClick={() => pickRoom(room)}
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-[12px] ${formData.eventStage === room.name ? 'border-infrared bg-infrared/15 text-white' : 'border-white/15 bg-transparent text-white/70'}`}>
+                      {room.name}{room.capacity ? ` · ${room.capacity}` : ''}
+                    </button>
+                  ))}
+                </div>
+              )}
               <input
                 type="text"
                 value={formData.eventStage}

@@ -88,7 +88,7 @@ const PublicPageCard = ({ profile, onVerify, onEdit, compact = false }) => {
           <ShareGlyph />
         </button>
       </div>
-      {sharing && <PublicShareSheet site={PUBLIC_SITE} slug={state.slug} url={publicPageUrl(state.slug)} onClose={() => setSharing(false)} />}
+      {sharing && <PublicShareSheet site={PUBLIC_SITE} slug={state.slug} url={publicPageUrl(state.slug)} updatedAt={profile?.updatedAt} onClose={() => setSharing(false)} />}
       {!igDone && (
         <div className="public-page-card items-start">
           <button type="button" onClick={markIgDone} aria-label={t('artistPage.igStepDone')} className="public-page-check" />

@@ -325,6 +325,8 @@ const zh = {
     sendDirect: '直接发给艺人',
     directHint: '此预订由艺人本人负责。',
     connectHint: '{{name}}接受您的请求后，您就可以向其发送报价。',
+    connectDraft: '{{name}}您好，我想向您发送一份报价。我们在TORA上建立联系吧。',
+    connectDraftFor: '{{name}}您好，我想为{{artist}}向您发送一份报价。我们在TORA上建立联系吧。',
     connectSent: '请求已发送给{{name}}。对方接受后，请重新为{{artist}}发起报价并选择对方。',
     back: '返回',
   },
@@ -340,6 +342,8 @@ const zh = {
   },
 
   offer: {
+    tourDatesHint: "巡演日期：{{from}} – {{to}}",
+    tourFeeHint: "艺人期望的演出费：{{fee}}",
     timeTbc: '时间待定',
     timeTbcHint: '先不填时间，可以在聊天中商定。',
     eventLogistics: "活动详情",
@@ -1576,6 +1580,7 @@ const zh = {
     agencyNamePlaceholder: '你的经纪公司名称',
     tapGenres: '点选你演奏的音乐风格',
     yourGenres: "你的风格 · 拖动排序",
+    otherGenre: "列表中没有的其他风格",
     genresOrderHint: "前 {{n}} 个显示在你的主页和分享图片最前面，其余点击 +N 查看",
     soundcloudMixtape: 'SoundCloud/混音带',
     residentAdvisorLabel: 'Resident Advisor',

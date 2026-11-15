@@ -136,6 +136,19 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
   const [pdfViewerUrl, setPdfViewerUrl] = useState(null);
   const [viewConfirmedSignal, setViewConfirmedSignal] = useState(0);
   const [depositInput, setDepositInput] = useState('');
+  // The deposit a booker most often sends: half the fee for the first one,
+  // the remaining balance for any after it. Editable, never assumed.
+  const depositSuggestion = (deal) => {
+    const pay = summarizeDealPayment(deal);
+    const amount = pay.markedDeposit > 0 ? pay.remaining : pay.totalFee / 2;
+    return amount > 0 ? String(Math.round(amount * 100) / 100) : '';
+  };
+  const openPaymentModal = (deal) => {
+    setSelectedDealForWorkflow(deal);
+    setShowDepositAgain(false);
+    setDepositInput(depositSuggestion(deal));
+    setShowPaymentModal(true);
+  };
   const [paymentProofFile, setPaymentProofFile] = useState(null);
   const [proofImageUrl, setProofImageUrl] = useState(null);
   const [depositHistoryDeal, setDepositHistoryDeal] = useState(null);
@@ -1174,11 +1187,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   return (
                     <button
                       className="btn btn-outline"
-                      onClick={() => {
-                        setSelectedDealForWorkflow(deal);
-                        setShowDepositAgain(false);
-                        setShowPaymentModal(true);
-                      }}
+                      onClick={() => openPaymentModal(deal)}
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -1652,11 +1661,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                           {isBookerSide && (
                             <button
                               className="btn btn-outline btn-sm"
-                              onClick={() => {
-                                setSelectedDealForWorkflow(deal);
-                                setShowDepositAgain(false);
-                                setShowPaymentModal(true);
-                              }}
+                              onClick={() => openPaymentModal(deal)}
                             >
                               {t('bookings.updatePayment')}
                             </button>
@@ -2239,7 +2244,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                         ? t('bookings.depositAlreadySent', { amount: `${formatFee(last.amount)} ${paySummary.currency}`, date: formatTimestamp(last.date, t('dateFormat.locale')) })
                         : t('bookings.depositAlreadySent', { amount: `${formatFee(paySummary.markedDeposit)} ${paySummary.currency}`, date: '' })}
                       {' '}
-                      <button type="button" className="link-btn" onClick={() => setShowDepositAgain(true)}>{t('bookings.addAnotherDeposit')}</button>
+                      <button type="button" className="link-btn" onClick={() => { setShowDepositAgain(true); setDepositInput(depositSuggestion(selectedDealForWorkflow)); }}>{t('bookings.addAnotherDeposit')}</button>
                     </p>
                   ) : null;
                 })()}
@@ -2251,7 +2256,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
                   backgroundColor: 'rgba(255,255,255,0.02)',
                 }}>
                   <label style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontWeight: 600 }}>
-                    Deposit transferred ({selectedDealForWorkflow.currency || 'USD'} · total fee {selectedDealForWorkflow.currentFee})
+                    Deposit transferred ({summarizeDealPayment(selectedDealForWorkflow).currency} · total fee {selectedDealForWorkflow.currentFee})
                   </label>
                   <input
                     type="number"

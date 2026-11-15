@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import OverlayPortal from '../common/OverlayPortal';
 import FilterSheet, { FilterButton } from '../common/FilterSheet';
 import { CURRENCY_OPTIONS, CURRENCY_OPTIONS_WITH_SYMBOL } from '../common/CurrencyOptions';
@@ -29,7 +30,7 @@ import { useNativeDesktop } from '../../utils/desktopV2';
 import TourBoard from '../desktop/TourBoard';
 
 const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange, onOpenPremium, accountUser, isActive = true }) => {
-  const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers } = useAppContext();
+  const { user, getCalendarMatches, sentRequests, sendConnectionRequest, connectedUsers, preferredCurrency } = useAppContext();
   const { t } = useLanguage();
   const tourStatusLabel = (st) => ({ ACTIVE: t('tour.statusActive'), COMPLETED: t('tour.statusCompleted'), CANCELLED: t('tour.statusCancelled') }[st] || st);
 
@@ -228,32 +229,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // Calendar Matches state
   const [viewingProfile, setViewingProfile] = useState(null);
 
-  // Exact screen height: the CSS 100vh calc over-shoots on iPhones (100vh
-  // includes the collapsed-URL-bar area), which let the whole page scroll.
-  // Measure the space the scroller actually gives us and pin the screen to it.
-  // Re-keyed on viewingProfile — the root remounts around that early return.
+  // Exact phone height (see useFitScreenHeight). Re-keyed on viewingProfile —
+  // the root remounts around that early return.
   const screenRef = useRef(null);
-  useEffect(() => {
-    const el = screenRef.current;
-    if (!el) return undefined;
-    const measure = () => {
-      // Phones only: desktop lets the page scroll (responsive.css) and
-      // ignores --tour-screen-h.
-      if (window.matchMedia('(min-width: 1024px)').matches) return;
-      const scroller = el.closest('.app-content');
-      if (!scroller || scroller.clientHeight < 100) return; // hidden keep-mounted panel
-      // NaN-only fallback: desktop legitimately has padding-bottom 0 (sidebar
-      // layout), and `|| 70` would treat that real 0 as missing.
-      const pb = parseFloat(getComputedStyle(scroller).paddingBottom);
-      const padBottom = Number.isNaN(pb) ? 70 : pb;
-      el.style.setProperty('--tour-screen-h', `${Math.max(320, Math.round(scroller.clientHeight - padBottom))}px`);
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    const ro = new ResizeObserver(measure); // fires when the hidden tab becomes visible
-    ro.observe(el);
-    return () => { window.removeEventListener('resize', measure); ro.disconnect(); };
-  }, [viewingProfile]);
+  useFitScreenHeight(screenRef, '--tour-screen-h', [viewingProfile]);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [message, setMessage] = useState('');
@@ -386,23 +365,35 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     setTourZoneFilter('all'); setTourCountryFilter('all');
     setTourGenreFilter([]); setTourMonthFilter('all');
   };
-  const [tourForm, setTourForm] = useState({
-    artistId: '', // agents create tours on behalf of a represented artist
+  // A blank tour in the member's own currency; an agent with one artist has
+  // them picked already.
+  const blankTourForm = () => ({
+    artistId: roster.length === 1 ? rosterEntryId(roster[0]) : '',
     hideFee: false,
     zone: '',
     country: '', // Optional - if selected, tour is country-specific
     startDate: '',
     endDate: '',
     minRevenue: '',
-    revenueCurrency: 'EUR',
-    feeCurrency: 'EUR',
+    revenueCurrency: preferredCurrency || 'EUR',
+    feeCurrency: preferredCurrency || 'EUR',
     feeMin: '',
     feeMax: '',
     additionalNotes: ''
   });
+  const [tourForm, setTourForm] = useState(blankTourForm);
+  // An untouched form is rebuilt on open, so the currency and sole artist
+  // reflect what has loaded since mount; a half-typed draft is kept.
+  const openCreateTour = () => {
+    closeTourPanes();
+    setTourForm((f) => (f.zone || f.startDate || f.minRevenue ? f : blankTourForm()));
+    setShowCreateTourModal(true);
+  };
 
   // Modal states
   const [showMakeOfferModal, setShowMakeOfferModal] = useState(false);
+  const [offerTour, setOfferTour] = useState(null);
+  const [offerDate, setOfferDate] = useState(null);
 
   // Portaled sub-panes escape the hidden keep-mounted panel — close them when
   // this tab deactivates. MUST live above every early return (viewingProfile
@@ -663,11 +654,19 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const matches = filteredMatches;
 
 
-  const handleConnect = (profile) => {
+  // `draft` pre-writes the request (Calendar Matches: the shared dates).
+  const handleConnect = (profile, draft = '') => {
     if (!sentRequests.has(profile.id)) {
       setSelectedProfile(profile);
+      setMessage(draft);
       setShowMessageModal(true);
     }
+  };
+
+  // The first shared night from today on, as YYYY-MM-DD, for the offer form.
+  const firstSharedDate = (match) => {
+    const today = new Date().toISOString().slice(0, 10);
+    return (match?.rawDates || []).map(normalizeDate).filter((d) => d && d >= today).sort()[0] || null;
   };
 
   const handleMessage = (profile, draft = null) => {
@@ -934,6 +933,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             <button className="btn btn-primary" onClick={() => {
               setSelectedTourArtist(prof);
               setOfferCountry(prof.country || null);
+              setOfferDate(pickedMatch.kind === 'match' ? firstSharedDate(pickedMatch.match) : null);
               setShowMakeOfferModal(true);
             }}>
               {t('tour.makeAnOffer')}
@@ -948,7 +948,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             </button>
           ) : (
             <button className={`btn ${isRequested ? 'btn-disabled' : canOffer(prof) ? '' : 'btn-primary'}`}
-              onClick={() => handleConnect(prof)} disabled={isRequested}>
+              onClick={() => handleConnect(prof, pickedMatch.kind === 'match'
+                ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
+                : '')} disabled={isRequested}>
               {isRequested ? t('search.requested') : t('search.connect')}
             </button>
           )}
@@ -1057,7 +1059,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       ) : (
                         <button
                           className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
-                          onClick={() => handleConnect(match.profile)}
+                          onClick={() => handleConnect(match.profile, t('tour.matchDraft', { name: match.profile.name, dates: match.dates }))}
                           disabled={isRequested}
                         >
                           {isRequested ? t('search.requested') : t('search.connect')}
@@ -1236,20 +1238,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         setMyTours([response.tour, ...myTours]);
 
         // Reset form and close modal
-        setTourForm({
-          artistId: '',
-          hideFee: false,
-          zone: '',
-          country: '',
-          startDate: '',
-          endDate: '',
-          minRevenue: '',
-          revenueCurrency: 'EUR',
-          feeCurrency: 'EUR',
-          feeMin: '',
-          feeMax: '',
-          additionalNotes: ''
-        });
+        setTourForm(blankTourForm());
         setShowCreateTourModal(false);
 
         appAlert(t('tour.tourCreated'));
@@ -1265,6 +1254,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   // Handle Make Offer (for tours)
   const handleMakeOffer = (tour) => {
     setSelectedTour(tour);
+    setOfferTour(tour); // the offer form pre-fills from it (dates, country, currency, fee hint)
     setSelectedTourArtist(tour.artist); // Set the artist profile for MakeOfferModal
     setShowMakeOfferModal(true);
   };
@@ -1349,18 +1339,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
 
       // Close modal and reset form
       setShowEditTourModal(false);
-      setTourForm({
-        zone: '',
-        country: '',
-        startDate: '',
-        endDate: '',
-        minRevenue: '',
-        revenueCurrency: 'EUR',
-        feeCurrency: 'EUR',
-        feeMin: '',
-        feeMax: '',
-        additionalNotes: ''
-      });
+      setTourForm(blankTourForm());
       setSelectedTour(null);
 
       appAlert(t('tour.tourUpdated'));
@@ -1943,7 +1922,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
             {renderSubTabHeader({
               intro: t('tour.kickstartIntro'),
               action: (
-                <button className="btn btn-primary btn-small shrink-0" onClick={() => { closeTourPanes(); setShowCreateTourModal(true); }}>
+                <button className="btn btn-primary btn-small shrink-0" onClick={openCreateTour}>
                   <span>+ {t('tour.createTour')}</span>
                 </button>
               ),
@@ -2294,7 +2273,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       </select>
                     )}
                     {owner
-                      ? <button className="btn btn-primary btn-small shrink-0" onClick={() => { closeTourPanes(); setShowCreateTourModal(true); }}>+ {t('tour.createTour')}</button>
+                      ? <button className="btn btn-primary btn-small shrink-0" onClick={openCreateTour}>+ {t('tour.createTour')}</button>
                       : <FilterButton count={tourFilterCount} onClick={() => setShowTourFilters(true)} label={t('search.filters')} />}
                   </>
                 )}
@@ -2399,13 +2378,19 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);
           setOfferCountry(null);
+          setOfferTour(null);
+          setOfferDate(null);
         }}
         recipientProfile={selectedTourArtist}
         preferCountry={offerCountry || selectedTour?.country || null}
+        tour={offerTour}
+        suggestedDate={offerDate}
         onSuccess={() => {
           setShowMakeOfferModal(false);
           setSelectedTourArtist(null);
           setOfferCountry(null);
+          setOfferTour(null);
+          setOfferDate(null);
           // Navigate to Messages tab to see the offer
           onNavigateToMessages();
         }}

@@ -3,6 +3,7 @@ import { genresList } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel, ROLES } from '../../utils/roles';
 import CitySearch from '../common/CitySearch';
+import { useAppContext } from '../../contexts/AppContext';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -16,13 +17,19 @@ const AddProfileScreen = ({ onClose, onSuccess, takenRoles = [] }) => {
   const [submitted, setSubmitted] = useState(false);
   const [attempted, setAttempted] = useState(false);
 
+  // Same person, same city and sound: start from the profile in use. Links
+  // are left empty, since a new role usually has its own pages (a venue's
+  // Instagram is not its owner's).
+  const { user: from } = useAppContext();
+  const fromCity = from?.city && from?.country ? from : null;
+
   // Form state
   const [role, setRole] = useState('');
   const [profileName, setProfileName] = useState('');
-  const [zone, setZone] = useState('');
-  const [country, setCountry] = useState('');
-  const [city, setCity] = useState('');
-  const [genres, setGenres] = useState([]);
+  const [zone, setZone] = useState(fromCity?.zone || '');
+  const [country, setCountry] = useState(fromCity?.country || '');
+  const [city, setCity] = useState(fromCity?.city || '');
+  const [genres, setGenres] = useState(() => (Array.isArray(from?.genres) ? from.genres.filter((g) => genresList.includes(g)) : []));
   const [instagram, setInstagram] = useState('');
   const [residentAdvisor, setResidentAdvisor] = useState('');
   const [soundcloud, setSoundcloud] = useState('');
