@@ -249,6 +249,16 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Search globe, Travelling view: trips and tours overlapping [from, to].
+  async getOnTheRoad(profileId, from, to) {
+    const params = new URLSearchParams({ profileId, from, to });
+    const response = await fetch(`${API_URL}/profiles/on-the-road?${params}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(response);
+  }
+
   async getProfileSuggestions(profileId) {
     const response = await fetch(`${API_URL}/profiles/suggestions?profileId=${encodeURIComponent(profileId || '')}`, {
       method: 'GET',

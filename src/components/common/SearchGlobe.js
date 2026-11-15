@@ -7,11 +7,27 @@ import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
 import LoadingGlobe from './LoadingGlobe';
 import PhotoCard from './PhotoCard';
+import { useAppContext } from '../../contexts/AppContext';
+import apiService from '../../services/api';
+import { formatEventDate } from '../../utils/dates';
 
 // Country geometry is decoded once at module load (shared across mounts).
 const LAND = feature(worldData, worldData.objects.countries);
 const BORDERS = mesh(worldData, worldData.objects.countries, (a, b) => a !== b);
 const GRATICULE = geoGraticule10();
+// Close in, coastlines and islands come from the 1:50m atlas, fetched the
+// first time someone zooms past DETAIL_ZOOM (the 1:110m one stays for the
+// whole-globe view, where the extra detail is invisible and costs frames).
+const DETAIL_ZOOM = 2.2;
+let DETAIL = null; // { land, borders } once loaded
+let detailLoading = false;
+const loadDetail = () => {
+  if (DETAIL || detailLoading) return;
+  detailLoading = true;
+  import('world-atlas/countries-50m.json').then(({ default: w }) => {
+    DETAIL = { land: feature(w, w.objects.countries), borders: mesh(w, w.objects.countries, (a, b) => a !== b) };
+  }).catch(() => { detailLoading = false; });
+};
 const SPHERE = { type: 'Sphere' };
 
 const ROLES = ['ARTIST', 'AGENT', 'PROMOTER', 'VENUE'];
@@ -26,33 +42,82 @@ const LABEL_ALL_ZOOM = 4.0;      // country-level: every visible pin is labelled
 const MAJOR_KEYS = new Set(FEATURED_HUBS.map((n) => normalizeCity(n)));
 
 const cityNameOf = (p) => p.city || (p.location || '').split(',')[0].trim();
+const countryOf = (p) => p.country || (p.location || '').split(',').slice(1).join(',').trim();
 
-// Group the (already server-filtered) profiles by mapped city.
+// The centre of a country on the atlas, for trips and tours that name no city.
+const countryCentroid = (country) => {
+  const name = atlasCountryName(country);
+  const f = name && LAND.features.find((c) => (c.properties?.name || '').toLowerCase() === name);
+  return f ? geoCentroid(f) : null;
+};
+
+// Group the (already server-filtered) profiles by place. The server sends
+// each row's real coordinates (any city a member can pick); the hub table is
+// only the fallback for rows without them. Keyed by city AND country, so two
+// cities sharing a name stay two pins.
 function groupByCity(profiles) {
   const map = new Map();
   let unmapped = 0;
   for (const p of profiles || []) {
     const name = cityNameOf(p);
-    const coord = coordsForCity(name);
+    const coord = p.coord || coordsForCity(name);
     if (!coord) { unmapped += 1; continue; }
-    const key = normalizeCity(name);
-    if (!map.has(key)) {
-      map.set(key, { key, name, country: p.country || (p.location || '').split(',').slice(1).join(',').trim(), coord, profiles: [] });
-    }
+    const country = countryOf(p);
+    const cityKey = normalizeCity(name);
+    const key = `${cityKey}|${country.toLowerCase()}`;
+    if (!map.has(key)) map.set(key, { key, cityKey, name, country, coord, profiles: [] });
     map.get(key).profiles.push(p);
   }
   return { list: [...map.values()], unmapped };
 }
 
+// "Travelling" view: one entry per trip, placed at its destination, carrying
+// the trip itself (dates, home city, tour or travel) for the panel rows.
+const tripItems = (rows) => rows.map((r, i) => {
+  const coord = r.coord || countryCentroid(r.destCountry);
+  return {
+    ...r.profile,
+    _profile: r.profile, // what opens: the member as they are, not the trip
+    _key: `${r.profile.id}-${i}`,
+    city: r.destCity || r.destCountry,
+    country: r.destCountry,
+    coord,
+    _trip: { kind: r.kind, from: r.startDate, to: r.endDate, home: r.profile.city, country: r.destCountry },
+  };
+});
+
+const isoDay = (offset) => new Date(Date.now() + offset * 864e5).toISOString().slice(0, 10);
+const TRAVEL_RANGES = { today: 0, week: 6, month: 30 };
+
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
   const { t } = useLanguage();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const { list: cities, unmapped } = useMemo(() => groupByCity(profiles), [profiles]);
+  // Based here (where members live) | Travelling (where they will be, from
+  // the trips and tours they share on TORA — Premium, like the travel feed).
+  const { user } = useAppContext();
+  const [mode, setMode] = useState('based');
+  const [range, setRange] = useState('today');
+  const [trips, setTrips] = useState(null); // null = loading
+  useEffect(() => {
+    if (mode !== 'travel' || locked || !user?.id) return undefined;
+    let cancelled = false;
+    setTrips(null);
+    apiService.getOnTheRoad(user.id, isoDay(0), isoDay(TRAVEL_RANGES[range]))
+      .then((res) => { if (!cancelled) setTrips(tripItems(res.rows || [])); })
+      .catch(() => { if (!cancelled) setTrips([]); });
+    return () => { cancelled = true; };
+  }, [mode, range, locked, user?.id]);
+  const travelling = mode === 'travel' && !locked;
+
+  const { list: cities, unmapped } = useMemo(
+    () => groupByCity(travelling ? trips || [] : profiles),
+    [travelling, trips, profiles],
+  );
 
   // The FREE member's own country feature — their whole discovery scope.
   const ownCountryFeature = useMemo(() => {
@@ -72,7 +137,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const lockedHubs = useMemo(() => {
     if (!locked) return [];
     const ownKey = normalizeCity(userCity);
-    const dataKeys = new Set(cities.map((c) => c.key));
+    const dataKeys = new Set(cities.map((c) => c.cityKey));
     return FEATURED_HUBS
       .map((name) => ({ key: normalizeCity(name), name, coord: CITY_COORDS[normalizeCity(name)] }))
       .filter((h) => h.coord && h.key !== ownKey && !dataKeys.has(h.key)
@@ -131,7 +196,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   useEffect(() => {
     for (const c of cities) {
       c._cnt = c.profiles.reduce((n, p) => n + (roleOn[p.role] ? 1 : 0), 0);
-      c._major = c._cnt >= 3 || MAJOR_KEYS.has(c.key);
+      c._major = c._cnt >= 3 || MAJOR_KEYS.has(c.cityKey);
     }
     citiesRef.current = [...cities].sort((a, b) => (b._cnt || 0) - (a._cnt || 0));
   }, [cities, roleOn]);
@@ -268,8 +333,11 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       ctx.beginPath(); path(GRATICULE);
       ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.6; ctx.stroke();
 
-      // land — soft top-left light, luminous coastlines
-      ctx.beginPath(); path(LAND);
+      // land — soft top-left light, luminous coastlines (1:50m when close)
+      const close = zoomRef.current >= DETAIL_ZOOM;
+      if (close) loadDetail();
+      const land = close && DETAIL ? DETAIL.land : LAND;
+      ctx.beginPath(); path(land);
       const lg = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
       lg.addColorStop(0, '#262633');
       lg.addColorStop(0.5, '#1d1d29');
@@ -278,7 +346,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 0.6; ctx.stroke();
 
       // country borders
-      ctx.beginPath(); path(BORDERS);
+      ctx.beginPath(); path(close && DETAIL ? DETAIL.borders : BORDERS);
       ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 0.5; ctx.stroke();
 
       // selected country — crimson tint + glowing outline
@@ -487,7 +555,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const openCity = (c) => {
     setSelectedCity(c);
     setSelectedCountry(null);
-    onSelectionChange?.({ city: c.name }); // the list can take over this selection
+    // the list can take over this selection — not a trip: the list knows where people live
+    if (!travelling) onSelectionChange?.({ city: c.name });
     focusOn(c.coord[0], c.coord[1]);
     setTip(null);
     sheetAnimating.current = true;
@@ -526,7 +595,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     // ("Czechia") would not match the filters, so an empty country carries nothing.
     // A country with nobody in it still IS a selection — reported separately so
     // callers that turn the selection into a server query keep ignoring it.
-    onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null, { country: name, empty: !inCountry.length });
+    if (!travelling) onSelectionChange?.(inCountry[0]?.country ? { country: inCountry[0].country } : null, { country: name, empty: !inCountry.length });
     const center = geoCentroid(f);
     focusOn(center[0], center[1]);
     setTip(null);
@@ -661,7 +730,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   //      pull down at the top → collapse toward the globe / close.
   //      Native listeners because React touch events are passive at the root.
   // listTakesOver: the host's own list shows the selection (desktop workspace), so no panel here
-  const sheetOpen = !!(selectedCity || selectedCountry) && !(isDesktop && listTakesOver);
+  // …except in Travelling: the trips live only here, so the globe keeps its panel.
+  const sheetOpen = !!(selectedCity || selectedCountry) && !(isDesktop && listTakesOver && !travelling);
   useEffect(() => {
     const el = listRef.current;
     if (!el || !sheetOpen || isDesktop) return undefined; // desktop panel is fixed, no sheet gestures
@@ -700,8 +770,32 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetOpen, isDesktop]);
 
+  // A new view or window is a new map: whatever was open belongs to the old one.
+  useEffect(() => { closeCity(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [mode, range]);
+
   const place = selectedCountry || selectedCity;
   const panelProfiles = place ? place.profiles.filter((p) => roleOn[p.role]) : [];
+  const locale = t('dateFormat.locale');
+  const tripDates = (trip) => {
+    const a = formatEventDate(trip.from, locale, { year: undefined });
+    const b = formatEventDate(trip.to, locale, { year: undefined });
+    return a === b ? a : `${a} – ${b}`;
+  };
+  // The line under a name: on a trip, when and from where (or the tour);
+  // otherwise the city (country panel) or the sound (city panel).
+  const rowDetail = (p) => {
+    if (p._trip) {
+      return `${tripDates(p._trip)} · ${p._trip.kind === 'tour'
+        ? t('globe.touring', { country: p._trip.country })
+        : (p._trip.home ? t('globe.fromCity', { city: p._trip.home }) : '')}`.replace(/ · $/, '');
+    }
+    if (selectedCountry) return cityNameOf(p);
+    return p.genres?.length ? p.genres.slice(0, 2).join(', ') : '';
+  };
+  const pickMode = (next) => {
+    if (next === 'travel' && locked) { (onLockedTravel || (() => onLockedCity?.(t('globe.travelling'))))(); return; }
+    setMode(next);
+  };
 
   return (
     <div className="absolute inset-0 flex overflow-hidden bg-[#040407]">
@@ -729,6 +823,38 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         <div className="absolute rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-tech uppercase tracking-[0.12em] text-white/40 backdrop-blur-sm"
              style={{ top: topInset + 8, right: 12 }}>
           {t('search.globeUnmapped', { count: unmapped })}
+        </div>
+      )}
+
+      {/* Based here | Travelling, and the window for Travelling. A stage
+          squeezed beside the open panel has no room for them; closing the
+          panel brings them back. */}
+      {!(sheetOpen && isDesktop && dims.w < 380) && (
+      <div className="absolute z-20 flex flex-col items-start gap-1.5" style={{ top: topInset + 8, left: controlsLeft }}>
+        <div className="flex rounded-full border border-white/10 bg-black/55 p-0.5 backdrop-blur-md" role="tablist">
+          {[['based', 'globe.basedHere'], ['travel', 'globe.travelling']].map(([key, label]) => (
+            <button key={key} type="button" role="tab" aria-selected={mode === key} onClick={() => pickMode(key)}
+              className={`cursor-pointer whitespace-nowrap rounded-full border-0 px-3 py-1 text-[10px] font-tech uppercase tracking-[0.12em] transition ${mode === key ? 'bg-white/90 text-black' : 'bg-transparent text-white/60'}`}>
+              {t(label)}{key === 'travel' && locked ? ' · Premium' : ''}
+            </button>
+          ))}
+        </div>
+        {travelling && (
+          <div className="flex gap-1">
+            {Object.keys(TRAVEL_RANGES).map((key) => (
+              <button key={key} type="button" onClick={() => setRange(key)}
+                className={`cursor-pointer whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[10px] backdrop-blur-md ${range === key ? 'border-infrared bg-infrared/20 text-white' : 'border-white/10 bg-black/45 text-white/55'}`}>
+                {t(`globe.${key}`)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      )}
+
+      {travelling && trips === null && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <LoadingGlobe label={t('common.loading')} />
         </div>
       )}
 
@@ -786,9 +912,9 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       </div>
 
       {/* Empty state (premium only — FREE members always see the locked hubs) */}
-      {cities.length === 0 && !locked && (
+      {cities.length === 0 && !locked && !(travelling && trips === null) && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
-          <p className="text-sm text-white/50">{t('search.globeNoCities')}</p>
+          <p className="text-sm text-white/50">{t(travelling ? 'globe.travelEmpty' : 'search.globeNoCities')}</p>
         </div>
       )}
 
@@ -821,7 +947,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             {isDesktop && <div className="pt-4" />}
             <div className="flex shrink-0 items-start justify-between px-5 pb-3">
               <div>
-                <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-infrared">{t('search.globeOnNetwork')}</div>
+                <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-infrared">{t(travelling ? 'globe.travellingHere' : 'search.globeOnNetwork')}</div>
                 <h2 className="mt-0.5 text-xl font-semibold text-white">{place.name}</h2>
                 <div className="mt-0.5 text-xs text-white/45">
                   {t(panelProfiles.length === 1 ? 'search.globeMember' : 'search.globeMembers', { count: panelProfiles.length })}
@@ -837,14 +963,14 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
               {isDesktop && panelProfiles.length > 0 && (
                 <div className="globe-panel-tiles grid grid-cols-2 gap-2.5">
                   {panelProfiles.map((p) => (
-                    <PhotoCard key={p.id} profile={p} variant="tile" place={cityNameOf(p)} onOpen={() => onSelectProfile(p)} />
+                    <PhotoCard key={p._key || p.id} profile={p} variant="tile" place={p._trip ? rowDetail(p) : cityNameOf(p)} onOpen={() => onSelectProfile(p._profile || p)} />
                   ))}
                 </div>
               )}
               {!isDesktop && panelProfiles.map((p) => (
                 <button
-                  key={p.id}
-                  onClick={() => onSelectProfile(p)}
+                  key={p._key || p.id}
+                  onClick={() => onSelectProfile(p._profile || p)}
                   className="mb-2 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-[#0a0a0e] px-3 py-2.5 text-left active:scale-[0.99]"
                 >
                   <span className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-semibold text-white ${getAvatarClass(p.role)}`}>
@@ -854,9 +980,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
                     <span className="block truncate text-sm font-medium text-white">{p.name}</span>
                     <span className="mt-0.5 block text-xs" style={{ color: ROLE_COLOR[p.role] || 'rgba(255,255,255,0.5)' }}>
                       {t(`editProfile.${(p.role || '').toLowerCase()}`)}
-                      {selectedCountry
-                        ? (cityNameOf(p) ? <span className="text-white/35"> · {cityNameOf(p)}</span> : null)
-                        : (p.genres?.length ? <span className="text-white/35"> · {p.genres.slice(0, 2).join(', ')}</span> : null)}
+                      {rowDetail(p) ? <span className="text-white/35"> · {rowDetail(p)}</span> : null}
                     </span>
                   </span>
                   <span className="shrink-0 text-white/25">›</span>

@@ -1625,6 +1625,18 @@ const ko = {
     viewFullProfile: '전체 프로필 보기',
   },
 
+  globe: {
+    basedHere: '거점',
+    travelling: '이동 중',
+    today: '오늘',
+    week: '이번 주',
+    month: '이번 달',
+    travellingHere: '여기로 이동 중',
+    touring: '{{country}} 투어 중',
+    fromCity: '{{city}}에서',
+    travelEmpty: '이 기간에 공유된 이동 일정이 아직 없습니다',
+    travelLockedBody: '멤버들이 TORA에 공유한 이동 일정으로 누가 어디로 가는지 확인하세요. 프리미엄으로 업그레이드하면 열 수 있습니다.',
+  },
   search: {
     typeToFilter: '입력해서 필터…',
     roleArtist: '아티스트',

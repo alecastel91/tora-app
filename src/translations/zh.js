@@ -1625,6 +1625,18 @@ const zh = {
     viewFullProfile: '查看完整档案',
   },
 
+  globe: {
+    basedHere: '常驻',
+    travelling: '出行中',
+    today: '今天',
+    week: '本周',
+    month: '本月',
+    travellingHere: '正在前来',
+    touring: '正在{{country}}巡演',
+    fromCity: '来自{{city}}',
+    travelEmpty: '这些日期还没有人分享行程',
+    travelLockedBody: '根据会员在TORA上分享的行程，查看谁正前往哪里。升级至Premium即可使用。',
+  },
   search: {
     typeToFilter: '输入以筛选…',
     roleArtist: '艺人',

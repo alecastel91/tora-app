@@ -236,6 +236,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
               onSelectionChange={(sel, meta) => setMapSel(sel || (meta?.empty ? { country: meta.country, empty: true } : null))}
               topInset={full ? 80 : premium ? 16 : 64}
               bottomInset={16}
+              controlsLeft={60} /* clear of the full-screen button */
             />
           </Suspense>
           <button

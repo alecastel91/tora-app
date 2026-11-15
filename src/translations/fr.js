@@ -1625,6 +1625,18 @@ const fr = {
     viewFullProfile: 'Voir le profil complet',
   },
 
+  globe: {
+    basedHere: 'Basés ici',
+    travelling: 'En voyage',
+    today: 'Aujourd\'hui',
+    week: 'Cette semaine',
+    month: 'Ce mois-ci',
+    travellingHere: 'En voyage ici',
+    touring: 'En tournée : {{country}}',
+    fromCity: 'depuis {{city}}',
+    travelEmpty: 'Personne n\'a encore partagé de voyage pour ces dates',
+    travelLockedBody: 'Voyez qui voyage où, d\'après les voyages que les membres partagent sur TORA. Passez à Premium pour y accéder.',
+  },
   search: {
     typeToFilter: 'Tapez pour filtrer…',
     roleArtist: 'Artiste',

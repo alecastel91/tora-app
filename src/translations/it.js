@@ -1625,6 +1625,18 @@ const it = {
     viewFullProfile: 'Vedi profilo completo',
   },
 
+  globe: {
+    basedHere: 'Con base qui',
+    travelling: 'In viaggio',
+    today: 'Oggi',
+    week: 'Questa settimana',
+    month: 'Questo mese',
+    travellingHere: 'In viaggio qui',
+    touring: 'In tour: {{country}}',
+    fromCity: 'da {{city}}',
+    travelEmpty: 'Nessuno ha ancora condiviso un viaggio per queste date',
+    travelLockedBody: 'Scopri chi viaggia e dove, dai viaggi che i membri condividono su TORA. Passa a Premium per aprirlo.',
+  },
   search: {
     typeToFilter: 'Scrivi per filtrare…',
     roleArtist: 'Artista',

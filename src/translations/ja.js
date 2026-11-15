@@ -1625,6 +1625,18 @@ const ja = {
     viewFullProfile: '完全なプロフィールを見る',
   },
 
+  globe: {
+    basedHere: '拠点',
+    travelling: '渡航中',
+    today: '今日',
+    week: '今週',
+    month: '今月',
+    travellingHere: 'ここに渡航中',
+    touring: '{{country}}をツアー中',
+    fromCity: '{{city}}から',
+    travelEmpty: 'この期間に共有された渡航はまだありません',
+    travelLockedBody: 'メンバーがTORAで共有した渡航スケジュールから、誰がどこへ渡航するかを確認できます。プレミアムにアップグレードすると利用できます。',
+  },
   search: {
     typeToFilter: '入力して絞り込む…',
     roleArtist: 'アーティスト',

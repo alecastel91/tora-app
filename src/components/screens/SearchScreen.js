@@ -24,6 +24,9 @@ import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../util
 // user actually switches to the globe view (matches the PdfViewer lazy pattern).
 const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 
+// The globe's Travelling view, tapped by a FREE member: same upsell, its own words.
+const TRAVEL_UPSELL = '__travel';
+
 const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, accountUser }) => {
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptRequest, declineRequest } = useAppContext();
   const { t } = useLanguage();
@@ -601,6 +604,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               userCity={user?.city}
               userCountry={user?.country}
               onLockedCity={setGlobeUpsellCity}
+              onLockedTravel={() => setGlobeUpsellCity(TRAVEL_UPSELL)}
               topInset={user && !hasGlobalSearch() ? 118 : 66}
               bottomInset={8}
             />
@@ -1075,7 +1079,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
         <OverlayPortal><div className="modal-overlay" onClick={() => setGlobeUpsellCity(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{t('search.globeLockedTitle')}</h3>
+              <h3>{t(globeUpsellCity === TRAVEL_UPSELL ? 'globe.travelling' : 'search.globeLockedTitle')}</h3>
               <button className="modal-close" onClick={() => setGlobeUpsellCity(null)}>×</button>
             </div>
             <div className="modal-body">
@@ -1083,7 +1087,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                 <div className="limit-icon">
                   <SlashCircleIcon />
                 </div>
-                <p className="limit-main-text">{t('search.globeLockedBody', { city: globeUpsellCity })}</p>
+                <p className="limit-main-text">{globeUpsellCity === TRAVEL_UPSELL ? t('globe.travelLockedBody') : t('search.globeLockedBody', { city: globeUpsellCity })}</p>
               </div>
             </div>
             <div className="modal-footer">

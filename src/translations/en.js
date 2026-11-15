@@ -1627,6 +1627,18 @@ const en = {
   },
   
   // Search Screen
+  globe: {
+    basedHere: 'Based here',
+    travelling: 'Travelling',
+    today: 'Today',
+    week: 'This week',
+    month: 'This month',
+    travellingHere: 'Travelling here',
+    touring: 'Touring {{country}}',
+    fromCity: 'from {{city}}',
+    travelEmpty: 'Nobody has shared a trip for these dates yet',
+    travelLockedBody: 'See who is travelling where, from the trips members share on TORA. Upgrade to Premium to open it.',
+  },
   search: {
     typeToFilter: 'Type to filter…',
     roleArtist: 'Artist',
