@@ -1638,6 +1638,8 @@ const en = {
     fromCity: 'from {{city}}',
     travelEmpty: 'Nobody has shared a trip for these dates yet',
     travelLockedBody: 'See who is travelling where, from the trips members share on TORA. Upgrade to Premium to open it.',
+    zoneCount: '{{count}} travelling',
+    zoneUndecided: 'Country not decided yet',
   },
   search: {
     nearCity: 'Near a city',

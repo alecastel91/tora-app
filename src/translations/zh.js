@@ -1636,6 +1636,8 @@ const zh = {
     fromCity: '来自{{city}}',
     travelEmpty: '这些日期还没有人分享行程',
     travelLockedBody: '根据会员在TORA上分享的行程，查看谁正前往哪里。升级至Premium即可使用。',
+    zoneCount: '{{count}}人出行',
+    zoneUndecided: '国家待定',
   },
   search: {
     nearCity: '城市附近',

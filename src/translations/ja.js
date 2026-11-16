@@ -1636,6 +1636,8 @@ const ja = {
     fromCity: '{{city}}から',
     travelEmpty: 'この期間に共有された渡航はまだありません',
     travelLockedBody: 'メンバーがTORAで共有した渡航スケジュールから、誰がどこへ渡航するかを確認できます。プレミアムにアップグレードすると利用できます。',
+    zoneCount: '{{count}}人が渡航予定',
+    zoneUndecided: '国は未定',
   },
   search: {
     nearCity: '都市の近く',

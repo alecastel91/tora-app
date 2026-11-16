@@ -3,6 +3,7 @@ import { geoOrthographic, geoPath, geoGraticule10, geoContains, geoCentroid, geo
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
 import { coordsForCity, normalizeCity, atlasCountryName, FEATURED_HUBS, CITY_COORDS } from '../../data/cityCoords';
+import { countriesByZone } from '../../data/profiles';
 import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
 import LoadingGlobe from './LoadingGlobe';
@@ -73,8 +74,10 @@ function groupByCity(profiles) {
 
 // "Travelling" view: one entry per trip, placed at its destination, carrying
 // the trip itself (dates, home city, tour or travel) for the panel rows.
+// A trip that names only a zone has no place to pin: it carries `_zone`
+// instead and is drawn as the zone's tint (zoneGroups).
 const tripItems = (rows) => rows.map((r, i) => {
-  const coord = r.coord || countryCentroid(r.destCountry);
+  const coord = r.destCountry ? (r.coord || countryCentroid(r.destCountry)) : null;
   return {
     ...r.profile,
     _profile: r.profile, // what opens: the member as they are, not the trip
@@ -82,9 +85,27 @@ const tripItems = (rows) => rows.map((r, i) => {
     city: r.destCity || r.destCountry,
     country: r.destCountry,
     coord,
-    _trip: { kind: r.kind, from: r.startDate, to: r.endDate, home: r.profile.city, country: r.destCountry },
+    _zone: r.destCountry ? null : r.zone,
+    _trip: { kind: r.kind, from: r.startDate, to: r.endDate, home: r.profile.city, country: r.destCountry || r.zone },
   };
 });
+
+// Where a zone's label sits: its visual middle, not the geometric centroid
+// (Europe's list includes all of Russia, the Americas span both continents).
+const ZONE_ANCHORS = {
+  Europe: [15, 50], Asia: [100, 32], 'Middle East': [45, 27], Africa: [20, 4], Americas: [-82, 12], Oceania: [140, -22],
+};
+// A zone's countries on a given atlas (the 1:50m one close in), built once each.
+const zoneFeatureCache = new Map();
+const zoneFeatures = (zone, land) => {
+  const key = `${zone}|${land === LAND ? 110 : 50}`;
+  if (!zoneFeatureCache.has(key)) {
+    const names = new Set((countriesByZone[zone] || []).map((c) => atlasCountryName(c)));
+    if (zone === 'Europe') names.delete('russia'); // the tint would cover Siberia and read as Asia
+    zoneFeatureCache.set(key, { type: 'FeatureCollection', features: land.features.filter((f) => names.has((f.properties?.name || '').toLowerCase())) });
+  }
+  return zoneFeatureCache.get(key);
+};
 
 const isoDay = (offset) => new Date(Date.now() + offset * 864e5).toISOString().slice(0, 10);
 const TRAVEL_RANGES = { today: 0, week: 6, month: 30 };
@@ -94,6 +115,9 @@ const TRAVEL_RANGES = { today: 0, week: 6, month: 30 };
 // tell this component how much of its own chrome those overlays cover.
 const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
   const { t } = useLanguage();
+  // Read by the draw loop, which outlives renders: a ref keeps the language current.
+  const zoneCountText = useRef(null);
+  zoneCountText.current = (n) => t('globe.zoneCount', { count: n });
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -115,9 +139,21 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const travelling = mode === 'travel' && !locked;
 
   const { list: cities, unmapped } = useMemo(
-    () => groupByCity(travelling ? trips || [] : profiles),
+    () => groupByCity(travelling ? (trips || []).filter((p) => !p._zone) : profiles),
     [travelling, trips, profiles],
   );
+  // Trips that name only a zone ("Asia, dates set, country not decided"):
+  // one tinted region + label per zone, opening the same panel as a city.
+  const zoneGroups = useMemo(() => {
+    if (!travelling || !trips) return [];
+    const map = new Map();
+    for (const p of trips) {
+      if (!p._zone || !ZONE_ANCHORS[p._zone]) continue;
+      if (!map.has(p._zone)) map.set(p._zone, { key: `zone:${p._zone}`, zone: p._zone, name: p._zone, coord: ZONE_ANCHORS[p._zone], profiles: [] });
+      map.get(p._zone).profiles.push(p);
+    }
+    return [...map.values()];
+  }, [travelling, trips]);
 
   // The FREE member's own country feature — their whole discovery scope.
   const ownCountryFeature = useMemo(() => {
@@ -181,6 +217,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const selectedCountryRef = useRef(null);
   const roleOnRef = useRef(roleOn);
   const citiesRef = useRef(cities);
+  const zonesRef = useRef(zoneGroups);
   const lockedHubsRef = useRef(lockedHubs);
   const dimsRef = useRef({ w: 0, h: 0, dpr: 1 });
   const hiddenRef = useRef(false); // keep-mounted tab panel is display:none
@@ -199,9 +236,11 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       c._major = c._cnt >= 3 || MAJOR_KEYS.has(c.cityKey);
     }
     citiesRef.current = [...cities].sort((a, b) => (b._cnt || 0) - (a._cnt || 0));
-  }, [cities, roleOn]);
+    for (const z of zoneGroups) z._cnt = z.profiles.reduce((n, p) => n + (roleOn[p.role] ? 1 : 0), 0);
+    zonesRef.current = zoneGroups;
+  }, [cities, zoneGroups, roleOn]);
   useEffect(() => {
-    selectedKey.current = selectedCity?.key || selectedCountry?.name || null;
+    selectedKey.current = selectedCity?.key || selectedCountry?.key || selectedCountry?.name || null;
     selectedCityKey.current = selectedCity?.key || null;
     selectedCountryRef.current = selectedCountry;
   }, [selectedCity, selectedCountry]);
@@ -349,6 +388,14 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       ctx.beginPath(); path(close && DETAIL ? DETAIL.borders : BORDERS);
       ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 0.5; ctx.stroke();
 
+      // zones with trips that name no country — a soft tint over their countries
+      for (const z of zonesRef.current) {
+        if (!z._cnt) continue;
+        ctx.beginPath(); path(zoneFeatures(z.zone, land));
+        ctx.fillStyle = 'rgba(255,51,102,0.09)'; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,51,102,0.28)'; ctx.lineWidth = 0.6; ctx.stroke();
+      }
+
       // selected country — crimson tint + glowing outline
       if (selectedCountryRef.current) {
         ctx.beginPath(); path(selectedCountryRef.current.feature);
@@ -449,6 +496,23 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
         ctx.fillText(c.name, lx, ly); ctx.shadowBlur = 0;
       }
+      // zone labels — a pill at the zone's middle: "Asia · 3 travelling"
+      for (const z of zonesRef.current) {
+        z._box = null;
+        if (!z._cnt || !onFront(z.coord)) continue;
+        const [zx, zy] = projection(z.coord);
+        const isSel = selectedKey.current === z.key;
+        const text = `${z.name} · ${zoneCountText.current(z._cnt)}`;
+        ctx.font = `700 11px ${font}`;
+        const tw = ctx.measureText(text).width, pw = tw + 22, ph = 24;
+        const box = { x: zx - pw / 2, y: zy - ph / 2, w: pw, h: ph };
+        labelBoxes.push(box);
+        z._box = box;
+        ctx.beginPath(); ctx.roundRect(box.x, box.y, pw, ph, 12);
+        ctx.fillStyle = isSel ? 'rgba(255,51,102,0.9)' : 'rgba(7,7,9,0.88)'; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,51,102,0.85)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.fillText(text, zx - tw / 2, zy + 4);
+      }
       ctx.font = `500 11px ${font}`;
       for (const hub of lockedHubsRef.current) {
         if (!hub._xy) continue;
@@ -490,6 +554,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         if (cand.d - pick.d <= 6 && (cand.c._count || 0) > (pick.c._count || 0)) pick = cand;
       }
       best = { kind: 'city', ref: pick.c };
+    }
+    if (!best) {
+      for (const z of zonesRef.current) {
+        const b = z._box;
+        if (b && mx >= b.x - 4 && mx <= b.x + b.w + 4 && my >= b.y - 4 && my <= b.y + b.h + 4) return { kind: 'zone', ref: z };
+      }
     }
     if (!best) {
       let bd = 1e9;
@@ -602,6 +672,14 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     sheetAnimating.current = true;
     setSheetPx(Math.round(dimsRef.current.h * 0.62));
   };
+  const openZone = (z) => {
+    setSelectedCountry({ key: z.key, name: z.name, zone: z.zone, feature: zoneFeatures(z.zone, LAND), cities: [], profiles: z.profiles });
+    setSelectedCity(null);
+    focusOn(z.coord[0], z.coord[1]);
+    setTip(null);
+    sheetAnimating.current = true;
+    setSheetPx(Math.round(dimsRef.current.h * 0.62));
+  };
   const closeCity = () => { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); focusing.current = false; onSelectionChange?.(null); };
 
   // ---- pointer interaction on the canvas ----
@@ -671,6 +749,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     const mx = e.nativeEvent.offsetX, my = e.nativeEvent.offsetY;
     const h = hit(mx, my);
     if (h?.kind === 'city') { openCity(h.ref); return; }
+    if (h?.kind === 'zone') { openZone(h.ref); return; }
     if (h?.kind === 'locked') { onLockedCity?.(h.ref.name); return; }
     const country = countryAt(mx, my);
     if (country) { openCountry(country); return; }
@@ -912,7 +991,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       </div>
 
       {/* Empty state (premium only — FREE members always see the locked hubs) */}
-      {cities.length === 0 && !locked && !(travelling && trips === null) && (
+      {cities.length === 0 && zoneGroups.length === 0 && !locked && !(travelling && trips === null) && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
           <p className="text-sm text-white/50">{t(travelling ? 'globe.travelEmpty' : 'search.globeNoCities')}</p>
         </div>
@@ -951,7 +1030,9 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
                 <h2 className="mt-0.5 text-xl font-semibold text-white">{place.name}</h2>
                 <div className="mt-0.5 text-xs text-white/45">
                   {t(panelProfiles.length === 1 ? 'search.globeMember' : 'search.globeMembers', { count: panelProfiles.length })}
-                  {selectedCountry
+                  {selectedCountry?.zone
+                    ? ` · ${t('globe.zoneUndecided')}`
+                    : selectedCountry
                     ? ` · ${t(selectedCountry.cities.length === 1 ? 'search.globeCity' : 'search.globeCities', { count: selectedCountry.cities.length })}`
                     : (selectedCity?.country ? ` · ${selectedCity.country}` : '')}
                 </div>

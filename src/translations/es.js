@@ -1636,6 +1636,8 @@ const es = {
     fromCity: 'desde {{city}}',
     travelEmpty: 'Nadie ha compartido un viaje para estas fechas todavía',
     travelLockedBody: 'Mira quién viaja y adónde, según los viajes que los miembros comparten en TORA. Hazte Premium para abrirlo.',
+    zoneCount: '{{count}} de viaje',
+    zoneUndecided: 'País aún sin decidir',
   },
   search: {
     nearCity: 'Cerca de una ciudad',
