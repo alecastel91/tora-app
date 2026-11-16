@@ -1640,6 +1640,10 @@ const en = {
     travelLockedBody: 'See who is travelling where, from the trips members share on TORA. Upgrade to Premium to open it.',
   },
   search: {
+    nearCity: 'Near a city',
+    nearAnywhere: 'Anywhere',
+    nearHint: 'Everyone within this distance, whatever their town is called',
+    kmAway: '{{km}} km away',
     typeToFilter: 'Type to filter…',
     roleArtist: 'Artist',
     roleVenue: 'Venue',

@@ -15,6 +15,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import apiService from '../../services/api';
 import LoadingGlobe from '../common/LoadingGlobe';
 import FilterList from '../common/FilterList';
+import CitySearch from '../common/CitySearch';
 import LimitReachedModal from '../common/LimitReachedModal';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
 import useProfileSuggestions from '../../hooks/useProfileSuggestions';
@@ -48,7 +49,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     zones: [],
     countries: [],
     cities: [],
-    genres: []
+    genres: [],
+    near: [], // [] or [{ city, country, zone, radiusKm }] — an array so the filter count sees it
   });
   const [searchResults, setSearchResults] = useState([]);
   const [agencyResults, setAgencyResults] = useState([]);
@@ -223,6 +225,11 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       if (f.countries.length > 0) params.countries = f.countries.join(',');
       if (f.cities.length > 0) params.cities = f.cities.join(',');
       if (f.genres.length > 0) params.genres = f.genres.join(',');
+      if (f.near?.length) {
+        params.nearCity = f.near[0].city;
+        params.nearCountry = f.near[0].country;
+        params.radiusKm = f.near[0].radiusKm;
+      }
 
       const response = await apiService.searchProfiles(params);
       if (seq !== searchSeq.current) return; // a newer search is in flight
@@ -269,9 +276,17 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       zones: [],
       countries: [],
       cities: [],
-      genres: []
+      genres: [],
+      near: [],
     });
   };
+  // "Near a city": anywhere within the radius, whatever the town is called.
+  const NEAR_RADII = [25, 50, 100, 300];
+  const setNear = (patch) => setFilters((f) => {
+    const cur = f.near[0] || { radiusKm: 100 };
+    const next = { ...cur, ...patch };
+    return { ...f, near: next.city ? [next] : [] };
+  });
 
   const getAvailableCountries = () => {
     if (filters.zones.length > 0) {
@@ -718,7 +733,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               <PhotoCard
                 key={profileId}
                 profile={profile}
-                place={profile.location}
+                place={profile.distanceKm >= 5 ? `${profile.location} · ${t('search.kmAway', { km: profile.distanceKm })}` : profile.location}
                 onOpen={() => handleProfileClick(profile)}
                 actions={(
                   <>
@@ -898,6 +913,41 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
                   </label>
                 )}
               </FilterList>
+            )}
+          </div>
+
+          {/* Near a city */}
+          <div className="filter-dropdown-group">
+            <div
+              className="filter-dropdown-header"
+              onClick={() => setOpenDropdown(openDropdown === 'near' ? null : 'near')}
+            >
+              <span>{t('search.nearCity')}</span>
+              <span className="dropdown-value">
+                {filters.near.length > 0
+                  ? `${filters.near[0].city} · ${filters.near[0].radiusKm} km`
+                  : t('search.nearAnywhere')}
+              </span>
+              <span className="dropdown-arrow">{openDropdown === 'near' ? '▲' : '▼'}</span>
+            </div>
+            {openDropdown === 'near' && (
+              <div className="filter-dropdown-content flex flex-col gap-3" style={{ padding: 14 }}>
+                <CitySearch
+                  city={filters.near[0]?.city || ''}
+                  country={filters.near[0]?.country || ''}
+                  zone={filters.near[0]?.zone || ''}
+                  onSelect={(city, country, zone) => setNear({ city, country, zone })}
+                />
+                <div className="flex flex-wrap gap-2">
+                  {NEAR_RADII.map((km) => (
+                    <button key={km} type="button" onClick={() => setNear({ radiusKm: km })}
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-[12px] ${(filters.near[0]?.radiusKm || 100) === km ? 'border-infrared bg-infrared/15 text-white' : 'border-white/15 bg-transparent text-white/70'}`}>
+                      {km} km
+                    </button>
+                  ))}
+                </div>
+                <p className="m-0 text-[11px] leading-relaxed text-white/40">{t('search.nearHint')}</p>
+              </div>
             )}
           </div>
 

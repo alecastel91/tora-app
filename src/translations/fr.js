@@ -1638,6 +1638,10 @@ const fr = {
     travelLockedBody: 'Voyez qui voyage où, d\'après les voyages que les membres partagent sur TORA. Passez à Premium pour y accéder.',
   },
   search: {
+    nearCity: 'Près d\'une ville',
+    nearAnywhere: 'Partout',
+    nearHint: 'Tout le monde dans ce rayon, quel que soit le nom de sa ville',
+    kmAway: 'à {{km}} km',
     typeToFilter: 'Tapez pour filtrer…',
     roleArtist: 'Artiste',
     roleVenue: 'Salle',

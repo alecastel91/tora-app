@@ -1638,6 +1638,10 @@ const zh = {
     travelLockedBody: '根据会员在TORA上分享的行程，查看谁正前往哪里。升级至Premium即可使用。',
   },
   search: {
+    nearCity: '城市附近',
+    nearAnywhere: '任何地方',
+    nearHint: '显示此距离内的所有会员，无论其所在城镇名称为何',
+    kmAway: '距离{{km}}公里',
     typeToFilter: '输入以筛选…',
     roleArtist: '艺人',
     roleVenue: '场地',
