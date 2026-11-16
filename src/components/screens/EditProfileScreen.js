@@ -344,6 +344,16 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
 
   const screenRef = useRef(null);
   useFitScreenHeight(screenRef, '--edit-screen-h');
+  // The app scroller keeps the Profile tab's offset: opening Edit after
+  // scrolling down the profile left this screen scrolled too, its header
+  // under the app header. Start at the top; give the profile its place back.
+  useLayoutEffect(() => {
+    const scroller = screenRef.current?.closest('.app-content');
+    if (!scroller) return undefined;
+    const before = scroller.scrollTop;
+    scroller.scrollTop = 0;
+    return () => { scroller.scrollTop = before; };
+  }, []);
 
   return (
     <div ref={screenRef} className={`screen active edit-profile-screen${nativeDesktop ? ' d3-edit' : ''}`}>
