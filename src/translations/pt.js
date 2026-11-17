@@ -2729,6 +2729,19 @@ const pt = {
     matNightsHere: "{{n}} das suas noites livres enquanto estão lá",
   },
   // Artist page: sets, releases, public page (2026-11)
+  // Pre-launch profile-only home (ProfileOnlyHome)
+  profileOnly: {
+    title: 'Você está dentro',
+    intro: 'Monte seu perfil e compartilhe sua página agora. Busca, ofertas e bookings abrem para todos no lançamento.',
+    step1Title: 'Complete seu perfil',
+    step1Body: 'Foto, bio, gêneros e links.',
+    step2Title: 'Faça a verificação',
+    step2Body: 'Envie seu código para @tora.verify no Instagram. Perfis verificados podem publicar uma página.',
+    step3Title: 'Publique e compartilhe sua página',
+    step3Body: 'Sua página fica em torahub.io/@seunome. Coloque o link na bio do Instagram.',
+    editProfile: 'Editar perfil',
+    launchNote: 'Vamos te avisar por e-mail no dia em que o acesso completo abrir.',
+  },
   artistPage: {
     addLink: "Adicionar um link",
     addMix: "Adicionar um mix",

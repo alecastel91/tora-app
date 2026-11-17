@@ -2729,6 +2729,19 @@ const zh = {
     matNightsHere: "对方在此期间，你有 {{n}} 天有空",
   },
   // Artist page: sets, releases, public page (2026-11)
+  // Pre-launch profile-only home (ProfileOnlyHome)
+  profileOnly: {
+    title: '欢迎加入',
+    intro: '现在就完善你的资料并分享你的页面。搜索、邀约和预订将在正式上线时向所有人开放。',
+    step1Title: '完善个人资料',
+    step1Body: '照片、简介、风格和链接。',
+    step2Title: '完成认证',
+    step2Body: '在Instagram上把你的验证码发给@tora.verify。通过认证的资料才能发布页面。',
+    step3Title: '发布并分享你的页面',
+    step3Body: '你的页面地址是torahub.io/@你的名字。把链接放进Instagram简介。',
+    editProfile: '编辑资料',
+    launchNote: '完整功能开放当天，我们会发邮件通知你。',
+  },
   artistPage: {
     addLink: "添加链接",
     addMix: "添加混音",

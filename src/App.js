@@ -52,6 +52,7 @@ import BetaTools from './components/common/BetaTools';
 import AssistantChat from './components/common/AssistantChat';
 import GuideScreen from './components/common/GuideScreen';
 import GettingStartedSheet from './components/common/GettingStartedSheet';
+import ProfileOnlyHome from './components/screens/ProfileOnlyHome';
 import PushSettingsToggle from './components/common/PushSettingsToggle';
 import PushNudge from './components/common/PushNudge';
 import InstallSheet, { InstallSettingsSection } from './components/common/InstallSheet';
@@ -328,7 +329,7 @@ function App() {
     setShowGettingStarted(false);
   };
   const { t, language, changeLanguage, availableLanguages } = useLanguage();
-  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles } = useAppContext();
+  const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles, setProfileOnly } = useAppContext();
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared
   // after t/setShowPremium so the [t] dependency isn't read before init.
@@ -440,6 +441,11 @@ function App() {
     }
   }, [accountUser]);
 
+  // Pre-launch profile-only account (tora-backend utils/access.js): the app is
+  // ProfileOnlyHome until access opens, and nothing polls the member graph.
+  const profileOnly = accountUser?.accessLevel === 'PROFILE_ONLY';
+  useEffect(() => { setProfileOnly(profileOnly); }, [profileOnly, setProfileOnly]);
+
   // Fetch unread messages count (includes both unread messages and connection requests)
   useEffect(() => {
     // Clear the previous profile's badges immediately on switch (F6-02): these
@@ -450,7 +456,7 @@ function App() {
     setBookingsActionCount(0);
 
     const fetchUnreadCount = async () => {
-      if (!isAuthenticated || !user || !user.id) return;
+      if (!isAuthenticated || !user || !user.id || profileOnly) return;
 
       try {
         // Badge = unread messages + pending connection requests. Uses the
@@ -505,7 +511,7 @@ function App() {
     // Depend on ids, not object identities — the AppContext poll republishes
     // `user` and would otherwise restart this effect every cycle.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user?.id, activeChatUser?.id]);
+  }, [isAuthenticated, user?.id, activeChatUser?.id, profileOnly]);
 
   const handleLoginSuccess = async (data) => {
     console.log('[App] Login success, received data:', data);
@@ -890,6 +896,16 @@ function App() {
         {/* Install CTA before login too — long delay so the intro splash
             (form fades in ~2.8s, splash gone at 3.5s) finishes first. */}
         <InstallSheet delay={4500} />
+      </>
+    );
+  }
+
+  if (profileOnly) {
+    return (
+      <>
+        <ProfileOnlyHome onSignOut={handleLogout} />
+        <AppDialogHost />
+        <ToastHost />
       </>
     );
   }

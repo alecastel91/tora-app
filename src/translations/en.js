@@ -2738,6 +2738,19 @@ const en = {
     matNightsHere: "{{n}} of your open nights while they're here",
   },
   // Artist page: sets, releases, public page (2026-11)
+  // Pre-launch profile-only home (ProfileOnlyHome)
+  profileOnly: {
+    title: "You're in",
+    intro: 'Build your profile and share your page now. Search, offers and bookings open for everyone at launch.',
+    step1Title: 'Complete your profile',
+    step1Body: 'Photo, bio, genres and links.',
+    step2Title: 'Get verified',
+    step2Body: 'Send your code to @tora.verify on Instagram. Verified profiles can publish a page.',
+    step3Title: 'Publish and share your page',
+    step3Body: 'Your page lives at torahub.io/@yourname. Put the link in your Instagram bio.',
+    editProfile: 'Edit profile',
+    launchNote: "We'll email you the day full access opens.",
+  },
   artistPage: {
     addLink: "Add a link",
     addMix: "Add a mix",

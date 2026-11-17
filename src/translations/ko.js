@@ -2729,6 +2729,19 @@ const ko = {
     matNightsHere: "상대가 머무는 동안 비어 있는 날 {{n}}일",
   },
   // Artist page: sets, releases, public page (2026-11)
+  // Pre-launch profile-only home (ProfileOnlyHome)
+  profileOnly: {
+    title: '환영합니다',
+    intro: '지금 프로필을 완성하고 페이지를 공유하세요. 검색, 오퍼, 부킹은 런칭과 함께 모두에게 열립니다.',
+    step1Title: '프로필 완성하기',
+    step1Body: '사진, 소개, 장르, 링크.',
+    step2Title: '인증 받기',
+    step2Body: 'Instagram에서 @tora.verify로 코드를 보내세요. 인증된 프로필만 페이지를 공개할 수 있습니다.',
+    step3Title: '페이지 공개하고 공유하기',
+    step3Body: '페이지 주소는 torahub.io/@yourname입니다. 링크를 Instagram 소개란에 넣으세요.',
+    editProfile: '프로필 편집',
+    launchNote: '전체 기능이 열리는 날 이메일로 알려드릴게요.',
+  },
   artistPage: {
     addLink: "링크 추가",
     addMix: "믹스 추가",

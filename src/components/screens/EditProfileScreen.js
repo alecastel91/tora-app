@@ -933,12 +933,11 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
           </div>
         )}
 
-        {editedUser.role === 'ARTIST' && (
-          <div className="edit-section">
-            <h3>{t('artistPage.publicPage')}</h3>
-            <PublicPageSettings profileId={user.id} />
-          </div>
-        )}
+        {/* Every role may publish a page (2026-11-17). */}
+        <div className="edit-section">
+          <h3>{t('artistPage.publicPage')}</h3>
+          <PublicPageSettings profileId={user.id} />
+        </div>
 
         {/* Action Buttons */}
         {highlightsBlocked && (

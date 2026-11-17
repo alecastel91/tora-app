@@ -11,11 +11,10 @@ export const publicPageUrl = (slug) => `${PUBLIC_SITE}/@${slug}`;
 const igStepKey = (profileId) => `tora:ig-bio-step:${profileId}`;
 const readIgStep = (profileId) => { try { return localStorage.getItem(igStepKey(profileId)) === '1'; } catch { return false; } };
 
-/* An artist's own profile: is my public page live, my link (one tap copies
-   it), and the one step that makes the page work — putting the link in the
-   Instagram bio. Publishing itself lives in Edit profile → Public page; this
-   card only offers it. Venues, promoters and agents have no public page yet,
-   so the caller renders this for artists only. */
+/* A member's own profile, any role: is my public page live, my link (one
+   tap copies it), and the one step that makes the page work — putting the
+   link in the Instagram bio. Publishing itself lives in Edit profile → Public
+   page; this card only offers it. */
 const PublicPageCard = ({ profile, onVerify, onEdit, compact = false }) => {
   const { t } = useLanguage();
   const [state, setState] = useState(null);

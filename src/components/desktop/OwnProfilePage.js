@@ -115,7 +115,7 @@ const OwnProfilePage = ({
       <div className="d3-op-body">
         {/* ---- main: what needs you, then your work ---- */}
         <main className="flex min-w-0 flex-col gap-6">
-          {role === 'ARTIST' && <PublicPageCard compact profile={user} onVerify={onVerify} onEdit={onEdit} />}
+          {<PublicPageCard compact profile={user} onVerify={onVerify} onEdit={onEdit} />}
 
           {trialInfo && (
             <div className={`flex items-center justify-between gap-3 rounded-xl border p-4 ${trialInfo.expired ? 'border-amber-500/30 bg-amber-500/[0.06]' : 'border-emerald-500/30 bg-emerald-500/[0.06]'}`}>

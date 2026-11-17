@@ -669,7 +669,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         />
       </div>
 
-      {user?.role === 'ARTIST' && <PublicPageCard profile={user} onVerify={() => setShowVerification(true)} onEdit={() => { closeSubScreens(); setShowEditProfile(true); }} />}
+      {<PublicPageCard profile={user} onVerify={() => setShowVerification(true)} onEdit={() => { closeSubScreens(); setShowEditProfile(true); }} />}
 
       {/* Activation checklist — first-session guidance; hides once complete.
           Lives on the profile rather than in the feed: it is about setting

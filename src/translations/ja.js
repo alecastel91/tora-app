@@ -2729,6 +2729,19 @@ const ja = {
     matNightsHere: "相手の滞在中にあなたが空いている日が{{n}}日",
   },
   // Artist page: sets, releases, public page (2026-11)
+  // Pre-launch profile-only home (ProfileOnlyHome)
+  profileOnly: {
+    title: 'ようこそ、TORAへ',
+    intro: '今すぐプロフィールを作成して、あなたのページをシェアしましょう。検索、オファー、ブッキングはローンチ時に全員に開放されます。',
+    step1Title: 'プロフィールを完成させる',
+    step1Body: '写真、プロフィール文、ジャンル、リンク。',
+    step2Title: '認証を受ける',
+    step2Body: 'Instagramで@tora.verifyにコードを送ってください。認証済みのプロフィールはページを公開できます。',
+    step3Title: 'ページを公開してシェアする',
+    step3Body: 'あなたのページはtorahub.io/@yournameです。リンクをInstagramのプロフィールに追加しましょう。',
+    editProfile: 'プロフィールを編集',
+    launchNote: 'フルアクセスが開始される日にメールでお知らせします。',
+  },
   artistPage: {
     addLink: "リンクを追加",
     addMix: "ミックスを追加",

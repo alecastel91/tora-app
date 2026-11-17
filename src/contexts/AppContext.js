@@ -65,6 +65,9 @@ export const AppProvider = ({ children }) => {
 
   // Subscription tier from active profile (per-profile, synced when user changes)
   const [accountSubscriptionTier, setAccountSubscriptionTier] = useState('FREE');
+  // Pre-launch profile-only account: no member graph to load or poll (the
+  // server refuses those calls with PROFILE_ONLY). App sets it from /auth/me.
+  const [profileOnly, setProfileOnly] = useState(false);
 
   // Callback to refresh accountUser in App.js (registered by App.js on mount)
   const [refreshAccountUserCallback, setRefreshAccountUserCallback] = useState(null);
@@ -88,7 +91,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const loadProfileData = async () => {
       const userId = user?.id;
-      if (!user || !userId) return;
+      if (!user || !userId || profileOnly) return;
       // This effect keys on user?.id, so a re-run means the profile changed —
       // it must NOT be short-circuited by an in-flight load for the OLD profile
       // (F6-02). The stale guard below discards a superseded result instead.
@@ -134,7 +137,7 @@ export const AppProvider = ({ children }) => {
 
     loadProfileData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]); // Re-load when active profile changes
+  }, [user?.id, profileOnly]); // Re-load when the active profile changes, or access opens
 
   const [searchResults, setSearchResults] = useState([]);
   const [conversations] = useState(mockConversations);
@@ -249,7 +252,7 @@ export const AppProvider = ({ children }) => {
   const reloadSeqRef = useRef(0);
   const reloadProfileData = async () => {
     const userId = user?.id;
-    if (!user || !userId) return;
+    if (!user || !userId || profileOnly) return;
     if (isLoadingProfileData) return; // Prevent duplicate fetches
     const seq = ++reloadSeqRef.current;
 
@@ -784,6 +787,8 @@ export const AppProvider = ({ children }) => {
     preferredCurrency,
     setPreferredCurrency,
     accountSubscriptionTier,
+    profileOnly,
+    setProfileOnly,
     setAccountSubscriptionTier,
     setRefreshAccountUserCallback,
     refreshAccountUser: refreshAccountUserCallback,
