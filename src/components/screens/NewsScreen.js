@@ -173,8 +173,11 @@ const InlineEditor = ({ initial, multiline, maxLength, allowEmpty = false, onSav
 const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
   const { t, language } = useLanguage();
   const { user, userProfiles } = useAppContext();
-  // Authorship is per account: any of my profiles counts as mine.
+  // Edit/Delete belong to the profile in use: a post by another of my profiles
+  // is edited from that profile (beta feedback 7a77a940). The whole account
+  // still counts for Report, so nobody reports their own other profile.
   const myProfileIds = new Set([user?.id, ...(userProfiles || []).map((p) => p.id)].filter(Boolean));
+  const byActiveProfile = (authorId) => !!authorId && authorId === user?.id;
   const [posts, setPosts] = useState(null);
   const [cursor, setCursor] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -495,7 +498,8 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
 
       {(posts || []).map((post) => {
         const m = milestone(post);
-        const isOwn = myProfileIds.has(post.author?.id);
+        const isOwn = byActiveProfile(post.author?.id);
+        const isMyAccount = myProfileIds.has(post.author?.id);
         const isNews = post.type === 'NEWS';
         const official = !!post.author?.isOfficial && !isNews;
         const thread = openComments[post.id];
@@ -547,8 +551,8 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                     : `${[post.author?.city, post.author?.country].filter(Boolean).join(', ')} · ${relativeTime(post.createdAt, t)}`}
                 </div>
               </div>
-              {/* menu */}
-              <div className="relative">
+              {/* menu: nothing in it for a post by another of my own profiles */}
+              {(isOwn || !isMyAccount) && <div className="relative">
                 <button
                   className="cursor-pointer rounded-full border-0 bg-transparent px-2 py-1 text-white/40 hover:text-white"
                   onClick={(e) => { e.stopPropagation(); setMenuFor(menuFor === post.id ? null : post.id); }}
@@ -570,7 +574,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                       </button>
                       </>
                     )}
-                    {!isOwn && (
+                    {!isMyAccount && (
                       <button className="block w-full cursor-pointer border-0 bg-transparent px-4 py-2.5 text-left text-xs text-infrared hover:bg-white/5"
                               onClick={() => { setMenuFor(null); setReportingPost(post); }}>
                         {t('news.report')}
@@ -578,7 +582,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                     )}
                   </div>
                 )}
-              </div>
+              </div>}
             </div>
 
             {/* body */}
@@ -647,13 +651,14 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                         {/* Edit: your own comment. Delete: yours, any under your own post,
                             or any at all for the official account. Report: everyone else's. */}
                         {(() => {
-                          const mine = myProfileIds.has(c.author?.id);
+                          const mine = byActiveProfile(c.author?.id);
+                          const myAccount = myProfileIds.has(c.author?.id);
                           const link = 'shrink-0 border-0 bg-transparent p-0 text-[10px] text-white/35 underline hover:text-white/70';
                           return !isEditing('comment', c.id) && (
                             <span className="ml-auto flex shrink-0 gap-2">
                               {mine && <button type="button" className={link} onClick={() => setEditing({ kind: 'comment', id: c.id })}>{t('common.edit')}</button>}
                               {(mine || isOwn || user?.isOfficial) && <button type="button" className={link} onClick={() => deleteComment(post, c)}>{t('common.delete')}</button>}
-                              {!mine && <button type="button" className={link} onClick={() => setReportingComment(c)}>{t('news.report')}</button>}
+                              {!myAccount && <button type="button" className={link} onClick={() => setReportingComment(c)}>{t('news.report')}</button>}
                             </span>
                           );
                         })()}

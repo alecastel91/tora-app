@@ -1,5 +1,5 @@
 import { clampDateRange, formatEventDate } from '../../utils/dates';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CURRENCY_OPTIONS } from './CurrencyOptions';
 import ReactDOM from 'react-dom';
 import { appAlert } from '../../utils/dialogs';
@@ -198,6 +198,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.selectedArtistName]);
 
+  const formRef = useRef(null); // above the early return: hooks keep their order
+
   if (!isOpen) return null;
 
   // Event logistics (capacity / rooms / stage) are mandatory whenever the
@@ -279,25 +281,36 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
 
   const setDuration = calculateSetDuration();
 
+  // A missing field used to only set the error at the TOP of a long form,
+  // while Send sits at the bottom, so the tap seemed to do nothing. The error
+  // now also shows beside Send, and the form jumps to the field itself.
+  const failOn = (field, message) => {
+    setError(message);
+    const el = formRef.current?.querySelector(`[name="${field}"], [data-field="${field}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    (el.matches('input, select, textarea') ? el : el.querySelector('input'))?.focus({ preventScroll: true });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     // Validation
     if (recipientProfile.role === 'AGENT' && !formData.selectedArtistId) {
-      setError(t('offer.selectArtistError'));
+      failOn('selectedArtistId', t('offer.selectArtistError'));
       return;
     }
     if (!formData.venueName.trim()) {
-      setError(t('offer.venueRequired'));
+      failOn('venueName', t('offer.venueRequired'));
       return;
     }
     if (!formData.city || !formData.country || !formData.zone) {
-      setError(t('offer.cityRequired'));
+      failOn('city', t('offer.cityRequired'));
       return;
     }
     if (!formData.date) {
-      setError(t('offer.dateRequired'));
+      failOn('date', t('offer.dateRequired'));
       return;
     }
 
@@ -313,7 +326,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
     }
 
     if (!formData.fee || parseFloat(formData.fee) <= 0) {
-      setError(t('chat.enterValidFee'));
+      failOn('fee', t('chat.enterValidFee'));
       return;
     }
 
@@ -322,16 +335,16 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
     if (logisticsRequired) {
       const cap = parseInt(formData.eventCapacity, 10);
       if (!formData.eventCapacity || Number.isNaN(cap) || cap <= 0) {
-        setError(t('offer.capacityRequired'));
+        failOn('eventCapacity', t('offer.capacityRequired'));
         return;
       }
       const rooms = parseInt(formData.eventRoomsCount, 10);
       if (!formData.eventRoomsCount || Number.isNaN(rooms) || rooms <= 0) {
-        setError(t('offer.roomsRequired'));
+        failOn('eventRoomsCount', t('offer.roomsRequired'));
         return;
       }
       if (!formData.eventStage.trim()) {
-        setError(t('offer.stageRequired'));
+        failOn('eventStage', t('offer.stageRequired'));
         return;
       }
     }
@@ -518,7 +531,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="make-offer-form">
+        <form ref={formRef} onSubmit={handleSubmit} className="make-offer-form">
           {error && (
             <div className="error-message">
               {error}
@@ -532,6 +545,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               <div className="form-group">
                 <label>{t('offer.selectArtistToBook')} *</label>
                 <select
+                  name="selectedArtistId"
                   value={formData.selectedArtistId}
                   onChange={handleArtistChange}
                   className="form-input"
@@ -591,6 +605,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               ) : (
                 <input
                   type="text"
+                  name="venueName"
                   value={formData.venueName}
                   onChange={(e) => handleChange('venueName', e.target.value)}
                   placeholder={isArtistOrAgent ? recipientProfile.name : t('offer.yourVenueName')}
@@ -605,7 +620,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               )}
             </div>
 
-            <div className="form-group">
+            <div className="form-group" data-field="city">
               <label>{t('editProfile.city')} *</label>
               <CitySearch
                 key={`city-${geoPrefillKey}`}
@@ -621,7 +636,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               <label>{t('tour.date')} *</label>
               <input className="form-input"
                 type="date"
-                value={formData.date}
+                name="date"
+                  value={formData.date}
                 min={tourFrom || undefined}
                 max={tourTo || undefined}
                 onChange={(e) => handleChange('date', e.target.value)}
@@ -671,6 +687,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
                   type="number"
                   step="1"
                   min="0"
+                  name="fee"
                   value={formData.fee}
                   onChange={(e) => handleChange('fee', e.target.value)}
                   onWheel={(e) => e.target.blur()}
@@ -867,6 +884,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
                   type="number"
                   step="1"
                   min="0"
+                  name="eventCapacity"
                   value={formData.eventCapacity}
                   onChange={(e) => handleChange('eventCapacity', e.target.value)}
                   onWheel={(e) => e.target.blur()}
@@ -882,6 +900,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
                   type="number"
                   step="1"
                   min="0"
+                  name="eventRoomsCount"
                   value={formData.eventRoomsCount}
                   onChange={(e) => handleChange('eventRoomsCount', e.target.value)}
                   onWheel={(e) => e.target.blur()}
@@ -906,7 +925,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               )}
               <input
                 type="text"
-                value={formData.eventStage}
+                name="eventStage"
+                  value={formData.eventStage}
                 onChange={(e) => handleChange('eventStage', e.target.value)}
                 placeholder={t('offer.eventStagePlaceholder')}
                 className="form-input"
@@ -1030,6 +1050,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               />
             </div>
           </div>
+
+          {error && <div className="error-message" role="alert">{error}</div>}
 
           <div className="make-offer-actions">
             <button type="button" className="btn btn-outline" onClick={onClose} disabled={loading}>

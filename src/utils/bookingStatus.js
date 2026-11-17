@@ -95,5 +95,7 @@ export function bookingStatusLine(deal, viewer, t, { hasPendingDocs = false } = 
 
   if (artistSide && hasPendingDocs) return line('shareDocs', true);
   if (summary.isFullyConfirmed) return line('paid', false);
-  return artistSide ? line('waitingPayment', false) : line('sendPayment', true);
+  if (artistSide) return line('waitingPayment', false);
+  // An invoice the artist side shared is easy to miss in chat: name it here.
+  return line(categoryStatus(deal.sharedDocuments, 'invoice') === 'shared' ? 'sendPaymentInvoice' : 'sendPayment', true);
 }

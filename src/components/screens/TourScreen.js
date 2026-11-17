@@ -590,20 +590,19 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     }
     groups.push(currentGroup);
 
-    // Format each group
-    const formattedGroups = groups.slice(0, 3).map(group => {
-      const startDate = new Date(group[0]);
-      const endDate = new Date(group[group.length - 1]);
-
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const month = monthNames[startDate.getMonth()];
-      const year = startDate.getFullYear();
-
-      if (group.length === 1) {
-        return `${month} ${startDate.getDate()}, ${year}`;
-      } else {
-        return `${month} ${startDate.getDate()}-${endDate.getDate()}, ${year}`;
-      }
+    // Each group in the app language ("Dec 12–13, 2026", "2026年12月12日～13日"):
+    // the month names used to be hard-coded English in every language.
+    // The year goes once, where the language puts it: first in CJK, last elsewhere.
+    const locale = t('dateFormat.locale');
+    const yearFirst = /^(ja|zh|ko)/i.test(locale);
+    const noYear = { year: undefined };
+    const formattedGroups = groups.slice(0, 3).map((group) => {
+      const first = group[0];
+      const last = group[group.length - 1];
+      if (group.length === 1) return formatEventDate(first, locale);
+      return yearFirst
+        ? `${formatEventDate(first, locale)} – ${formatEventDate(last, locale, noYear)}`
+        : `${formatEventDate(first, locale, noYear)} – ${formatEventDate(last, locale)}`;
     });
 
     return formattedGroups.join('; ');

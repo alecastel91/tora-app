@@ -1441,6 +1441,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       deal.technicalRequirements && { label: lbl('chat.technicalLabel'), value: deal.technicalRequirements },
       depositDeadline && { label: lbl('offer.depositDeadline'), value: formatEventDate(depositDeadline, locale) },
       finalPaymentDeadline && { label: lbl('offer.finalPaymentDeadline'), value: formatEventDate(finalPaymentDeadline, locale) },
+      // Say so rather than drop the rows: a missing row read as "unclear" (beta feedback bf1f8cca).
+      !depositDeadline && !finalPaymentDeadline && { label: lbl('bookings.paymentDeadlinesLabel'), value: t('bookings.noDeadlineAgreed') },
     ].filter(Boolean);
 
     return (
