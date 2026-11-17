@@ -25,8 +25,9 @@ import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../util
 // user actually switches to the globe view (matches the PdfViewer lazy pattern).
 const SearchGlobe = lazy(() => import('../common/SearchGlobe'));
 
-// The globe's Travelling view, tapped by a FREE member: same upsell, its own words.
-const TRAVEL_UPSELL = '__travel';
+// "Near a city": anywhere within the radius, whatever the town is called.
+const NEAR_RADII = [25, 50, 100, 300];
+const DEFAULT_NEAR_KM = 100;
 
 const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, accountUser }) => {
   const { user, likedProfiles, toggleLike, sentRequests, sendConnectionRequest, connectedUsers, receivedRequests, acceptRequest, declineRequest } = useAppContext();
@@ -39,7 +40,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   // "Suggested for you" — complementary-role recommendations shown on the
   // list view's empty state (no query, no filters).
   const suggestedProfiles = useProfileSuggestions(user?.id);
-  const [globeUpsellCity, setGlobeUpsellCity] = useState(null); // FREE member tapped a locked city
+  // FREE member tapped a locked city or the Travelling view: { kind: 'city', city } | { kind: 'travel' } | null
+  const [globeUpsell, setGlobeUpsell] = useState(null);
   const stageRef = useRef(null);
   const [stageH, setStageH] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -50,7 +52,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     countries: [],
     cities: [],
     genres: [],
-    near: [], // [] or [{ city, country, zone, radiusKm }] — an array so the filter count sees it
+    near: null, // null or { city, country, zone, radiusKm }
   });
   const [searchResults, setSearchResults] = useState([]);
   const [agencyResults, setAgencyResults] = useState([]);
@@ -225,10 +227,10 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       if (f.countries.length > 0) params.countries = f.countries.join(',');
       if (f.cities.length > 0) params.cities = f.cities.join(',');
       if (f.genres.length > 0) params.genres = f.genres.join(',');
-      if (f.near?.length) {
-        params.nearCity = f.near[0].city;
-        params.nearCountry = f.near[0].country;
-        params.radiusKm = f.near[0].radiusKm;
+      if (f.near) {
+        params.nearCity = f.near.city;
+        params.nearCountry = f.near.country;
+        params.radiusKm = f.near.radiusKm;
       }
 
       const response = await apiService.searchProfiles(params);
@@ -277,15 +279,12 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       countries: [],
       cities: [],
       genres: [],
-      near: [],
+      near: null,
     });
   };
-  // "Near a city": anywhere within the radius, whatever the town is called.
-  const NEAR_RADII = [25, 50, 100, 300];
   const setNear = (patch) => setFilters((f) => {
-    const cur = f.near[0] || { radiusKm: 100 };
-    const next = { ...cur, ...patch };
-    return { ...f, near: next.city ? [next] : [] };
+    const next = { ...(f.near || { radiusKm: DEFAULT_NEAR_KM }), ...patch };
+    return { ...f, near: next.city ? next : null };
   });
 
   const getAvailableCountries = () => {
@@ -314,7 +313,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
     });
   };
 
-  const activeFilterCount = Object.values(filters).reduce((count, arr) => count + arr.length, 0);
+  const { near, ...listFilters } = filters;
+  const activeFilterCount = Object.values(listFilters).reduce((count, arr) => count + arr.length, 0) + (near ? 1 : 0);
 
   const handleLike = async (profileId, likedProfile) => {
     console.log('Like button clicked for profile:', profileId);
@@ -618,8 +618,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               locked={!hasGlobalSearch()}
               userCity={user?.city}
               userCountry={user?.country}
-              onLockedCity={setGlobeUpsellCity}
-              onLockedTravel={() => setGlobeUpsellCity(TRAVEL_UPSELL)}
+              onLockedCity={(city) => setGlobeUpsell({ kind: 'city', city })}
+              onLockedTravel={() => setGlobeUpsell({ kind: 'travel' })}
               topInset={user && !hasGlobalSearch() ? 118 : 66}
               bottomInset={8}
             />
@@ -924,8 +924,8 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             >
               <span>{t('search.nearCity')}</span>
               <span className="dropdown-value">
-                {filters.near.length > 0
-                  ? `${filters.near[0].city} · ${filters.near[0].radiusKm} km`
+                {filters.near
+                  ? `${filters.near.city} · ${filters.near.radiusKm} km`
                   : t('search.nearAnywhere')}
               </span>
               <span className="dropdown-arrow">{openDropdown === 'near' ? '▲' : '▼'}</span>
@@ -933,15 +933,15 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
             {openDropdown === 'near' && (
               <div className="filter-dropdown-content flex flex-col gap-3" style={{ padding: 14 }}>
                 <CitySearch
-                  city={filters.near[0]?.city || ''}
-                  country={filters.near[0]?.country || ''}
-                  zone={filters.near[0]?.zone || ''}
+                  city={filters.near?.city || ''}
+                  country={filters.near?.country || ''}
+                  zone={filters.near?.zone || ''}
                   onSelect={(city, country, zone) => setNear({ city, country, zone })}
                 />
                 <div className="flex flex-wrap gap-2">
                   {NEAR_RADII.map((km) => (
                     <button key={km} type="button" onClick={() => setNear({ radiusKm: km })}
-                      className={`cursor-pointer rounded-full border px-3 py-1 text-[12px] ${(filters.near[0]?.radiusKm || 100) === km ? 'border-infrared bg-infrared/15 text-white' : 'border-white/15 bg-transparent text-white/70'}`}>
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-[12px] ${(filters.near?.radiusKm || DEFAULT_NEAR_KM) === km ? 'border-infrared bg-infrared/15 text-white' : 'border-white/15 bg-transparent text-white/70'}`}>
                       {km} km
                     </button>
                   ))}
@@ -1125,32 +1125,32 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       )}
 
       {/* Globe locked-city upsell (FREE members tapping a Premium pin) */}
-      {globeUpsellCity && (
-        <OverlayPortal><div className="modal-overlay" onClick={() => setGlobeUpsellCity(null)}>
+      {globeUpsell && (
+        <OverlayPortal><div className="modal-overlay" onClick={() => setGlobeUpsell(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{t(globeUpsellCity === TRAVEL_UPSELL ? 'globe.travelling' : 'search.globeLockedTitle')}</h3>
-              <button className="modal-close" onClick={() => setGlobeUpsellCity(null)}>×</button>
+              <h3>{t(globeUpsell.kind === 'travel' ? 'globe.travelling' : 'search.globeLockedTitle')}</h3>
+              <button className="modal-close" onClick={() => setGlobeUpsell(null)}>×</button>
             </div>
             <div className="modal-body">
               <div className="limit-message-centered">
                 <div className="limit-icon">
                   <SlashCircleIcon />
                 </div>
-                <p className="limit-main-text">{globeUpsellCity === TRAVEL_UPSELL ? t('globe.travelLockedBody') : t('search.globeLockedBody', { city: globeUpsellCity })}</p>
+                <p className="limit-main-text">{globeUpsell.kind === 'travel' ? t('globe.travelLockedBody') : t('search.globeLockedBody', { city: globeUpsell.city })}</p>
               </div>
             </div>
             <div className="modal-footer">
               <button
                 className="btn btn-outline"
-                onClick={() => setGlobeUpsellCity(null)}
+                onClick={() => setGlobeUpsell(null)}
               >
                 {t('common.close')}
               </button>
               <button
                 className="btn btn-upgrade"
                 onClick={() => {
-                  setGlobeUpsellCity(null);
+                  setGlobeUpsell(null);
                   if (onOpenPremium) {
                     onOpenPremium();
                   }

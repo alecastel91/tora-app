@@ -7,7 +7,7 @@ import { zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { CloseIcon, CalendarIcon, ListIcon } from '../../utils/icons';
 import Modal from '../common/Modal';
 import apiService from '../../services/api';
-import { clampDateRange } from '../../utils/dates';
+import { clampDateRange, localIsoDay } from '../../utils/dates';
 import { appAlert } from '../../utils/dialogs';
 import { isYearlyViewer } from '../../utils/subscription';
 import { useNativeDesktop } from '../../utils/desktopV2';
@@ -81,8 +81,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   const upcomingEvents = useMemo(() => {
     // deal.date is date-only (UTC midnight): compare the calendar day as a
     // string so a gig "today" never slips to yesterday west of UTC.
-    const n = new Date();
-    const todayIso = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+    const todayIso = localIsoDay();
     return deals
       .filter((deal) => String(deal.date).slice(0, 10) >= todayIso && ['PENDING', 'NEGOTIATING', 'ACCEPTED'].includes(deal.status))
       .sort((a, b) => String(a.date).localeCompare(String(b.date)))

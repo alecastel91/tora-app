@@ -39,6 +39,16 @@ export function formatEventDate(value, locale, opts = {}) {
 }
 
 /**
+ * The viewer's own calendar day as 'YYYY-MM-DD', `offsetDays` from today —
+ * LOCAL, not UTC (before 9am in Tokyo, UTC is still on yesterday).
+ */
+export function localIsoDay(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
  * Format a `DateTime` moment in the viewer's LOCAL zone (a timestamp, not a
  * calendar date). Returns '' for a null/invalid value.
  */
