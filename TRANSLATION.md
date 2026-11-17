@@ -54,9 +54,10 @@ kanji deliberately.
 | Artist | アーティスト | 아티스트 | 艺人 | Artista | Artiste | Artista | Artista |
 | Agent | エージェント | 에이전트 | 经纪人 | Agente | Agent | Agente | Agente |
 | Promoter | プロモーター | 프로모터 | 主办方 | Promotor | Promoteur | Promoter | Promotor |
-| **Venue** | **ベニュー** | 베뉴 | 场地 | Sala | Lieu | Venue | **Casa** |
+| **Venue** | **ヴェニュー** | 베뉴 | 场地 | Sala | Lieu | Venue | **Casa** |
 
-> **Venue is the trap.** JA uses ベニュー for the *role*, never 会場 — but 会場 is
+> **Venue is the trap.** JA uses ヴェニュー for the *role* (changed from ベニュー on
+> 2026-11-17 to match the reviewed press release), never 会場 — but 会場 is
 > correct for a *physical* venue ("会場名" = venue name). PT-BR uses **casa** for
 > the role, "local" for a physical space.
 
@@ -64,7 +65,7 @@ Product vocabulary:
 
 | EN | JA | ZH | PT-BR | Notes |
 |---|---|---|---|---|
-| booking | ブッキング | 预订 | booking / reserva | |
+| booking | ブッキング (never 予約) | 预订 | reserva / booking | IT: il booking (never prenotazione). ES: never the English "venue", use sala |
 | offer | オファー | 报价 | proposta | |
 | connection | コネクション | 人脉 | conexão | |
 | tour | ツアー | 巡演 | turnê | |
@@ -82,7 +83,7 @@ Product vocabulary:
 translation; the reviewer rewrote several literal renderings that were
 grammatical but read as translated. Katakana for role names in prose.
 
-**Portuguese (BR)** — *você*, never *tu*. So: `seu/sua` not `teu/tua`;
+**Portuguese (BR)** — *você*, never *tu*. Never European forms: turnê (not digressão), reserva (not marcação), equipe (not equipa), compartilhar, registro, gêneros, "com a gente" (not connosco); casas de shows for venues in prose. So: `seu/sua` not `teu/tua`;
 `pode/quer/tem` not `podes/queres/tens`; imperatives in the *você* form
 (`Selecione`, not `Seleciona`). Vocabulary: **usuário** (not utilizador),
 **gerenciar** (not gerir), **arquivo** (not ficheiro), **compartilhar** (not
@@ -94,7 +95,7 @@ before the verb (`se conectar`), not attached after (`ligar-te`).
 (an artist headline that said the artist does the hiring) — check that the
 *direction* of a transaction survives translation.
 
-**French** — *vous*. Watch for phrasings that read as an insult echo; one was
+**French** — *vous*, everywhere including notifications (25 tu-forms were fixed on 2026-11-17). Watch for phrasings that read as an insult echo; one was
 caught in review ("Faites-vous voir").
 
 **All languages** — one account can hold several profiles across roles. Do not

@@ -1331,7 +1331,7 @@ const ko = {
     calendarNoArtists: '로스터에 아티스트를 추가하면 여기서 캘린더를 관리할 수 있습니다.',
     calendarAddArtists: '로스터 열기',
     calendarIntro: '비어 있는 날짜와 머무는 곳을 표시하세요. 매치와 이동 알림은 이 정보로 작동합니다.',
-    kickstartIntro: '지역별로 투어를 계획하고 베뉴와 프로모터가 날짜를 제안하게 하세요.',
+    kickstartIntro: '지역별 투어를 계획하고 베뉴와 프로모터에게 일정 제안을 받아보세요.',
     matchesSource: '매치는 내 가능 일정과 이동 일정을 기준으로 만들어집니다.',
     matchesSourceAgent: '매치는 소속 아티스트의 가능 일정과 이동 일정을 기준으로 만들어집니다.',
     editAvailability: '편집',

@@ -7,7 +7,7 @@
  * Catches the four ways translations have actually broken here:
  *   1. key drift between locales (a missing key silently shows English)
  *   2. {{var}} drift (a user sees a literal "{{n}}")
- *   3. banned terminology (ヴェニュー, palavra-passe, tu-forms in pt-BR…)
+ *   3. banned terminology (ベニュー, 予約 for a booking, palavra-passe, tu-forms in pt-BR…)
  *   4. brand terms that got translated (Tour Kickstart, TORA)
  *
  * Exits non-zero when anything fails, so it can gate a commit or CI.
@@ -23,7 +23,8 @@ const DIR = path.join(HERE, '..', 'src', 'translations');
 // Terms that must never appear, per locale, with what to use instead.
 const BANNED = {
   ja: [
-    [/ヴェニュー/, 'ベニュー (the reviewed term for the VENUE role)'],
+    [/ベニュー/, 'ヴェニュー (the reviewed term for the VENUE role, Nov 2026)'],
+    [/予約(?!されて)/, 'ブッキング (予約 reads as a consumer reservation)'],
   ],
   pt: [
     [/\bpalavra-passe\b/i, 'senha'],

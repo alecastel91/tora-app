@@ -1331,7 +1331,7 @@ const zh = {
     calendarNoArtists: '把艺人加入名册后，即可在此管理他们的日历。',
     calendarAddArtists: '打开名册',
     calendarIntro: '标记你有空的日期和所在地。匹配和行程提醒都基于这些信息。',
-    kickstartIntro: '按地区规划巡演，让场地和主办方沿途提议日期。',
+    kickstartIntro: '按地区规划巡演，让场地方和主办方提出沿途演出日期。',
     matchesSource: '匹配基于你的空档日期和行程安排。',
     matchesSourceAgent: '匹配基于你代理艺人的空档日期和行程安排。',
     editAvailability: '编辑',
