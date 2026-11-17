@@ -591,7 +591,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
               <EventPhotoPicker value={eventImage} onChange={setEventImage} disabled={loading} />
             </div>
 
-            <div className="form-group">
+            <div className="form-group" data-field="venueName">
               <label>{t('offer.venueName')} *</label>
               {currentUser.role === 'PROMOTER' ? (
                 // Promoters run events in other people's rooms — autocomplete

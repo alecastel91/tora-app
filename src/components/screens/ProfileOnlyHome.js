@@ -30,6 +30,7 @@ const ProfileOnlyHome = ({ onSignOut }) => {
   const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [page, setPage] = useState(null);
 
   if (editing) return <EditProfileScreen onClose={() => setEditing(false)} />;
 
@@ -62,7 +63,7 @@ const ProfileOnlyHome = ({ onSignOut }) => {
           n={2}
           done={verified}
           title={t('profileOnly.step2Title')}
-          body={inReview ? t('verify.inReviewTitle') : t('profileOnly.step2Body')}
+          body={inReview ? t('verify.inReviewTitle') : t(user?.role === 'AGENT' ? 'profileOnly.step2BodyAgent' : 'profileOnly.step2Body')}
           action={!verified && (
             <button type="button" className={linkButton} onClick={() => setVerifying(true)}>
               {inReview ? t('verify.statusButton') : t('verify.verifyButton')}
@@ -71,12 +72,12 @@ const ProfileOnlyHome = ({ onSignOut }) => {
         />
         <Step
           n={3}
-          done={false}
+          done={verified && !!page?.enabled}
           title={t('profileOnly.step3Title')}
           body={t('profileOnly.step3Body')}
         />
         {/* Once verified: page off (publish) or live (link, share sheet, Instagram step). */}
-        {verified && <PublicPageCard profile={user} onVerify={() => setVerifying(true)} onEdit={() => setEditing(true)} />}
+        {verified && <PublicPageCard profile={user} onState={setPage} onVerify={() => setVerifying(true)} onEdit={() => setEditing(true)} />}
 
         <p className="m-0 mt-4 text-[12.5px] leading-relaxed text-white/45">{t('profileOnly.launchNote')}</p>
       </main>

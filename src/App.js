@@ -362,6 +362,7 @@ function App() {
   useEffect(() => {
     const onExpired = () => {
       apiService.removeToken();
+      setAccountUser(null);
       updateUser(null);
       closeAllOverlays();
       setActiveTab(HOME_TAB);
@@ -409,9 +410,10 @@ function App() {
   }, []);
 
   // Refresh accountUser from backend (called after likes, connections, etc.)
-  const refreshAccountUser = async () => {
+  // AppContext passes the /auth/me it just fetched; otherwise fetch it here.
+  const refreshAccountUser = async (fetched) => {
     try {
-      const data = await apiService.getCurrentUser();
+      const data = fetched || await apiService.getCurrentUser();
       if (data.user) {
         setAccountUser(data.user);
       }
@@ -444,7 +446,7 @@ function App() {
   // Pre-launch profile-only account (tora-backend utils/access.js): the app is
   // ProfileOnlyHome until access opens, and nothing polls the member graph.
   const profileOnly = accountUser?.accessLevel === 'PROFILE_ONLY';
-  useEffect(() => { setProfileOnly(profileOnly); }, [profileOnly, setProfileOnly]);
+  useEffect(() => { setProfileOnly(accountUser ? profileOnly : null); }, [accountUser, profileOnly, setProfileOnly]);
 
   // Fetch unread messages count (includes both unread messages and connection requests)
   useEffect(() => {
@@ -561,7 +563,14 @@ function App() {
   };
 
   const handleSignupSuccess = (data) => {
-    updateUser(data.profile);
+    // Same account-level state as login: accessLevel decides the profile-only home.
+    if (data.user) {
+      setAccountUser(data.user);
+      const currency = data.user.preferredCurrency || 'USD';
+      setPreferredCurrency(currency);
+      setContextCurrency(currency);
+    }
+    updateUser(data.profiles || data.profile);
     setIsAuthenticated(true);
   };
 
@@ -595,6 +604,7 @@ function App() {
   const handleLogout = () => {
     apiService.logout();
     setIsAuthenticated(false);
+    setAccountUser(null);
     updateUser(null);
     // next login starts fresh on the home tab
     closeAllOverlays();

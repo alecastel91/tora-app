@@ -2737,6 +2737,7 @@ const ja = {
     step1Body: '写真、プロフィール文、ジャンル、リンク。',
     step2Title: '認証を受ける',
     step2Body: 'Instagramで@tora.verifyにコードを送ってください。認証済みのプロフィールはページを公開できます。',
+    step2BodyAgent: "エージェンシーのウェブサイトと同じドメインのメールアドレスを確認してください。認証済みのプロフィールはページを公開できます。",
     step3Title: 'ページを公開してシェアする',
     step3Body: 'あなたのページはtorahub.io/@yournameです。リンクをInstagramのプロフィールに追加しましょう。',
     editProfile: 'プロフィールを編集',

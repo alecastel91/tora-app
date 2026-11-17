@@ -552,7 +552,7 @@ const NewsScreen = ({ onOpenProfile, onOpenPremium }) => {
                 </div>
               </div>
               {/* menu: nothing in it for a post by another of my own profiles */}
-              {(isOwn || !isMyAccount) && <div className="relative">
+              {((isOwn && post.type === 'TEXT') || !isMyAccount) && <div className="relative">
                 <button
                   className="cursor-pointer rounded-full border-0 bg-transparent px-2 py-1 text-white/40 hover:text-white"
                   onClick={(e) => { e.stopPropagation(); setMenuFor(menuFor === post.id ? null : post.id); }}

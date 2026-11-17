@@ -2737,6 +2737,7 @@ const zh = {
     step1Body: '照片、简介、风格和链接。',
     step2Title: '完成认证',
     step2Body: '在Instagram上把你的验证码发给@tora.verify。通过认证的资料才能发布页面。',
+    step2BodyAgent: "确认与你的经纪公司网站同域名的邮箱。已认证的资料可以发布页面。",
     step3Title: '发布并分享你的页面',
     step3Body: '你的页面地址是torahub.io/@你的名字。把链接放进Instagram简介。',
     editProfile: '编辑资料',

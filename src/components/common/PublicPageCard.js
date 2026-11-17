@@ -15,7 +15,7 @@ const readIgStep = (profileId) => { try { return localStorage.getItem(igStepKey(
    tap copies it), and the one step that makes the page work — putting the
    link in the Instagram bio. Publishing itself lives in Edit profile → Public
    page; this card only offers it. */
-const PublicPageCard = ({ profile, onVerify, onEdit, compact = false }) => {
+const PublicPageCard = ({ profile, onVerify, onEdit, onState, compact = false }) => {
   const { t } = useLanguage();
   const [state, setState] = useState(null);
   const [igDone, setIgDone] = useState(() => readIgStep(profile?.id));
@@ -27,7 +27,7 @@ const PublicPageCard = ({ profile, onVerify, onEdit, compact = false }) => {
     setIgDone(readIgStep(profile?.id));
     if (!profile?.id) return undefined;
     apiService.getPublicPage(profile.id)
-      .then((s) => { if (!cancelled) setState(s); })
+      .then((s) => { if (!cancelled) { setState(s); onState?.(s); } })
       .catch(() => { if (!cancelled) setState(null); });
     return () => { cancelled = true; };
     // Saving the profile can change what the page shows, not whether it is live.

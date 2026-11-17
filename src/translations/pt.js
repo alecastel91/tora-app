@@ -2737,6 +2737,7 @@ const pt = {
     step1Body: 'Foto, bio, gêneros e links.',
     step2Title: 'Faça a verificação',
     step2Body: 'Envie seu código para @tora.verify no Instagram. Perfis verificados podem publicar uma página.',
+    step2BodyAgent: "Confirme o e-mail da sua agência, o do domínio do site. Perfis verificados podem publicar uma página.",
     step3Title: 'Publique e compartilhe sua página',
     step3Body: 'Sua página fica em torahub.io/@seunome. Coloque o link na bio do Instagram.',
     editProfile: 'Editar perfil',

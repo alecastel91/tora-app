@@ -15,7 +15,7 @@ import { requiredEmailDomain } from '../../utils/emailDomain';
  */
 const AgentVerificationPanel = ({ onClose, onVerified }) => {
   const { t } = useLanguage();
-  const { user, reloadProfileData } = useAppContext();
+  const { user, reloadProfileData, profileOnly } = useAppContext();
 
   // 'choose' | 'email' | 'code' | 'vouch' | 'done'
   const [step, setStep] = useState('choose');
@@ -133,16 +133,19 @@ const AgentVerificationPanel = ({ onClose, onVerified }) => {
             </span>
           </button>
 
-          <button
-            type="button"
-            className="rounded-xl border border-white/12 bg-black/30 p-4 text-left transition-colors hover:border-infrared/40"
-            onClick={() => setStep('vouch')}
-          >
-            <span className="block text-sm font-semibold text-white">{t('verify.agentMethodVouch')}</span>
-            <span className="mt-1 block text-[12.5px] leading-relaxed text-white/50">
-              {t('verify.agentMethodVouchHint')}
-            </span>
-          </button>
+          {/* Vouching searches other members: closed until launch for profile-only accounts. */}
+          {!profileOnly && (
+            <button
+              type="button"
+              className="rounded-xl border border-white/12 bg-black/30 p-4 text-left transition-colors hover:border-infrared/40"
+              onClick={() => setStep('vouch')}
+            >
+              <span className="block text-sm font-semibold text-white">{t('verify.agentMethodVouch')}</span>
+              <span className="mt-1 block text-[12.5px] leading-relaxed text-white/50">
+                {t('verify.agentMethodVouchHint')}
+              </span>
+            </button>
+          )}
         </div>
       )}
 

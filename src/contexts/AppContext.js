@@ -66,8 +66,12 @@ export const AppProvider = ({ children }) => {
   // Subscription tier from active profile (per-profile, synced when user changes)
   const [accountSubscriptionTier, setAccountSubscriptionTier] = useState('FREE');
   // Pre-launch profile-only account: no member graph to load or poll (the
-  // server refuses those calls with PROFILE_ONLY). App sets it from /auth/me.
-  const [profileOnly, setProfileOnly] = useState(false);
+  // server refuses those calls with PROFILE_ONLY). App sets it from /auth/me;
+  // null = not known yet, and nothing member-wide loads until it is false.
+  const [profileOnly, setProfileOnly] = useState(null);
+  // Read at call time: the poll and inbox closures outlive the render that made them.
+  const profileOnlyRef = useRef(profileOnly);
+  profileOnlyRef.current = profileOnly;
 
   // Callback to refresh accountUser in App.js (registered by App.js on mount)
   const [refreshAccountUserCallback, setRefreshAccountUserCallback] = useState(null);
@@ -91,7 +95,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const loadProfileData = async () => {
       const userId = user?.id;
-      if (!user || !userId || profileOnly) return;
+      if (!user || !userId || profileOnly !== false) return;
       // This effect keys on user?.id, so a re-run means the profile changed —
       // it must NOT be short-circuited by an in-flight load for the OLD profile
       // (F6-02). The stale guard below discards a superseded result instead.
@@ -152,6 +156,7 @@ export const AppProvider = ({ children }) => {
     if (!userData) {
       setUser(null);
       setUserProfiles([]);
+      setProfileOnly(null);
       return;
     }
 
@@ -252,9 +257,27 @@ export const AppProvider = ({ children }) => {
   const reloadSeqRef = useRef(0);
   const reloadProfileData = async () => {
     const userId = user?.id;
-    if (!user || !userId || profileOnly) return;
+    if (!user || !userId || profileOnlyRef.current === null) return;
     if (isLoadingProfileData) return; // Prevent duplicate fetches
     const seq = ++reloadSeqRef.current;
+
+    // Profile-only: no graph, but the account still changes (verification
+    // approved, page published, access opened at launch) — refresh it alone.
+    if (profileOnlyRef.current) {
+      try {
+        const userData = await apiService.getCurrentUser();
+        if (seq !== reloadSeqRef.current) return;
+        const currentProfile = userData.profiles?.find(p => p.id === userId);
+        if (currentProfile) {
+          setUser(currentProfile);
+          setUserProfiles(userData.profiles);
+        }
+        if (refreshAccountUserCallback) refreshAccountUserCallback(userData);
+      } catch (error) {
+        console.error('Error refreshing profile-only account:', error);
+      }
+      return;
+    }
 
     try {
       setIsLoadingProfileData(true);
@@ -294,7 +317,7 @@ export const AppProvider = ({ children }) => {
         }
         // Also refresh accountUser in App.js (usage stats, subscription tier)
         if (refreshAccountUserCallback) {
-          refreshAccountUserCallback();
+          refreshAccountUserCallback(userData);
         }
       }
     } catch (error) {
@@ -345,7 +368,7 @@ export const AppProvider = ({ children }) => {
   // message.
   const inboxReloadTimerRef = useRef(null);
   useEffect(() => {
-    if (!user?.id) return undefined;
+    if (!user?.id || profileOnly !== false) return undefined;
     const unsub = subscribeToInbox(user.id, () => {
       if (inboxReloadTimerRef.current) clearTimeout(inboxReloadTimerRef.current);
       inboxReloadTimerRef.current = setTimeout(() => {
@@ -357,7 +380,7 @@ export const AppProvider = ({ children }) => {
       if (typeof unsub === 'function') unsub();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, profileOnly]);
 
   // Calendar matching functionality
   const getCalendarMatches = () => {

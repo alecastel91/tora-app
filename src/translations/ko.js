@@ -2737,6 +2737,7 @@ const ko = {
     step1Body: '사진, 소개, 장르, 링크.',
     step2Title: '인증 받기',
     step2Body: 'Instagram에서 @tora.verify로 코드를 보내세요. 인증된 프로필만 페이지를 공개할 수 있습니다.',
+    step2BodyAgent: "에이전시 웹사이트 도메인의 이메일 주소를 인증하세요. 인증된 프로필은 페이지를 공개할 수 있습니다.",
     step3Title: '페이지 공개하고 공유하기',
     step3Body: '페이지 주소는 torahub.io/@yourname입니다. 링크를 Instagram 소개란에 넣으세요.',
     editProfile: '프로필 편집',
