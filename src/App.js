@@ -328,7 +328,14 @@ function App() {
     }
     setShowGettingStarted(false);
   };
-  const { t, language, changeLanguage, availableLanguages } = useLanguage();
+  const { t, language, changeLanguage, availableLanguages, syncAccountLanguage } = useLanguage();
+  // Once per signed-in account: open in the account's language, or teach the
+  // account this device's (its emails follow it).
+  const accountId = accountUser?.id;
+  const accountLanguage = accountUser?.language;
+  useEffect(() => {
+    if (accountId) syncAccountLanguage(accountLanguage);
+  }, [accountId]); // eslint-disable-line react-hooks/exhaustive-deps
   const { updateUser, user, setPreferredCurrency: setContextCurrency, setAccountSubscriptionTier, setRefreshAccountUserCallback, setBillingCurrency, replaceProfiles, userProfiles, setProfileOnly } = useAppContext();
 
   // Free-tier offer limit tripped anywhere: styled upgrade prompt. Declared

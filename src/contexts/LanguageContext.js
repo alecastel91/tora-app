@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import apiService from '../services/api';
 import en from '../translations/en';
 
 const LanguageContext = createContext();
@@ -78,6 +79,8 @@ export const LanguageProvider = ({ children }) => {
   const changeLanguage = (newLanguage) => {
     if (availableLanguages.some((l) => l.code === newLanguage)) {
       setLanguage(newLanguage);
+      // The account remembers it: TORA's emails go out in this language.
+      if (localStorage.getItem('token')) apiService.updateUserPreferences({ language: newLanguage }).catch(() => {});
       // Beta T09: "change the language, then change it back" = two changes.
       try {
         const n = (parseInt(localStorage.getItem('tora-beta-lang-changes') || '0', 10) || 0) + 1;
@@ -99,10 +102,22 @@ export const LanguageProvider = ({ children }) => {
     { code: 'pt', name: 'Portuguese', nativeName: 'Português' }
   ];
 
+  // On login: an account that already has a language (from the application or
+  // another device) opens the app in it. An account without one learns this
+  // device's language, so its emails are not stuck in English.
+  const syncAccountLanguage = useCallback((accountLanguage) => {
+    if (accountLanguage && availableLanguages.some((l) => l.code === accountLanguage)) {
+      setLanguage(accountLanguage);
+    } else if (!accountLanguage && localStorage.getItem('token')) {
+      apiService.updateUserPreferences({ language }).catch(() => {});
+    }
+  }, [language]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const value = {
     language,
     t,
     changeLanguage,
+    syncAccountLanguage,
     availableLanguages
   };
 
