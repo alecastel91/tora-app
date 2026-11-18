@@ -7,7 +7,7 @@ import { isPremiumViewer } from '../../utils/subscription';
 import { zones, countriesByZone, citiesByCountry, genresList } from '../../data/profiles';
 import { ROLES, roleLabel } from '../../utils/roles';
 import { appAlert } from '../../utils/dialogs';
-import { SearchIcon } from '../../utils/icons';
+import { SearchIcon, ListIcon, GlobeIcon } from '../../utils/icons';
 import LoadingGlobe from '../common/LoadingGlobe';
 import ConnectAction from '../common/ConnectAction';
 import PhotoCard, { PhotoCardLike } from '../common/PhotoCard';
@@ -40,7 +40,10 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
   const [agencies, setAgencies] = useState([]);
   const [openAgencyId, setOpenAgencyId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [full, setFull] = useState(false);
+  // Search opens on the globe across the whole page, like the phone app; the
+  // list joins it on the left on demand (or as soon as you type a name).
+  const [listOpen, setListOpen] = useState(false);
+  const listInputRef = useRef(null);
   // A city/country tapped on the globe narrows the LIST only. It must stay out
   // of `filters`, which drive the fetch the globe's own pins come from.
   const [mapSel, setMapSel] = useState(null);
@@ -78,13 +81,6 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
     return () => clearTimeout(id);
   }, [run]);
 
-  // Esc leaves the full-screen map.
-  useEffect(() => {
-    if (!full) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') setFull(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [full]);
 
   const applyFilters = (v) => {
     // Same gate as SearchScreen: FREE members browse their own country only.
@@ -142,17 +138,10 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
       options: (d) => [{ value: 'all', label: t('calendar.allCities') }, ...(citiesByCountry[d.country] || []).map((c) => ({ value: c, label: c }))] },
   ];
 
-  const FullscreenGlyph = ({ exit }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {exit
-        ? <><path d="M9 3v6H3" /><path d="M15 21v-6h6" /><path d="M21 9h-6V3" /><path d="M3 15h6v6" /></>
-        : <><path d="M3 9V3h6" /><path d="M21 15v6h-6" /><path d="M15 3h6v6" /><path d="M9 21H3v-6" /></>}
-    </svg>
-  );
 
   return (
     <div className="screen active d3-screen">
-      <div className="d3-ws d3-fill">
+      <div className={`d3-ws d3-fill${listOpen ? '' : ' d3-ws--map'}`}>
         {/* ---------------- list ---------------- */}
         <div className="d3-panel flex min-w-0 flex-col">
           <div className="border-b border-white/[0.07] px-3 pb-3 pt-3">
@@ -160,6 +149,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
               <label className="relative block min-w-0 flex-1">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35 [&>svg]:h-4 [&>svg]:w-4"><SearchIcon /></span>
                 <input
+                  ref={listInputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t('search.searchByName')}
@@ -219,38 +209,61 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
         </div>
 
         {/* ---------------- map ---------------- */}
-        <div className={`d3-ws-globe${full ? ' d3-ws-globe--full' : ''}`}>
+        <div className="d3-ws-globe">
           <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><LoadingGlobe label={t('search.loadingProfiles')} /></div>}>
             <SearchGlobe
               profiles={results}
               loading={loading}
-              // The full-screen map sits above the profile/Premium layer, so leave it first.
-              onSelectProfile={(p) => { setFull(false); onOpenProfile(p); }}
+              onSelectProfile={onOpenProfile}
               locked={!premium}
               userCity={user?.city}
               userCountry={user?.country}
-              onLockedCity={() => { setFull(false); onOpenPremium?.(); }}
-              // Full screen hides the list, so the globe shows the place's people itself.
-              listTakesOver={!full}
+              onLockedCity={() => onOpenPremium?.()}
+              // Without the list, the globe shows the place's people itself.
+              listTakesOver={listOpen}
               onRolesChange={setMapRoles}
               onSelectionChange={(sel, meta) => setMapSel(sel || (meta?.empty ? { country: meta.country, empty: true } : null))}
-              topInset={full ? 80 : premium ? 16 : 64}
+              topInset={listOpen ? (premium ? 16 : 64) : (premium ? 72 : 120)}
               bottomInset={16}
-              controlsLeft={60} /* clear of the full-screen button */
+              controlsLeft={listOpen ? 60 : 16} /* clear of the hide-list button */
             />
           </Suspense>
-          <button
-            onClick={() => setFull((v) => !v)}
-            aria-label={full ? t('desktop.exitFullscreen') : t('desktop.fullscreen')}
-            title={full ? t('desktop.exitFullscreen') : t('desktop.fullscreen')}
-            className="absolute left-3 top-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/10 bg-black/50 text-white/80 backdrop-blur-md transition-colors hover:border-white/30 hover:text-white [&>svg]:h-4 [&>svg]:w-4"
-          >
-            <FullscreenGlyph exit={full} />
-          </button>
+          {listOpen ? (
+            <button
+              onClick={() => setListOpen(false)}
+              aria-label={t('search.viewGlobe')}
+              title={t('search.viewGlobe')}
+              className="absolute left-3 top-3 z-30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/10 bg-black/50 text-white/80 backdrop-blur-md transition-colors hover:border-white/30 hover:text-white [&>svg]:h-4 [&>svg]:w-4"
+            >
+              <GlobeIcon />
+            </button>
+          ) : (
+            // The page opens on the map: search, filters and the list button float on it.
+            <div className="absolute left-4 right-4 top-4 z-30 flex max-w-[560px] items-center gap-2">
+              <label className="relative block min-w-0 flex-1">
+                <span className="pointer-events-none absolute z-10 left-3 top-1/2 -translate-y-1/2 text-white/40 [&>svg]:h-4 [&>svg]:w-4"><SearchIcon /></span>
+                <input
+                  value={query}
+                  onChange={(e) => { setQuery(e.target.value); setListOpen(true); requestAnimationFrame(() => listInputRef.current?.focus()); }}
+                  placeholder={t('search.searchByName')}
+                  className="h-10 w-full rounded-full border border-white/10 bg-black/45 pl-9 pr-3 text-[13.5px] text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
+                />
+              </label>
+              <FilterButton count={activeChips.length} onClick={() => setShowFilters(true)} label={t('search.filters')} />
+              <button
+                onClick={() => setListOpen(true)}
+                aria-label={t('search.viewList')}
+                title={t('search.viewList')}
+                className="flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-black/45 px-4 text-[12.5px] font-medium text-white/85 backdrop-blur-md transition-colors hover:border-white/30 hover:text-white [&>svg]:h-4 [&>svg]:w-4"
+              >
+                <ListIcon />{t('search.viewList')}
+              </button>
+            </div>
+          )}
           {user && !premium && (
             <button
               onClick={onOpenPremium}
-              className="absolute left-1/2 top-3 z-30 flex -translate-x-1/2 cursor-pointer items-center gap-2 rounded-full border border-infrared/35 bg-infrared/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md"
+              className={`absolute z-30 flex cursor-pointer items-center gap-2 rounded-full border border-infrared/35 bg-infrared/10 px-4 py-2 text-xs text-white/85 backdrop-blur-md ${listOpen ? 'left-1/2 top-3 -translate-x-1/2' : 'left-4 top-[66px]'}`}
             >
               <span className="truncate">{t('profile.searchLimitedTo')} {user.country || user.city}</span>
               <span className="shrink-0 font-semibold text-infrared">{t('search.upgradeNow')}</span>

@@ -222,6 +222,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const ptrs = useRef(new Map());
   const pinchDist = useRef(0);
   const hoveredKey = useRef(null);
+  const lastSigRef = useRef(null); // what the canvas last showed (draw-on-change)
+  const settleRef = useRef(0); // last moment the view moved (detailed coastlines wait for it to settle)
   const selectedKey = useRef(null);
   const selectedCityKey = useRef(null); // city selection only (pin highlight)
   const selectedCountryRef = useRef(null);
@@ -297,11 +299,13 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     const canvas = canvasRef.current;
     if (!canvas || !dims.w || !dims.h) return undefined;
     const ctx = canvas.getContext('2d');
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // 1.5x is sharp on phones and draws ~44% fewer pixels than 2x every frame.
+    const dpr = Math.min(window.devicePixelRatio || 1, window.matchMedia('(pointer: coarse)').matches ? 1.5 : 2);
     canvas.width = dims.w * dpr;
     canvas.height = dims.h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     dimsRef.current = { w: dims.w, h: dims.h, dpr };
+    lastSigRef.current = null; // resizing clears the canvas
 
     // Starfield: regenerated per canvas size, drifts gently via per-star twinkle.
     const starCount = Math.round((dims.w * dims.h) / 8500);
@@ -352,23 +356,25 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         rot.current[0] += 0.12;
       }
       projection.rotate(rot.current).scale(r).translate([cx, cy]);
-      ctx.clearRect(0, 0, W, H);
 
-      const now = performance.now();
+      // Draw only when something on screen changed: an idle globe (paused,
+      // nothing moving) used to repaint the whole planet 60 times a second,
+      // which blocked touch on phones.
+      const sig = [Math.round(rot.current[0] * 100), Math.round(rot.current[1] * 100), Math.round(zoomRef.current * 1000),
+        hoveredKey.current, selectedKey.current, selectedCityKey.current, selectedCountryRef.current,
+        citiesRef.current, zonesRef.current, lockedHubsRef.current, !!DETAIL, draggingRef.current];
+      const last = lastSigRef.current;
+      const same = last && sig.length === last.length && sig.every((v, i) => v === last[i]);
+      if (same) { raf = requestAnimationFrame(frame); return; }
+      const moving = !last || draggingRef.current || focusing.current || sig[0] !== last[0] || sig[1] !== last[1] || sig[2] !== last[2];
+      lastSigRef.current = sig;
+      ctx.clearRect(0, 0, W, H);
 
       // starfield behind the sphere
       for (const s of starsRef.current) {
-        const a = s.a * (0.7 + 0.3 * Math.sin(now * s.tw + s.ph));
-        ctx.fillStyle = s.crimson ? `rgba(255,80,120,${a})` : `rgba(255,255,255,${a})`;
+        ctx.fillStyle = s.crimson ? `rgba(255,80,120,${s.a})` : `rgba(255,255,255,${s.a})`;
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
       }
-
-      // atmosphere: one soft crimson wash (kept gentle on purpose)
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.97, cx, cy, r * 1.16);
-      halo.addColorStop(0, 'rgba(255,51,102,0.20)');
-      halo.addColorStop(1, 'rgba(255,51,102,0)');
-      ctx.fillStyle = halo;
-      ctx.beginPath(); ctx.arc(cx, cy, r * 1.16, 0, 7); ctx.fill();
 
       // ocean sphere — deep, lit from the upper left
       ctx.beginPath(); path(SPHERE);
@@ -383,9 +389,14 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.6; ctx.stroke();
 
       // land — soft top-left light, luminous coastlines (1:50m when close)
+      // The 1:50m coastlines cost several times the 1:110m ones: drawn only
+      // once the view settles, so dragging and zooming stay smooth.
       const close = zoomRef.current >= DETAIL_ZOOM;
       if (close) loadDetail();
-      const atlas = close && DETAIL ? DETAIL : { land: LAND, borders: BORDERS };
+      if (close && moving) settleRef.current = performance.now();
+      const settled = !moving && performance.now() - settleRef.current > 120;
+      if (close && !settled) lastSigRef.current = null; // come back for the detailed pass
+      const atlas = close && DETAIL && settled ? DETAIL : { land: LAND, borders: BORDERS };
       const { land } = atlas;
       ctx.beginPath(); path(land);
       const lg = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
@@ -411,10 +422,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       if (selectedCountryRef.current) {
         ctx.beginPath(); path(selectedCountryRef.current.feature);
         ctx.fillStyle = 'rgba(255,51,102,0.16)'; ctx.fill();
-        ctx.save();
-        ctx.shadowColor = 'rgba(255,51,102,0.8)'; ctx.shadowBlur = 8;
         ctx.strokeStyle = 'rgba(255,51,102,0.75)'; ctx.lineWidth = 1.2; ctx.stroke();
-        ctx.restore();
       }
 
       // spherical shading
@@ -427,7 +435,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
       // rim
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7);
-      ctx.strokeStyle = 'rgba(255,51,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1; ctx.stroke();
 
       const zoom = zoomRef.current;
       const showSecondary = zoom >= SECONDARY_PINS_ZOOM;
@@ -477,16 +485,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         if (!xy) continue;
         const isHov = hoveredKey.current === c.key;
         const rad = 3 + Math.min(count, 8) * 0.7;
-        ctx.save();
-        ctx.shadowColor = 'rgba(255,51,102,0.95)';
-        ctx.shadowBlur = isSel ? 20 : (isHov ? 16 : 10);
-        ctx.fillStyle = '#ff3366';
+        ctx.fillStyle = isSel || isHov ? '#ff4d7a' : '#ff3366';
         ctx.beginPath(); ctx.arc(xy[0], xy[1], rad, 0, 7); ctx.fill();
-        ctx.restore();
         ctx.fillStyle = isSel ? '#fff' : 'rgba(255,255,255,0.85)';
         ctx.beginPath(); ctx.arc(xy[0], xy[1], Math.max(1, rad * 0.36), 0, 7); ctx.fill();
         if (isSel) {
-          const pr = rad + 6 + Math.sin(now * 0.005) * 3;
+          const pr = rad + 6;
           ctx.strokeStyle = 'rgba(255,51,102,0.85)'; ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.arc(xy[0], xy[1], pr, 0, 7); ctx.stroke();
         }
@@ -495,6 +499,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       // label pass — member cities first (sorted by count, so the big ones
       // win the space), hubs last; selection/hover always label.
       ctx.font = `600 12px ${font}`; ctx.textAlign = 'left';
+      ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(4,4,9,0.85)'; // label outline (strokeText)
       for (const c of citiesRef.current) {
         if (!c._xy) continue;
         const isSel = selectedCityKey.current === c.key;
@@ -504,8 +509,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         const lx = c._xy[0] + (3 + Math.min(c._count, 8) * 0.7) + 6, ly = c._xy[1] + 4;
         if (!claimLabel(lx, ly, c.name, isSel || isHov)) continue;
         ctx.fillStyle = isSel ? '#fff' : 'rgba(255,255,255,0.82)';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
-        ctx.fillText(c.name, lx, ly); ctx.shadowBlur = 0;
+        ctx.strokeText(c.name, lx, ly); ctx.fillText(c.name, lx, ly);
       }
       // zone labels — a pill at the zone's middle: "Asia · 3 travelling"
       for (const z of zonesRef.current) {
@@ -525,6 +529,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         ctx.fillStyle = '#fff'; ctx.fillText(text, zx - tw / 2, zy + 4);
       }
       ctx.font = `500 11px ${font}`;
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(4,4,9,0.85)'; // the zone pills changed the stroke
       for (const hub of lockedHubsRef.current) {
         if (!hub._xy) continue;
         const isHov = hoveredKey.current === hub.key;
@@ -532,8 +537,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         const lx = hub._xy[0] + 8, ly = hub._xy[1] + 4;
         if (!claimLabel(lx, ly, hub.name, isHov)) continue;
         ctx.fillStyle = 'rgba(255,255,255,0.38)';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 4;
-        ctx.fillText(hub.name, lx, ly); ctx.shadowBlur = 0;
+        ctx.strokeText(hub.name, lx, ly); ctx.fillText(hub.name, lx, ly);
       }
       raf = requestAnimationFrame(frame);
     }

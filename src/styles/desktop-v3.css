@@ -106,22 +106,24 @@
     background: #040407;
   }
 
-  /* The map takes the whole window (Esc leaves). SearchGlobe's own
-     ResizeObserver redraws the canvas; the members panel keeps working. */
-  html.desktop-v3 .d3-ws-globe--full {
-    position: fixed;
-    inset: 0;
-    z-index: var(--z-screen);
+  /* Search opens on the map alone, borderless across the page; the list
+     column comes back with the List button. */
+  html.desktop-v3 .d3-ws--map {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html.desktop-v3 .d3-ws--map > .d3-panel {
+    display: none;
+  }
+  html.desktop-v3 .d3-ws--map > .d3-ws-globe {
     border: 0;
     border-radius: 0;
   }
-
-  /* .app-content is a stacking context (z-index:1), so the map alone cannot
-     paint over the sidebar/top bar (z 100 in the container's context). While
-     the map is full, lift the whole content layer above them. */
-  html.desktop-v3 .app-container:has(.d3-ws-globe--full) .app-content {
-    z-index: var(--z-screen);
+  /* …and runs to the edges of the page, under the header and beside the sidebar. */
+  html.desktop-v3 .d3-ws--map.d3-fill {
+    height: calc(100dvh - var(--d2-top));
+    margin: calc(var(--d2-gutter) * -1);
   }
+
 
   /* The thread column at desk density */
   html.desktop-v3 .chat-screen .chat-header { padding: 10px 16px; }
