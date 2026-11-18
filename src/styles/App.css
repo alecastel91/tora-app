@@ -1649,6 +1649,18 @@
   font-weight: 600;
 }
 
+/* Native dropdown lists: Windows/Linux draw the open list with the options'
+   own colours, and a translucent background inherited from the field showed
+   white rows with white text until hovered. Opaque dark rows, every select. */
+select {
+  color-scheme: dark;
+}
+select option,
+select optgroup {
+  background-color: #101015;
+  color: #F2F2F5;
+}
+
 /* Obsidian Neon: glass inputs, focus animates border to crimson. */
 .form-group input,
 .form-group textarea,
@@ -8036,10 +8048,7 @@ textarea.form-textarea:focus {
   border-color: #FF3366;
 }
 
-.agent-artist-select option {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.9);
-}
+
 
 .bookings-tab {
   flex: 1;
@@ -13126,7 +13135,11 @@ div.poster-stat { cursor: default; }
 .d3-dash-title { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 22px; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
 .d3-dash-action { min-height: 62px; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .d3-dash-cta { flex: none; display: flex; align-items: center; justify-content: center; height: 40px; min-width: 84px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.28); color: #fff; font-size: 12px; font-weight: 600; text-transform: capitalize; }
-.globe-panel-tiles .photo-card--tile { height: 216px; }
+/* The map's member panel: near-square tiles (a little taller than wide). The
+   html (body) prefix outranks desktop-v3's 400px roster tiles and their 28px names. */
+html .globe-panel-tiles .photo-card.photo-card--tile { height: auto; aspect-ratio: 1 / 1.15; }
+html body .globe-panel-tiles .photo-card.photo-card--tile .photo-card-name { font-size: 18px; }
+html body .globe-panel-tiles .photo-card.photo-card--tile .photo-card-meta { font-size: 11.5px; }
 
 /* One-time Like / Connect explainer (LikeConnectTip) */
 .like-tip { display: grid; gap: 8px; margin-top: 12px; padding: 12px 14px; text-align: left; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: rgba(255, 51, 102, 0.06); }

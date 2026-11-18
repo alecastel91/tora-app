@@ -224,6 +224,8 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
               onRolesChange={setMapRoles}
               onSelectionChange={(sel, meta) => setMapSel(sel || (meta?.empty ? { country: meta.country, empty: true } : null))}
               topInset={listOpen ? (premium ? 16 : 64) : (premium ? 72 : 120)}
+              // On the map alone the search bar sits on the left: the panel can start at the top.
+              panelTopInset={listOpen ? undefined : 0}
               bottomInset={16}
               controlsLeft={listOpen ? 60 : 16} /* clear of the hide-list button */
             />

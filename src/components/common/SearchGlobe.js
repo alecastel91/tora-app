@@ -134,7 +134,7 @@ const globe3dOn = () => {
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false, panelTopInset }) => {
   const { t } = useLanguage();
   // Read by the draw loop, which outlives renders: a ref keeps the language current.
   const zoneCountText = useRef(null);
@@ -1062,7 +1062,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
               ? 'relative z-40 flex shrink-0 flex-col rounded-tl-2xl border-l border-t border-white/10 bg-[#070709]'
               : 'absolute inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border-t border-white/10 bg-[#070709]'}
             style={isDesktop
-              ? { width: PANEL_W, marginTop: topInset } /* below the floating search chrome, which stays clickable */
+              ? { width: PANEL_W, marginTop: panelTopInset ?? topInset } /* below the floating search chrome, which stays clickable */
               : { height: sheetPx, transition: sheetAnimating.current ? 'height 0.22s ease' : 'none' }}
           >
             {!isDesktop && (
