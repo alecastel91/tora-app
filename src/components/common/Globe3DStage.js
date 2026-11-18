@@ -2,34 +2,34 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react
 import Globe from 'globe.gl';
 import { MeshPhongMaterial, Color } from 'three';
 import { feature } from 'topojson-client';
-import { polygonToCells } from 'h3-js';
 import worldData from 'world-atlas/countries-110m.json';
 import { coordsForCity, normalizeCity } from '../../data/cityCoords';
 
 /**
  * The search globe drawn in WebGL (test: ?globe=3d). It only draws and reports
  * clicks: SearchGlobe keeps every state, panel and control, and calls the
- * handle below to fly or zoom. TORA's look, not a copy: land as a fine dot
- * grid, crimson member pins standing off the surface by how many members a
+ * handle below to fly or zoom. TORA's look, not a copy: solid countries with
+ * fine borders (hover lifts one, the selection turns crimson), crimson member pins standing off the surface by how many members a
  * city has, and in Travelling an arc from each member's home to where they go.
  */
-// A shape h3 cannot fill (North Korea's 4-point sliver at 1:110m) throws, and
-// three-globe then stops drawing every country after it: drop such fragments.
-const fillable = (poly) => { try { polygonToCells(poly, 3, true); return true; } catch { return false; } };
-const LAND = feature(worldData, worldData.objects.countries).features.map((f) => {
-  if (f.geometry.type !== 'MultiPolygon') return fillable(f.geometry.coordinates) ? f : null;
-  const polys = f.geometry.coordinates.filter(fillable);
-  return polys.length ? { ...f, geometry: { ...f.geometry, coordinates: polys } } : null;
-}).filter(Boolean);
+const LAND = feature(worldData, worldData.objects.countries).features;
 const CRIMSON = '#ff3366';
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const WORLD_ALT = 2.3; // camera distance for the whole globe (globe radii)
 const pinAlt = (count) => 0.003 + Math.min(count, 20) * 0.0015;
+// Is this place within ~70° of the camera's centre (clearly on the visible face)?
+const facing = ({ lat, lng }, [clng, clat]) => {
+  const r = Math.PI / 180;
+  return Math.sin(lat * r) * Math.sin(clat * r) + Math.cos(lat * r) * Math.cos(clat * r) * Math.cos((clng - lng) * r) > 0.34;
+};
 
 const Globe3DStage = forwardRef(({ cities, zones, lockedHubs, travelling, selectedKey, selectedFeature, initialCoord, onCity, onCountry, onZone, onLocked }, ref) => {
   const elRef = useRef(null);
   const gRef = useRef(null);
   const labelCull = useRef(() => {});
+  const hoverRef = useRef(null);
+  const repaintLand = useRef(() => {});
+  const selNames = useRef(new Set());
   const handlers = useRef({});
   handlers.current = { onCity, onCountry, onZone, onLocked };
 
@@ -58,12 +58,19 @@ const Globe3DStage = forwardRef(({ cities, zones, lockedHubs, travelling, select
       .showAtmosphere(false)
       .showGraticules(false)
       .globeMaterial(new MeshPhongMaterial({ color: new Color('#0c0c15'), emissive: new Color('#05050a'), shininess: 6 }))
-      .hexPolygonsData(LAND)
-      .hexPolygonResolution(3)
-      .hexPolygonMargin(0.45)
-      .hexPolygonUseDots(true)
-      .hexPolygonAltitude(0.002)
-      .onHexPolygonClick((f) => handlers.current.onCountry?.(f))
+      // Countries as solid, slightly raised shapes with hairline borders: each
+      // one readable at a glance. Hover lifts it; the selection turns crimson.
+      .polygonsData(LAND)
+      .polygonAltitude((f) => (f === hoverRef.current ? 0.012 : 0.006))
+      .polygonSideColor(() => 'rgba(0,0,0,0)')
+      .polygonStrokeColor(() => 'rgba(255,255,255,0.16)')
+      .polygonsTransitionDuration(180)
+      .onPolygonHover((f) => {
+        hoverRef.current = f || null;
+        el.style.cursor = f ? 'pointer' : 'grab';
+        paintLand();
+      })
+      .onPolygonClick((f) => handlers.current.onCountry?.(f))
       .pointResolution(10)
       .pointLat((p) => p.coord[1]).pointLng((p) => p.coord[0])
       .onPointClick((p) => (p.locked ? handlers.current.onLocked?.(p.name) : handlers.current.onCity?.(p.ref)))
@@ -79,6 +86,8 @@ const Globe3DStage = forwardRef(({ cities, zones, lockedHubs, travelling, select
           : 'pointer-events:auto;cursor:pointer;transform:translate(8px,-50%);padding:0;border:0;background:none;color:rgba(255,255,255,.88);font:600 12px Inter,sans-serif;white-space:nowrap;text-shadow:0 0 3px #040409,0 0 3px #040409';
         el.onclick = (e) => { e.stopPropagation(); if (l.zone) handlers.current.onZone?.(l.ref); else handlers.current.onCity?.(l.ref); };
         el.__coord = l.coord;
+        // Names are created a frame after the data lands, so each decides here too.
+        if (gRef.current) el.style.visibility = facing(gRef.current.pointOfView(), l.coord) ? 'visible' : 'hidden';
         return el;
       })
       .htmlTransitionDuration(0)
@@ -98,19 +107,22 @@ const Globe3DStage = forwardRef(({ cities, zones, lockedHubs, travelling, select
     g.pointOfView(initialCoord ? { lat: initialCoord[1], lng: initialCoord[0], altitude: near } : { lat: 30, lng: 15, altitude: WORLD_ALT }, 0);
     if (initialCoord) c.autoRotate = false;
     gRef.current = g;
+    // Land colours: graphite, a lighter hover, crimson for the selection.
+    const nameOf = (f) => (f.properties?.name || '').toLowerCase();
+    function paintLand() {
+      g.polygonCapColor((f) => (selNames.current.has(nameOf(f)) ? 'rgba(255,51,102,0.55)' : f === hoverRef.current ? '#34344a' : '#23232f'))
+        .polygonAltitude((f) => (f === hoverRef.current || selNames.current.has(nameOf(f)) ? 0.012 : 0.006));
+    }
+    paintLand();
+    repaintLand.current = paintLand;
 
     // A name shows only while its city faces the camera: far-side and
     // horizon names would otherwise pile up along the edge of the sphere.
     let raf = 0;
     const cullLabels = () => {
       raf = 0;
-      const { lat, lng } = g.pointOfView();
-      const toRad = Math.PI / 180;
-      for (const el of el_labels()) {
-        const [clng, clat] = el.__coord || [0, 0];
-        const cos = Math.sin(lat * toRad) * Math.sin(clat * toRad) + Math.cos(lat * toRad) * Math.cos(clat * toRad) * Math.cos((clng - lng) * toRad);
-        el.style.visibility = cos > 0.34 ? 'visible' : 'hidden'; // within ~70° of the centre
-      }
+      const pov = g.pointOfView();
+      for (const el of el_labels()) el.style.visibility = facing(pov, el.__coord || [0, 0]) ? 'visible' : 'hidden';
     };
     const el_labels = () => el.querySelectorAll('button');
     c.addEventListener('change', () => { if (!raf) raf = requestAnimationFrame(cullLabels); });
@@ -139,7 +151,7 @@ const Globe3DStage = forwardRef(({ cities, zones, lockedHubs, travelling, select
     g.pointsData(pins)
       // Low discs, not towers: close up, tall pins read as sticks lying on the map.
       .pointAltitude((p) => (p.locked ? 0.002 : pinAlt(p.count)))
-      .pointRadius((p) => (p.locked ? 0.16 : 0.2 + Math.min(p.count, 20) * 0.012))
+      .pointRadius((p) => (p.locked ? 0.2 : 0.3 + Math.min(p.count, 20) * 0.015))
       .pointColor((p) => (p.locked ? 'rgba(255,255,255,0.28)' : p.sel ? '#ffffff' : CRIMSON));
     const top = [...live].sort((a, b) => b._cnt - a._cnt).slice(0, 14);
     const labels = [
@@ -165,14 +177,12 @@ const Globe3DStage = forwardRef(({ cities, zones, lockedHubs, travelling, select
     g.arcsData(arcs.slice(0, 400));
   }, [cities, travelling]);
 
-  // The selected country (or a zone's countries) lights up in crimson dots.
+  // The selected country (or a zone's countries) turns crimson. Matched by
+  // name: the panel's country comes from its own copy of the atlas.
   useEffect(() => {
-    const g = gRef.current; if (!g) return;
-    // Matched by name: the panel's country comes from its own copy of the atlas.
-    const name = (f) => (f.properties?.name || '').toLowerCase();
     const list = selectedFeature?.features || (selectedFeature ? [selectedFeature] : []);
-    const sel = new Set(list.map(name));
-    g.hexPolygonColor((f) => (sel.has(name(f)) ? 'rgba(255,51,102,0.85)' : 'rgba(255,255,255,0.20)'));
+    selNames.current = new Set(list.map((f) => (f.properties?.name || '').toLowerCase()));
+    repaintLand.current();
   }, [selectedFeature]);
 
   return <div ref={elRef} className="absolute inset-0" style={{ cursor: 'grab' }} />;
