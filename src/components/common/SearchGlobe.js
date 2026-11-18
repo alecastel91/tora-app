@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { geoOrthographic, geoPath, geoGraticule10, geoContains, geoCentroid, geoDistance } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
@@ -120,6 +120,17 @@ const zoneFeatures = (zone, land) => {
 
 const TRAVEL_RANGES = { today: 0, week: 6, month: 30 };
 
+// WebGL globe on test: ?globe=3d switches it on for this browser, ?globe=2d back off.
+const Globe3DStage = lazy(() => import('./Globe3DStage'));
+const globe3dOn = () => {
+  try {
+    const q = new URLSearchParams(window.location.search).get('globe');
+    if (q === '3d') localStorage.setItem('tora:globe3d', '1');
+    if (q === '2d') localStorage.removeItem('tora:globe3d');
+    return localStorage.getItem('tora:globe3d') === '1';
+  } catch { return false; }
+};
+
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
@@ -130,6 +141,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   zoneCountText.current = (n) => t('globe.zoneCount', { count: n });
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
+  const [use3D] = useState(globe3dOn);
+  const globe3D = useRef(null);
 
   // Based here (where members live) | Travelling (where they will be, from
   // the trips and tours they share on TORA — Premium, like the travel feed).
@@ -191,6 +204,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   }, [locked, userCity, cities, ownCountryFeature]);
 
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
+  const counted = useMemo(() => {
+    const n = (g) => g.profiles.reduce((k, p) => k + (roleOn[p.role] ? 1 : 0), 0);
+    return { cities: cities.map((c) => ({ ...c, _cnt: n(c) })), zones: zoneGroups.map((z) => ({ ...z, _cnt: n(z) })) };
+  }, [cities, zoneGroups, roleOn]);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null); // { name, feature, cities, profiles }
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
@@ -615,6 +632,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   // the docked panel (flex sibling), so the canvas center is already the
   // visible center; on mobile, offset north of the 62% bottom sheet.
   const focusOn = (lon, lat) => {
+    if (use3D) { globe3D.current?.flyTo(lon, lat, !isDesktop); return; }
     const r = Math.max(viewRef.current.r, 1);
     if (isDesktop) {
       focusing.current = true;
@@ -899,16 +917,35 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           <LoadingGlobe label={t('search.loadingProfiles')} />
         </div>
       )}
+      {use3D ? (
+        <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><LoadingGlobe label={t('search.loadingProfiles')} /></div>}>
+          <Globe3DStage
+            ref={globe3D}
+            cities={counted.cities}
+            zones={counted.zones}
+            lockedHubs={lockedHubs}
+            travelling={travelling}
+            selectedKey={selectedCity?.key || null}
+            selectedFeature={selectedCountry?.feature || null}
+            initialCoord={coordsForCity(userCity)}
+            onCity={openCity}
+            onCountry={openCountry}
+            onZone={openZone}
+            onLocked={(name) => onLockedCity?.(name)}
+          />
+        </Suspense>
+      ) : (
       <canvas
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full touch-none"
-        style={{ cursor: 'grab' }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancelH}
-        onWheel={onWheel}
-      />
+          ref={canvasRef}
+          className="absolute inset-0 h-full w-full touch-none"
+          style={{ cursor: 'grab' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancelH}
+          onWheel={onWheel}
+        />
+      )}
 
       {/* Un-mapped count — sits below the parent's search-bar overlay */}
       {unmapped > 0 && (
@@ -956,7 +993,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           <button
             key={sym}
             aria-label={i === 0 ? 'Zoom in' : 'Zoom out'}
-            onClick={() => { zoomRef.current = i === 0 ? Math.min(MAX_ZOOM, zoomRef.current * 1.3) : Math.max(1, zoomRef.current / 1.3); }}
+            onClick={() => {
+              if (use3D) { globe3D.current?.zoomBy(i === 0 ? 1 / 1.3 : 1.3); return; }
+              zoomRef.current = i === 0 ? Math.min(MAX_ZOOM, zoomRef.current * 1.3) : Math.max(1, zoomRef.current / 1.3);
+            }}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/45 text-lg text-white/70 backdrop-blur-md active:scale-95"
           >
             {sym}
