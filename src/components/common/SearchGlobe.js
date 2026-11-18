@@ -120,15 +120,19 @@ const zoneFeatures = (zone, land) => {
 
 const TRAVEL_RANGES = { today: 0, week: 6, month: 30 };
 
-// WebGL globe on test: ?globe=3d switches it on for this browser, ?globe=2d back off.
+// The WebGL globe is the default; ?globe=2d keeps the flat canvas globe in
+// this browser (fallback / comparison), ?globe=3d switches back.
 const Globe3DStage = lazy(() => import('./Globe3DStage'));
 const globe3dOn = () => {
   try {
     const q = new URLSearchParams(window.location.search).get('globe');
-    if (q === '3d') localStorage.setItem('tora:globe3d', '1');
-    if (q === '2d') localStorage.removeItem('tora:globe3d');
-    return localStorage.getItem('tora:globe3d') === '1';
-  } catch { return false; }
+    if (q === '2d') localStorage.setItem('tora:globe2d', '1');
+    if (q === '3d') localStorage.removeItem('tora:globe2d');
+    localStorage.removeItem('tora:globe3d'); // the old opt-in flag
+    if (localStorage.getItem('tora:globe2d') === '1') return false;
+  } catch { /* storage blocked: decide on WebGL alone */ }
+  // No WebGL (old phones, some locked-down browsers): the flat globe instead.
+  try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; }
 };
 
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
