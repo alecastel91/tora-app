@@ -15,6 +15,7 @@ import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
 import GenreOrder from '../common/GenreOrder';
 import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
+import FillWithClaudeSheet, { fileForClaude } from '../common/FillWithClaude';
 
 const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
 
@@ -110,6 +111,47 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
   const [showGenresDropdown, setShowGenresDropdown] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [showFill, setShowFill] = useState(false);
+  const [readingHighlight, setReadingHighlight] = useState(null); // row index, or 'new'
+  const flyerRef = useRef(null);
+
+  // "Fill with Claude": the ticked fields go into the form; Save still decides.
+  const applyFill = (f) => {
+    setEditedUser((prev) => {
+      const next = { ...prev };
+      for (const k of ['bio', 'bioLong', 'pronouns', 'soundcloud', 'spotify', 'bandcamp', 'residentAdvisor', 'instagram', 'website']) if (f[k]) next[k] = f[k];
+      if (f.city) Object.assign(next, { city: f.city, country: f.country || next.country, zone: getZoneFromCountry(f.country || next.country) || next.zone });
+      if (f.highlights?.length) {
+        const have = new Set((prev.pastHighlights || []).map(highlightSignature));
+        const added = f.highlights.filter((h) => !have.has(highlightSignature(h)));
+        next.pastHighlights = [...(prev.pastHighlights || []), ...added].slice(0, Math.max(HIGHLIGHT_MAX, (prev.pastHighlights || []).length));
+      }
+      return next;
+    });
+    if (f.genres?.length) setSelectedGenres((prev) => new Set([...prev, ...f.genres]));
+  };
+
+  // One highlight read by Claude: into row `i` (only its empty fields), or a new row.
+  const readHighlight = async (i, body) => {
+    setReadingHighlight(i);
+    try {
+      const { highlight } = await apiService.fillHighlight(user.id, body);
+      // RA refuses automated reads (403): a pasted RA link stays as the row's link, quietly.
+      if (!highlight) { if (!body.link) appAlert(t('fill.highlightNotFound')); return; }
+      setEditedUser((prev) => {
+        const list = [...(prev.pastHighlights || [])];
+        if (i === 'new') {
+          if (list.length < HIGHLIGHT_MAX) list.push(highlight);
+        } else {
+          const row = list[i] || {};
+          list[i] = Object.fromEntries(['venue', 'city', 'artist', 'year', 'raUrl'].map((k) => [k, row[k] || highlight[k] || '']));
+        }
+        return { ...prev, pastHighlights: list };
+      });
+    } catch (err) {
+      appAlert(err.message || t('common.error'));
+    } finally { setReadingHighlight(null); }
+  };
   // Role-specific gallery (VENUE: venue photos, PROMOTER: past flyers).
   // Existing entries are Storage URLs; new ones are data URLs until save.
   const [photos, setPhotos] = useState(Array.isArray(user?.photos) ? user.photos : []);
@@ -377,6 +419,11 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
           className="pointer-events-none absolute -inset-x-5 -top-5 h-40 -z-10 bg-grid
                      [mask-image:radial-gradient(70%_100%_at_50%_0%,black,transparent)]"
         />
+        <button type="button" className="btn btn-outline mb-4 w-full" onClick={() => setShowFill(true)}>
+          ✦ {t('fill.button')}
+        </button>
+        <p className="form-hint" style={{ marginTop: -8, marginBottom: 16 }}>{t('fill.buttonHint')}</p>
+
         {/* Basic Info Section */}
         <div className="edit-section">
           <h3>{t('editProfile.basicInformation')}</h3>
@@ -893,7 +940,13 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                       next[i] = { ...next[i], raUrl: e.target.value.trim() };
                       setEditedUser({ ...editedUser, pastHighlights: next });
                     }}
+                    // A pasted RA event link fills an empty row: Claude reads the event page.
+                    onBlur={(e) => {
+                      const link = e.target.value.trim();
+                      if (RA_URL_RE.test(link) && (!h.venue || !h.year) && readingHighlight === null) readHighlight(i, { link });
+                    }}
                   />
+                  {readingHighlight === i && <span className="shrink-0 text-[11px] text-white/50">{t('fill.readingShort')}</span>}
                   <MoveButtons
                     index={i}
                     count={editedUser.pastHighlights.length}
@@ -926,6 +979,25 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                 >
                   + {t('editProfile.addHighlight')} ({(editedUser.pastHighlights || []).length}/{HIGHLIGHT_MAX})
                 </button>
+              ) : null}
+              {(editedUser.pastHighlights || []).length < HIGHLIGHT_MAX ? (
+                <>
+                  <button type="button" className="btn btn-outline" disabled={readingHighlight !== null} onClick={() => flyerRef.current?.click()}>
+                    ✦ {readingHighlight === 'new' ? t('fill.readingShort') : t('fill.fromFlyer')}
+                  </button>
+                  <input
+                    ref={flyerRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,application/pdf"
+                    hidden
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      e.target.value = '';
+                      if (!file) return;
+                      try { readHighlight('new', { files: [await fileForClaude(file)] }); } catch (err) { appAlert(err.message); }
+                    }}
+                  />
+                </>
               ) : (
                 <p className="m-0 text-xs text-white/40">{t('editProfile.highlightsFull', { max: HIGHLIGHT_MAX })}</p>
               )}
@@ -959,6 +1031,14 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
         </div>
       </div>
       {nativeDesktop && <EditPreview draft={editedUser} genres={Array.from(selectedGenres)} photos={hasPhotoGallery ? photos : []} />}
+      {showFill && (
+        <FillWithClaudeSheet
+          profileId={user.id}
+          current={{ ...editedUser, genres: Array.from(selectedGenres) }}
+          onApply={applyFill}
+          onClose={() => setShowFill(false)}
+        />
+      )}
     </div>
   );
 };

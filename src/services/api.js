@@ -863,6 +863,26 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // "Fill with Claude": a draft from links / text / files (data URLs). Nothing is saved.
+  async fillProfile(profileId, body) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/fill`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(body),
+    });
+    return this.handleResponse(response);
+  }
+
+  // One highlight from an RA event link, a flyer / screenshot, or pasted text.
+  async fillHighlight(profileId, body) {
+    const response = await fetch(`${API_URL}/profiles/${profileId}/fill-highlight`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(body),
+    });
+    return this.handleResponse(response);
+  }
+
   async createProfile(profileData) {
     const response = await fetch(`${API_URL}/profiles`, {
       method: 'POST',

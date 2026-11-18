@@ -13792,3 +13792,8 @@ input[type="radio"] {
 .genre-pills li.genre-pills-more { padding: 0; border-color: transparent; }
 .genre-pills-more button { border: 1px solid #2a2a33; border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 12px; line-height: 1.35; color: #b9b9c6; background: transparent; cursor: pointer; }
 .genre-pills-more button:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+
+/* Fill with Claude: a wider, opaque review sheet (the drafted bios are long). */
+.delete-modal.fill-claude-modal { max-width: 520px; background: #101015; }
+.fill-claude-modal .modal-title { margin-bottom: 10px; }
+.fill-claude-modal .form-hint { font-size: 13px; line-height: 1.45; }
