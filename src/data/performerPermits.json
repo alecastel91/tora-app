@@ -1,0 +1,1256 @@
+{
+ "_verifiedAt": "2026-11-19",
+ "Japan": {
+  "permit": "required",
+  "permitName": "Entertainer (Kogyo) status of residence, via Certificate of Eligibility",
+  "summary": "Paid shows are not allowed on visa-free or Temporary Visitor entry. The Japanese promoter or venue gets a Certificate of Eligibility for 'Entertainer' status, then the artist gets the visa or enters on it.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 8,
+  "cost": "Certificate of Eligibility is free; consular visa fee varies by nationality",
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Promoter files the Certificate of Eligibility at its regional immigration bureau with the contract and the artist's credentials",
+   "Promoter sends the certificate to the artist",
+   "Artist applies for the visa at a Japanese embassy if their nationality needs one, or shows the certificate on arrival",
+   "Japanese payer withholds tax from the fee"
+  ],
+  "tax": "Japanese payer withholds 20.42% of the fee (20% plus reconstruction surtax); a tax treaty may reduce it if filed in advance",
+  "sources": [
+   {
+    "title": "MOFA Japan: Visa information",
+    "url": "https://www.mofa.go.jp/j_info/visit/visa/index.html"
+   },
+   {
+    "title": "Entertainment visa guide for employers (practitioner)",
+    "url": "https://hr.visajapan.jp/kougyo.html"
+   }
+  ],
+  "confidence": "high"
+ },
+ "South Korea": {
+  "permit": "required",
+  "permitName": "E-6 Arts and Entertainment visa (E-6-1; E-6-2 for some hotel/bar-type venues)",
+  "summary": "Paid shows are not allowed on visa-free or K-ETA entry. The Korean organiser gets a Korea Media Rating Board recommendation where the venue requires one, then sponsors an E-6 visa.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Organiser applies to the Korea Media Rating Board for a performance recommendation (around 1-2 weeks)",
+   "Organiser applies for a Visa Issuance Confirmation at Korean immigration",
+   "Artist collects the E-6 visa at a Korean consulate or e-visa",
+   "Korean payer withholds tax from the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Korea's E-6 visa: a practical guide (practitioner)",
+    "url": "https://klawguru.com/2026/08/07/koreas-e-6-arts-and-entertainment-visa-a-practical-guide/"
+   },
+   {
+    "title": "E-6 Arts and Performance overview (visa agency)",
+    "url": "https://www.visaskorea.com/e-6-arts-performance-en/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "China": {
+  "permit": "required",
+  "permitName": "Commercial performance approval plus Z (work) visa",
+  "summary": "Visa-free entry does not cover paid shows. A licensed Chinese performance agency must get the culture authority's approval for foreign commercial performances, then the artist applies for a Z visa.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Local licensed performance agency applies to the culture and tourism authority for approval of the show",
+   "Agency issues the visa invitation/notification letter with the approval",
+   "Artist applies for a Z visa at a Chinese embassy or visa centre",
+   "The approved line-up, dates and venues must be followed"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "DutchCulture: Mapping China, Music - Visa",
+    "url": "https://dutchculture.nl/en/mapping-china-music-visa"
+   },
+   {
+    "title": "DutchCulture: Mapping China, Music - Permits",
+    "url": "https://dutchculture.nl/en/mapping-china-music-permits"
+   },
+   {
+    "title": "China Briefing: commercial performance applications resume",
+    "url": "https://www.china-briefing.com/news/china-commercial-performances-applications-resume/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Hong Kong": {
+  "permit": "required",
+  "permitName": "Employment visa / entry permit for entertainers",
+  "summary": "Visitors may not perform for pay, whatever the length of stay. The local promoter sponsors an employment visa for entertainers. A 14-day facilitation scheme exists only for guests of approved host organisations.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "The Short-term Activities (STV) scheme lets guests of authorised host organisations in sectors like Arts and Cultural work up to 14 days without a visa. It is unlikely to cover ordinary club bookings.",
+  "steps": [
+   "Hong Kong promoter sponsors the employment visa / entry permit application with ImmD",
+   "Artist enters only after the visa is approved",
+   "Hong Kong payer withholds tax and files the return for the artist"
+  ],
+  "tax": "Payer withholds 10% of the gross fee for individuals (about 11% if paid to a foreign company), as a prepayment of profits tax",
+  "sources": [
+   {
+    "title": "ImmD: Scheme for visitors in short-term activities",
+    "url": "https://www.immd.gov.hk/eng/services/visas/stv.html"
+   },
+   {
+    "title": "IRD: Non-resident entertainers and sportsmen",
+    "url": "https://www.ird.gov.hk/eng/tax/ind_non.htm"
+   },
+   {
+    "title": "LegCo: visa rules for overseas participants in cultural activities",
+    "url": "https://legco.gov.hk/research-publications/english/1819rt02-visa-requirement-for-overseas-participants-in-cultural-arts-and-sports-activities-in-selected-places-20181214-e.pdf"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Taiwan": {
+  "permit": "required",
+  "permitName": "Work permit for foreign professionals in arts and performing arts (Ministry of Labor)",
+  "summary": "Paid gigs need a Ministry of Labor arts and performance work permit, even on visa-free entry. The Taiwanese organiser applies before the show.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 3,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "Some short stays of 30 days or less are treated as work-permitted, for example non-profit performances invited by the central government. Do not assume a paid club show qualifies.",
+  "steps": [
+   "Organiser applies online to the Workforce Development Agency for an arts/performance work permit",
+   "Artist enters visa-free or with a visitor visa once the permit is issued",
+   "Taiwanese payer withholds tax from the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "MOL laws database: Labor laws and regulations",
+    "url": "https://laws.mol.gov.tw/Eng/EngContent.aspx?msgid=1044"
+   },
+   {
+    "title": "Foreign artists applying for work permits in Taiwan (practitioner)",
+    "url": "https://kaizencpa.com/Knowledge/info/id/1210.html"
+   },
+   {
+    "title": "Work Permits 101 for foreign freelancers in Taiwan",
+    "url": "https://talenttaiwan.substack.com/p/work-permits-101-a-guide-for-foreign"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Singapore": {
+  "permit": "depends",
+  "permitName": "Work Pass Exempt Activity notification, or a work pass for nightlife venues",
+  "summary": "Shows at public performance venues or government-supported events can run on a visit pass if MOM is notified first. Bars, clubs, lounges and hotels with a Category 1 entertainment licence are excluded, and the Performing Artiste Work Permit closed to new applications on 1 June 2026, so club bookings need a regular work pass or a service-provider arrangement.",
+  "whoApplies": "either",
+  "leadTimeWeeks": null,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "Exempt-activity route: up to 90 days a year in total. Not valid for performances at bars, discotheques, lounges, nightclubs, pubs, hotels, private clubs or restaurants with a Category 1 licence.",
+  "steps": [
+   "Check whether the venue is a public performance venue or a Category 1 licensed nightlife venue",
+   "Festival or concert venue: enter on a Short-Term Visit Pass, then notify MOM online before the show",
+   "Nightclub or bar: ask MOM or the venue which work pass now applies before booking flights",
+   "Singapore payer withholds 15% tax and files with IRAS"
+  ],
+  "tax": "15% withholding on non-resident public entertainers' fees (the 10% concession ended 31 March 2022)",
+  "sources": [
+   {
+    "title": "MOM: Eligible activities for a work pass exemption",
+    "url": "https://www.mom.gov.sg/passes-and-permits/work-pass-exempt-activities/eligible-activities"
+   },
+   {
+    "title": "MOM: Performing Artiste Work Permit scheme to end",
+    "url": "https://www.mom.gov.sg/newsroom/announcements/2025/1201-work-permit-performing-artiste-scheme-to-end"
+   },
+   {
+    "title": "IRAS: Tax obligations of non-resident public entertainers",
+    "url": "https://www.iras.gov.sg/taxes/withholding-tax/payments-to-non-resident-public-entertainer-(artiste-musician-sportsman-etc-)/tax-obligations-of-non-resident-public-entertainer"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Thailand": {
+  "permit": "required",
+  "permitName": "Work permit (Ministry of Labour) with Non-Immigrant B visa",
+  "summary": "Performing, even unpaid, counts as work, so visa-exempt entry is not enough. A Thai club, festival or agency sponsors a work permit, and the artist usually enters on a Non-Immigrant B visa.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Thai organiser prepares the sponsor documents and work permit application",
+   "Artist gets a Non-Immigrant B visa at a Thai embassy before travel",
+   "Work permit is finalised once the artist is in Thailand, before the show",
+   "Thai payer withholds tax from the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Thailand.go.th: foreign entertainers working in Thailand",
+    "url": "https://thailand.go.th/useful-information-detail/001_01_121"
+   },
+   {
+    "title": "Sounds Australia: Thailand visas",
+    "url": "https://soundsaustralia.com.au/?p=2395"
+   },
+   {
+    "title": "Musicians, DJs and performers in Thailand (practitioner)",
+    "url": "https://www.issacompass.com/insights/musicians-djs-and-performers-in-thailand-the-entertainment-work-permit-most-tour"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Indonesia": {
+  "permit": "required",
+  "permitName": "Performer visit visa (C7 / C7A music performance e-visa)",
+  "summary": "Visa-on-arrival and visa-free entry do not cover paid shows. The Indonesian organiser sponsors a performer e-visa (usually single-entry, about 30 days) before the artist flies.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 2,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Organiser applies as sponsor on evisa.imigrasi.go.id with the event details and the artist's profile",
+   "Artist receives the e-visa before travelling",
+   "Payment usually runs through a contract between the local sponsor and the artist's company",
+   "Indonesian payer withholds tax from the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Indonesia e-Visa portal (Imigrasi)",
+    "url": "https://evisa.imigrasi.go.id/"
+   },
+   {
+    "title": "Tempo: Coldplay granted music and art visas",
+    "url": "https://en.tempo.co/amp/1797222/coldplay-granted-new-music-and-art-visas-for-jakarta-concert"
+   },
+   {
+    "title": "Performer visa guide (practitioner)",
+    "url": "https://emerhub.com/bali/visas/performer-visa/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Philippines": {
+  "permit": "required",
+  "permitName": "Special Work Permit (SWP), Bureau of Immigration",
+  "summary": "Foreign artists performing in front of an audience for a fee need a Special Work Permit. The local promoter files for it on the artist's behalf before the event.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 2,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Promoter files the SWP petition with the Bureau of Immigration (the rules say at least 3 working days before the show; allow more)",
+   "Artist enters visa-free or on a visa, depending on nationality",
+   "Promoter withholds tax and remits it to the BIR"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Rules for Special Work Permits for foreign artists (summary)",
+    "url": "https://jur.ph/law/summary/rule-and-procedures-for-the-processing-of-applications-of-special-work-permit-for-foreign-artists-athletes-and-religious-preachers"
+   },
+   {
+    "title": "Inquirer: BI issues SWP to Air Supply",
+    "url": "https://globalnation.inquirer.net/150210/bi-issues-special-work-permit-air-supply-perform-ph/amp"
+   },
+   {
+    "title": "BAL: Philippines work permit guidelines",
+    "url": "https://www.bal.com/immigration-news/philippines-new-work-permit-guidelines-announced/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Vietnam": {
+  "permit": "required",
+  "permitName": "Performance licence/approval (performing arts authority) plus a work-purpose visa",
+  "summary": "Shows with foreign performers need approval from the culture authorities, and the artist needs a visa that allows the activity (tourist e-visa is not enough). Work permit exemptions for short stays exist under Decree 393/2026, but how they apply to DJs is unclear.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Vietnamese organiser gets performance approval for the show and the foreign line-up",
+   "Organiser handles any work permit exemption confirmation needed",
+   "Organiser sponsors the artist's visa with the immigration department",
+   "Local payer withholds personal income tax"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Decree 144/2020/ND-CP on performing arts",
+    "url": "https://english.luatvietnam.vn/decree-no-144-2020-nd-cp-dated-december-14-2020-of-the-government-providing-performing-art-activities-195588-doc1.html"
+   },
+   {
+    "title": "Decree 393/2026 work permit exemptions (practitioner)",
+    "url": "https://eiglaw.com/vietnam-issues-new-decree-393-on-foreign-worker-rules-and-work-permit-exemptions/"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Malaysia": {
+  "permit": "required",
+  "permitName": "PUSPAL approval plus Professional Visit Pass",
+  "summary": "Every foreign artiste performance needs approval from PUSPAL (One-Stop Centre for Foreign Film Production and Foreign Artiste Performances), followed by a Professional Visit Pass. The Malaysian organiser applies.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Organiser applies online via ePUSPAL with the event, venue and artist details",
+   "After PUSPAL approval, organiser applies to Immigration for the Professional Visit Pass",
+   "Local police and council permits for the event may also be needed",
+   "Malaysian payer withholds tax from the fee"
+  ],
+  "tax": "15% withholding on fees paid to non-resident public entertainers",
+  "sources": [
+   {
+    "title": "Immigration Malaysia: Professional Visit Pass",
+    "url": "https://www.imi.gov.my/index.php/en/main-services/pass/professional-visitor-pass/"
+   },
+   {
+    "title": "Malay Mail: Ministry on foreign artistes' stay",
+    "url": "https://www.malaymail.com/news/malaysia/2024/03/26/ministry-denies-claims-of-prohibiting-foreign-artistes-from-staying-in-malaysia-before-show/125633"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "India": {
+  "permit": "required",
+  "permitName": "Employment visa (paid performance)",
+  "summary": "Tourist or business e-visas do not allow paid performances. Foreign artists usually need an Employment visa supported by the Indian organiser's contract, and some states need local event permissions.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [
+   "Nepal",
+   "Bhutan"
+  ],
+  "exemptNote": "Citizens of Nepal and Bhutan do not need a visa for India. Check whether paid work still needs other clearances.",
+  "steps": [
+   "Indian organiser issues the contract and supporting letter",
+   "Artist applies for an Employment visa at an Indian mission or visa centre",
+   "Organiser arranges local event permissions",
+   "Indian payer withholds tax from the fee"
+  ],
+  "tax": "Non-resident entertainers are taxed at 20% of gross receipts plus surcharge and cess (s.115BBA), withheld by the payer (s.194E)",
+  "sources": [
+   {
+    "title": "Income Tax Department: Section 115BBA",
+    "url": "https://incometaxindia.gov.in/w/section-115bba-12"
+   },
+   {
+    "title": "BCAJ: Taxation of artistes and sportsmen",
+    "url": "https://bcajonline.org/journal/taxation-of-artistes-and-sportsmen/"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Australia": {
+  "permit": "required",
+  "permitName": "Temporary Activity visa (subclass 408), Entertainment activities stream",
+  "summary": "ETA and eVisitor do not allow paid shows. The Australian promoter is usually an approved Temporary Activities Sponsor and nominates the artist, who then applies for a 408 visa.",
+  "whoApplies": "either",
+  "leadTimeWeeks": 6,
+  "cost": "Visa charge set by Home Affairs (check the Visa Pricing Estimator); sponsor approval is separate",
+  "exemptNationalities": [
+   "New Zealand"
+  ],
+  "exemptNote": "New Zealand citizens can work in Australia on the Special Category visa (subclass 444) granted on arrival.",
+  "steps": [
+   "Promoter gets Temporary Activities Sponsor approval if it doesn't already have it",
+   "Promoter lodges the sponsorship and nominates the artist",
+   "Artist lodges the 408 visa application online and waits for the grant before travelling",
+   "Australian payer withholds tax under the ATO's foreign resident rules"
+  ],
+  "tax": "Payer must withhold from fees to foreign-resident entertainers (company rate for companies, foreign-resident individual rate for individuals, top rate without an ABN); a variation can be requested from the ATO",
+  "sources": [
+   {
+    "title": "Home Affairs: Temporary Activity visa (subclass 408)",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-activity-408"
+   },
+   {
+    "title": "ATO: Foreign resident entertainment and sports withholding",
+    "url": "https://www.ato.gov.au/businesses-and-organisations/hiring-and-paying-your-workers/payg-withholding/payments-you-need-to-withhold-from/payments-with-special-rules/foreign-resident-entertainment-sports-construction-and-gaming-junket-activities"
+   },
+   {
+    "title": "Musicians Union of Australia: Touring artist 408 visa",
+    "url": "https://www.musiciansunion.com.au/temporary-activity-visa"
+   }
+  ],
+  "confidence": "high"
+ },
+ "New Zealand": {
+  "permit": "depends",
+  "permitName": "Short-term Entertainment Act Visitor Visa (or NZeTA with approved-promoter letter)",
+  "summary": "Short live shows are allowed when the promoter is on Immigration New Zealand's approved list. Visa-waiver nationals can use an NZeTA with the promoter's letter; others need the Short-term Entertainment Act Visitor Visa.",
+  "whoApplies": "either",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [
+   "Australia"
+  ],
+  "exemptNote": "Australian citizens may live and work in New Zealand without a work visa. If the promoter is not approved, a work visa (for example the Entertainers Work Visa) is needed.",
+  "steps": [
+   "Check that the promoter holds Immigration New Zealand approved-promoter status",
+   "Promoter issues the invitation/support letter",
+   "Visa-waiver nationals request an NZeTA at least 72 hours before travel; others apply for the visitor visa at least 4 weeks ahead",
+   "Anyone with criminal convictions must apply for a visa"
+  ],
+  "tax": "NZ payers generally deduct non-resident withholding (schedular) tax from entertainer fees; confirm the current rate with Inland Revenue",
+  "sources": [
+   {
+    "title": "INZ: Visa guidance for performers and support staff",
+    "url": "https://www.immigration.govt.nz/visit/visiting-on-business/visa-guidance-for-performers-and-support-staff"
+   },
+   {
+    "title": "INZ: Short-term Entertainment Act Visitor Visa",
+    "url": "https://immigration.govt.nz/visas/short-term-entertainment-act-visitor-visa"
+   },
+   {
+    "title": "INZ: Entertainers Work Visa",
+    "url": "https://www.immigration.govt.nz/visas/entertainers-work-visa"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "United Kingdom": {
+  "permit": "depends",
+  "permitName": "Standard Visitor - Permitted Paid Engagement (PPE); Permit-Free Festival; Creative Worker visa / concession",
+  "summary": "Non-visa nationals can play paid UK shows as a visitor under Permitted Paid Engagement if invited by a UK promoter and the gig is within 30 days of arrival; they need an ETA, not a visa. Visa nationals must get a Standard Visitor visa before travel; longer or multi-show tours use the Creative Worker route with a Certificate of Sponsorship.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 3,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Israel",
+   "UAE",
+   "Austria",
+   "Belgium",
+   "Bulgaria",
+   "Croatia",
+   "Cyprus",
+   "Czech Republic",
+   "Denmark",
+   "Estonia",
+   "Finland",
+   "France",
+   "Germany",
+   "Greece",
+   "Hungary",
+   "Ireland",
+   "Italy",
+   "Latvia",
+   "Lithuania",
+   "Luxembourg",
+   "Malta",
+   "Netherlands",
+   "Poland",
+   "Portugal",
+   "Romania",
+   "Slovakia",
+   "Slovenia",
+   "Spain",
+   "Sweden",
+   "Iceland",
+   "Liechtenstein",
+   "Norway",
+   "Switzerland"
+  ],
+  "exemptNote": "Not a visa, but still conditional: written invitation from a UK client, evidence you are an established professional, paid by a UK source, engagement done within 30 days of entry. ETA needed by all of these except Irish citizens. Tell Border Force you are on a PPE; do not rely on eGates. Visa nationals relevant to club music include China, India, South Africa, Colombia, Turkey, Georgia, Thailand, Philippines, Vietnam, Indonesia, Nigeria, Egypt, Russia, Ukraine.",
+  "steps": [
+   "Get a signed invitation letter from the UK promoter/venue naming dates and fee",
+   "Non-visa nationals: apply for a UK ETA online; visa nationals: apply for a Standard Visitor visa (state PPE) well before travel",
+   "Carry the invitation plus proof of your profession (press, past gig listings) and see a Border Force officer on arrival",
+   "For tours longer than 30 days or with a sponsor, use a Creative Worker Certificate of Sponsorship"
+  ],
+  "tax": "UK payer must withhold basic-rate tax (20%) via HMRC's Foreign Entertainers Unit once total UK payments to the artist exceed the personal allowance; reduced rate possible via form FEU8 (30 days ahead).",
+  "sources": [
+   {
+    "title": "GOV.UK - Visit the UK for a paid engagement or event",
+    "url": "https://www.gov.uk/standard-visitor/paid-engagement-event"
+   },
+   {
+    "title": "GOV.UK - Visiting the UK as a creative professional from a non-visa national country",
+    "url": "https://www.gov.uk/guidance/visiting-the-uk-as-a-creative-professional-from-a-non-visa-national-country"
+   },
+   {
+    "title": "Immigration Rules Appendix Visitor: Permitted Activities",
+    "url": "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-visitor-permitted-activities"
+   },
+   {
+    "title": "GOV.UK - Pay tax on payments to foreign entertainers",
+    "url": "https://www.gov.uk/guidance/pay-tax-on-payments-to-foreign-performers"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Germany": {
+  "permit": "not_required",
+  "permitName": "Exemption under §22 + §30 Employment Ordinance (BeschV): one-day performances up to 15 days a year; festivals/guest performances up to 90 days in 12 months",
+  "summary": "Short club and festival shows by artists who live abroad do not count as employment, so no work permit is needed. Visa-free nationals just enter; visa-required nationals still need a Schengen short-stay visa.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "United Kingdom",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Colombia",
+   "Peru",
+   "Israel",
+   "UAE"
+  ],
+  "exemptNote": "Artist must keep their usual residence abroad. Single-day shows: max 15 performance days per calendar year; festivals and guest performances: max 90 days in 12 months. Schengen 90/180-day rule applies. ETIAS pre-travel authorisation expected for visa-free travellers from late 2026.",
+  "steps": [
+   "Check the gigs fit the 15-days-a-year (single shows) or 90-days (festival/tour) limit",
+   "Visa-required nationals: apply for a Schengen C visa at the German mission with contract and invitation",
+   "Carry the performance contract at the border",
+   "Agree with the promoter how the §50a withholding tax is handled"
+  ],
+  "tax": "Promoter withholds 15% plus 5.5% solidarity surcharge (15.825%) on fees to non-resident artists under §50a EStG; no withholding for fees up to EUR 250 per performance. Treaty relief needs a BZSt exemption certificate.",
+  "sources": [
+   {
+    "title": "BeschV §22 (gesetze-im-internet.de)",
+    "url": "https://www.gesetze-im-internet.de/beschv_2013/__22.html"
+   },
+   {
+    "title": "BeschV §30 (gesetze-im-internet.de)",
+    "url": "https://www.gesetze-im-internet.de/beschv_2013/__30.html"
+   },
+   {
+    "title": "Make it in Germany - Special regulation for artists",
+    "url": "https://www.make-it-in-germany.com/en/visa-residence/types/other/artists"
+   },
+   {
+    "title": "touring-artists.info - Visa and residence",
+    "url": "https://www.touring-artists.info/en/visa-residence"
+   }
+  ],
+  "confidence": "high"
+ },
+ "France": {
+  "permit": "not_required",
+  "permitName": "Work-authorisation exemption for stays of 3 months or less in cultural and artistic events (Code du travail L5221-2-1 / D5221-2-1)",
+  "summary": "Non-EU artists playing shows in France for 3 months or less need no work authorisation. Visa-required nationals still need a Schengen short-stay visa, and the promoter must contract and pay the artist properly (usually as a salaried performer).",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "United Kingdom",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Colombia",
+   "Peru",
+   "Israel",
+   "UAE"
+  ],
+  "exemptNote": "Covers performers and production crew on contracts of 3 months or less. Schengen 90/180-day rule applies. In France performers are presumed employees, so the promoter normally pays via a work contract (e.g. GUSO) unless a foreign company invoices.",
+  "steps": [
+   "Get the contract from the French promoter (usually an employment contract for the performance)",
+   "Visa-required nationals: apply for a Schengen C visa at the French consulate/France-Visas",
+   "Carry the contract and invitation at the border"
+  ],
+  "tax": "15% withholding on artistic fees paid to non-residents (CGI art. 182 A bis), after a 10% deduction for expenses; tax treaties can change this.",
+  "sources": [
+   {
+    "title": "Ministère de la Culture - Guide pratique des visas",
+    "url": "https://www.culture.gouv.fr/Media/Thematiques/Musique/Files/Guide-pratique-des-visas"
+   },
+   {
+    "title": "ARTCENA - Autorisations de travail et de séjour",
+    "url": "https://www.artcena.fr/precis-juridique/etudes/international/autorisations-de-travail-et-de-sejour"
+   },
+   {
+    "title": "ARTCENA - Retenue à la source",
+    "url": "https://www.artcena.fr/guide/droit-et-administration/organiser-un-spectacle/international/retenue-la-source"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Netherlands": {
+  "permit": "not_required",
+  "permitName": "Work-permit (TWV/GVVA) exemption for musicians and artists: max 6 consecutive weeks within 13 weeks",
+  "summary": "Foreign musicians and artists can perform in the Netherlands without a work permit for up to 6 consecutive weeks in a 13-week period. Visa-required nationals still need a Schengen short-stay visa.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "United Kingdom",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Colombia",
+   "Peru",
+   "Israel",
+   "UAE"
+  ],
+  "exemptNote": "Limit is 6 consecutive weeks in any 13 weeks; leaving and re-entering within that window may trigger a permit requirement. Non-EU crew may not be covered. Schengen 90/180-day rule applies.",
+  "steps": [
+   "Confirm the stay fits the 6-weeks-in-13 limit",
+   "Visa-required nationals: apply for a Schengen C visa at the Dutch mission",
+   "Send the promoter your tax residence certificate if you want treaty relief"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "UWV - Musicus of artiest",
+    "url": "https://www.uwv.nl/nl/werkvergunning/musicus-artiest"
+   },
+   {
+    "title": "DutchCulture - Mobility info point",
+    "url": "https://dutchculture.nl/node/1435904"
+   },
+   {
+    "title": "GOV.UK - Travel to the Netherlands for work",
+    "url": "https://www.gov.uk/guidance/travel-to-the-netherlands-for-work"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Spain": {
+  "permit": "depends",
+  "permitName": "Work authorisation (Ley Orgánica 4/2000 and Reglamento RD 1155/2024); former exemption for one-off artist performances",
+  "summary": "Spain used to exempt artists playing one-off shows (up to 5 consecutive days or 20 days in 6 months) from a work permit; practitioner guides say the new 2025 regulation no longer clearly lists this exemption. Check with the promoter or a Spanish immigration lawyer before booking.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": null,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "Status of the short-performance exemption under RD 1155/2024 (in force 20 May 2025) is unclear. Visa-free nationals can enter without a Schengen visa but other obligations (NIE, social security registration by promoter, tax) may still apply.",
+  "steps": [
+   "Ask the Spanish promoter to confirm in writing whether a work authorisation is needed for your dates",
+   "Visa-required nationals: apply for a Schengen C visa or the visa the promoter's authorisation specifies",
+   "Make sure the promoter handles social security registration and IRNR tax withholding"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "BOE - Real Decreto 1155/2024 (Reglamento de Extranjería)",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2024-24099"
+   },
+   {
+    "title": "Machel Indiaz - Artistas extranjeros en España 2025 (practitioner guide)",
+    "url": "https://machelindiaz.com/vienen-artistas-extranjeros-a-actuar-en-espana-guia-legal-y-migratoria-actualizada-para-conciertos-en-2025/"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Italy": {
+  "permit": "required",
+  "permitName": "Nulla osta / work visa for performing artists (Testo Unico Immigrazione art. 27; DPR 394/99 art. 40 c.15 for self-employed stays under 90 days)",
+  "summary": "Non-EU artists generally need a work visa for paid performances in Italy, normally based on a nulla osta requested by the Italian organiser or, for short self-employed jobs, on the contract. Rules are complex; get the promoter to handle it early.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 8,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "No clear official short-stay exemption for artists was found; visa-free entry alone does not authorise paid work.",
+  "steps": [
+   "Italian organiser requests the nulla osta (or prepares the contract for a self-employed work visa)",
+   "Artist applies for the work visa at the Italian consulate with the nulla osta or contract",
+   "Enter within the visa's validity and perform only for the named organiser"
+  ],
+  "tax": "30% final withholding on fees paid to non-resident performers (DPR 600/73 art. 25); treaties may change this. Travel/hotel paid as buy-outs are often taxed too.",
+  "sources": [
+   {
+    "title": "Brocardi - Testo Unico Immigrazione art. 27",
+    "url": "https://brocardi.it/testo-unico-immigrazione/titolo-iii/art27.html"
+   },
+   {
+    "title": "Prefettura - Vademecum art. 27",
+    "url": "https://prefettura.interno.gov.it/sites/default/files/31/2024-01/vademecum_art._27.pdf"
+   },
+   {
+    "title": "Arletti Partners - Visto di lavoro per artisti",
+    "url": "https://arlettipartners.com/visto-di-lavoro-per-artisti-come-richiederlo/?lang=it"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Portugal": {
+  "permit": "depends",
+  "permitName": "Temporary stay visa for professional performing activity (visto de estada temporária para espetáculos); Schengen short-stay visa for up to 90 days",
+  "summary": "Portugal has a dedicated visa for performers; official guidance points stays of up to 90 days to the Schengen short-stay route. Whether visa-free nationals can play a 1-3 night paid show without any authorisation is not clearly stated, so check with AIMA or the consulate.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 5,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "No explicit short-stay artist exemption found in official sources.",
+  "steps": [
+   "Ask the Portuguese promoter what they have confirmed with AIMA for your dates",
+   "Visa-required nationals: apply at the Portuguese consulate at least 30 days before travel",
+   "Carry the performance contract"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "gov.pt - Visa for professional performing activity",
+    "url": "https://www.gov.pt/en/servicos/pedir-um-visto-de-residencia-ou-estada-temporaria-para-o-exercicio-de-atividade-profissional-de-espetaculos"
+   },
+   {
+    "title": "gov.pt - Migrants: visas and permits",
+    "url": "https://www.gov.pt/guias/migrantes-vistos-e-autorizacoes-para-entrar-e-viver-em-portugal"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Belgium": {
+  "permit": "depends",
+  "permitName": "Single-permit exemption for internationally renowned performing artists (Royal Decree 2 Sept 2018, regional rules)",
+  "summary": "Artists with an international reputation are exempt from a work permit for short stays: up to 21 days per quarter in Flanders, and up to 90 days per quarter in Brussels and Wallonia. Visa-required nationals still need a Schengen visa and the employer may need a Limosa declaration.",
+  "whoApplies": "either",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "United Kingdom",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Colombia",
+   "Peru",
+   "Israel",
+   "UAE"
+  ],
+  "exemptNote": "Only if the artist counts as internationally renowned; keep proof (contract, press, CV). Flanders 21 days per quarter; Brussels/Wallonia 90 days per quarter (secondary source). A Limosa declaration may be required.",
+  "steps": [
+   "Check which region the venue is in and that the stay fits its day limit",
+   "Prepare proof of international reputation",
+   "Promoter/employer files a Limosa declaration if required",
+   "Visa-required nationals: apply for a Schengen C visa"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Vlaanderen.be - Performing artist",
+    "url": "https://www.vlaanderen.be/en/working-enterprise-and-investment/working/employing-a-foreigner-in-flanders/categories/performing-artist"
+   },
+   {
+    "title": "GOV.UK - Travel to Belgium for work",
+    "url": "https://www.gov.uk/guidance/travel-to-belgium-for-work"
+   },
+   {
+    "title": "Tiberghien - 18% withholding on foreign artists",
+    "url": "https://www.tiberghien.com/en/2440/is-the-18-of-withholding-tax-on-income-paid-to-foreign-artists-and-sportspersons-no-longer-due"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Poland": {
+  "permit": "not_required",
+  "permitName": "Work-permit exemption for artistic performances up to 30 days per calendar year",
+  "summary": "Foreign artists performing musical or stage work in Poland need no work permit for up to 30 days in a calendar year, provided they are legally in Poland. Visa-required nationals still need a Schengen short-stay visa.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "United Kingdom",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Colombia",
+   "Peru",
+   "Israel",
+   "UAE"
+  ],
+  "exemptNote": "Max 30 days per calendar year (regulation in force from 1 Dec 2025); legal stay required (visa-free entry, visa or residence permit).",
+  "steps": [
+   "Confirm the total Polish performance days this year stay under 30",
+   "Visa-required nationals: apply for a Schengen C visa at the Polish consulate",
+   "Carry the contract at the border"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "praca.gov.pl - Categories of foreigners who can work without a permit",
+    "url": "https://lang-psz.praca.gov.pl/en/-/10217876-praca-bez-zezwolenia"
+   },
+   {
+    "title": "Mazowiecki Urząd Wojewódzki - Work without a permit",
+    "url": "https://www.mos.cudzoziemcy.gov.pl/en/categories-information/doing-the-job/performing-work-without-a-work-permit/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Czech Republic": {
+  "permit": "not_required",
+  "permitName": "Free access to the labour market for performing artists: max 7 consecutive days and 30 days per calendar year",
+  "summary": "Performing artists need no work permit if each stay of work is no more than 7 consecutive days and 30 days total per calendar year. Visa-required nationals still need a Schengen short-stay visa.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 6,
+  "cost": null,
+  "exemptNationalities": [
+   "United States",
+   "United Kingdom",
+   "Canada",
+   "Australia",
+   "New Zealand",
+   "Japan",
+   "South Korea",
+   "Singapore",
+   "Malaysia",
+   "Taiwan",
+   "Hong Kong",
+   "Brazil",
+   "Argentina",
+   "Chile",
+   "Mexico",
+   "Uruguay",
+   "Colombia",
+   "Peru",
+   "Israel",
+   "UAE"
+  ],
+  "exemptNote": "Limits: 7 consecutive days and 30 days per calendar year. Longer tours need an employment permit.",
+  "steps": [
+   "Check the dates fit 7 consecutive days / 30 days a year",
+   "Visa-required nationals: apply for a Schengen C visa at the Czech embassy",
+   "Carry the contract at the border"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Úřad práce ČR - Free entry to the labour market",
+    "url": "https://up.gov.cz/en/free-entry-to-the-labour-market"
+   },
+   {
+    "title": "GOV.UK - Travel to Czechia for work",
+    "url": "https://www.gov.uk/guidance/travel-to-czechia-for-work"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Georgia": {
+  "permit": "depends",
+  "permitName": "Right to work / work permit under the amended Law on Labour Migration (from 1 March 2026)",
+  "summary": "Since March 2026 Georgia requires foreigners to hold a work permit for paid work in Georgia, and no specific short-stay exemption for performers was found. Many nationalities enter visa-free, but check with the promoter whether a one-off gig needs a permit.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 5,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "Rules are new and still being amended (changes in April and July 2026); how they apply to one-night performances is unclear.",
+  "steps": [
+   "Ask the Georgian promoter whether they have applied for a work permit for you",
+   "If a permit is needed: promoter applies to the State Employment Promotion Agency (up to 30 days), then you get a D1 visa or labour residence permit",
+   "Visa-required nationals: check the e-Visa portal"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Revera - New labour migration rules from 1 March 2026",
+    "url": "https://georgia.revera.legal/en/info-centr/news-and-analytical-materials/378-novye-regulyacii-s-1-marta-2026-goda-v-zakon/"
+   },
+   {
+    "title": "Investor.ge - Georgia's labour migration reform",
+    "url": "https://www.investor.ge/2026/04/20/georgias-labor-migration-reform-moves-into-implementation/"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Turkey": {
+  "permit": "required",
+  "permitName": "Work permit exemption for scientific, cultural and artistic activities (Implementing Regulation art. 48/a), max 1 month",
+  "summary": "Paid artistic work of up to one month needs no full work permit, but a work permit exemption must be applied for through the Ministry's online system before performing. The artist also needs the right entry visa or e-Visa unless visa-exempt.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 4,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "The 1-month exemption is not automatic: it is granted via the Ministry of Labour system. Some nationalities are visa-exempt for entry, but still need the exemption to work.",
+  "steps": [
+   "Turkish promoter files the art. 48/a work permit exemption application (calismaizni.csgb.gov.tr)",
+   "Artist gets an e-Visa or sticker visa if their nationality needs one",
+   "Wait for the exemption to be issued before performing"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Ministry of Labour (ÇSGB) - Exemption types",
+    "url": "https://www.csgb.gov.tr/uigm/en/exemptions/muafiyet-turleri/"
+   },
+   {
+    "title": "ÇSGB - Work permit exemption table (PDF)",
+    "url": "https://csgb.gov.tr/Media/z2xbmogh/ingilizce-tablo.pdf"
+   },
+   {
+    "title": "MFA Türkiye - General information about Turkish visas",
+    "url": "https://mfa.gov.tr/general-information-about-turkish-visas.en.mfa"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "UAE": {
+  "permit": "required",
+  "permitName": "Performer / entertainment permit (Dubai: DET e-permit; Abu Dhabi: DCT) plus entry visa",
+  "summary": "Every DJ or live act at a public or ticketed event needs an individual performer permit, applied for by a locally licensed organiser through the emirate's permit system. The artist also needs a valid entry visa unless visa-free.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 3,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "Rules and authorities differ by emirate; mostly documented by agencies, not in official public guidance.",
+  "steps": [
+   "Send passport copy, photo and bio to the promoter early",
+   "Promoter applies for the performer permit via the DET (Dubai) or DCT (Abu Dhabi) system",
+   "Check whether your nationality gets a visa on arrival or needs a pre-arranged visa"
+  ],
+  "tax": "The UAE has no personal income tax, so no withholding on performance fees is normally deducted there.",
+  "sources": [
+   {
+    "title": "Dubai Department of Economy and Tourism - permits",
+    "url": "https://www.dubaidet.gov.ae/en/"
+   },
+   {
+    "title": "Ticmint - DET entertainment permit guide (secondary)",
+    "url": "https://ticmint.com/blog/dtcm/det/dubai-event-permits-during-ramadan-2026-det-instructions-all-you-need-to-know"
+   }
+  ],
+  "confidence": "low"
+ },
+ "United States": {
+  "permit": "required",
+  "permitName": "O-1B, P-1B or P-3 visa (Form I-129 petition)",
+  "summary": "Paid shows are not allowed on ESTA or a B-1/B-2 visitor visa. A US petitioner (promoter, venue or agent) must get an approved I-129 petition from USCIS, then the artist gets the visa at a US consulate.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 12,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "No nationality is exempt from the petition. Canadian citizens still need an approved petition but no visa stamp.",
+  "steps": [
+   "US promoter, venue or agent files Form I-129 with USCIS, with a union consultation letter (e.g. AFM)",
+   "Allow 2-6 months; premium processing gives a decision in about 15 business days",
+   "Artist books a visa interview at a US consulate with the approval notice",
+   "Plan US tax withholding or a Central Withholding Agreement with the IRS"
+  ],
+  "tax": "30% federal withholding on US-source performance fees paid to non-residents (IRC §1441/1442), unless reduced by a treaty or a Central Withholding Agreement.",
+  "sources": [
+   {
+    "title": "USCIS: O-1 Visa: Individuals with Extraordinary Ability or Achievement",
+    "url": "https://www.uscis.gov/working-in-the-united-states/temporary-workers/o-1-visa-individuals-with-extraordinary-ability-or-achievement"
+   },
+   {
+    "title": "USCIS: P-3 Artist or Entertainer Coming to Be Part of a Culturally Unique Program",
+    "url": "https://www.uscis.gov/working-in-the-united-states/temporary-workers/p-3-artist-or-entertainer-coming-to-be-part-of-a-culturally-unique-program"
+   },
+   {
+    "title": "Artists From Abroad: Filing fees",
+    "url": "https://www.artistsfromabroad.org/immigration-procedures/filing-fees/"
+   },
+   {
+    "title": "IRS: Withholding on nonresident aliens (Publication 515)",
+    "url": "https://www.irs.gov/publications/p515"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Canada": {
+  "permit": "not_required",
+  "permitName": "Work-permit exemption for performing artists (IRPR R186(g))",
+  "summary": "Foreign DJs and performers can play short, time-limited paid gigs in Canada without a work permit, as long as they are not employed by the venue. They still need a normal eTA or visitor visa to enter.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": null,
+  "cost": "No work permit fee; eTA CAD 7 or visitor visa fee if your nationality needs one",
+  "exemptNationalities": [],
+  "exemptNote": "The exemption covers all nationalities. It does not apply to an employment relationship (e.g. a residency several nights a week for weeks) or to film/TV/radio productions.",
+  "steps": [
+   "Get an eTA or visitor visa, depending on nationality",
+   "Carry the performance contract and itinerary for the border officer",
+   "Keep the booking short and freelance (no employment contract with the venue)",
+   "Expect 15% withholding on the fee unless a waiver is approved"
+  ],
+  "tax": "15% non-resident withholding on fees for services in Canada (Income Tax Regulation 105); a waiver can be requested from CRA. Provincial withholding may also apply.",
+  "sources": [
+   {
+    "title": "IRCC: Authorization to work without a work permit - Performing artists",
+    "url": "https://www.canada.ca/en/immigration-refugees-citizenship/corporate/publications-manuals/operational-bulletins-manuals/temporary-residents/foreign-workers/work-without-permit/arts.html"
+   },
+   {
+    "title": "IRCC Operational Bulletin 580 (bars and restaurants change, 2014)",
+    "url": "https://www.canada.ca/en/immigration-refugees-citizenship/corporate/publications-manuals/operational-bulletins-manuals/bulletins-2014/580-june-23-2014.html"
+   },
+   {
+    "title": "CRA: Non-resident withholding tax on services (Reg 105)",
+    "url": "https://www.canada.ca/en/revenue-agency/services/tax/international-non-residents/information-been-moved/payments-non-residents-services-provided-canada.html"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Mexico": {
+  "permit": "required",
+  "permitName": "Visitor visa with permission to carry out paid activities (Visitante con permiso para realizar actividades remuneradas)",
+  "summary": "Tourist entry does not allow paid work. The Mexican promoter must get an INM authorisation first, then the artist collects the paid-activity visitor visa at a Mexican consulate.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 6,
+  "cost": "Consular visa fee plus INM migration fee; amounts vary, check the consulate",
+  "exemptNationalities": [],
+  "exemptNote": "Consulates say all foreign nationals hired to perform need the INM permit, including those who are visa-exempt as tourists.",
+  "steps": [
+   "Mexican promoter (registered with INM) files the entry permit request at INM",
+   "INM decision usually takes about 30 days",
+   "Artist books a consulate appointment within 30 days of the INM letter and gets the visa (2-10 working days)",
+   "Promoter withholds Mexican tax on the fee"
+  ],
+  "tax": "25% withholding on the gross fee for public-show income of non-residents, no deductions (LISR Art. 170).",
+  "sources": [
+   {
+    "title": "Consulado de México en Reino Unido: Lucrative visitor visa",
+    "url": "https://consulmex.sre.gob.mx/reinounido/index.php/es/contenido/94-lucrative-visitor-visa"
+   },
+   {
+    "title": "Consulado de México en Nueva York: Visa para visitante con permiso para actividades remuneradas (PDF)",
+    "url": "https://consulmex.sre.gob.mx/nuevayork/phocadownload/2_Visa_para_visitante_o_residente_con_permiso_para_realizar_actividades.pdf"
+   },
+   {
+    "title": "LISR Artículo 170 (text)",
+    "url": "https://mley.mx/LISR/articulo/170/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Brazil": {
+  "permit": "depends",
+  "permitName": "Visit visa (Visto de visita, VIVIS) or visa-exempt entry; temporary visa for longer fixed-term contracts",
+  "summary": "Brazil's Migration Law lets visitors receive a performance fee (cachê) for short artistic activities, so visa-exempt nationals can usually play on normal entry. Nationals who need a visa (incl. US, Canada, Australia since April 2025) must get a visit visa or e-visa first.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 2,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "These nationals do not need a visa for short visits, and visitors may be paid a cachê under Law 13.445 Art. 13. Most other EU countries are also visa-exempt; check Itamaraty's list. Longer fixed-term contracts need a temporary visa.",
+  "steps": [
+   "Check Itamaraty's visa table for the artist's nationality",
+   "If a visa is needed, apply for the visit visa or e-visa with the promoter's invitation and contract",
+   "Carry the contract showing a short, time-limited engagement",
+   "Promoter withholds Brazilian income tax on the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Lei 13.445/2017 (Lei de Migração), Art. 13-14",
+    "url": "https://www.normaslegais.com.br/legislacao/lei-13445-2017.htm"
+   },
+   {
+    "title": "Decreto 9.199/2017 (regulation of the Migration Law)",
+    "url": "https://www2.camara.leg.br/legin/fed/decret/2017/decreto-9199-20-novembro-2017-785772-normaatualizada-pe.pdf"
+   },
+   {
+    "title": "Itamaraty: Quadro geral de regime de vistos",
+    "url": "https://www.gov.br/mre/pt-br/consulado-londres/vistos-para-estrangeiros"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Argentina": {
+  "permit": "required",
+  "permitName": "Transitory residence for artistic activities (Ley 25.871 Art. 24(h)), electronic entry permit via DNM",
+  "summary": "Paid artistic work needs a transitory permit from the National Migration Directorate (DNM). It is requested through a local organiser registered in RENURE and is valid for up to one month.",
+  "whoApplies": "organiser",
+  "leadTimeWeeks": 3,
+  "cost": "DNM migration fee per the official fee table; amount not confirmed",
+  "exemptNationalities": [],
+  "exemptNote": "Not confirmed whether Mercosur nationals can skip this for a one-off show; check with DNM.",
+  "steps": [
+   "Local organiser registers in RENURE (Registro Nacional Único de Requirentes de Extranjeros)",
+   "Organiser files the electronic entry request with a notarised note and the contract",
+   "Artist shows the DNM authorisation email to the officer on arrival",
+   "Ask the promoter how non-resident income tax will be withheld"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Argentina.gob.ar: Tramitación de ingreso electrónica - tareas remuneradas o no en el campo artístico",
+    "url": "https://www.argentina.gob.ar/servicio/tramitacion-de-ingreso-electronica-tareas-remuneradas-o-no-en-el-campo-cientifico"
+   },
+   {
+    "title": "Disposición DNM 1170/2010 and 1824/2013",
+    "url": "https://www.argentina.gob.ar/normativa/nacional/norma-216404/texto"
+   },
+   {
+    "title": "Argentina.gob.ar: Cuadro de tasas migratorias",
+    "url": "https://www.argentina.gob.ar/cuadro-tasas-migratorias"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Colombia": {
+  "permit": "required",
+  "permitName": "Permit for Other Activities (POA) - concerts, events or artistic activities; Visitor visa (Visa V) for visa-required nationals",
+  "summary": "Visa-exempt artists still need a POA from Migración Colombia for concerts and artistic events, requested online at least 5 business days before arrival. Artists from visa-required countries need a Visitor (V) visa from the Foreign Ministry.",
+  "whoApplies": "either",
+  "leadTimeWeeks": 2,
+  "cost": null,
+  "exemptNationalities": [],
+  "exemptNote": "No nationality is exempt from the POA. A plain tourist entry (PIP) does not allow being paid in Colombia.",
+  "steps": [
+   "Check whether the artist's nationality needs a visa for Colombia",
+   "Visa-exempt: file the POA form on Migración Colombia ('Conciertos, eventos o actividades artísticas') 5+ business days ahead",
+   "Visa-required: apply for the Visa V at Cancillería with the organiser's invitation",
+   "Ask the promoter about non-resident withholding on the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "Cancillería: ¿Necesito una visa?",
+    "url": "https://cancilleria.gov.co/atencion-y-servicio-al-ciudadano/tramites-y-servicios/visa/necesito-un-visa"
+   },
+   {
+    "title": "Fragomen: Nueva categorización de los permisos de ingreso y permanencia en Colombia",
+    "url": "https://www.fragomen.com/insights/nueva-categorizaci-n-de-los-permisos-de-ingreso-y-permanencia-en-colombia/index.html"
+   },
+   {
+    "title": "DIAN Oficio 4716 de 2024 (tax treatment of POA holders)",
+    "url": "https://normograma.dian.gov.co/dian/compilacion/docs/oficio_dian_4716_2024.htm"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Chile": {
+  "permit": "required",
+  "permitName": "Work authorisation for Permanencia Transitoria holders (Autorización para trabajar con Permanencia Transitoria)",
+  "summary": "Tourists cannot be paid without permission. Performers at public shows can get a short work authorisation from SERMIG for the exact show dates, filed online before or after arrival.",
+  "whoApplies": "either",
+  "leadTimeWeeks": 1,
+  "cost": "SERMIG fee per the official tariff (amount varies by nationality)",
+  "exemptNationalities": [],
+  "exemptNote": null,
+  "steps": [
+   "Get a notarised letter or contract from the Chilean promoter with duties, venue and exact dates",
+   "File on SERMIG's online portal (artist, representative or employer), no later than the business day before the show",
+   "Pay the fee and carry the approval at the gig",
+   "Promoter withholds Chilean tax on the fee"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "SERMIG: Autorización de trabajo para titulares de Permanencia Transitoria",
+    "url": "https://serviciomigraciones.cl/permanencia-transitoria/autorizacion-de-trabajo/"
+   },
+   {
+    "title": "ChileAtiende: Autorización para trabajar con Permanencia Transitoria",
+    "url": "https://www.chileatiende.gob.cl/fichas/104214-autorizacion-para-trabajar-con-permanencia-transitoria"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "South Africa": {
+  "permit": "required",
+  "permitName": "Visitor's visa with Section 11(2) short-term work authorisation",
+  "summary": "Any paid work, including short gigs, needs a Section 11(2) work authorisation, even for visa-exempt nationals. Apply at a South African embassy before travelling, with a letter from the local host.",
+  "whoApplies": "artist",
+  "leadTimeWeeks": 3,
+  "cost": "Small mission fee where applicable (e.g. AUD 37 in Canberra)",
+  "exemptNationalities": [],
+  "exemptNote": "Visa-exempt nationals still need the Section 11(2) authorisation for paid work; the authorisation is capped at 90 days per stay.",
+  "steps": [
+   "Get a letter from the South African promoter to the Director-General of Home Affairs describing the work and dates",
+   "Apply in person at the South African mission for your country with Form DHA-84 and documents",
+   "Allow about 10 working days processing",
+   "Promoter withholds 15% entertainer tax and pays it to SARS"
+  ],
+  "tax": null,
+  "sources": [
+   {
+    "title": "DIRCO Canberra: Visitor's Visa Section 11(2)",
+    "url": "https://dirco.gov.za/canberra/vistors-visa-section-11-2-short-work-period-authorisation/"
+   },
+   {
+    "title": "DIRCO Ottawa: Section 11(2) Visitor's Visa",
+    "url": "https://dirco.gov.za/ottawa/section-11-2-visa/"
+   },
+   {
+    "title": "SARS: Withholding tax on foreign entertainers and sportspersons",
+    "url": "https://www.sars.gov.za/types-of-tax/withholding-tax-on-foreign-entertainers-and-sportspersons/"
+   }
+  ],
+  "confidence": "medium"
+ }
+}

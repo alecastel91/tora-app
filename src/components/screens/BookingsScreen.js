@@ -13,6 +13,16 @@ import IssueInvoiceModal from '../common/IssueInvoiceModal';
 import DraftContractModal from '../common/DraftContractModal';
 import PdfViewerModal from '../common/PdfViewerModal';
 import ImageLightbox from '../common/ImageLightbox';
+import TravelPermitPanel from '../common/TravelPermitPanel';
+
+// Set length from its own times (stored durations from old seeds were hours, not minutes).
+const setMinutes = (deal) => {
+  const [sh, sm] = String(deal.setStartTime || '').split(':').map(Number);
+  const [eh, em] = String(deal.setEndTime || '').split(':').map(Number);
+  if (![sh, sm, eh, em].every(Number.isFinite)) return null;
+  const m = (eh * 60 + em - (sh * 60 + sm) + 1440) % 1440;
+  return m || null;
+};
 import { deriveSignerCapacity, deriveRecipientName, isArtistSideForDeal, signatureIsArtistSide } from '../../utils/contractSigner';
 import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../utils/representation';
 import { DOC_CATEGORIES, categoryStatus, documentsStillDue } from '../../utils/documentCategories';
@@ -1431,7 +1441,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
       deal.artistName && { label: lbl('bookings.artistLabel'), value: deal.artistName },
       (deal.venueName || deal.city) && { label: lbl('chat.venueLabel'), value: deal.venueName || '', sub: deal.city && deal.country ? `${deal.city}, ${deal.country}` : deal.city },
       deal.startTime && deal.endTime && { label: lbl('chat.eventTimeLabel'), value: deal.startTime === 'TBC' ? t('offer.timeTbc') : `${deal.startTime} – ${deal.endTime}` },
-      deal.setStartTime && deal.setEndTime && { label: lbl('chat.setTimeLabel'), value: `${deal.setStartTime} – ${deal.setEndTime}`, sub: deal.setDuration ? t('chat.durationMinutes', { n: deal.setDuration }) : null },
+      deal.setStartTime && deal.setEndTime && { label: lbl('chat.setTimeLabel'), value: `${deal.setStartTime} – ${deal.setEndTime}`, sub: setMinutes(deal) ? t('chat.durationMinutes', { n: setMinutes(deal) }) : null },
       deal.performanceType && { label: lbl('offer.performanceType'), value: deal.performanceType },
       deal.eventRoomsCount != null && deal.eventRoomsCount !== '' && { label: lbl('offer.eventRooms'), value: String(deal.eventRoomsCount) },
       lineupNames.length > 0 && { label: lbl('offer.lineup'), value: lineupNames.join(', ') },
@@ -1534,6 +1544,8 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
               )}
             </section>
           )}
+
+          {!['DECLINED', 'CANCELLED'].includes(deal.status) && <TravelPermitPanel deal={deal} artistSide={artistSide} />}
 
           {delegateToAgent && (
             <div className="via-agent-info">

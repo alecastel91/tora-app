@@ -3,7 +3,9 @@ import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import RoomGearEditor from '../common/RoomGearEditor';
 import { roomsFromCount, roomsHaveContent } from '../../utils/venueRooms';
-import { genresList, getZoneFromCountry } from '../../data/profiles';
+import { genresList, getZoneFromCountry, countriesByZone } from '../../data/profiles';
+
+const ALL_COUNTRIES = Object.values(countriesByZone).flat().sort((a, b) => a.localeCompare(b));
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import CitySearch from '../common/CitySearch';
@@ -449,6 +451,33 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                 placeholder={t('artistPage.pronounsPlaceholder')}
               />
               <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('artistPage.pronounsHint')}</p>
+            </div>
+          )}
+
+          {editedUser.role === 'ARTIST' && (
+            // Passport(s): private, only shown as visa/permit guidance on bookings.
+            <div className="form-group">
+              <label>{t('permits.passportLabel')} <span className="text-white/35">· {t('artistPage.optional')}</span></label>
+              {[0, 1].map((i) => {
+                const list = editedUser.nationalities || [];
+                if (i === 1 && !list[0]) return null;
+                return (
+                  <select
+                    key={i}
+                    className={i ? 'mt-2' : ''}
+                    value={list[i] || ''}
+                    onChange={(e) => {
+                      const next = [...list];
+                      next[i] = e.target.value;
+                      setEditedUser({ ...editedUser, nationalities: [...new Set(next.filter(Boolean))] });
+                    }}
+                  >
+                    <option value="">{i ? t('permits.secondPassport') : t('permits.choosePassport')}</option>
+                    {ALL_COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                );
+              })}
+              <p className="m-0 mt-1.5 text-[11.5px] leading-relaxed text-white/40">{t('permits.passportHint')}</p>
             </div>
           )}
 
