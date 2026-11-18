@@ -241,6 +241,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   const hoveredKey = useRef(null);
   const lastSigRef = useRef(null); // what the canvas last showed (draw-on-change)
   const settleRef = useRef(0); // last moment the view moved (detailed coastlines wait for it to settle)
+  const detailPendingRef = useRef(false); // close in and not yet drawn with the 1:50m coastlines
   const selectedKey = useRef(null);
   const selectedCityKey = useRef(null); // city selection only (pin highlight)
   const selectedCountryRef = useRef(null);
@@ -382,8 +383,8 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         citiesRef.current, zonesRef.current, lockedHubsRef.current, !!DETAIL, draggingRef.current];
       const last = lastSigRef.current;
       const same = last && sig.length === last.length && sig.every((v, i) => v === last[i]);
-      if (same) { raf = requestAnimationFrame(frame); return; }
-      const moving = !last || draggingRef.current || focusing.current || sig[0] !== last[0] || sig[1] !== last[1] || sig[2] !== last[2];
+      if (same && !detailPendingRef.current) { raf = requestAnimationFrame(frame); return; }
+      const moving = draggingRef.current || focusing.current || (!!last && (sig[0] !== last[0] || sig[1] !== last[1] || sig[2] !== last[2]));
       lastSigRef.current = sig;
       ctx.clearRect(0, 0, W, H);
 
@@ -412,7 +413,9 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       if (close) loadDetail();
       if (close && moving) settleRef.current = performance.now();
       const settled = !moving && performance.now() - settleRef.current > 120;
-      if (close && !settled) lastSigRef.current = null; // come back for the detailed pass
+      // Come back for the detailed pass once the view has been still for a
+      // moment (or once the 1:50m atlas finishes loading).
+      detailPendingRef.current = close && (!settled || (!DETAIL && detailLoading));
       const atlas = close && DETAIL && settled ? DETAIL : { land: LAND, borders: BORDERS };
       const { land } = atlas;
       ctx.beginPath(); path(land);

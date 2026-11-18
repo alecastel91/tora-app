@@ -44,6 +44,7 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
   // list joins it on the left on demand (or as soon as you type a name).
   const [listOpen, setListOpen] = useState(false);
   const listInputRef = useRef(null);
+  const openListForTyping = () => { setListOpen(true); requestAnimationFrame(() => listInputRef.current?.focus()); };
   // A city/country tapped on the globe narrows the LIST only. It must stay out
   // of `filters`, which drive the fetch the globe's own pins come from.
   const [mapSel, setMapSel] = useState(null);
@@ -241,12 +242,16 @@ const SearchWorkspace = ({ onOpenChat, onOpenProfile: openProfile, onOpenPremium
             </button>
           ) : (
             // The page opens on the map: search, filters and the list button float on it.
-            <div className="absolute left-4 right-4 top-4 z-30 flex max-w-[560px] items-center gap-2">
+            // Never wider than the space left of the members panel (400px + gaps).
+            <div className="absolute left-4 right-4 top-4 z-30 flex max-w-[min(560px,calc(100%_-_440px))] items-center gap-2">
               <label className="relative block min-w-0 flex-1">
                 <span className="pointer-events-none absolute z-10 left-3 top-1/2 -translate-y-1/2 text-white/40 [&>svg]:h-4 [&>svg]:w-4"><SearchIcon /></span>
                 <input
                   value={query}
-                  onChange={(e) => { setQuery(e.target.value); setListOpen(true); requestAnimationFrame(() => listInputRef.current?.focus()); }}
+                  // The list opens with the first committed character: opening it
+                  // mid-composition would swap the input under a CJK keyboard.
+                  onChange={(e) => { setQuery(e.target.value); if (!e.nativeEvent.isComposing) openListForTyping(); }}
+                  onCompositionEnd={openListForTyping}
                   placeholder={t('search.searchByName')}
                   className="h-10 w-full rounded-full border border-white/10 bg-black/45 pl-9 pr-3 text-[13.5px] text-white placeholder-white/40 outline-none backdrop-blur-md focus:border-white/25"
                 />
