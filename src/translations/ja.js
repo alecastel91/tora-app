@@ -2700,8 +2700,6 @@ const ja = {
     jumpTo: "ページやプロフィールへ移動…",
     pages: "ページ",
     profilesLabel: "プロフィール",
-    fullscreen: "全画面",
-    exitFullscreen: "全画面を終了",
     allRoles: "すべての役割",
     preview: "プレビュー",
     selectTour: "ツアーを選択すると詳細が表示されます",

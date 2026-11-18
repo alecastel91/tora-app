@@ -1,4 +1,8 @@
 :root {
+  /* The app is dark-only: native controls (selects, date pickers, checkboxes,
+     scrollbars) draw their dark variant everywhere from this one line. */
+  color-scheme: dark;
+
   /* Stacking layers — the ONE place that defines what draws above what.
    * Every global overlay/screen/modal in App.css must use these tokens, never
    * a raw number (raw numbers are how modals silently sank behind the Premium

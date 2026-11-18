@@ -1651,10 +1651,8 @@
 
 /* Native dropdown lists: Windows/Linux draw the open list with the options'
    own colours, and a translucent background inherited from the field showed
-   white rows with white text until hovered. Opaque dark rows, every select. */
-select {
-  color-scheme: dark;
-}
+   white rows with white text until hovered. Opaque dark rows, every select
+   (color-scheme: dark comes from :root in variables.css). */
 select option,
 select optgroup {
   background-color: #101015;
@@ -7560,7 +7558,6 @@ select optgroup {
 .currency-select {
   border: none;
   background-color: #0a0a0e;
-  color-scheme: dark;
   color: #fff;
   padding: 12px;
   border-right: 1px solid #444;
@@ -7914,7 +7911,6 @@ select.form-input:focus {
 /* Make date/time picker indicators visible on dark background */
 input[type="date"].form-input,
 input[type="time"].form-input {
-  color-scheme: dark;
   cursor: pointer;
   /* Contain the full-size ::-webkit-calendar-picker-indicator below. Without
      a positioning context the absolutely-positioned indicator escapes the
@@ -12284,8 +12280,6 @@ textarea.form-textarea:focus {
   color: rgba(255, 255, 255, 0.85);
 }
 .bookings-filter-select option {
-  background: #101015;
-  color: #fff;
   text-transform: none;
   letter-spacing: normal;
 }
@@ -13135,11 +13129,10 @@ div.poster-stat { cursor: default; }
 .d3-dash-title { margin: 0; font-family: var(--font-space-grotesk); font-weight: 700; font-size: 22px; letter-spacing: -0.01em; text-transform: uppercase; color: #fff; }
 .d3-dash-action { min-height: 62px; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .d3-dash-cta { flex: none; display: flex; align-items: center; justify-content: center; height: 40px; min-width: 84px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.28); color: #fff; font-size: 12px; font-weight: 600; text-transform: capitalize; }
-/* The map's member panel: near-square tiles (a little taller than wide). The
-   html (body) prefix outranks desktop-v3's 400px roster tiles and their 28px names. */
-html .globe-panel-tiles .photo-card.photo-card--tile { height: auto; aspect-ratio: 1 / 1.15; }
-html body .globe-panel-tiles .photo-card.photo-card--tile .photo-card-name { font-size: 18px; }
-html body .globe-panel-tiles .photo-card.photo-card--tile .photo-card-meta { font-size: 11.5px; }
+/* The map's member panel: near-square tiles (a little taller than wide). */
+.globe-panel-tiles .photo-card--tile { height: auto; aspect-ratio: 1 / 1.15; }
+.globe-panel-tiles .photo-card--tile .photo-card-name { font-size: 18px; }
+.globe-panel-tiles .photo-card--tile .photo-card-meta { font-size: 11.5px; }
 
 /* One-time Like / Connect explainer (LikeConnectTip) */
 .like-tip { display: grid; gap: 8px; margin-top: 12px; padding: 12px 14px; text-align: left; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: rgba(255, 51, 102, 0.06); }
@@ -13635,10 +13628,6 @@ html body .globe-panel-tiles .photo-card.photo-card--tile .photo-card-meta { fon
 input[type="checkbox"],
 input[type="radio"] {
   accent-color: var(--color-crimson-action);
-  color-scheme: dark;
-}
-select {
-  color-scheme: dark;
 }
 
 /* ===== Artist page media (ArtistMedia.js) ===== */

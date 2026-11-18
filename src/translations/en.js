@@ -2709,8 +2709,6 @@ const en = {
     jumpTo: "Jump to a page or a profile…",
     pages: "Pages",
     profilesLabel: "Profiles",
-    fullscreen: "Full screen",
-    exitFullscreen: "Exit full screen",
     allRoles: "All roles",
     preview: "Preview",
     selectTour: "Select a tour to see everything about it",

@@ -204,10 +204,12 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
   }, [locked, userCity, cities, ownCountryFeature]);
 
   const [roleOn, setRoleOn] = useState({ ARTIST: true, AGENT: true, PROMOTER: true, VENUE: true });
+  // The 3D stage reads role counts during render (its effects run before ours).
   const counted = useMemo(() => {
+    if (!use3D) return null;
     const n = (g) => g.profiles.reduce((k, p) => k + (roleOn[p.role] ? 1 : 0), 0);
     return { cities: cities.map((c) => ({ ...c, _cnt: n(c) })), zones: zoneGroups.map((z) => ({ ...z, _cnt: n(z) })) };
-  }, [cities, zoneGroups, roleOn]);
+  }, [use3D, cities, zoneGroups, roleOn]);
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null); // { name, feature, cities, profiles }
   const [tip, setTip] = useState(null); // { x, y, name, count, locked }
@@ -325,15 +327,13 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     dimsRef.current = { w: dims.w, h: dims.h, dpr };
     lastSigRef.current = null; // resizing clears the canvas
 
-    // Starfield: regenerated per canvas size, drifts gently via per-star twinkle.
+    // Starfield: regenerated per canvas size (static: the canvas only redraws on change).
     const starCount = Math.round((dims.w * dims.h) / 8500);
     starsRef.current = Array.from({ length: starCount }, () => ({
       x: Math.random() * dims.w,
       y: Math.random() * dims.h,
       r: 0.4 + Math.random() * 0.8,
       a: 0.10 + Math.random() * 0.35,
-      tw: 0.0008 + Math.random() * 0.0022,
-      ph: Math.random() * Math.PI * 2,
       crimson: Math.random() < 0.12,
     }));
 
@@ -924,6 +924,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center"><LoadingGlobe label={t('search.loadingProfiles')} /></div>}>
           <Globe3DStage
             ref={globe3D}
+            land={LAND.features}
             cities={counted.cities}
             zones={counted.zones}
             lockedHubs={lockedHubs}

@@ -2700,8 +2700,6 @@ const ko = {
     jumpTo: "페이지 또는 프로필로 이동…",
     pages: "페이지",
     profilesLabel: "프로필",
-    fullscreen: "전체 화면",
-    exitFullscreen: "전체 화면 종료",
     allRoles: "모든 역할",
     preview: "미리보기",
     selectTour: "투어를 선택하면 상세 정보가 표시됩니다",

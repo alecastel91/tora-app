@@ -2700,8 +2700,6 @@ const fr = {
     jumpTo: "Aller à une page ou un profil…",
     pages: "Pages",
     profilesLabel: "Profils",
-    fullscreen: "Plein écran",
-    exitFullscreen: "Quitter le plein écran",
     allRoles: "Tous les rôles",
     preview: "Aperçu",
     selectTour: "Sélectionnez une tournée pour en voir tous les détails",

@@ -2700,8 +2700,6 @@ const es = {
     jumpTo: "Ir a una página o un perfil…",
     pages: "Páginas",
     profilesLabel: "Perfiles",
-    fullscreen: "Pantalla completa",
-    exitFullscreen: "Salir de pantalla completa",
     allRoles: "Todos los roles",
     preview: "Vista previa",
     selectTour: "Elige una gira para ver todos sus detalles",

@@ -1585,7 +1585,8 @@
   html.desktop-v3 .d3-ws > .d3-panel:first-child > .text-white\/45 { padding: 0 0 8px; }
   html.desktop-v3 .d3-ws-list { display: flex; flex-direction: column; gap: 10px; }
   html.desktop-v3 .photo-card--row { height: 158px; }
-  html.desktop-v3 .photo-card .photo-card-name { font-size: 26px; line-height: 1; font-weight: 700; letter-spacing: -0.01em; }
+  /* Desk-size names for list cards; tiles size their own (roster, map panel). */
+  html.desktop-v3 .photo-card:not(.photo-card--tile) .photo-card-name { font-size: 26px; line-height: 1; font-weight: 700; letter-spacing: -0.01em; }
   html.desktop-v3 .photo-card--row .photo-card-fade { top: 0; height: auto; background: linear-gradient(to right, rgba(4,4,7,0.92) 35%, rgba(4,4,7,0.2)); }
   html.desktop-v3 .photo-card-like { position: static; width: auto; height: 40px; padding: 0 12px; border-radius: 8px; border-color: rgba(255,255,255,0.32); background: rgba(4,4,7,0.45); font-size: 12px; font-weight: 600; }
   html.desktop-v3 .photo-card-like svg { display: none; }
@@ -1633,9 +1634,9 @@
   html.desktop-v3 .represented-artists-header { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "back title add"; align-items: center; gap: 14px; padding: 8px 0 20px; }
   html.desktop-v3 .represented-artists-header h1 { font-family: var(--font-space-grotesk); font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; margin: 0; }
   html.desktop-v3 .represented-artists-content .artists-list { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
-  html.desktop-v3 .photo-card--tile { height: 400px; }
-  html.desktop-v3 .photo-card.photo-card--tile .photo-card-name { font-size: 28px; }
-  html.desktop-v3 .photo-card--tile .photo-card-meta { font-size: 13px; }
+  html.desktop-v3 .represented-artists-content .photo-card--tile { height: 400px; }
+  html.desktop-v3 .represented-artists-content .photo-card.photo-card--tile .photo-card-name { font-size: 28px; }
+  html.desktop-v3 .represented-artists-content .photo-card--tile .photo-card-meta { font-size: 13px; }
 }
 
 

@@ -2700,8 +2700,6 @@ const zh = {
     jumpTo: "跳转到页面或档案…",
     pages: "页面",
     profilesLabel: "档案",
-    fullscreen: "全屏",
-    exitFullscreen: "退出全屏",
     allRoles: "所有角色",
     preview: "预览",
     selectTour: "选择一个巡演以查看全部详情",
