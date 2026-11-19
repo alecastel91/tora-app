@@ -628,7 +628,8 @@
     container-type: inline-size;
   }
 
-  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit {
+  html.desktop-v2.desktop-v3 .md-split > .md-detail > .d3-edit,
+  html.desktop-v2.desktop-v3 .profile-only-edit > .d3-edit {
     max-width: 1280px;
     padding: 0 var(--d2-gutter) 48px;
     /* App.css forces .edit-profile-screen.screen.active { display: flex !important }
@@ -642,6 +643,8 @@
     column-gap: 24px;
     align-items: start;
   }
+
+  html.desktop-v2.desktop-v3 .profile-only-edit > .d3-edit { margin: 0 auto; }
 
   html.desktop-v3 .d3-edit-head {
     grid-column: 1 / -1;

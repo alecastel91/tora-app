@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import EditProfileScreen from './EditProfileScreen';
@@ -31,8 +31,11 @@ const ProfileOnlyHome = ({ onSignOut }) => {
   const [editing, setEditing] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [page, setPage] = useState(null);
+  const pageCardRef = useRef(null);
 
-  if (editing) return <EditProfileScreen onClose={() => setEditing(false)} />;
+  // No app shell here (no header, tab bar or pane): .profile-only-edit gives
+  // Edit profile the whole phone height and the desktop pane layout.
+  if (editing) return <div className="profile-only-edit"><EditProfileScreen onClose={() => setEditing(false)} /></div>;
 
   const verified = user?.verifyStatus === 'VERIFIED';
   const inReview = user?.verifyStatus === 'PENDING_REVIEW';
@@ -75,9 +78,16 @@ const ProfileOnlyHome = ({ onSignOut }) => {
           done={verified && !!page?.enabled}
           title={t('profileOnly.step3Title')}
           body={t('profileOnly.step3Body')}
+          action={verified ? (
+            <button type="button" className={linkButton} onClick={() => pageCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>
+              {t(page?.enabled ? 'profileOnly.step3Share' : 'profileOnly.step3Publish')}
+            </button>
+          ) : (
+            <span className="shrink-0 text-[12px] text-white/35">{t('profileOnly.step3AfterVerify')}</span>
+          )}
         />
         {/* Once verified: page off (publish) or live (link, share sheet, Instagram step). */}
-        {verified && <PublicPageCard profile={user} onState={setPage} onVerify={() => setVerifying(true)} onEdit={() => setEditing(true)} />}
+        {verified && <div ref={pageCardRef}><PublicPageCard profile={user} onState={setPage} onVerify={() => setVerifying(true)} onEdit={() => setEditing(true)} /></div>}
 
         <p className="m-0 mt-4 text-[12.5px] leading-relaxed text-white/45">{t('profileOnly.launchNote')}</p>
       </main>

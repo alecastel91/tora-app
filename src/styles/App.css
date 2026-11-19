@@ -2843,6 +2843,11 @@ select optgroup {
 }
 
 /* Edit Profile Screen - Full Page */
+/* The profile-only page has no app header or tab bar to leave room for. */
+.profile-only-edit > .edit-profile-screen.screen.active {
+  height: 100dvh !important;
+  max-height: 100dvh;
+}
 .edit-profile-screen.screen.active {
   display: flex !important;
   flex-direction: column;
