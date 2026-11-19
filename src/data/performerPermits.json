@@ -22,8 +22,12 @@
     "url": "https://www.mofa.go.jp/j_info/visit/visa/index.html"
    },
    {
-    "title": "Entertainment visa guide for employers (practitioner)",
-    "url": "https://hr.visajapan.jp/kougyo.html"
+    "title": "Immigration Services Agency: Entertainer status of residence",
+    "url": "https://www.moj.go.jp/isa/applications/status/entertainer.html"
+   },
+   {
+    "title": "National Tax Agency No.2884: Withholding rates for non-residents",
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2884.htm"
    }
   ],
   "confidence": "high"
@@ -40,21 +44,20 @@
   "steps": [
    "Organiser applies to the Korea Media Rating Board for a performance recommendation (around 1-2 weeks)",
    "Organiser applies for a Visa Issuance Confirmation at Korean immigration",
-   "Artist collects the E-6 visa at a Korean consulate or e-visa",
-   "Korean payer withholds tax from the fee"
+   "Artist collects the E-6 visa at a Korean consulate or e-visa"
   ],
   "tax": null,
   "sources": [
    {
-    "title": "Korea's E-6 visa: a practical guide (practitioner)",
-    "url": "https://klawguru.com/2026/08/07/koreas-e-6-arts-and-entertainment-visa-a-practical-guide/"
+    "title": "Korean Embassy (MOFA): Arts/Entertainment (E-6) visa",
+    "url": "https://overseas.mofa.go.kr/ch-en/brd/m_7996/view.do?seq=700056"
    },
    {
-    "title": "E-6 Arts and Performance overview (visa agency)",
-    "url": "https://www.visaskorea.com/e-6-arts-performance-en/"
+    "title": "Korea Visa Portal (Ministry of Justice): visa types incl. E-6-1/E-6-2",
+    "url": "https://www.visa.go.kr/openPage.do?MENU_ID=10102"
    }
   ],
-  "confidence": "medium"
+  "confidence": "low"
  },
  "China": {
   "permit": "required",
@@ -67,6 +70,7 @@
   "exemptNote": null,
   "steps": [
    "Local licensed performance agency applies to the culture and tourism authority for approval of the show",
+   "For shows of 90 days or less, the organiser also gets an Approval of Short-Term Employment for the artist",
    "Agency issues the visa invitation/notification letter with the approval",
    "Artist applies for a Z visa at a Chinese embassy or visa centre",
    "The approved line-up, dates and venues must be followed"
@@ -74,19 +78,23 @@
   "tax": null,
   "sources": [
    {
+    "title": "Shanghai Municipal Government: Applying for a Z (work) visa",
+    "url": "https://english.shanghai.gov.cn/en-Individuals-ImmigrationandVisas-Visaapplication/20260813/a6bbaed65ff446df8c590ff2b965290d.html"
+   },
+   {
+    "title": "National Immigration Administration (NIA): entry policies",
+    "url": "https://en.nia.gov.cn/"
+   },
+   {
     "title": "DutchCulture: Mapping China, Music - Visa",
     "url": "https://dutchculture.nl/en/mapping-china-music-visa"
    },
    {
     "title": "DutchCulture: Mapping China, Music - Permits",
     "url": "https://dutchculture.nl/en/mapping-china-music-permits"
-   },
-   {
-    "title": "China Briefing: commercial performance applications resume",
-    "url": "https://www.china-briefing.com/news/china-commercial-performances-applications-resume/"
    }
   ],
-  "confidence": "medium"
+  "confidence": "low"
  },
  "Hong Kong": {
   "permit": "required",
@@ -130,22 +138,17 @@
   "exemptNote": "Some short stays of 30 days or less are treated as work-permitted, for example non-profit performances invited by the central government. Do not assume a paid club show qualifies.",
   "steps": [
    "Organiser applies online to the Workforce Development Agency for an arts/performance work permit",
-   "Artist enters visa-free or with a visitor visa once the permit is issued",
-   "Taiwanese payer withholds tax from the fee"
+   "Artist enters visa-free or with a visitor visa once the permit is issued"
   ],
   "tax": null,
   "sources": [
    {
-    "title": "MOL laws database: Labor laws and regulations",
-    "url": "https://laws.mol.gov.tw/Eng/EngContent.aspx?msgid=1044"
+    "title": "Workforce Development Agency: EZ Work Taiwan (Arts and Performing Arts permits)",
+    "url": "https://ezworktaiwan.wda.gov.tw/en/"
    },
    {
-    "title": "Foreign artists applying for work permits in Taiwan (practitioner)",
-    "url": "https://kaizencpa.com/Knowledge/info/id/1210.html"
-   },
-   {
-    "title": "Work Permits 101 for foreign freelancers in Taiwan",
-    "url": "https://talenttaiwan.substack.com/p/work-permits-101-a-guide-for-foreign"
+    "title": "Regulations on the Permission and Administration of the Employment of Foreign Workers (Art. 5, 30-day rule)",
+    "url": "https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=N0090027"
    }
   ],
   "confidence": "medium"
@@ -194,8 +197,7 @@
   "steps": [
    "Thai organiser prepares the sponsor documents and work permit application",
    "Artist gets a Non-Immigrant B visa at a Thai embassy before travel",
-   "Work permit is finalised once the artist is in Thailand, before the show",
-   "Thai payer withholds tax from the fee"
+   "Work permit is finalised once the artist is in Thailand, before the show"
   ],
   "tax": null,
   "sources": [
@@ -204,12 +206,8 @@
     "url": "https://thailand.go.th/useful-information-detail/001_01_121"
    },
    {
-    "title": "Sounds Australia: Thailand visas",
+    "title": "Sounds Australia (government-funded music export office): Thailand visas",
     "url": "https://soundsaustralia.com.au/?p=2395"
-   },
-   {
-    "title": "Musicians, DJs and performers in Thailand (practitioner)",
-    "url": "https://www.issacompass.com/insights/musicians-djs-and-performers-in-thailand-the-entertainment-work-permit-most-tour"
    }
   ],
   "confidence": "low"
@@ -226,8 +224,7 @@
   "steps": [
    "Organiser applies as sponsor on evisa.imigrasi.go.id with the event details and the artist's profile",
    "Artist receives the e-visa before travelling",
-   "Payment usually runs through a contract between the local sponsor and the artist's company",
-   "Indonesian payer withholds tax from the fee"
+   "Payment usually runs through a contract between the local sponsor and the artist's company"
   ],
   "tax": null,
   "sources": [
@@ -236,12 +233,8 @@
     "url": "https://evisa.imigrasi.go.id/"
    },
    {
-    "title": "Tempo: Coldplay granted music and art visas",
-    "url": "https://en.tempo.co/amp/1797222/coldplay-granted-new-music-and-art-visas-for-jakarta-concert"
-   },
-   {
-    "title": "Performer visa guide (practitioner)",
-    "url": "https://emerhub.com/bali/visas/performer-visa/"
+    "title": "Directorate General of Immigration: C7A music performance visit visa",
+    "url": "https://imigrasi.go.id/wna/daftar-visa-indonesia/C7A"
    }
   ],
   "confidence": "medium"
@@ -257,21 +250,20 @@
   "exemptNote": null,
   "steps": [
    "Promoter files the SWP petition with the Bureau of Immigration (the rules say at least 3 working days before the show; allow more)",
-   "Artist enters visa-free or on a visa, depending on nationality",
-   "Promoter withholds tax and remits it to the BIR"
+   "Artist enters visa-free or on a visa, depending on nationality"
   ],
   "tax": null,
   "sources": [
    {
-    "title": "Rules for Special Work Permits for foreign artists (summary)",
-    "url": "https://jur.ph/law/summary/rule-and-procedures-for-the-processing-of-applications-of-special-work-permit-for-foreign-artists-athletes-and-religious-preachers"
+    "title": "Bureau of Immigration: Special Work Permit - Artists and Athletes",
+    "url": "https://immigration.gov.ph/special-work-permit-artists-and-athletes/"
    },
    {
-    "title": "Inquirer: BI issues SWP to Air Supply",
-    "url": "https://globalnation.inquirer.net/150210/bi-issues-special-work-permit-air-supply-perform-ph/amp"
+    "title": "BI Operations Order SBM-2014-041 (Supreme Court E-Library)",
+    "url": "https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/10/78488"
    },
    {
-    "title": "BAL: Philippines work permit guidelines",
+    "title": "BAL: Philippines work permit guidelines (practitioner)",
     "url": "https://www.bal.com/immigration-news/philippines-new-work-permit-guidelines-announced/"
    }
   ],
@@ -289,17 +281,16 @@
   "steps": [
    "Vietnamese organiser gets performance approval for the show and the foreign line-up",
    "Organiser handles any work permit exemption confirmation needed",
-   "Organiser sponsors the artist's visa with the immigration department",
-   "Local payer withholds personal income tax"
+   "Organiser sponsors the artist's visa with the immigration department"
   ],
   "tax": null,
   "sources": [
    {
-    "title": "Decree 144/2020/ND-CP on performing arts",
-    "url": "https://english.luatvietnam.vn/decree-no-144-2020-nd-cp-dated-december-14-2020-of-the-government-providing-performing-art-activities-195588-doc1.html"
+    "title": "Government portal: consolidated Decree 144/2020/ND-CP on performing arts (2026)",
+    "url": "https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/9/08-vbhn-bvhttdl.signed.pdf"
    },
    {
-    "title": "Decree 393/2026 work permit exemptions (practitioner)",
+    "title": "Decree 393/2026 work permit exemptions (EIG law firm, practitioner)",
     "url": "https://eiglaw.com/vietnam-issues-new-decree-393-on-foreign-worker-rules-and-work-permit-exemptions/"
    }
   ],
@@ -323,12 +314,12 @@
   "tax": "15% withholding on fees paid to non-resident public entertainers",
   "sources": [
    {
-    "title": "Immigration Malaysia: Professional Visit Pass",
+    "title": "Immigration Malaysia: Professional Visit Pass (PUSPAL approval, ePUSPAL)",
     "url": "https://www.imi.gov.my/index.php/en/main-services/pass/professional-visitor-pass/"
    },
    {
-    "title": "Malay Mail: Ministry on foreign artistes' stay",
-    "url": "https://www.malaymail.com/news/malaysia/2024/03/26/ministry-denies-claims-of-prohibiting-foreign-artistes-from-staying-in-malaysia-before-show/125633"
+    "title": "LHDN (Inland Revenue Board): Withholding tax, s.109A public entertainers",
+    "url": "https://www.hasil.gov.my/en/perundangan/cukai-pegangan/"
    }
   ],
   "confidence": "medium"
@@ -388,12 +379,12 @@
     "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-activity-408"
    },
    {
-    "title": "ATO: Foreign resident entertainment and sports withholding",
-    "url": "https://www.ato.gov.au/businesses-and-organisations/hiring-and-paying-your-workers/payg-withholding/payments-you-need-to-withhold-from/payments-with-special-rules/foreign-resident-entertainment-sports-construction-and-gaming-junket-activities"
+    "title": "Home Affairs: 408 Entertainment activities",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-activity-408/entertainment-activities"
    },
    {
-    "title": "Musicians Union of Australia: Touring artist 408 visa",
-    "url": "https://www.musiciansunion.com.au/temporary-activity-visa"
+    "title": "ATO: Foreign resident entertainment and sports withholding",
+    "url": "https://www.ato.gov.au/businesses-and-organisations/hiring-and-paying-your-workers/payg-withholding/payments-you-need-to-withhold-from/payments-with-special-rules/foreign-resident-entertainment-sports-construction-and-gaming-junket-activities"
    }
   ],
   "confidence": "high"
@@ -719,18 +710,18 @@
    "Artist applies for the work visa at the Italian consulate with the nulla osta or contract",
    "Enter within the visa's validity and perform only for the named organiser"
   ],
-  "tax": "30% final withholding on fees paid to non-resident performers (DPR 600/73 art. 25); treaties may change this. Travel/hotel paid as buy-outs are often taxed too.",
+  "tax": null,
   "sources": [
    {
-    "title": "Brocardi - Testo Unico Immigrazione art. 27",
-    "url": "https://brocardi.it/testo-unico-immigrazione/titolo-iii/art27.html"
+    "title": "Normattiva: Testo Unico Immigrazione (D.Lgs. 286/1998) art. 27",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:1998-07-25;286~art27"
    },
    {
     "title": "Prefettura - Vademecum art. 27",
     "url": "https://prefettura.interno.gov.it/sites/default/files/31/2024-01/vademecum_art._27.pdf"
    },
    {
-    "title": "Arletti Partners - Visto di lavoro per artisti",
+    "title": "Arletti Partners - Visto di lavoro per artisti (practitioner)",
     "url": "https://arlettipartners.com/visto-di-lavoro-per-artisti-come-richiederlo/?lang=it"
    }
   ],
@@ -854,12 +845,12 @@
   "tax": null,
   "sources": [
    {
-    "title": "praca.gov.pl - Categories of foreigners who can work without a permit",
-    "url": "https://lang-psz.praca.gov.pl/en/-/10217876-praca-bez-zezwolenia"
+    "title": "Dz.U. 2025 poz. 1620: Regulation on work without a permit (in force 1 Dec 2025)",
+    "url": "https://eli.gov.pl/eli/DU/2025/1620/ogl"
    },
    {
-    "title": "Mazowiecki Urząd Wojewódzki - Work without a permit",
-    "url": "https://www.mos.cudzoziemcy.gov.pl/en/categories-information/doing-the-job/performing-work-without-a-work-permit/"
+    "title": "Dz.U. 2025 poz. 1620: full text (PDF, § 1 item 6: artistic performances up to 30 days)",
+    "url": "https://eli.gov.pl/api/acts/DU/2025/1620/text.pdf"
    }
   ],
   "confidence": "medium"
@@ -929,12 +920,16 @@
   "tax": null,
   "sources": [
    {
-    "title": "Revera - New labour migration rules from 1 March 2026",
-    "url": "https://georgia.revera.legal/en/info-centr/news-and-analytical-materials/378-novye-regulyacii-s-1-marta-2026-goda-v-zakon/"
+    "title": "Legislative Herald of Georgia (Matsne): Law on Labour Migration (consolidated)",
+    "url": "https://matsne.gov.ge/en/document/view/2806732"
    },
    {
-    "title": "Investor.ge - Georgia's labour migration reform",
-    "url": "https://www.investor.ge/2026/04/20/georgias-labor-migration-reform-moves-into-implementation/"
+    "title": "MFA Georgia: Labour Migration Law amendments from 1 March 2026",
+    "url": "https://cyprus.mfa.gov.ge/news/482686-gatsnobebt-rom-2026-tslis-1-martidan-dzalashi-sheva-tsvlilebebi-saqartvelos-kanonshi-shromiti-migrat"
+   },
+   {
+    "title": "Revera - New labour migration rules from 1 March 2026 (practitioner)",
+    "url": "https://georgia.revera.legal/en/info-centr/news-and-analytical-materials/378-novye-regulyacii-s-1-marta-2026-goda-v-zakon/"
    }
   ],
   "confidence": "low"
@@ -991,8 +986,8 @@
     "url": "https://www.dubaidet.gov.ae/en/"
    },
    {
-    "title": "Ticmint - DET entertainment permit guide (secondary)",
-    "url": "https://ticmint.com/blog/dtcm/det/dubai-event-permits-during-ramadan-2026-det-instructions-all-you-need-to-know"
+    "title": "Abu Dhabi Media Office: DCT Abu Dhabi event licensing guidelines",
+    "url": "https://www.mediaoffice.abudhabi/en/tourism/department-of-culture-and-tourism-abu-dhabi-launches-event-licensing-guidelines-to-streamline-process-across-the-emirate/"
    }
   ],
   "confidence": "low"
@@ -1091,8 +1086,8 @@
     "url": "https://consulmex.sre.gob.mx/nuevayork/phocadownload/2_Visa_para_visitante_o_residente_con_permiso_para_realizar_actividades.pdf"
    },
    {
-    "title": "LISR Artículo 170 (text)",
-    "url": "https://mley.mx/LISR/articulo/170/"
+    "title": "Cámara de Diputados: Ley del Impuesto sobre la Renta (Art. 170)",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LISR.pdf"
    }
   ],
   "confidence": "medium"
@@ -1109,22 +1104,21 @@
   "steps": [
    "Check Itamaraty's visa table for the artist's nationality",
    "If a visa is needed, apply for the visit visa or e-visa with the promoter's invitation and contract",
-   "Carry the contract showing a short, time-limited engagement",
-   "Promoter withholds Brazilian income tax on the fee"
+   "Carry the contract showing a short, time-limited engagement"
   ],
   "tax": null,
   "sources": [
    {
-    "title": "Lei 13.445/2017 (Lei de Migração), Art. 13-14",
-    "url": "https://www.normaslegais.com.br/legislacao/lei-13445-2017.htm"
+    "title": "LexML (Federal Senate): Lei 13.445/2017 (Lei de Migração), Art. 13",
+    "url": "https://www.lexml.gov.br/urn/urn:lex:br:federal:lei:2017-05-24;13445"
    },
    {
     "title": "Decreto 9.199/2017 (regulation of the Migration Law)",
     "url": "https://www2.camara.leg.br/legin/fed/decret/2017/decreto-9199-20-novembro-2017-785772-normaatualizada-pe.pdf"
    },
    {
-    "title": "Itamaraty: Quadro geral de regime de vistos",
-    "url": "https://www.gov.br/mre/pt-br/consulado-londres/vistos-para-estrangeiros"
+    "title": "gov.br: Obter visto para viajar ao Brasil",
+    "url": "https://www.gov.br/pt-br/servicos/obter-visto-para-viajar-ao-brasil"
    }
   ],
   "confidence": "medium"
@@ -1247,8 +1241,8 @@
     "url": "https://dirco.gov.za/ottawa/section-11-2-visa/"
    },
    {
-    "title": "SARS: Withholding tax on foreign entertainers and sportspersons",
-    "url": "https://www.sars.gov.za/types-of-tax/withholding-tax-on-foreign-entertainers-and-sportspersons/"
+    "title": "SARS: Withholding tax for non-resident entertainers and sportspersons",
+    "url": "https://www.sars.gov.za/individuals/tax-during-all-life-stages-and-events/tax-and-non-residents/withholding-tax-for-non-resident-entertainers-and-sportspersons/"
    }
   ],
   "confidence": "medium"

@@ -1,0 +1,4889 @@
+{
+ "_checkedAt": "2026-11-19",
+ "Japan": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Austria",
+     "Belgium",
+     "Bulgaria",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Italy",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Monaco",
+     "Netherlands",
+     "North Macedonia",
+     "Norway",
+     "Poland",
+     "Portugal",
+     "Romania",
+     "San Marino",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "United Kingdom",
+     "Canada",
+     "United States",
+     "Guam",
+     "Puerto Rico",
+     "Argentina",
+     "Bahamas",
+     "Barbados",
+     "Chile",
+     "Costa Rica",
+     "Dominican Republic",
+     "El Salvador",
+     "Guatemala",
+     "Honduras",
+     "Mexico",
+     "Suriname",
+     "Australia",
+     "New Zealand",
+     "Israel",
+     "Turkey",
+     "Lesotho",
+     "Mauritius",
+     "Tunisia",
+     "South Korea",
+     "Singapore",
+     "Hong Kong",
+     "Macao",
+     "Taiwan"
+    ],
+    "note": "Taiwan passports must show a personal ID number. Hong Kong: HKSAR or BN(O) passport with right of abode; Macao: MSAR passport. Barbados, Turkey, Lesotho: machine-readable passport needed."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Brazil",
+     "Malaysia",
+     "Montenegro",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Serbia",
+     "UAE"
+    ],
+    "note": "ICAO-standard ePassport (chip) only; others need a visa."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Uruguay"
+    ],
+    "note": "Only the older Uruguayan passport (with place of birth). New-format passports issued after 16 April 2025 without place of birth are not accepted."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Brunei"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Qatar"
+    ],
+    "note": "ePassport must be registered in advance with a Japanese embassy or consulate (valid 3 years)."
+   },
+   {
+    "kind": "visa_free",
+    "days": 15,
+    "nationalities": [
+     "Thailand"
+    ],
+    "note": "ICAO-standard ePassport only."
+   },
+   {
+    "kind": "visa_free",
+    "days": 15,
+    "nationalities": [
+     "Indonesia"
+    ],
+    "note": "ePassport must be registered in advance with a Japanese mission in Indonesia (valid 3 years)."
+   }
+  ],
+  "otherwise": "A visitor visa from a Japanese embassy or consulate. Some nationalities living in certain countries can apply for a Japan eVisa online.",
+  "authorisations": [
+   {
+    "name": "JESTA (Japan Electronic System for Travel Authorization)",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": null,
+    "url": "https://www.moj.go.jp/isa/index.html",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Planned pre-travel authorisation for visa-free visitors. Not live; the government target is fiscal year 2028 and no start date is set."
+   }
+  ],
+  "arrivalCard": {
+   "name": "Visit Japan Web",
+   "url": "https://services.digital.go.jp/en/visit-japan-web/",
+   "required": false,
+   "note": "Optional. Lets you complete the immigration and customs forms online before arrival; paper forms still work."
+  },
+  "sources": [
+   {
+    "title": "MOFA Japan: Exemption of Visa (Short-Term Stay), list dated 1 Sep 2025",
+    "url": "https://www.mofa.go.jp/j_info/visit/visa/short/novisa.html"
+   },
+   {
+    "title": "Immigration Services Agency of Japan",
+    "url": "https://www.moj.go.jp/isa/index.html"
+   },
+   {
+    "title": "Visit Japan Web (Digital Agency)",
+    "url": "https://services.digital.go.jp/en/visit-japan-web/"
+   }
+  ],
+  "confidence": "high"
+ },
+ "South Korea": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 180,
+    "nationalities": [
+     "Canada"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Bahamas",
+     "Barbados",
+     "Belgium",
+     "Botswana",
+     "Brazil",
+     "Bulgaria",
+     "Chile",
+     "Hong Kong",
+     "Macao",
+     "Colombia",
+     "Dominica",
+     "Costa Rica",
+     "Croatia",
+     "Czech Republic",
+     "Denmark",
+     "Dominican Republic",
+     "Ecuador",
+     "El Salvador",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Grenada",
+     "Guatemala",
+     "Haiti",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Jamaica",
+     "Japan",
+     "Kuwait",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Malta",
+     "Mexico",
+     "Morocco",
+     "Netherlands",
+     "New Zealand",
+     "Nicaragua",
+     "Norway",
+     "Panama",
+     "Peru",
+     "Poland",
+     "Qatar",
+     "Serbia",
+     "Romania",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Suriname",
+     "Sweden",
+     "Switzerland",
+     "Taiwan",
+     "Thailand",
+     "Trinidad and Tobago",
+     "Turkey",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Guam",
+     "Puerto Rico",
+     "Uruguay",
+     "Venezuela",
+     "Portugal"
+    ],
+    "note": "Some countries are listed as 3 months rather than 90 days. United Kingdom: British citizens only. Portugal: at most 90 days in any 180."
+   },
+   {
+    "kind": "visa_free",
+    "days": 60,
+    "nationalities": [
+     "Lesotho"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 60,
+    "nationalities": [
+     "Russia"
+    ],
+    "note": "At most 90 days in any 180 days."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Albania",
+     "Andorra",
+     "Bahrain",
+     "Bosnia and Herzegovina",
+     "Brunei",
+     "Cyprus",
+     "Eswatini",
+     "Fiji",
+     "Guyana",
+     "Honduras",
+     "Kiribati",
+     "Marshall Islands",
+     "Mauritius",
+     "Micronesia",
+     "Monaco",
+     "Montenegro",
+     "Nauru",
+     "New Caledonia",
+     "Oman",
+     "Palau",
+     "Paraguay",
+     "Samoa",
+     "San Marino",
+     "Saudi Arabia",
+     "Seychelles",
+     "Solomon Islands",
+     "South Africa",
+     "Tonga",
+     "Tunisia",
+     "Tuvalu"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Kazakhstan"
+    ],
+    "note": "At most 60 days in any 180 days."
+   }
+  ],
+  "otherwise": "A visitor visa from a Korean embassy or consulate (some categories via e-Visa Korea).",
+  "authorisations": [
+   {
+    "name": "K-ETA",
+    "appliesTo": "visa_free",
+    "except": [
+     "Japan",
+     "Taiwan",
+     "Hong Kong",
+     "Singapore",
+     "Macao",
+     "United States",
+     "Guam",
+     "Puerto Rico",
+     "Canada",
+     "United Kingdom",
+     "Germany",
+     "France",
+     "Italy",
+     "Netherlands",
+     "Spain",
+     "Poland",
+     "Sweden",
+     "Finland",
+     "Norway",
+     "Belgium",
+     "Denmark",
+     "Austria",
+     "New Zealand",
+     "Australia"
+    ],
+    "cost": "KRW 10,000 (plus about 3% online payment fee)",
+    "url": "https://www.k-eta.go.kr",
+    "leadTime": "Apply at least 72 hours before boarding; it can take longer",
+    "status": "live",
+    "startsOn": null,
+    "note": "Valid 3 years. The listed nationalities are temporarily exempt until 31 December 2026 (KST); they may still apply to skip the arrival card. Under-18s (17 and younger) and 65+ are also exempt.",
+    "exceptUntil": "2026-12-31"
+   }
+  ],
+  "arrivalCard": {
+   "name": "Korea e-Arrival Card",
+   "url": "https://www.e-arrivalcard.go.kr",
+   "required": true,
+   "note": "Free. Submit within 3 days before arrival. Not needed if you hold an approved K-ETA or a Korean residence card."
+  },
+  "sources": [
+   {
+    "title": "K-ETA: Eligible countries and period of stay",
+    "url": "https://www.k-eta.go.kr/portal/guide/viewetaalification.do"
+   },
+   {
+    "title": "K-ETA: Application guide (fee, processing, validity)",
+    "url": "https://www.k-eta.go.kr/portal/guide/viewetaapplication.do"
+   },
+   {
+    "title": "K-ETA notice: extension of temporary exemption to 31 Dec 2026",
+    "url": "https://www.k-eta.go.kr/portal/board/viewboarddetail.do?bbsSn=299707&esntlPnotiMtYn=Y"
+   },
+   {
+    "title": "Embassy of Korea in Spain: list of 22 K-ETA-exempt countries/regions to 31 Dec 2026",
+    "url": "https://www.mofa.go.kr/es-ko/brd/m_8093/view.do?seq=1347316"
+   },
+   {
+    "title": "Korea e-Arrival Card (Ministry of Justice)",
+    "url": "https://www.e-arrivalcard.go.kr"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2026-12-15",
+  "reviewNote": "K-ETA temporary exemption ends 31 Dec 2026"
+ },
+ "China": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "France",
+     "Germany",
+     "Italy",
+     "Netherlands",
+     "Spain",
+     "Switzerland",
+     "Ireland",
+     "Hungary",
+     "Austria",
+     "Belgium",
+     "Luxembourg",
+     "Australia",
+     "New Zealand",
+     "Poland",
+     "Portugal",
+     "Greece",
+     "Cyprus",
+     "Slovenia",
+     "Slovakia",
+     "Norway",
+     "Finland",
+     "Denmark",
+     "Iceland",
+     "Monaco",
+     "Liechtenstein",
+     "Andorra",
+     "South Korea",
+     "Bulgaria",
+     "Romania",
+     "Croatia",
+     "Montenegro",
+     "North Macedonia",
+     "Malta",
+     "Estonia",
+     "Latvia",
+     "Japan",
+     "Brazil",
+     "Argentina",
+     "Chile",
+     "Peru",
+     "Uruguay",
+     "Saudi Arabia",
+     "Oman",
+     "Kuwait",
+     "Bahrain",
+     "Sweden",
+     "Canada",
+     "United Kingdom"
+    ],
+    "note": "Unilateral visa-free policy for ordinary passports (business, tourism, visiting family or friends, exchanges, transit). Currently set to end 31 December 2026.",
+    "until": "2026-12-31"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Russia"
+    ],
+    "note": "Unilateral policy for ordinary passports, extended to 31 December 2027.",
+    "until": "2027-12-31"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Brunei"
+    ],
+    "note": "Unilateral policy for ordinary passports; no end date."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Albania",
+     "Antigua and Barbuda",
+     "Armenia",
+     "Azerbaijan",
+     "Bahamas",
+     "Barbados",
+     "Belarus",
+     "Bosnia and Herzegovina",
+     "Fiji",
+     "Georgia",
+     "Grenada",
+     "Kazakhstan",
+     "Malaysia",
+     "Maldives",
+     "Mauritius",
+     "Qatar",
+     "Samoa",
+     "San Marino",
+     "Serbia",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "Suriname",
+     "Thailand",
+     "UAE",
+     "Uzbekistan"
+    ],
+    "note": "Mutual visa exemption agreement for ordinary passports. Some agreements also cap total stays (often 90 days in any 180)."
+   }
+  ],
+  "otherwise": "A visa (usually an L tourist or M business visa) from a Chinese embassy or consulate. Many nationalities can instead use visa-free transit of up to 240 hours (10 days) when flying on to a third country.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "Foreigner Arrival Card (NIA online filing)",
+   "url": "https://s.nia.gov.cn/ArrivalCardFillingPC/",
+   "required": true,
+   "note": "Can be filled online before travel (NIA website, NIA 12367 app, WeChat or Alipay) since 20 Nov 2025; otherwise fill it in at the border."
+  },
+  "sources": [
+   {
+    "title": "Chinese Embassy in Malta: Notice on extending the unilateral visa-free policy to 31 Dec 2026 (45 countries + Sweden)",
+    "url": "https://mt.china-embassy.gov.cn/eng/lsfw/202511/t20251104_11747075.htm"
+   },
+   {
+    "title": "Chinese Embassy in the UK: FAQs on visa-free entry (50 countries, end dates), 16 Feb 2026",
+    "url": "https://gb.china-embassy.gov.cn/eng/visa/notice/202412/t20241218_11498670.htm"
+   },
+   {
+    "title": "Chinese Embassy in the UK: visa waiver for the UK and Canada from 17 Feb 2026",
+    "url": "https://gb.china-embassy.gov.cn/eng/visa/notice/202602/t20260216_11860580.htm"
+   },
+   {
+    "title": "Shanghai Municipal Government: China extends visa-free policy for Russia to 31 Dec 2027",
+    "url": "https://english.shanghai.gov.cn/en-VisaLatest/20260520/0b86f04686c84c4a8bdca4f77dbee1eb.html"
+   },
+   {
+    "title": "MFA China Consular Service: List of mutual visa exemption agreements (Jul 2026)",
+    "url": "https://cs.mfa.gov.cn/lh/lhqz_149493/list/202607/t20260713_11981384.html"
+   },
+   {
+    "title": "Chinese Embassy in the USA: online arrival card launched",
+    "url": "https://us.china-embassy.gov.cn/eng/lsfw/zj/notice/202512/t20251203_11765346.htm"
+   }
+  ],
+  "confidence": "medium",
+  "reviewBy": "2026-12-15",
+  "reviewNote": "unilateral visa-free policy ends 31 Dec 2026"
+ },
+ "Hong Kong": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 180,
+    "nationalities": [
+     "United Kingdom"
+    ],
+    "note": "British citizens only; other British passport types get 90 days."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Bahamas",
+     "Barbados",
+     "Belgium",
+     "Belize",
+     "Botswana",
+     "Brazil",
+     "Brunei",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Dominica",
+     "Ecuador",
+     "Egypt",
+     "Estonia",
+     "Fiji",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Grenada",
+     "Guyana",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Jamaica",
+     "Japan",
+     "Kenya",
+     "Kiribati",
+     "South Korea",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malawi",
+     "Malaysia",
+     "Maldives",
+     "Malta",
+     "Mauritius",
+     "Mexico",
+     "Monaco",
+     "Namibia",
+     "Nauru",
+     "Netherlands",
+     "New Zealand",
+     "Norway",
+     "Papua New Guinea",
+     "Poland",
+     "Portugal",
+     "Romania",
+     "San Marino",
+     "Saudi Arabia",
+     "Seychelles",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Sweden",
+     "Switzerland",
+     "Tanzania",
+     "Trinidad and Tobago",
+     "Turkey",
+     "Uruguay",
+     "United States",
+     "Vanuatu",
+     "Venezuela",
+     "Zambia",
+     "Zimbabwe",
+     "Guam",
+     "Puerto Rico"
+    ],
+    "note": "Uruguay: passports issued under Decree 289/90 need a visa."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Armenia",
+     "Bahrain",
+     "Belarus",
+     "Bolivia",
+     "Cabo Verde",
+     "Costa Rica",
+     "Dominican Republic",
+     "El Salvador",
+     "Georgia",
+     "Guatemala",
+     "Honduras",
+     "Indonesia",
+     "Jordan",
+     "Kuwait",
+     "Morocco",
+     "Nicaragua",
+     "Oman",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Qatar",
+     "Samoa",
+     "Solomon Islands",
+     "South Africa",
+     "Thailand",
+     "Tunisia",
+     "Uganda",
+     "UAE"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "Albania",
+     "Algeria",
+     "Benin",
+     "Bhutan",
+     "Bosnia and Herzegovina",
+     "Burkina Faso",
+     "Chad",
+     "Comoros",
+     "Djibouti",
+     "Equatorial Guinea",
+     "Gabon",
+     "Guinea",
+     "Haiti",
+     "Kazakhstan",
+     "Lesotho",
+     "Madagascar",
+     "Mali",
+     "Marshall Islands",
+     "Mauritania",
+     "Micronesia",
+     "Mongolia",
+     "Montenegro",
+     "Mozambique",
+     "Niger",
+     "North Macedonia",
+     "Palau",
+     "Philippines",
+     "Russia",
+     "Sao Tome and Principe",
+     "Serbia",
+     "Suriname",
+     "Ukraine"
+    ],
+    "note": "Albania and Serbia: biometric passports only."
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "India"
+    ],
+    "note": "Online Pre-arrival Registration (PAR) must be approved before travel."
+   },
+   {
+    "kind": "visa_free",
+    "days": 7,
+    "nationalities": [
+     "Timor-Leste"
+    ],
+    "note": "Falls under the 7-day rule for nationals not listed by name."
+   }
+  ],
+  "otherwise": "An entry visa from the Hong Kong Immigration Department (apply directly, through a local sponsor, or via a Chinese embassy or consulate).",
+  "authorisations": [
+   {
+    "name": "Pre-arrival Registration (PAR)",
+    "appliesTo": [
+     "India"
+    ],
+    "except": [],
+    "cost": "Free",
+    "url": "https://www.immd.gov.hk/eng/services/visas/pre-arrival_registration_for_indian_nationals.html",
+    "leadTime": null,
+    "status": "live",
+    "startsOn": null,
+    "note": "Online registration for Indian nationals before a visa-free visit; passport must be valid at least 6 months. Not needed in direct airside transit."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Hong Kong Immigration Department: Visit visa / entry permit requirements (updated Aug 2026)",
+    "url": "https://www.immd.gov.hk/eng/services/visas/visit-transit/visit-visa-entry-permit.html"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Taiwan": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Albania",
+     "Andorra",
+     "Australia",
+     "Austria",
+     "Belgium",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Eswatini",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Guatemala",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "Kosovo",
+     "South Korea",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Marshall Islands",
+     "Monaco",
+     "Netherlands",
+     "New Zealand",
+     "North Macedonia",
+     "Norway",
+     "Palau",
+     "Paraguay",
+     "Poland",
+     "Portugal",
+     "Romania",
+     "San Marino",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Tuvalu",
+     "United Kingdom",
+     "United States",
+     "Guam",
+     "Puerto Rico"
+    ],
+    "note": "United Kingdom: British citizens only. UK and Canadian visitors can extend to 180 days. Eswatini and Tuvalu passports with a place of birth in Afghanistan, Iran, Iraq, Libya, Nigeria, Pakistan, PRC, Syria or Yemen are not eligible. North Macedonia: until 31 March 2030."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Honduras"
+    ],
+    "note": "Ordinary passports; not for passports showing a PRC place of birth."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Belize",
+     "Malaysia",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Singapore"
+    ],
+    "note": "Belize, Saint Kitts and Nevis and Saint Lucia passports with a place of birth in Afghanistan, Iran, Iraq, Libya, Nigeria, Pakistan, PRC, Syria or Yemen are not eligible."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Dominican Republic"
+    ],
+    "note": "Ordinary passports."
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "Oman"
+    ],
+    "note": "Stays over 14 days need an eVisa."
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "Thailand",
+     "Brunei",
+     "Philippines"
+    ],
+    "note": "Trial programme until 31 July 2027. Bring proof of accommodation, a host contact and enough funds.",
+    "until": "2027-07-31"
+   }
+  ],
+  "otherwise": "A visitor visa or eVisa from Taiwan's Bureau of Consular Affairs or a Taiwan overseas mission. Some Southeast Asian and Indian nationals holding certain foreign visas or residence can use the online Travel Authorization Certificate instead.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "Taiwan Arrival Card (TWAC)",
+   "url": "https://twac.immigration.gov.tw",
+   "required": true,
+   "note": "Online only since 1 October 2025; complete it within 7 days before arrival."
+  },
+  "sources": [
+   {
+    "title": "Bureau of Consular Affairs (Taiwan): Visa-exempt entry (updated 17 Jul 2026)",
+    "url": "https://www.boca.gov.tw/cp-149-4486-7785a-2.html"
+   },
+   {
+    "title": "Bureau of Consular Affairs (Taiwan): Landing visa",
+    "url": "https://www.boca.gov.tw/cp-149-271-2fdc9-2.html"
+   },
+   {
+    "title": "National Immigration Agency: Taiwan Arrival Card",
+    "url": "https://twac.immigration.gov.tw"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Singapore": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": "*",
+    "note": "Length of stay is set at the checkpoint and sent to you as an e-Pass by email (commonly up to 30 days).",
+    "except": [
+     "Afghanistan",
+     "Algeria",
+     "Armenia",
+     "Azerbaijan",
+     "Bangladesh",
+     "Belarus",
+     "Egypt",
+     "Georgia",
+     "India",
+     "Iran",
+     "Iraq",
+     "Jordan",
+     "Kazakhstan",
+     "Kosovo",
+     "Kyrgyzstan",
+     "Lebanon",
+     "Libya",
+     "Mali",
+     "Moldova",
+     "Morocco",
+     "Nigeria",
+     "Pakistan",
+     "Russia",
+     "Somalia",
+     "South Sudan",
+     "Sudan",
+     "Syria",
+     "Tajikistan",
+     "Tunisia",
+     "Turkmenistan",
+     "Ukraine",
+     "Uzbekistan",
+     "Yemen",
+     "Palestine",
+     "Singapore"
+    ]
+   }
+  ],
+  "otherwise": "A Singapore entry visa, applied for through a local contact with Singpass/Corppass, an authorised visa agent, or a Singapore overseas mission.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "SG Arrival Card (with electronic health declaration)",
+   "url": "https://eservices.ica.gov.sg/sgarrivalcard/",
+   "required": true,
+   "note": "Free. Submit within 3 days before arrival (including the arrival day) via the ICA e-service or MyICA app."
+  },
+  "sources": [
+   {
+    "title": "ICA Singapore: Visa guidelines (updated 28 Oct 2026)",
+    "url": "https://www.ica.gov.sg/enter-transit-depart/entering-singapore/visa_requirements"
+   },
+   {
+    "title": "ICA Singapore: SG Arrival Card with electronic health declaration",
+    "url": "https://www.ica.gov.sg/enter-transit-depart/entering-singapore/sg-arrival-card"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Thailand": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Argentina",
+     "Brazil",
+     "Chile",
+     "Peru",
+     "South Korea"
+    ],
+    "note": "Under bilateral agreements"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Australia",
+     "Austria",
+     "Bahrain",
+     "Belgium",
+     "Bhutan",
+     "Brunei",
+     "Bulgaria",
+     "Canada",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Fiji",
+     "Finland",
+     "France",
+     "Georgia",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Iceland",
+     "India",
+     "Indonesia",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "Jordan",
+     "Kuwait",
+     "Kyrgyzstan",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Maldives",
+     "Malta",
+     "Netherlands",
+     "New Zealand",
+     "Norway",
+     "Oman",
+     "Philippines",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "Romania",
+     "Saudi Arabia",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "South Africa",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Taiwan",
+     "Turkey",
+     "UAE",
+     "Ukraine",
+     "United Kingdom",
+     "United States"
+    ],
+    "note": "Tourism only. Entry by land or sea under this scheme is limited to twice per calendar year, except for nationals of Brunei, Indonesia, Malaysia and Singapore"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "China",
+     "Hong Kong",
+     "Kazakhstan",
+     "Laos",
+     "Macao",
+     "Mongolia",
+     "Russia",
+     "Timor-Leste",
+     "Vietnam"
+    ],
+    "note": "Under bilateral agreements"
+   },
+   {
+    "kind": "visa_free",
+    "days": 15,
+    "nationalities": [
+     "Mauritius",
+     "Seychelles"
+    ],
+    "note": "Tourism only"
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "Cambodia",
+     "Myanmar"
+    ],
+    "note": "Under bilateral agreements. Myanmar nationals only through international airports"
+   },
+   {
+    "kind": "visa_on_arrival",
+    "days": 15,
+    "nationalities": [
+     "Azerbaijan",
+     "Belarus",
+     "Serbia"
+    ],
+    "note": "Tourism only. Fee THB 2,000, cash in Thai baht only"
+   }
+  ],
+  "otherwise": "A Thai visa, applied for online through the official Thai e-Visa portal (thaievisa.go.th) before travel.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "Thailand Digital Arrival Card (TDAC)",
+   "url": "https://tdac.immigration.go.th",
+   "required": true,
+   "note": "All foreign nationals arriving by air, land or sea; submit online within 3 days before arrival. Not needed when transiting without passing immigration"
+  },
+  "sources": [
+   {
+    "title": "Thai MFA Department of Consular Affairs: 30-day visa exemption list (15 September 2026)",
+    "url": "https://image.mfa.go.th/mfa/0/zE6021nSnu/0303/%E0%B8%9C.30.pdf"
+   },
+   {
+    "title": "Thai MFA Department of Consular Affairs: bilateral visa exemption agreements, ordinary passports (12 December 2025)",
+    "url": "https://image.mfa.go.th/mfa/0/zE6021nSnu/%E0%B8%9A%E0%B8%A3%E0%B8%B4%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%8A%E0%B8%B2%E0%B8%8A%E0%B8%99/Bilat_Ordinary.pdf"
+   },
+   {
+    "title": "Royal Thai Embassy Doha: Tourist visa exemption and visa on arrival (from 15 September 2026)",
+    "url": "https://doha.thaiembassy.org/en/publicservice/tourist-visa-exemption-visa-on-arrival"
+   },
+   {
+    "title": "Royal Thai Embassy Helsinki: New visa exemption and VoA to Thailand",
+    "url": "https://helsinki.thaiembassy.org/en/publicservice/new-visa-exemption-and-visa-on-arrival-voa-to-thailand"
+   },
+   {
+    "title": "TAT Newsroom: New 30-day and 15-day visa exemption rules from 15 September",
+    "url": "https://www.tatnews.org/2026/09/thailand-introduces-new-30-day-and-15-day-visa-exemption-rules-from-15-september/"
+   },
+   {
+    "title": "Royal Thai Embassy Colombo: Thailand Digital Arrival Card (TDAC)",
+    "url": "https://colombo.thaiembassy.org/en/publicservice/thailand-digital-arrival-card-tdac"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Indonesia": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Belarus",
+     "Brazil",
+     "Brunei",
+     "Cambodia",
+     "Colombia",
+     "Hong Kong",
+     "Kazakhstan",
+     "Laos",
+     "Macao",
+     "Malaysia",
+     "Myanmar",
+     "Peru",
+     "Philippines",
+     "Singapore",
+     "Suriname",
+     "Thailand",
+     "Timor-Leste",
+     "Turkey",
+     "Vietnam"
+    ],
+    "note": "Visit visa exemption; cannot be extended or converted"
+   },
+   {
+    "kind": "visa_on_arrival",
+    "days": 30,
+    "nationalities": [
+     "Albania",
+     "Andorra",
+     "Argentina",
+     "Armenia",
+     "Australia",
+     "Austria",
+     "Bahrain",
+     "Belgium",
+     "Bosnia and Herzegovina",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "China",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Ecuador",
+     "Egypt",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Guatemala",
+     "Hungary",
+     "Iceland",
+     "India",
+     "Ireland",
+     "Italy",
+     "Japan",
+     "Jordan",
+     "Kenya",
+     "Kuwait",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Maldives",
+     "Malta",
+     "Mexico",
+     "Monaco",
+     "Mongolia",
+     "Morocco",
+     "Mozambique",
+     "Netherlands",
+     "New Zealand",
+     "Norway",
+     "Oman",
+     "Palestine",
+     "Papua New Guinea",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "Romania",
+     "Russia",
+     "Rwanda",
+     "Saudi Arabia",
+     "Serbia",
+     "Seychelles",
+     "Slovakia",
+     "Slovenia",
+     "South Africa",
+     "South Korea",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Taiwan",
+     "Tanzania",
+     "Tunisia",
+     "UAE",
+     "Ukraine",
+     "United Kingdom",
+     "United States",
+     "Uzbekistan",
+     "Venezuela"
+    ],
+    "note": "Visa on arrival (B1), IDR 500,000; can also be bought online before travel as an e-VOA at evisa.imigrasi.go.id. Extendable once by 30 days"
+   }
+  ],
+  "otherwise": "An Indonesian visit visa applied for online through the official e-Visa portal (evisa.imigrasi.go.id) before travel.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "All Indonesia arrival card",
+   "url": "https://allindonesia.imigrasi.go.id",
+   "required": true,
+   "note": "Covers immigration, customs and health declaration; submit within 3 days before arrival and show the QR code on arrival"
+  },
+  "sources": [
+   {
+    "title": "Directorate General of Immigration: VoA, visa-exemption (BVK) and Calling Visa subject lists",
+    "url": "https://www.imigrasi.go.id/wna/daftar-negara-voa-bvk-calling-visa/daftar-%20negara-bebas-visa-kunjungan?golden_visa=0"
+   },
+   {
+    "title": "Directorate General of Immigration: B1 Visa on Arrival",
+    "url": "https://www.imigrasi.go.id/wna/daftar-visa-indonesia/b1"
+   },
+   {
+    "title": "Kemenimipas: six countries added to visa exemption (Permenimipas 10/2026)",
+    "url": "https://kemenimipas.go.id/berita-utama/kemenimipas-menambah-enam-negara-penerima-bebas-visa-kunjungan-ke-indonesia"
+   },
+   {
+    "title": "Indonesia e-Visa portal",
+    "url": "https://evisa.imigrasi.go.id/"
+   },
+   {
+    "title": "All Indonesia arrival card portal",
+    "url": "https://allindonesia.imigrasi.go.id/"
+   },
+   {
+    "title": "Embassy of Indonesia Madrid: All Indonesia, simplifying passenger arrival",
+    "url": "https://kemlu.go.id/madrid/berita/all-indonesia-simplifying-passenger-arrival?type=publication"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Philippines": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 59,
+    "nationalities": [
+     "Brazil",
+     "Israel"
+    ],
+    "note": "Under bilateral agreements"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Andorra",
+     "Angola",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Bahamas",
+     "Bahrain",
+     "Barbados",
+     "Belgium",
+     "Belize",
+     "Benin",
+     "Bhutan",
+     "Bolivia",
+     "Botswana",
+     "Brunei",
+     "Bulgaria",
+     "Burkina Faso",
+     "Burundi",
+     "Cabo Verde",
+     "Cambodia",
+     "Cameroon",
+     "Canada",
+     "Central African Republic",
+     "Chad",
+     "Chile",
+     "Colombia",
+     "Comoros",
+     "Congo",
+     "Costa Rica",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "DR Congo",
+     "Denmark",
+     "Djibouti",
+     "Dominica",
+     "Dominican Republic",
+     "Ecuador",
+     "El Salvador",
+     "Equatorial Guinea",
+     "Eritrea",
+     "Estonia",
+     "Eswatini",
+     "Ethiopia",
+     "Fiji",
+     "Finland",
+     "France",
+     "Gabon",
+     "Gambia",
+     "Germany",
+     "Ghana",
+     "Greece",
+     "Grenada",
+     "Guatemala",
+     "Guinea",
+     "Guinea-Bissau",
+     "Guyana",
+     "Haiti",
+     "Honduras",
+     "Hungary",
+     "Iceland",
+     "Indonesia",
+     "Ireland",
+     "Italy",
+     "Ivory Coast",
+     "Jamaica",
+     "Japan",
+     "Kazakhstan",
+     "Kenya",
+     "Kiribati",
+     "Kuwait",
+     "Kyrgyzstan",
+     "Laos",
+     "Latvia",
+     "Lesotho",
+     "Liberia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Madagascar",
+     "Malawi",
+     "Malaysia",
+     "Maldives",
+     "Mali",
+     "Malta",
+     "Marshall Islands",
+     "Mauritania",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Mongolia",
+     "Morocco",
+     "Mozambique",
+     "Myanmar",
+     "Namibia",
+     "Nepal",
+     "Netherlands",
+     "New Zealand",
+     "Nicaragua",
+     "Niger",
+     "Norway",
+     "Oman",
+     "Palau",
+     "Panama",
+     "Papua New Guinea",
+     "Paraguay",
+     "Peru",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "Romania",
+     "Russia",
+     "Rwanda",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Sao Tome and Principe",
+     "Saudi Arabia",
+     "Senegal",
+     "Seychelles",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Solomon Islands",
+     "South Africa",
+     "South Korea",
+     "Spain",
+     "Suriname",
+     "Sweden",
+     "Switzerland",
+     "Tajikistan",
+     "Tanzania",
+     "Thailand",
+     "Togo",
+     "Trinidad and Tobago",
+     "Tunisia",
+     "Turkey",
+     "Turkmenistan",
+     "Tuvalu",
+     "UAE",
+     "Uganda",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Uzbekistan",
+     "Vanuatu",
+     "Venezuela",
+     "Vietnam",
+     "Zambia",
+     "Zimbabwe"
+    ],
+    "note": "Initial stay; passport valid 6 months beyond the stay and a return or onward ticket required"
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "India"
+    ],
+    "note": "Tourism or business; not extendable. 30 days for holders of a valid US, Japanese, Australian, Canadian, Schengen, Singapore or UK visa or residence permit"
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "China"
+    ],
+    "note": "Since 16 January 2026; tourism or business, not extendable, only via Manila (NAIA) or Mactan-Cebu airports"
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "Hong Kong",
+     "Macao"
+    ],
+    "note": "HKSAR or Macao SAR passport; return or onward ticket required"
+   }
+  ],
+  "otherwise": "A Philippine visa from a Philippine embassy or consulate, or through the official eVisa portal (evisa.gov.ph) where it is available.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "eTravel",
+   "url": "https://etravel.gov.ph",
+   "required": true,
+   "note": "Register within 72 hours before arrival; free of charge"
+  },
+  "sources": [
+   {
+    "title": "DFA Philippines eVisa: Visa policy (visa-free nationals, India and China policies)",
+    "url": "https://evisa.gov.ph/page/policy"
+   },
+   {
+    "title": "Philippine Consulate General Macau: Guidelines on the entry of temporary visitors",
+    "url": "https://macaupcg.dfa.gov.ph/91-phl-"
+   },
+   {
+    "title": "Philippine eTravel",
+    "url": "https://etravel.gov.ph"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Vietnam": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Chile",
+     "Panama"
+    ],
+    "note": "Under bilateral agreements"
+   },
+   {
+    "kind": "visa_free",
+    "days": 45,
+    "nationalities": [
+     "Denmark",
+     "Finland",
+     "France",
+     "Germany",
+     "Italy",
+     "Japan",
+     "Norway",
+     "Russia",
+     "South Korea",
+     "Spain",
+     "Sweden",
+     "United Kingdom"
+    ],
+    "note": "Unilateral exemption valid until 14 March 2028, any passport type. UK BN(O) passports not covered",
+    "until": "2028-03-14"
+   },
+   {
+    "kind": "visa_free",
+    "days": 45,
+    "nationalities": [
+     "Belgium",
+     "Bulgaria",
+     "Croatia",
+     "Czech Republic",
+     "Hungary",
+     "Luxembourg",
+     "Netherlands",
+     "Poland",
+     "Romania",
+     "Slovakia",
+     "Slovenia",
+     "Switzerland"
+    ],
+    "note": "Unilateral exemption for tourism, valid until 14 August 2028",
+    "until": "2028-08-14"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Cambodia",
+     "Indonesia",
+     "Kyrgyzstan",
+     "Laos",
+     "Malaysia",
+     "Mongolia",
+     "Myanmar",
+     "Singapore",
+     "Thailand"
+    ],
+    "note": "Under bilateral agreements"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Belarus"
+    ],
+    "note": "Total stay at most 90 days per calendar year"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Kazakhstan"
+    ],
+    "note": "Total stay at most 90 days in any 180 days"
+   },
+   {
+    "kind": "visa_free",
+    "days": 21,
+    "nationalities": [
+     "Philippines"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 14,
+    "nationalities": [
+     "Brunei"
+    ],
+    "note": null
+   },
+   {
+    "kind": "evisa",
+    "days": 90,
+    "nationalities": "*",
+    "except": [
+     "Vietnam"
+    ],
+    "note": "E-visa open to citizens of all countries and territories, single or multiple entry, at evisa.gov.vn. USD 25 single entry, USD 50 multiple entry"
+   }
+  ],
+  "otherwise": "A Vietnamese e-visa from the official portal evisa.gov.vn (open to all nationalities), or a visa from a Vietnamese embassy.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Vietnam MOFA: Viet Nam's visa exemption list",
+    "url": "https://mofa.gov.vn/tin-chi-tiet/chi-tiet/viet-nam-39-s-visa-exemption-list-57163-596.html"
+   },
+   {
+    "title": "Vietnam Government News: visa exemptions for citizens of 24 countries",
+    "url": "https://en.baochinhphu.vn/viet-nam-waives-visas-for-citizens-of-24-countries-from-mid-august-111250815144715035.htm"
+   },
+   {
+    "title": "Embassy of Vietnam in Belgium: Resolution 229/NQ-CP visa exemption",
+    "url": "https://vnembassy-bruxelles.mofa.gov.vn/en/tin-chi-tiet/chi-tiet/thong-bao-ve-nghi-quyet-cua-chinh-phu-ve-viec-mien-thi-thuc-theo-chuong-trinh-kich-cau-phat-trien-du-lich-59009-1353.html"
+   },
+   {
+    "title": "Vietnam National Electronic Visa system",
+    "url": "https://evisa.gov.vn/"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2028-03-14",
+  "reviewNote": "Unilateral 45-day exemptions end 14 March 2028 (12 countries, Resolution 44) and 14 August 2028 (12 countries, Resolution 229)."
+ },
+ "Malaysia": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Hong Kong",
+     "Ireland",
+     "South Africa",
+     "UAE",
+     "United Kingdom"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Brunei",
+     "Cambodia",
+     "Indonesia",
+     "Laos",
+     "Philippines",
+     "Singapore",
+     "Thailand",
+     "Vietnam"
+    ],
+    "note": "ASEAN nationals; Brunei and Singapore nationals may stay longer"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "China"
+    ],
+    "note": "Mutual visa exemption; at most 90 days in any 180 days"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "India"
+    ],
+    "note": "Temporary exemption until 31 December 2026",
+    "until": "2026-12-31"
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Botswana",
+     "Comoros",
+     "Eswatini",
+     "Lesotho",
+     "Macao",
+     "Madagascar",
+     "Malawi",
+     "Mauritius",
+     "Seychelles",
+     "Zambia",
+     "Zimbabwe"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": "*",
+    "except": [
+     "Afghanistan",
+     "Angola",
+     "Bangladesh",
+     "Bhutan",
+     "Botswana",
+     "Brunei",
+     "Burkina Faso",
+     "Burundi",
+     "Cambodia",
+     "Cameroon",
+     "Central African Republic",
+     "China",
+     "Colombia",
+     "Comoros",
+     "Congo",
+     "Cook Islands",
+     "DR Congo",
+     "Djibouti",
+     "Equatorial Guinea",
+     "Eritrea",
+     "Eswatini",
+     "Ethiopia",
+     "Ghana",
+     "Guinea-Bissau",
+     "Hong Kong",
+     "India",
+     "Indonesia",
+     "Ireland",
+     "Israel",
+     "Ivory Coast",
+     "Kosovo",
+     "Laos",
+     "Lesotho",
+     "Liberia",
+     "Macao",
+     "Madagascar",
+     "Malawi",
+     "Malaysia",
+     "Mali",
+     "Mauritius",
+     "Montenegro",
+     "Mozambique",
+     "Myanmar",
+     "Nepal",
+     "Niger",
+     "Nigeria",
+     "Pakistan",
+     "Philippines",
+     "Rwanda",
+     "Serbia",
+     "Seychelles",
+     "Singapore",
+     "South Africa",
+     "Sri Lanka",
+     "Thailand",
+     "UAE",
+     "United Kingdom",
+     "Vietnam",
+     "Zambia",
+     "Zimbabwe"
+    ],
+    "note": "Visa not required for a social visit; the permitted stay (usually 14, 30 or 90 days) depends on nationality and is set on arrival"
+   }
+  ],
+  "otherwise": "A Malaysian visa, applied for online through the official eVISA portal (malaysiavisa.imi.gov.my) or at a Malaysian embassy. Some nationalities may enter by air only.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "Malaysia Digital Arrival Card (MDAC)",
+   "url": "https://imigresen-online.imi.gov.my/mdac/main",
+   "required": true,
+   "note": "Submit within 3 days before arrival. Singapore citizens are exempt"
+  },
+  "sources": [
+   {
+    "title": "Immigration Department of Malaysia: Visa requirement by country",
+    "url": "https://www.imi.gov.my/index.php/en/main-services/visa/visa-requirement-by-country/"
+   },
+   {
+    "title": "Consulate General of Malaysia Hong Kong: Visa requirement for foreigners (updated 1 June 2026)",
+    "url": "https://www.kln.gov.my/web/chn_hong-kong/requirement_foreigner"
+   },
+   {
+    "title": "High Commission of Malaysia Pretoria: Visa requirements for foreigners",
+    "url": "https://www.kln.gov.my/web/zaf_pretoria/requirement_foreigner"
+   },
+   {
+    "title": "Embassy of Malaysia Dublin: Visa requirements (Ireland, China, India)",
+    "url": "https://www.kln.gov.my/web/irl_dublin/requirement_foreigner"
+   },
+   {
+    "title": "Embassy of Malaysia Abu Dhabi: Visa requirements and MDAC",
+    "url": "https://www.kln.gov.my/web/are_abu-dhabi/requirement_foreigner"
+   },
+   {
+    "title": "High Commission of Malaysia London: Entry requirement",
+    "url": "https://www.kln.gov.my/web/gbr_london/requirement_foreigner"
+   },
+   {
+    "title": "Ministry of Foreign Affairs Malaysia (Singapore mission): MDAC exemptions",
+    "url": "https://www.kln.gov.my/web/sgp_singapore/requirement_foreigner"
+   }
+  ],
+  "confidence": "medium",
+  "reviewBy": "2026-12-31",
+  "reviewNote": "India's temporary 30-day visa exemption ends 31 December 2026 unless extended; China's 30-day exemption is a standing mutual agreement."
+ },
+ "India": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": [
+     "Bhutan",
+     "Nepal"
+    ],
+    "note": "No visa needed when arriving from Nepal or Bhutan; a passport and visa are needed when entering from China, Macao, Hong Kong or Pakistan"
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Maldives"
+    ],
+    "note": "Business, medical or tourism only; the 90 days include all stays in India in the previous 6 months"
+   },
+   {
+    "kind": "visa_on_arrival",
+    "days": 60,
+    "nationalities": [
+     "Japan",
+     "South Korea"
+    ],
+    "note": "Only at Delhi, Mumbai, Chennai, Kolkata, Bengaluru and Hyderabad airports; double entry, not extendable. Not available to people of Pakistani origin"
+   },
+   {
+    "kind": "evisa",
+    "days": 30,
+    "nationalities": "*",
+    "except": [
+     "Afghanistan",
+     "Algeria",
+     "Bhutan",
+     "Burkina Faso",
+     "Central African Republic",
+     "Chad",
+     "China",
+     "Congo",
+     "DR Congo",
+     "Egypt",
+     "Ethiopia",
+     "French Polynesia",
+     "Guam",
+     "Guinea-Bissau",
+     "Hong Kong",
+     "India",
+     "Iran",
+     "Iraq",
+     "Kosovo",
+     "Lebanon",
+     "Libya",
+     "Macao",
+     "Maldives",
+     "Nepal",
+     "New Caledonia",
+     "Nigeria",
+     "Pakistan",
+     "Puerto Rico",
+     "Sao Tome and Principe",
+     "Saudi Arabia",
+     "Somalia",
+     "South Sudan",
+     "Sudan",
+     "Syria",
+     "Timor-Leste",
+     "Tunisia",
+     "Turkey",
+     "Turkmenistan",
+     "Yemen"
+    ],
+    "note": "e-Tourist Visa: 30-day double-entry version, plus 1-year and 5-year versions. Apply at least 4 days before arrival; fee depends on nationality; not extendable. Not available to people of Pakistani origin"
+   }
+  ],
+  "otherwise": "An Indian visa from an Indian embassy, consulate or its appointed visa centre.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "Indian e-Arrival Card",
+   "url": "https://indianvisaonline.gov.in/earrival/",
+   "required": true,
+   "note": "All foreign nationals (including OCI holders); fill in online within 72 hours before arrival or via the Su-Swagatam app; free"
+  },
+  "sources": [
+   {
+    "title": "Indian e-Visa: eligibility and general instructions",
+    "url": "https://indianvisaonline.gov.in/evisa/tvoa.html"
+   },
+   {
+    "title": "Bureau of Immigration India: Visa-free regime and visa on arrival",
+    "url": "https://boi.gov.in/boi/contents/travelling-to-india/foreigners/visa-free-regime-visa-on-arrival"
+   },
+   {
+    "title": "Indian e-Arrival Card portal",
+    "url": "https://indianvisaonline.gov.in/earrival/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Germany": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a German embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "France": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a French embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Netherlands": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Dutch embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Spain": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Spanish embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Italy": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Italian embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Portugal": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Portuguese embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Belgium": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Belgian embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Poland": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Polish embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "Czech Republic": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Bahamas",
+     "Barbados",
+     "Brazil",
+     "Brunei",
+     "Canada",
+     "Chile",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Dominica",
+     "El Salvador",
+     "Grenada",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Israel",
+     "Japan",
+     "Kiribati",
+     "Macao",
+     "Malaysia",
+     "Marshall Islands",
+     "Mauritius",
+     "Mexico",
+     "Micronesia",
+     "Monaco",
+     "Nauru",
+     "New Zealand",
+     "Nicaragua",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Puerto Rico",
+     "Saint Kitts and Nevis",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Samoa",
+     "San Marino",
+     "Seychelles",
+     "Singapore",
+     "Solomon Islands",
+     "South Korea",
+     "Timor-Leste",
+     "Tonga",
+     "Trinidad and Tobago",
+     "Tuvalu",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "90 days in any 180 days across the whole Schengen area, not per country. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "North Macedonia",
+     "Albania",
+     "Bosnia and Herzegovina",
+     "Georgia",
+     "Moldova",
+     "Montenegro",
+     "Serbia",
+     "Ukraine",
+     "Kosovo",
+     "Taiwan"
+    ],
+    "note": "Biometric (chip) passport only; Taiwan passports must show the ID card number. 90 days in any 180 days across the Schengen area. Fingerprints and a photo are taken at the Schengen border under the Entry/Exit System (EES), live since 10 April 2026."
+   }
+  ],
+  "otherwise": "A short-stay Schengen visa (type C) from a Czech embassy or consulate (or the consulate of the Schengen country that is your main destination). Hong Kong BN(O) and other British national (non-citizen) passports are also visa-free.",
+  "authorisations": [
+   {
+    "name": "ETIAS",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "EUR 20",
+    "url": "https://travel-europe.europa.eu/etias_en",
+    "leadTime": null,
+    "status": "upcoming",
+    "startsOn": null,
+    "note": "Not in operation yet and not needed today. The EU says it will announce the start date several months before launch."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: Regulation (EU) 2018/1806, consolidated text 30/12/2025 (Annex II visa-exempt list)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02018R1806-20251230"
+   },
+   {
+    "title": "European Commission: ETIAS (fee EUR 20, start date to be announced)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/european-travel-information-authorisation-system_en"
+   },
+   {
+    "title": "European Commission: Entry-Exit System (fully operational 10 April 2026)",
+    "url": "https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en"
+   },
+   {
+    "title": "EUR-Lex: Commission Implementing Regulation (EU) 2026/496 (Georgia: suspension for diplomatic/service/official passports only)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202600496"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-03-06",
+  "reviewNote": "ETIAS start date still to be announced; Georgia's partial suspension (official passports only) runs to 6 March 2027 and a wider suspension has been discussed."
+ },
+ "United Kingdom": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 180,
+    "nationalities": "*",
+    "except": [
+     "Afghanistan",
+     "Albania",
+     "Algeria",
+     "Angola",
+     "Armenia",
+     "Azerbaijan",
+     "Bangladesh",
+     "Belarus",
+     "Benin",
+     "Bhutan",
+     "Bolivia",
+     "Bosnia and Herzegovina",
+     "Botswana",
+     "Burkina Faso",
+     "Burundi",
+     "Cabo Verde",
+     "Cambodia",
+     "Cameroon",
+     "Central African Republic",
+     "Chad",
+     "China",
+     "Colombia",
+     "Comoros",
+     "Congo",
+     "Cuba",
+     "DR Congo",
+     "Djibouti",
+     "Dominica",
+     "Dominican Republic",
+     "Ecuador",
+     "Egypt",
+     "El Salvador",
+     "Equatorial Guinea",
+     "Eritrea",
+     "Eswatini",
+     "Ethiopia",
+     "Fiji",
+     "Gabon",
+     "Gambia",
+     "Georgia",
+     "Ghana",
+     "Guinea",
+     "Guinea-Bissau",
+     "Haiti",
+     "Honduras",
+     "India",
+     "Indonesia",
+     "Iran",
+     "Iraq",
+     "Ivory Coast",
+     "Jamaica",
+     "Jordan",
+     "Kazakhstan",
+     "Kenya",
+     "Kosovo",
+     "Kyrgyzstan",
+     "Laos",
+     "Lebanon",
+     "Lesotho",
+     "Liberia",
+     "Libya",
+     "Madagascar",
+     "Malawi",
+     "Mali",
+     "Mauritania",
+     "Moldova",
+     "Mongolia",
+     "Montenegro",
+     "Morocco",
+     "Mozambique",
+     "Myanmar",
+     "Namibia",
+     "Nauru",
+     "Nepal",
+     "Nicaragua",
+     "Niger",
+     "Nigeria",
+     "North Macedonia",
+     "Pakistan",
+     "Palestine",
+     "Philippines",
+     "Russia",
+     "Rwanda",
+     "Saint Lucia",
+     "Sao Tome and Principe",
+     "Senegal",
+     "Serbia",
+     "Sierra Leone",
+     "Somalia",
+     "South Africa",
+     "South Sudan",
+     "Sri Lanka",
+     "Sudan",
+     "Suriname",
+     "Syria",
+     "Tajikistan",
+     "Tanzania",
+     "Thailand",
+     "Timor-Leste",
+     "Togo",
+     "Trinidad and Tobago",
+     "Tunisia",
+     "Turkey",
+     "Turkmenistan",
+     "Uganda",
+     "Ukraine",
+     "Uzbekistan",
+     "Vanuatu",
+     "Venezuela",
+     "Vietnam",
+     "Yemen",
+     "Zambia",
+     "Zimbabwe"
+    ],
+    "note": "Up to 6 months per visit as a Standard Visitor. Taiwan passports must include the ID card number; Hong Kong SAR and Macao SAR passports are visa-free."
+   }
+  ],
+  "otherwise": "A UK Standard Visitor visa, applied for online with UK Visas and Immigration before travel.",
+  "authorisations": [
+   {
+    "name": "UK ETA",
+    "appliesTo": "visa_free",
+    "except": [
+     "Ireland"
+    ],
+    "cost": "GBP 20",
+    "url": "https://www.gov.uk/eta",
+    "leadTime": "Usually decided within 1 day, can take up to 3 working days",
+    "status": "live",
+    "startsOn": null,
+    "note": "Valid 2 years or until the passport expires. Also needed to transit through UK border control. Not needed with a British or Irish passport or UK permission to live, work or study."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "GOV.UK Immigration Rules Appendix Visitor: Visa national list (updated 29 October 2026)",
+    "url": "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-visitor-visa-national-list"
+   },
+   {
+    "title": "GOV.UK: Apply for an electronic travel authorisation (ETA)",
+    "url": "https://www.gov.uk/eta"
+   },
+   {
+    "title": "GOV.UK: ETA cost, decision time and validity",
+    "url": "https://www.gov.uk/eta/apply"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Georgia": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 365,
+    "nationalities": [
+     "Albania",
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Armenia",
+     "Australia",
+     "Austria",
+     "Azerbaijan",
+     "Bahamas",
+     "Bahrain",
+     "Barbados",
+     "Belarus",
+     "Belgium",
+     "Belize",
+     "Bosnia and Herzegovina",
+     "Botswana",
+     "Brazil",
+     "Brunei",
+     "Bulgaria",
+     "Canada",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Dominican Republic",
+     "Ecuador",
+     "El Salvador",
+     "Estonia",
+     "Finland",
+     "France",
+     "French Polynesia",
+     "Germany",
+     "Greece",
+     "Guam",
+     "Honduras",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "Jordan",
+     "Kazakhstan",
+     "Kuwait",
+     "Kyrgyzstan",
+     "Latvia",
+     "Lebanon",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Malta",
+     "Mauritius",
+     "Mexico",
+     "Moldova",
+     "Monaco",
+     "Montenegro",
+     "Netherlands",
+     "New Caledonia",
+     "New Zealand",
+     "Norway",
+     "Oman",
+     "Panama",
+     "Poland",
+     "Portugal",
+     "Puerto Rico",
+     "Qatar",
+     "Romania",
+     "Russia",
+     "Saint Vincent and the Grenadines",
+     "San Marino",
+     "Saudi Arabia",
+     "Serbia",
+     "Seychelles",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "South Africa",
+     "South Korea",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Tajikistan",
+     "Thailand",
+     "Turkey",
+     "Turkmenistan",
+     "UAE",
+     "Ukraine",
+     "United Kingdom",
+     "United States",
+     "Uzbekistan"
+    ],
+    "note": "Up to one full year. EU and Swiss/Liechtenstein citizens may also enter with a national ID card."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "China"
+    ],
+    "note": "Tourist visits only."
+   }
+  ],
+  "otherwise": "A Georgian visa, applied for online (evisa.gov.ge) or at a Georgian embassy or consulate. Holders of a valid visa or residence permit from certain countries (listed in Government Ordinance No 256) may enter visa-free for 90 days in any 180 days.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Legislative Herald of Georgia: Ordinance No 255 (list of visa-free countries), initial text",
+    "url": "https://matsne.gov.ge/en/document/view/2867361"
+   },
+   {
+    "title": "Amendment (2017): Jordan added",
+    "url": "https://matsne.gov.ge/ka/document/view/3556338"
+   },
+   {
+    "title": "Amendment (2023): China added, 30 days, tourism only",
+    "url": "https://matsne.gov.ge/ka/document/view/5916029"
+   },
+   {
+    "title": "Amendment (2025): Ukrainian citizens one year",
+    "url": "https://matsne.gov.ge/ka/document/view/6463219"
+   },
+   {
+    "title": "Amendment (24/02/2026)",
+    "url": "https://matsne.gov.ge/ka/document/view/6793257"
+   },
+   {
+    "title": "Legislative Herald of Georgia: Ordinance No 256 (visa-free entry for holders of certain visas/residence permits)",
+    "url": "https://matsne.gov.ge/en/document/view/2867377"
+   },
+   {
+    "title": "Georgia e-Visa portal (Ministry of Foreign Affairs)",
+    "url": "https://www.evisa.gov.ge/GeoVisa/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Turkey": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Albania",
+     "Andorra",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Azerbaijan",
+     "Bahrain",
+     "Belgium",
+     "Belize",
+     "Bolivia",
+     "Bosnia and Herzegovina",
+     "Brazil",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "China",
+     "Colombia",
+     "Cook Islands",
+     "Croatia",
+     "Czech Republic",
+     "Denmark",
+     "Ecuador",
+     "El Salvador",
+     "Estonia",
+     "Finland",
+     "France",
+     "French Polynesia",
+     "Georgia",
+     "Germany",
+     "Greece",
+     "Guam",
+     "Guatemala",
+     "Honduras",
+     "Hong Kong",
+     "Hungary",
+     "Iceland",
+     "Iran",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "Jordan",
+     "Kazakhstan",
+     "Kosovo",
+     "Kuwait",
+     "Kyrgyzstan",
+     "Latvia",
+     "Lebanon",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Malta",
+     "Moldova",
+     "Monaco",
+     "Montenegro",
+     "Morocco",
+     "Netherlands",
+     "New Caledonia",
+     "New Zealand",
+     "Nicaragua",
+     "North Macedonia",
+     "Norway",
+     "Oman",
+     "Panama",
+     "Paraguay",
+     "Peru",
+     "Poland",
+     "Portugal",
+     "Puerto Rico",
+     "Qatar",
+     "Romania",
+     "San Marino",
+     "Saudi Arabia",
+     "Serbia",
+     "Seychelles",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "South Korea",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Trinidad and Tobago",
+     "Tunisia",
+     "UAE",
+     "Ukraine",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Uzbekistan",
+     "Venezuela"
+    ],
+    "note": "Usually 90 days in any 180 days. Some exemptions (e.g. Australia, UK, Albania, Kosovo, Jordan, Lebanon, Serbia, Qatar, Romania, Slovakia, Slovenia) are worded for tourist or transit visits."
+   },
+   {
+    "kind": "visa_free",
+    "days": 60,
+    "nationalities": [
+     "Russia"
+    ],
+    "note": "Tourist and business visits."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Brunei",
+     "Costa Rica",
+     "Indonesia",
+     "Macao",
+     "Thailand"
+    ],
+    "note": "Indonesia: no more than 90 days in any 180 days."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Belarus"
+    ],
+    "note": "No more than 90 days in total within one year."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Mongolia"
+    ],
+    "note": "Tourist visits."
+   },
+   {
+    "kind": "evisa",
+    "days": 90,
+    "nationalities": [
+     "Antigua and Barbuda",
+     "Bahamas",
+     "Barbados",
+     "Dominican Republic",
+     "Grenada",
+     "Jamaica",
+     "Maldives",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines"
+    ],
+    "note": "Three-month multiple-entry e-Visa from evisa.gov.tr."
+   },
+   {
+    "kind": "evisa",
+    "days": 30,
+    "nationalities": [
+     "Fiji",
+     "Mauritius",
+     "Mexico",
+     "Suriname",
+     "Timor-Leste",
+     "Vietnam"
+    ],
+    "note": "One-month e-Visa from evisa.gov.tr."
+   },
+   {
+    "kind": "evisa",
+    "days": 30,
+    "nationalities": [
+     "South Africa"
+    ],
+    "note": "Multiple-entry e-visa for 30 days via dtvgroup.com.tr (the site named by the Turkish MFA); 90-day sticker visas from Turkish missions."
+   },
+   {
+    "kind": "evisa",
+    "days": null,
+    "nationalities": [
+     "Armenia",
+     "Cyprus",
+     "Namibia"
+    ],
+    "note": "e-Visa from evisa.gov.tr."
+   }
+  ],
+  "otherwise": "A visa from a Turkish embassy or consulate. Some nationalities (e.g. India, Pakistan, Bangladesh, Philippines, Nepal, Sri Lanka, Egypt) can get a one-month e-Visa only if they hold a valid Schengen, US, UK or Irish visa or residence permit.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Republic of Türkiye Ministry of Foreign Affairs: Visa information for foreigners",
+    "url": "https://www.mfa.gov.tr/visa-information-for-foreigners.en.mfa"
+   },
+   {
+    "title": "Türkiye e-Visa (official)",
+    "url": "https://www.evisa.gov.tr"
+   }
+  ],
+  "confidence": "high"
+ },
+ "UAE": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": [
+     "Bahrain",
+     "Kuwait",
+     "Oman",
+     "Qatar",
+     "Saudi Arabia"
+    ],
+    "note": "GCC citizens: no visa or sponsor needed; passport or GCC national ID card."
+   },
+   {
+    "kind": "visa_on_arrival",
+    "days": null,
+    "nationalities": [
+     "Albania",
+     "Andorra",
+     "Argentina",
+     "Armenia",
+     "Australia",
+     "Austria",
+     "Azerbaijan",
+     "Bahamas",
+     "Barbados",
+     "Belarus",
+     "Belgium",
+     "Bosnia and Herzegovina",
+     "Brazil",
+     "Brunei",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "China",
+     "Colombia",
+     "Cook Islands",
+     "Costa Rica",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Ecuador",
+     "El Salvador",
+     "Estonia",
+     "Fiji",
+     "Finland",
+     "France",
+     "French Polynesia",
+     "Georgia",
+     "Germany",
+     "Greece",
+     "Guam",
+     "Guyana",
+     "Honduras",
+     "Hong Kong",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "Kazakhstan",
+     "Kiribati",
+     "Kosovo",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Maldives",
+     "Malta",
+     "Mauritius",
+     "Mexico",
+     "Monaco",
+     "Mongolia",
+     "Montenegro",
+     "Nauru",
+     "Netherlands",
+     "New Caledonia",
+     "New Zealand",
+     "Norway",
+     "Paraguay",
+     "Peru",
+     "Poland",
+     "Portugal",
+     "Puerto Rico",
+     "Romania",
+     "Russia",
+     "Saint Vincent and the Grenadines",
+     "San Marino",
+     "Serbia",
+     "Seychelles",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Solomon Islands",
+     "South Korea",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Ukraine",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Uzbekistan"
+    ],
+    "note": "No visa needed in advance; free entry stamp on arrival. Stay is 30 days or 90 days (within 180) depending on nationality."
+   }
+  ],
+  "otherwise": "An entry permit (visit/tourist visa) arranged before travel through a UAE sponsor, airline, hotel or licensed travel agent, or the 5-year multiple-entry tourist visa. Indian citizens with a US visa or green card, or a UK or EU residence permit, can get a 14-day visa on arrival.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "UAE Ministry of Foreign Affairs: Visa exemptions for non-citizens (visa free / visa required by nationality, 2026)",
+    "url": "https://www.mofa.gov.ae/en/visa-exemptions-for-non-citizen"
+   },
+   {
+    "title": "UAE Government portal: Tourist visa",
+    "url": "https://u.ae/en/information-and-services/visa-and-emirates-id/Types-of-visas/tourist-visa"
+   },
+   {
+    "title": "Embassy of the UAE in Washington: Visas for non-US citizens (Indian nationals 14-day visa on arrival)",
+    "url": "https://uae-embassy.org/visas-for-non-us-citizens?page=0"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "South Africa": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Belgium",
+     "Botswana",
+     "Brazil",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "Cook Islands",
+     "Croatia",
+     "Czech Republic",
+     "Denmark",
+     "Ecuador",
+     "Estonia",
+     "Finland",
+     "France",
+     "French Polynesia",
+     "Germany",
+     "Greece",
+     "Guam",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Jamaica",
+     "Japan",
+     "Latvia",
+     "Lesotho",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Malta",
+     "Mauritius",
+     "Monaco",
+     "Netherlands",
+     "New Caledonia",
+     "New Zealand",
+     "Norway",
+     "Panama",
+     "Paraguay",
+     "Portugal",
+     "Puerto Rico",
+     "Qatar",
+     "Romania",
+     "Russia",
+     "Saint Vincent and the Grenadines",
+     "San Marino",
+     "Sao Tome and Principe",
+     "Saudi Arabia",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Trinidad and Tobago",
+     "Tunisia",
+     "UAE",
+     "United Kingdom",
+     "United States",
+     "Uruguay",
+     "Venezuela",
+     "Zimbabwe"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Ghana",
+     "Kenya",
+     "Madagascar",
+     "Namibia",
+     "Seychelles",
+     "Tanzania",
+     "Zambia"
+    ],
+    "note": "90 days in total per calendar year."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Antigua and Barbuda",
+     "Bahamas",
+     "Barbados",
+     "Belize",
+     "Benin",
+     "Bolivia",
+     "Cabo Verde",
+     "Costa Rica",
+     "Cyprus",
+     "Eswatini",
+     "Gabon",
+     "Guyana",
+     "Hong Kong",
+     "Jordan",
+     "Macao",
+     "Malawi",
+     "Maldives",
+     "Mozambique",
+     "Peru",
+     "Poland",
+     "South Korea",
+     "Thailand",
+     "Turkey"
+    ],
+    "note": "Belize, Benin, Gabon, Hong Kong, South Korea, Thailand and Turkey: a visa fee applies only for visits longer than 30 days."
+   },
+   {
+    "kind": "visa_free",
+    "days": 30,
+    "nationalities": [
+     "Angola"
+    ],
+    "note": "Each visit up to 30 days, 90 days in total per calendar year."
+   },
+   {
+    "kind": "evisa",
+    "days": null,
+    "nationalities": [
+     "China",
+     "India",
+     "Indonesia",
+     "Mexico"
+    ],
+    "note": "Visa issued online through the Electronic Travel Authorisation (ETA) platform before travel; for arrivals at OR Tambo, Cape Town, King Shaka or Lanseria airports."
+   }
+  ],
+  "otherwise": "A visitor visa from a South African embassy, high commission or consulate, or via the online ETA platform once your nationality has been added to it.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Department of Home Affairs: Countries exempt from South African visas (list issued 09 December 2025)",
+    "url": "https://www.dha.gov.za/index.php/immigration-services/exempt-countries"
+   },
+   {
+    "title": "Minister Leon Schreiber: Launch of South Africa's Electronic Travel Authorisation, 12 August 2026",
+    "url": "https://www.gov.za/news/speeches/minister-leon-schreiber-launch-south-africa%E2%80%99s-electronic-travel-authorisation-12-aug"
+   },
+   {
+    "title": "South African ETA (Department of Home Affairs)",
+    "url": "https://eta.dha.gov.za/faq"
+   }
+  ],
+  "confidence": "medium",
+  "reviewBy": "2027-01-31",
+  "reviewNote": "ETA is being extended country by country to all visa-required nationalities (reported 53 by October 2026) and to more ports; press reports the old eVisa platform closes 1 December 2026."
+ },
+ "United States": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Australia",
+     "Austria",
+     "Belgium",
+     "Brunei",
+     "Chile",
+     "Croatia",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "South Korea",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Monaco",
+     "Netherlands",
+     "New Zealand",
+     "Norway",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "San Marino",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Taiwan",
+     "United Kingdom"
+    ],
+    "note": "Visa Waiver Program. E-passport needed. UK: British citizens only. Taiwan: passport with national ID number. Not usable by people who travelled since 2011 to Iran, Iraq, Libya, North Korea, Somalia, Sudan, Syria or Yemen (Cuba since 2021), or by dual nationals of some of these; they need a visa."
+   },
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": [
+     "Canada"
+    ],
+    "note": "Canadian citizens need no visa and no ESTA. The officer sets the stay, usually up to 6 months."
+   }
+  ],
+  "otherwise": "A B-1/B-2 visitor visa from a US embassy or consulate.",
+  "authorisations": [
+   {
+    "name": "ESTA",
+    "appliesTo": "visa_free",
+    "except": [
+     "Canada"
+    ],
+    "cost": "USD 40.62",
+    "url": "https://esta.cbp.dhs.gov/",
+    "leadTime": "Apply as soon as you plan the trip, before buying tickets",
+    "status": "live",
+    "startsOn": null,
+    "note": "Fee set for US fiscal year 2027, charged from 16 Oct 2026. A denied application costs USD 10.62. Valid 2 years or until the passport expires (1 year for Brunei)."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "DHS: Visa Waiver Program (designated countries)",
+    "url": "https://www.dhs.gov/visa-waiver-program"
+   },
+   {
+    "title": "CBP: Visa Waiver Program",
+    "url": "https://www.cbp.gov/travel/international-visitors/visa-waiver-program"
+   },
+   {
+    "title": "CBP: ESTA",
+    "url": "https://www.cbp.gov/travel/international-visitors/esta"
+   },
+   {
+    "title": "Federal Register 2026-20185: FY 2027 HR-1 I-94, ESTA and EVUS fees",
+    "url": "https://public-inspection.federalregister.gov/2026-20185.pdf"
+   },
+   {
+    "title": "Official ESTA application site",
+    "url": "https://esta.cbp.dhs.gov/"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-10-01",
+  "reviewNote": "ESTA fee is inflation-adjusted each US fiscal year (next adjustment expected about Oct 2027). CBP proposed extra ESTA data rules (comments closed Feb 2026); not confirmed as in force."
+ },
+ "Canada": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": [
+     "Andorra",
+     "Australia",
+     "Austria",
+     "Bahamas",
+     "Barbados",
+     "Belgium",
+     "Brunei",
+     "Bulgaria",
+     "Chile",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Italy",
+     "Japan",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Monaco",
+     "Netherlands",
+     "New Zealand",
+     "Norway",
+     "Papua New Guinea",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "South Korea",
+     "Samoa",
+     "San Marino",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Solomon Islands",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "UAE",
+     "Hong Kong",
+     "Israel",
+     "Romania",
+     "Taiwan",
+     "United Kingdom"
+    ],
+    "note": "Usually up to 6 months; the border officer decides. Hong Kong: HKSAR passport. Israel: national Israeli passport. Romania: e-passport only. Taiwan: passport with personal ID number. UK: British citizens, BNO and other British nationals with right of abode."
+   },
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": [
+     "United States"
+    ],
+    "note": "US citizens need no visa and no eTA. Usually up to 6 months."
+   }
+  ],
+  "otherwise": "A visitor visa (temporary resident visa) from IRCC. Citizens of Antigua and Barbuda, Argentina, Brazil, Costa Rica, Mexico, Morocco, Panama, Philippines, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Seychelles, Thailand, Trinidad and Tobago and Uruguay (and some Indonesians and Malaysians) can fly in with an eTA instead if they held a Canadian visa in the last 10 years or now hold a valid US non-immigrant visa.",
+  "authorisations": [
+   {
+    "name": "eTA",
+    "appliesTo": "visa_free",
+    "except": [
+     "United States"
+    ],
+    "cost": "CAD 7",
+    "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta/apply.html",
+    "leadTime": "Most approved within minutes; some need extra documents and take several days, so apply before booking",
+    "status": "live",
+    "startsOn": null,
+    "note": "Needed only to fly to or through Canada. Not needed when arriving by car, bus, train or boat."
+   }
+  ],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "IRCC: Entry requirements by country/territory",
+    "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/entry-requirements-country.html"
+   },
+   {
+    "title": "IRCC: eTA for citizens of some visa-required countries",
+    "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta/eligibility/eta-x.html"
+   },
+   {
+    "title": "IRCC: Apply for an eTA",
+    "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta/apply.html"
+   }
+  ],
+  "confidence": "high"
+ },
+ "Mexico": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 180,
+    "nationalities": [
+     "Germany",
+     "Andorra",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Bahamas",
+     "Barbados",
+     "Belgium",
+     "Belize",
+     "Bolivia",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "Cyprus",
+     "Colombia",
+     "Costa Rica",
+     "Croatia",
+     "Denmark",
+     "UAE",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "United States",
+     "Estonia",
+     "Finland",
+     "France",
+     "Greece",
+     "Hungary",
+     "Ireland",
+     "Iceland",
+     "Marshall Islands",
+     "Israel",
+     "Italy",
+     "Jamaica",
+     "Japan",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malaysia",
+     "Malta",
+     "Micronesia",
+     "Monaco",
+     "Norway",
+     "New Zealand",
+     "Netherlands",
+     "Palau",
+     "Panama",
+     "Paraguay",
+     "Poland",
+     "Portugal",
+     "Hong Kong",
+     "Macao",
+     "United Kingdom",
+     "Czech Republic",
+     "South Korea",
+     "Romania",
+     "San Marino",
+     "Singapore",
+     "Sweden",
+     "Switzerland",
+     "Trinidad and Tobago",
+     "Uruguay"
+    ],
+    "note": "Visitors without paid activities. Stay is set by the officer, up to 180 days."
+   },
+   {
+    "kind": "evisa",
+    "days": null,
+    "nationalities": [
+     "Brazil"
+    ],
+    "note": "Electronic visa since 5 Feb 2026, USD 10, air arrivals only, one entry, valid 180 days. Apply at visaelectronica.sre.gob.mx."
+   },
+   {
+    "kind": "evisa",
+    "days": null,
+    "nationalities": [
+     "Russia",
+     "Turkey",
+     "Ukraine"
+    ],
+    "note": "Electronic Authorization System (SAE) instead of a visa: air travel only, on airlines that take part, one entry."
+   }
+  ],
+  "otherwise": "A visitor visa from a Mexican consulate. Exception: any nationality holding a valid US, Canada, UK, Japan or Schengen visa, or permanent residence there or in Chile, Colombia or Peru, or an APEC card, can visit for under 180 days without a Mexican visa.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "INM: Países que no requieren visa para México",
+    "url": "https://www.inm.gob.mx/gobmx/word/index.php/paises-no-requieren-visa-para-mexico/"
+   },
+   {
+    "title": "Embajada de México en Rep. Dominicana: ¿Requiero visa para viajar a México?",
+    "url": "https://embamex.sre.gob.mx/republicadominicana/index.php/visas/37-servicios-consulares/extranjeros/1011-requiero-visa-para-viajar-a-mexico-2"
+   },
+   {
+    "title": "SRE Comunicado 021/2026: Electronic Visa for Brazilian Nationals",
+    "url": "https://www.gob.mx/sre/prensa/electronic-visa-for-brazilian-nationals?idiom=en"
+   },
+   {
+    "title": "Consulado de México en Río de Janeiro: Visas",
+    "url": "https://consulmex.sre.gob.mx/riodejaneiro/index.php/es/visas"
+   },
+   {
+    "title": "INM: Sistema de Autorización Electrónica (SAE)",
+    "url": "https://www.gob.mx/inm/acciones-y-programas/sistema-de-autorizacion-electronica-sae"
+   }
+  ],
+  "confidence": "medium",
+  "reviewBy": "2027-03-01",
+  "reviewNote": "Mexico published an Electronic Travel Authorization (AEV) framework in the DOF in July 2025; countries and start date not yet set."
+ },
+ "Brazil": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Austria",
+     "Belgium",
+     "Bulgaria",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Italy",
+     "Latvia",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Netherlands",
+     "Poland",
+     "Portugal",
+     "Romania",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden"
+    ],
+    "note": "EU-Brazil agreement: 90 days in any 180 days. Does not cover Ireland. No paid work, including paid artistic performances."
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "United Kingdom",
+     "Japan"
+    ],
+    "note": null
+   },
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Argentina",
+     "Paraguay",
+     "Uruguay"
+    ],
+    "note": "Mercosur: ID card or passport. Extendable by the Federal Police."
+   },
+   {
+    "kind": "evisa",
+    "days": 90,
+    "nationalities": [
+     "United States",
+     "Canada",
+     "Australia"
+    ],
+    "note": "Visa required again since 10 Apr 2025. Apply online for the eVisa (USD 80.90) at brazil.vfsevisa.com."
+   }
+  ],
+  "otherwise": "A visitor visa (VIVIS) from a Brazilian consulate, or check the embassy: many other nationalities are also visa-free but could not be confirmed here.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "EUR-Lex: EU-Brazil short-stay visa waiver agreement (ordinary passports)",
+    "url": "https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX:22012A0921(02)"
+   },
+   {
+    "title": "EUR-Lex: OJ L 113 of 11.4.2022 (amendment to 90/180 days)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ%3AL%3A2022%3A113%3AFULL"
+   },
+   {
+    "title": "GOV.UK: Brazil entry requirements",
+    "url": "https://www.gov.uk/foreign-travel-advice/brazil/entry-requirements"
+   },
+   {
+    "title": "MOFA Japan: Visa exemption for Brazilian nationals (mutual waiver)",
+    "url": "https://www.mofa.go.jp/mofaj/press/release/press4_009773.html"
+   },
+   {
+    "title": "Agência Gov: Brasil começa a exigir visto para cidadãos dos EUA, Canadá e Austrália",
+    "url": "https://agenciagov.ebc.com.br/noticias/202504/brasil-comeca-a-exigir-visto-para-cidadaos-dos-eua-canada-e-australia"
+   },
+   {
+    "title": "Travel.gc.ca: Brazil travel advice (entry requirements)",
+    "url": "https://travel.gc.ca/destinations/brazil"
+   },
+   {
+    "title": "argentina.gob.ar: Guía sobre movilidad de personas en el MERCOSUR",
+    "url": "https://www.argentina.gob.ar/interior/migraciones/foro-especializado-migratorio-del-mercosur/guia-sobre-movilidad-de-personas-en-el-mercosur"
+   },
+   {
+    "title": "Itamaraty: Quadro Geral de Regime de Vistos (7 Oct 2026) - could not be loaded",
+    "url": "https://www.gov.br/mre/pt-br/assuntos/portal-consular/vistos/qgrv-simples-port-07out26.pdf"
+   }
+  ],
+  "confidence": "low"
+ },
+ "Argentina": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Bolivia",
+     "Brazil",
+     "Paraguay",
+     "Uruguay",
+     "Chile",
+     "Colombia",
+     "Ecuador",
+     "Guyana",
+     "Panama",
+     "Peru",
+     "Suriname"
+    ],
+    "note": "Mercosur and associated states. Extendable once."
+   },
+   {
+    "kind": "visa_free",
+    "days": null,
+    "nationalities": [
+     "Germany",
+     "Andorra",
+     "Armenia",
+     "Australia",
+     "Austria",
+     "Barbados",
+     "Belgium",
+     "Belarus",
+     "Bosnia and Herzegovina",
+     "Bulgaria",
+     "Canada",
+     "Cyprus",
+     "South Korea",
+     "Costa Rica",
+     "Croatia",
+     "Denmark",
+     "Dominica",
+     "El Salvador",
+     "UAE",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "United States",
+     "Estonia",
+     "Finland",
+     "Fiji",
+     "France",
+     "Georgia",
+     "Grenada",
+     "Greece",
+     "Guatemala",
+     "Honduras",
+     "Hungary",
+     "Ireland",
+     "Iceland",
+     "Israel",
+     "Italy",
+     "Jamaica",
+     "Japan",
+     "Kazakhstan",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Macao",
+     "North Macedonia",
+     "Malaysia",
+     "Malta",
+     "Mexico",
+     "Monaco",
+     "Mongolia",
+     "Montenegro",
+     "Nicaragua",
+     "Norway",
+     "New Zealand",
+     "Netherlands",
+     "Poland",
+     "Portugal",
+     "Puerto Rico",
+     "Qatar",
+     "United Kingdom",
+     "Czech Republic",
+     "Romania",
+     "Russia",
+     "Saint Kitts and Nevis",
+     "San Marino",
+     "Saint Vincent and the Grenadines",
+     "Saint Lucia",
+     "Serbia",
+     "Singapore",
+     "South Africa",
+     "Sweden",
+     "Switzerland",
+     "Thailand",
+     "Trinidad and Tobago",
+     "Turkey",
+     "Ukraine",
+     "Venezuela"
+    ],
+    "note": "Usually up to 90 days; some nationalities get less. The officer sets the stay."
+   }
+  ],
+  "otherwise": "A tourist visa from an Argentine consulate. Visa-required nationals marked eligible by Migraciones who hold a valid US B1/B2, J, O, P, E or H-1B visa can instead apply online for an AVE (electronic travel authorisation). Chinese, Indian and Dominican citizens with a valid US visa or green card can visit visa-free.",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Dirección Nacional de Migraciones: Régimen de visas por nacionalidad",
+    "url": "https://www.migraciones.gob.ar/accesible/indexdnm.php?visas"
+   },
+   {
+    "title": "argentina.gob.ar: Turistas extranjeros",
+    "url": "https://www.argentina.gob.ar/tema/extranjeros/turistas"
+   },
+   {
+    "title": "Migraciones: AVE Global",
+    "url": "https://www.migraciones.gob.ar/ave/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Colombia": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Albania",
+     "Germany",
+     "Andorra",
+     "Antigua and Barbuda",
+     "Argentina",
+     "Australia",
+     "Austria",
+     "Azerbaijan",
+     "Bahamas",
+     "Barbados",
+     "Belgium",
+     "Belize",
+     "Bolivia",
+     "Bosnia and Herzegovina",
+     "Brazil",
+     "Brunei",
+     "Bulgaria",
+     "Bhutan",
+     "Canada",
+     "Czech Republic",
+     "Chile",
+     "Cyprus",
+     "South Korea",
+     "Costa Rica",
+     "Croatia",
+     "Denmark",
+     "Dominica",
+     "Ecuador",
+     "El Salvador",
+     "UAE",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "United States",
+     "Estonia",
+     "Fiji",
+     "Philippines",
+     "Finland",
+     "France",
+     "Georgia",
+     "Grenada",
+     "Greece",
+     "Guatemala",
+     "Guyana",
+     "Honduras",
+     "Hungary",
+     "Indonesia",
+     "Ireland",
+     "Iceland",
+     "Marshall Islands",
+     "Solomon Islands",
+     "Israel",
+     "Italy",
+     "Jamaica",
+     "Japan",
+     "Kazakhstan",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "North Macedonia",
+     "Malta",
+     "Morocco",
+     "Mexico",
+     "Micronesia",
+     "Moldova",
+     "Monaco",
+     "Montenegro",
+     "Norway",
+     "New Zealand",
+     "Netherlands",
+     "Oman",
+     "Palau",
+     "Panama",
+     "Papua New Guinea",
+     "Paraguay",
+     "Peru",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "United Kingdom",
+     "Dominican Republic",
+     "Romania",
+     "Russia",
+     "Saint Kitts and Nevis",
+     "Samoa",
+     "San Marino",
+     "Saint Lucia",
+     "Saint Vincent and the Grenadines",
+     "Serbia",
+     "Singapore",
+     "Sweden",
+     "Switzerland",
+     "Suriname",
+     "Trinidad and Tobago",
+     "Turkey",
+     "Ukraine",
+     "Uruguay",
+     "Venezuela"
+    ],
+    "note": "Short stays under 90 days; can be extended up to 180 days in total."
+   }
+  ],
+  "otherwise": "A visitor (V) visa from the Colombian Foreign Ministry. Citizens of Cambodia, China, India, Myanmar, Nicaragua, Taiwan, Thailand and Vietnam can enter visa-free if they hold a US or Schengen residence permit, or a US or Schengen visa valid at least 180 more days on arrival.",
+  "authorisations": [],
+  "arrivalCard": {
+   "name": "Check-MIG",
+   "url": "https://apps.migracioncolombia.gov.co/pre-registro/",
+   "required": false,
+   "note": "Free online pre-registration from 72 hours to 1 hour before travel; recommended, speeds up passport control."
+  },
+  "sources": [
+   {
+    "title": "Cancillería: Resolución 5488 de 2022 (compiled, art. 3 as modified by Res. 12189 de 2026)",
+    "url": "https://cancilleria.gov.co/normograma/compilacion/docs/resolucion_minrelaciones_5488_2022.htm"
+   },
+   {
+    "title": "Cancillería: Casos especiales de exención de visado",
+    "url": "https://cancilleria.gov.co/node/26929"
+   },
+   {
+    "title": "Cancillería: Colombia restablece la exención de visa con Israel",
+    "url": "https://www.cancilleria.gov.co/sala-de-prensa/noticias/colombia-fortalece-sus-relaciones-con-israel-y-restablece-la-exencion-de-visa-para-viajeros-colombianos"
+   },
+   {
+    "title": "Migración Colombia: Check-Mig",
+    "url": "https://apps.migracioncolombia.gov.co/pre-registro/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Chile": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": "*",
+    "except": [
+     "Afghanistan",
+     "Angola",
+     "Saudi Arabia",
+     "Algeria",
+     "Armenia",
+     "Azerbaijan",
+     "Bahrain",
+     "Bangladesh",
+     "Belarus",
+     "Benin",
+     "Bhutan",
+     "Botswana",
+     "Brunei",
+     "Burkina Faso",
+     "Burundi",
+     "Cabo Verde",
+     "Cambodia",
+     "Cameroon",
+     "Qatar",
+     "Chad",
+     "China",
+     "DR Congo",
+     "Congo",
+     "Ivory Coast",
+     "Cuba",
+     "Djibouti",
+     "Dominica",
+     "Egypt",
+     "Eritrea",
+     "Eswatini",
+     "Ethiopia",
+     "Philippines",
+     "Gabon",
+     "Gambia",
+     "Ghana",
+     "Guinea",
+     "Guinea-Bissau",
+     "Equatorial Guinea",
+     "Haiti",
+     "India",
+     "Iraq",
+     "Iran",
+     "Comoros",
+     "Marshall Islands",
+     "Solomon Islands",
+     "Jordan",
+     "Kazakhstan",
+     "Kenya",
+     "Kyrgyzstan",
+     "Kiribati",
+     "Kosovo",
+     "Kuwait",
+     "Laos",
+     "Lesotho",
+     "Lebanon",
+     "Liberia",
+     "Libya",
+     "Madagascar",
+     "Malawi",
+     "Maldives",
+     "Mali",
+     "Morocco",
+     "Mauritania",
+     "Micronesia",
+     "Mozambique",
+     "Myanmar",
+     "Namibia",
+     "Nauru",
+     "Nepal",
+     "Niger",
+     "Nigeria",
+     "Oman",
+     "Pakistan",
+     "Palau",
+     "Palestine",
+     "Papua New Guinea",
+     "Central African Republic",
+     "Dominican Republic",
+     "Rwanda",
+     "Samoa",
+     "Sao Tome and Principe",
+     "Senegal",
+     "Seychelles",
+     "Sierra Leone",
+     "Syria",
+     "Somalia",
+     "Sri Lanka",
+     "Sudan",
+     "South Sudan",
+     "Tanzania",
+     "Tajikistan",
+     "Timor-Leste",
+     "Togo",
+     "Tunisia",
+     "Turkmenistan",
+     "Tuvalu",
+     "Uganda",
+     "Uzbekistan",
+     "Vanuatu",
+     "Venezuela",
+     "Yemen",
+     "Zambia",
+     "Zimbabwe"
+    ],
+    "note": "Permanencia Transitoria (tourist stay) up to 90 days."
+   }
+  ],
+  "otherwise": "Prior authorisation or a visa from a Chilean consulate, applied for online through the consular system (SAC).",
+  "authorisations": [],
+  "arrivalCard": null,
+  "sources": [
+   {
+    "title": "Diario Oficial: Decreto 359 (17 Sep 2025) - nationalities needing prior authorisation or visa",
+    "url": "https://www.diariooficial.interior.gob.cl/publicaciones/2025/09/17/44253/01/2702355.pdf"
+   },
+   {
+    "title": "ChileAtiende: Autorización previa o visa",
+    "url": "https://www.chileatiende.gob.cl/fichas/115648"
+   },
+   {
+    "title": "Servicio Nacional de Migraciones: Permanencia Transitoria (turistas)",
+    "url": "https://serviciomigraciones.cl/permanencia-transitoria/subcategorias/turistas/"
+   }
+  ],
+  "confidence": "medium"
+ },
+ "Australia": {
+  "tiers": [
+   {
+    "kind": "evisa",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Austria",
+     "Belgium",
+     "Bulgaria",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Italy",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Monaco",
+     "Netherlands",
+     "Norway",
+     "Poland",
+     "Portugal",
+     "Romania",
+     "San Marino",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "United Kingdom"
+    ],
+    "note": "eVisitor (subclass 651), free; valid 12 months, many visits, up to 3 months each. Most of these passports can also use the ETA."
+   },
+   {
+    "kind": "evisa",
+    "days": 90,
+    "nationalities": [
+     "Brunei",
+     "Canada",
+     "Hong Kong",
+     "Japan",
+     "Malaysia",
+     "Singapore",
+     "South Korea",
+     "Taiwan",
+     "United States"
+    ],
+    "note": "Electronic Travel Authority (subclass 601) via the Australian ETA app; valid 12 months, up to 3 months each visit. Taiwan: not for official or diplomatic passports. Hong Kong: HKSAR passport."
+   }
+  ],
+  "otherwise": "A Visitor visa (subclass 600) applied for online through ImmiAccount.",
+  "authorisations": [
+   {
+    "name": "eVisitor (subclass 651)",
+    "appliesTo": [
+     "Andorra",
+     "Austria",
+     "Belgium",
+     "Bulgaria",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Italy",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Malta",
+     "Monaco",
+     "Netherlands",
+     "Norway",
+     "Poland",
+     "Portugal",
+     "Romania",
+     "San Marino",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "United Kingdom"
+    ],
+    "except": [],
+    "cost": "Free",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/evisitor-651",
+    "leadTime": "Apply before booking travel; most are quick",
+    "status": "live",
+    "startsOn": null,
+    "note": "UK: British citizens only."
+   },
+   {
+    "name": "ETA (subclass 601)",
+    "appliesTo": [
+     "Brunei",
+     "Canada",
+     "Hong Kong",
+     "Japan",
+     "Malaysia",
+     "Singapore",
+     "South Korea",
+     "Taiwan",
+     "United States"
+    ],
+    "except": [],
+    "cost": "AUD 20 app service charge (no visa charge)",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601",
+    "leadTime": "Usually decided immediately; do not book until granted",
+    "status": "live",
+    "startsOn": null,
+    "note": "Apply only through the Australian ETA app. UK: British citizens and BNO."
+   }
+  ],
+  "arrivalCard": {
+   "name": "Incoming Passenger Card (or digital Australia Travel Declaration where offered)",
+   "url": "https://www.abf.gov.au/entering-and-leaving-australia/crossing-the-border/at-the-border",
+   "required": true,
+   "note": "Paper card on arrival; the digital ATD is available on some flights and airports and is being rolled out."
+  },
+  "sources": [
+   {
+    "title": "Home Affairs: Electronic Travel Authority (subclass 601)",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601"
+   },
+   {
+    "title": "Home Affairs: eVisitor (subclass 651)",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/evisitor-651"
+   },
+   {
+    "title": "Home Affairs: Visitor visa (subclass 600)",
+    "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/visitor-600"
+   }
+  ],
+  "confidence": "high",
+  "reviewBy": "2027-06-30",
+  "reviewNote": "Paper Incoming Passenger Card being replaced by the digital Australia Travel Declaration over 12-24 months from July 2026."
+ },
+ "New Zealand": {
+  "tiers": [
+   {
+    "kind": "visa_free",
+    "days": 90,
+    "nationalities": [
+     "Andorra",
+     "Argentina",
+     "Austria",
+     "Bahrain",
+     "Belgium",
+     "Brazil",
+     "Brunei",
+     "Bulgaria",
+     "Canada",
+     "Chile",
+     "Croatia",
+     "Cyprus",
+     "Czech Republic",
+     "Denmark",
+     "Estonia",
+     "Finland",
+     "France",
+     "Germany",
+     "Greece",
+     "Hong Kong",
+     "Hungary",
+     "Iceland",
+     "Ireland",
+     "Israel",
+     "Italy",
+     "Japan",
+     "South Korea",
+     "Latvia",
+     "Liechtenstein",
+     "Lithuania",
+     "Luxembourg",
+     "Macao",
+     "Malaysia",
+     "Malta",
+     "Mauritius",
+     "Mexico",
+     "Monaco",
+     "Netherlands",
+     "Norway",
+     "Oman",
+     "Poland",
+     "Portugal",
+     "Qatar",
+     "Romania",
+     "San Marino",
+     "Saudi Arabia",
+     "Seychelles",
+     "Singapore",
+     "Slovakia",
+     "Slovenia",
+     "Spain",
+     "Sweden",
+     "Switzerland",
+     "Taiwan",
+     "UAE",
+     "United States",
+     "Uruguay"
+    ],
+    "note": "Up to 3 months per visit, max 6 months in any 12. Hong Kong: HKSAR or BNO passport. Macao: Macau SAR passport. Taiwan: permanent residents with Taiwan passport. Portugal: right to live permanently in Portugal. Greece: passports issued from 2006. Estonia, Latvia, Lithuania: citizens only."
+   },
+   {
+    "kind": "visa_free",
+    "days": 180,
+    "nationalities": [
+     "United Kingdom"
+    ],
+    "note": "British citizens and other British passport holders with the right to live permanently in the UK."
+   }
+  ],
+  "otherwise": "A visitor visa from Immigration New Zealand (the IVL is usually charged too; Pacific nationals are exempt).",
+  "authorisations": [
+   {
+    "name": "NZeTA",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "NZD 17 (app) or NZD 23 (website)",
+    "url": "https://www.immigration.govt.nz/visas/new-zealand-electronic-travel-authority-nzeta/",
+    "leadTime": "Allow up to 72 hours",
+    "status": "live",
+    "startsOn": null,
+    "note": "Valid 2 years."
+   },
+   {
+    "name": "International Visitor Conservation and Tourism Levy (IVL)",
+    "appliesTo": "visa_free",
+    "except": [],
+    "cost": "NZD 100",
+    "url": "https://www.mbie.govt.nz/immigration-and-tourism/tourism/tourism-funding/international-visitor-conservation-and-tourism-levy",
+    "leadTime": "Paid together with the NZeTA",
+    "status": "live",
+    "startsOn": null,
+    "note": "Non-refundable."
+   }
+  ],
+  "arrivalCard": {
+   "name": "New Zealand Traveller Declaration (NZTD)",
+   "url": "https://www.travellerdeclaration.govt.nz/",
+   "required": true,
+   "note": "Free. Submit from 24 hours before the flight, before passport control."
+  },
+  "sources": [
+   {
+    "title": "Immigration NZ: Visa waiver countries and territories",
+    "url": "https://www.immigration.govt.nz/visit/what-you-need-to-visit-new-zealand/visa-waiver-countries-and-territories/"
+   },
+   {
+    "title": "Immigration NZ: NZeTA",
+    "url": "https://www.immigration.govt.nz/visas/new-zealand-electronic-travel-authority-nzeta/"
+   },
+   {
+    "title": "Immigration NZ: Fees Guide INZ 1028 (May 2026)",
+    "url": "https://www.immigration.govt.nz/assets/inz/documents/forms-and-guides/Fees-Guide-INZ-1028.pdf"
+   },
+   {
+    "title": "MBIE: International Visitor Conservation and Tourism Levy",
+    "url": "https://www.mbie.govt.nz/immigration-and-tourism/tourism/tourism-funding/international-visitor-conservation-and-tourism-levy"
+   },
+   {
+    "title": "NZ Traveller Declaration",
+    "url": "https://www.travellerdeclaration.govt.nz/"
+   }
+  ],
+  "confidence": "high"
+ }
+}

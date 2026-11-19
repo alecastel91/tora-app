@@ -13798,7 +13798,7 @@ input[type="radio"] {
 .fill-claude-modal .modal-title { margin-bottom: 10px; }
 .fill-claude-modal .form-hint { font-size: 13px; line-height: 1.45; }
 
-/* Travel & work permit on the booking page: one line closed, the guidance open. */
+/* Travel on the booking page: one line closed (entry + work pills), the guidance open. */
 .permit-panel { border-radius: 12px; background: #101015; border: 1px solid rgba(255, 255, 255, 0.12); }
 .permit-panel > summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; cursor: pointer; list-style: none; }
 .permit-panel > summary::-webkit-details-marker { display: none; }
@@ -13806,10 +13806,10 @@ input[type="radio"] {
 .permit-panel[open] > summary::after { transform: rotate(90deg); }
 .permit-panel-title { flex: 1; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); }
 .permit-panel-pill { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-.permit-panel.is-ok .permit-panel-pill { background: rgba(0, 200, 117, 0.16); color: #4ee3a3; }
-.permit-panel.is-warn .permit-panel-pill { background: rgba(255, 184, 0, 0.16); color: #ffc93d; }
-.permit-panel.is-check .permit-panel-pill { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.75); }
-.permit-panel-body { display: flex; flex-direction: column; gap: 8px; padding: 0 14px 14px; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.78); }
+.permit-panel-pill.is-ok { background: rgba(0, 200, 117, 0.16); color: #4ee3a3; }
+.permit-panel-pill.is-warn { background: rgba(255, 184, 0, 0.16); color: #ffc93d; }
+.permit-panel-pill.is-check { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.75); }
+.permit-panel-body { display: flex; flex-direction: column; gap: 14px; padding: 0 14px 14px; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.78); }
 .permit-panel-body p { margin: 0; }
 .permit-panel-lead { color: #fff; font-weight: 500; }
 .permit-panel-name { font: 600 15px/1.3 'Space Grotesk', sans-serif; color: #fff; }
@@ -13821,3 +13821,9 @@ input[type="radio"] {
 .permit-panel-sources a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
 .permit-panel-foot { font-size: 11.5px; color: rgba(255, 255, 255, 0.45); }
 .permit-panel-steps li { list-style: decimal; }
+.permit-panel-section { display: flex; flex-direction: column; gap: 8px; }
+.permit-panel-section + .permit-panel-section { padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.permit-panel-heading { margin: 0; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+.permit-panel-forms { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.permit-panel-forms a, .permit-panel-text a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+.permit-panel-form-name { display: block; color: #fff; font-weight: 600; }
