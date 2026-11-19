@@ -18,6 +18,7 @@ import GenreOrder from '../common/GenreOrder';
 import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
 import FillWithClaudeSheet, { fileForClaude } from '../common/FillWithClaude';
+import { TRAVEL_ENABLED } from '../../utils/travelData';
 
 const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
 
@@ -454,7 +455,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
             </div>
           )}
 
-          {editedUser.role === 'ARTIST' && (
+          {TRAVEL_ENABLED && editedUser.role === 'ARTIST' && (
             // Passport(s): private, only shown as visa/permit guidance on bookings.
             <div className="form-group">
               <label>{t('permits.passportLabel')} <span className="text-white/35">· {t('artistPage.optional')}</span></label>

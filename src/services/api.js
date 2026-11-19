@@ -921,6 +921,28 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  // Travel panel: the rules (the app falls back to its bundled copy), members'
+  // reports on them, and the official account's review page.
+  async getTravelRules() {
+    return this.handleResponse(await fetch(`${API_URL}/travel/rules`, { headers: this.getHeaders() }));
+  }
+
+  async reportTravelRule({ profileId, dealId, country, reason, note }) {
+    return this.handleResponse(await fetch(`${API_URL}/travel/reports`, {
+      method: 'POST', headers: this.getHeaders(), body: JSON.stringify({ profileId, dealId, country, reason, note }),
+    }));
+  }
+
+  async getTravelReview() {
+    return this.handleResponse(await fetch(`${API_URL}/travel/admin`, { headers: this.getHeaders() }));
+  }
+
+  async travelReviewAction(path, body = {}) {
+    return this.handleResponse(await fetch(`${API_URL}/travel/admin/${path}`, {
+      method: 'POST', headers: this.getHeaders(), body: JSON.stringify(body),
+    }));
+  }
+
   async getActionSummary(profileId, { artistProfileId } = {}) {
     const url = new URL(`${API_URL}/profiles/${profileId}/action-summary`);
     if (artistProfileId) url.searchParams.set('artistProfileId', artistProfileId);

@@ -1,18 +1,16 @@
-import PERMITS from '../data/performerPermits.json';
+import { travelData } from './travelData';
 
 /**
  * Visa / work-permit guidance for a booking: the event country's rules for
  * foreign performers, matched against the artist's passport(s). Guidance
- * only, from official sources (data/performerPermits.json, verified date in
- * the file): the panel always sends people to those sources.
+ * only, from official sources (utils/travelData: the server's copy, else
+ * data/performerPermits.json): the panel always sends people to those sources.
  */
 
 // Free movement: these citizens work in each other's countries without a permit.
 const EU_EEA_CH = ['Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Iceland', 'Liechtenstein', 'Norway', 'Switzerland'];
 const TRANS_TASMAN = ['Australia', 'New Zealand'];
 const sameBloc = (a, b) => [EU_EEA_CH, TRANS_TASMAN].some((bloc) => bloc.includes(a) && bloc.includes(b));
-
-export const PERMITS_VERIFIED_AT = PERMITS._verifiedAt;
 
 /**
  * { kind, country, rule?, passport? } where kind is:
@@ -30,6 +28,7 @@ export function permitStatusFor(eventCountry, nationalities) {
   const country = (eventCountry || '').trim();
   if (!country) return { kind: 'no-country' };
   const passports = (nationalities || []).filter(Boolean);
+  const PERMITS = travelData().permits;
   if (!passports.length) return { kind: 'no-passport', country, rule: PERMITS[country] || null };
   const home = passports.find((p) => p === country);
   if (home) return { kind: 'home', country, passport: home };

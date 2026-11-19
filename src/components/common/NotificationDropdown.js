@@ -30,6 +30,9 @@ const TYPE_TO_TAB = {
   DEAL_HANDED_TO_AGENT: 'bookings',
   DEAL_AGENT_TOOK_OVER: 'bookings',
   DEAL_CANCELLED: 'bookings',
+  // Travel panel: a rule changed for an upcoming show, or 3 weeks to go
+  TRAVEL_RULE_CHANGED: 'bookings',
+  TRAVEL_REMINDER: 'bookings',
   // Event-venue consent (a promoter tagged your venue for their event)
   VENUE_EVENT_REQUEST: 'bookings',
   VENUE_EVENT_CONFIRMED: 'bookings',

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { permitStatusFor, weeksUntil, PERMITS_VERIFIED_AT } from '../../utils/performerPermits';
-import { entryStatusFor, entryDataStale, ENTRY_CHECKED_AT } from '../../utils/visitorEntry';
+import { permitStatusFor, weeksUntil } from '../../utils/performerPermits';
+import { entryStatusFor } from '../../utils/visitorEntry';
+import { TRAVEL_ENABLED, useTravelData } from '../../utils/travelData';
+import TravelReportSheet from './TravelReportSheet';
 import { formatEventDate } from '../../utils/dates';
 
 /**
@@ -11,11 +13,18 @@ import { formatEventDate } from '../../utils/dates';
  * the arrival card), what performing for a fee needs (permit, who applies,
  * lead time, steps, tax), and, when a permit applies, plain facts on what a
  * visitor entry covers. Guidance only, every section sends people to the
- * official sources.
+ * official sources. The rules come from the server, checked against the
+ * official pages every week (tora-backend services/travelWatch): a change in
+ * the last 60 days shows on the bookings it reaches, and a country whose page
+ * changed in a way not yet confirmed says to check the official site.
  */
 const WORK_PILL = { exempt: 'ok', required: 'warn', depends: 'check', 'no-data': 'check' };
 const ENTRY_PILL = { visa_free: 'ok', visa_on_arrival: 'ok', evisa: 'check', visa: 'warn', 'no-data': 'check' };
 const SHORT_NAME = 10;
+// The weekly check missed a few runs: say the dates may be behind.
+const STALE_DAYS = 21;
+const RECENT_DAYS = 60;
+const DAY = 86400e3;
 
 const Section = ({ title, children }) => (
   <section className="permit-panel-section">
@@ -38,8 +47,10 @@ const Sources = ({ label, list }) => (
 
 const TravelPermitPanel = ({ deal, artistSide }) => {
   const { t } = useLanguage();
+  const travel = useTravelData();
+  const [reporting, setReporting] = useState(false);
   const s = permitStatusFor(deal.country, deal.artist?.nationalities);
-  if (s.kind === 'no-country') return null;
+  if (!TRAVEL_ENABLED || s.kind === 'no-country') return null;
   const locale = t('dateFormat.locale');
   const date = (d) => formatEventDate(d, locale);
 
@@ -91,11 +102,17 @@ const TravelPermitPanel = ({ deal, artistSide }) => {
 
   const detail = rule && ['required', 'depends', 'no-passport', 'exempt'].includes(s.kind);
   const who = rule?.whoApplies && t(`permits.who.${rule.whoApplies}`);
-  const stale = entryDataStale();
-  const checked = [ENTRY_CHECKED_AT, PERMITS_VERIFIED_AT].filter(Boolean).sort()[0];
+  // The older of the two datasets' dates is the honest one to show.
+  const oldest = (key) => [travel.dates?.entry?.[key], travel.dates?.permits?.[key]].filter(Boolean).sort()[0];
+  const checked = oldest('checkedAt');
+  const reviewed = oldest('reviewedAt');
+  const stale = !checked || Date.now() - new Date(checked).getTime() > STALE_DAYS * DAY;
+  const upcoming = new Date(deal.date).getTime() >= Date.now() - DAY;
+  const changes = upcoming ? (travel.changes || []).filter((c) => c.country === s.country && Date.now() - new Date(c.createdAt).getTime() < RECENT_DAYS * DAY) : [];
+  const unsettled = travel.entry?.[s.country]?._unsettled || travel.permits?.[s.country]?._unsettled;
 
   return (
-    <details className="permit-panel" open={tight || undefined}>
+    <details className="permit-panel" open={tight || changes.length > 0 || undefined}>
       <summary>
         <span className="permit-panel-title">{t('permits.title')}</span>
         {entryPill && <span className={`permit-panel-pill is-${ENTRY_PILL[entry.kind]}`}>{entryPill}</span>}
@@ -104,6 +121,16 @@ const TravelPermitPanel = ({ deal, artistSide }) => {
         </span>
       </summary>
       <div className="permit-panel-body">
+        {unsettled && <p className="permit-panel-warn">{t('travel.unsettled', { country: s.country, date: date(unsettled.since) })}</p>}
+        {changes.length > 0 && (
+          <div className="permit-panel-changed">
+            {changes.map((c) => (
+              <p key={c.id} className="permit-panel-text">
+                <strong>{t('travel.changedOn', { date: date(c.createdAt) })}</strong> {c.summary}
+              </p>
+            ))}
+          </div>
+        )}
         {entry && (
           <Section title={t('entry.heading')}>
             <p className="permit-panel-lead">{entryLead}</p>
@@ -162,8 +189,13 @@ const TravelPermitPanel = ({ deal, artistSide }) => {
           </Section>
         )}
 
-        <p className="permit-panel-foot">{t(stale ? 'permits.disclaimerStale' : 'permits.disclaimer', { date: date(checked) })}</p>
+        <div className="permit-panel-foot">
+          <p>{t('travel.checked', { checked: date(checked), reviewed: date(reviewed) })}</p>
+          <p>{t(stale ? 'travel.notChecked' : 'travel.guidance')}</p>
+          <button type="button" className="permit-panel-report" onClick={() => setReporting(true)}>{t('travel.report')}</button>
+        </div>
       </div>
+      <TravelReportSheet isOpen={reporting} onClose={() => setReporting(false)} country={s.country} dealId={deal.id} />
     </details>
   );
 };

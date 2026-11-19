@@ -13819,7 +13819,39 @@ input[type="radio"] {
 .permit-panel-warn { padding: 8px 10px; border-radius: 8px; background: rgba(255, 184, 0, 0.1); color: #ffc93d; }
 .permit-panel-steps { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
 .permit-panel-sources a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
-.permit-panel-foot { font-size: 11.5px; color: rgba(255, 255, 255, 0.45); }
+.permit-panel-foot { font-size: 11.5px; color: rgba(255, 255, 255, 0.45); display: flex; flex-direction: column; gap: 4px; }
+.permit-panel-foot p { margin: 0; }
+.permit-panel-report { align-self: flex-start; padding: 6px 0; min-height: 32px; border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 600; color: #ff7a99; cursor: pointer; }
+.permit-panel-report:hover { color: #ff3366; }
+.permit-panel-report:focus-visible { outline: 2px solid #ff3366; outline-offset: 2px; border-radius: 4px; }
+.permit-panel-changed { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255, 184, 0, 0.35); background: rgba(255, 184, 0, 0.08); }
+.permit-panel-changed strong { color: #ffc93d; }
+.travel-report { display: flex; flex-direction: column; gap: 14px; }
+.travel-review { background: #000; min-height: 100%; }
+.travel-review-pad { margin: 0 20px; }
+.travel-review-body { display: flex; flex-direction: column; gap: 22px; padding: 4px 20px 40px; max-width: 760px; margin: 0 auto; }
+.travel-review-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.travel-review-stats > div { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 14px; background: #101015; border: 1px solid rgba(255, 255, 255, 0.08); }
+.travel-review-stats > div.is-due { border-color: rgba(255, 51, 102, 0.5); }
+.travel-review-stats strong { font: 700 26px/1 'Space Grotesk', sans-serif; color: #fff; font-variant-numeric: tabular-nums; }
+.travel-review-stats span { font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.travel-review-section { display: flex; flex-direction: column; gap: 10px; }
+.travel-review-card { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 14px; background: #101015; border: 1px solid rgba(255, 255, 255, 0.08); }
+.travel-review-card.is-due { border-color: rgba(255, 51, 102, 0.5); }
+.travel-review-card > .permit-panel-pill { align-self: flex-start; }
+.travel-review-card > a { color: #fff; text-decoration: underline; text-underline-offset: 2px; align-self: flex-start; }
+.travel-review-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #fff; }
+.travel-review-quote { margin: 0; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.85); font-style: italic; }
+.travel-review-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.travel-review-line { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); color: #fff; font-size: 13.5px; }
+.travel-review-grow { flex: 1 1 200px; min-width: 0; color: rgba(255, 255, 255, 0.8); }
+.travel-review-link { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; color: #fff; font-size: 13px; word-break: break-all; text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+@media (min-width: 640px) { .travel-review-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.travel-report-reasons { display: flex; flex-wrap: wrap; gap: 8px; }
+.travel-report-reason { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.14); background: transparent; color: rgba(255, 255, 255, 0.75); font: inherit; font-size: 13px; cursor: pointer; }
+.travel-report-reason.is-on { border-color: #ff3366; background: rgba(255, 51, 102, 0.14); color: #fff; font-weight: 600; }
+.travel-report-note { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: rgba(255, 255, 255, 0.55); }
+.travel-report-note textarea { border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(0, 0, 0, 0.4); color: #fff; font: inherit; font-size: 14px; padding: 10px 12px; resize: vertical; }
 .permit-panel-steps li { list-style: decimal; }
 .permit-panel-section { display: flex; flex-direction: column; gap: 8px; }
 .permit-panel-section + .permit-panel-section { padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); }

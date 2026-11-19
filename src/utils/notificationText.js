@@ -69,6 +69,11 @@ export function renderNotificationText(notif, t, locale) {
     case 'VERIFICATION_REJECTED': return tr('VERIFICATION_REJECTED');
     case 'VERIFICATION_REVOKED': return tr('VERIFICATION_REVOKED');
     case 'VERIFICATION_VOUCH_REQUEST': return withName('VERIFICATION_VOUCH_REQUEST');
+    // System notices about a booking abroad (no sender: the place and show carry it).
+    case 'TRAVEL_RULE_CHANGED':
+      return rd.place && rd.summary ? tr('TRAVEL_RULE_CHANGED', { place: rd.place, summary: rd.summary }) : text;
+    case 'TRAVEL_REMINDER':
+      return rd.place ? tr('TRAVEL_REMINDER', { place: rd.place, event: rd.event || rd.place }) : text;
     default: return text; // free-text types (REPRESENTATION_REQUEST, PAYMENT_*, TEXT, …)
   }
 }

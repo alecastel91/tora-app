@@ -6,6 +6,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import Modal from '../common/Modal';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
+import TravelReviewScreen from './TravelReviewScreen';
+import { TRAVEL_ENABLED } from '../../utils/travelData';
 import EditProfileScreen from './EditProfileScreen';
 import PhotoFocusModal, { FocusIcon } from '../common/PhotoFocusModal';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
@@ -97,6 +99,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   // and it still serves as the narrow master column beside a sub-screen.
   const nativeDesktop = useNativeDesktop();
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showTravelReview, setShowTravelReview] = useState(false);
   const [editFocus, setEditFocus] = useState(null); // section the editor opens at (the "+" buttons)
   const [showPhotoFocus, setShowPhotoFocus] = useState(false);
   const [showManageProfile, setShowManageProfile] = useState(false);
@@ -366,6 +369,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   const closeSubScreens = () => {
     setShowManageProfile(false);
     setShowEditProfile(false);
+    setShowTravelReview(false);
     setShowFindAgent(false);
     setShowAddProfile(false);
     setShowRepresentedArtists(false);
@@ -505,6 +509,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
           </div>
           <div className="mx-auto max-w-xs space-y-2.5">
             <ActionCard primary icon={<EditIcon />} label={t('profile.editProfile')} onClick={() => { closeSubScreens(); setShowEditProfile(true); }} />
+            {TRAVEL_ENABLED && <ActionCard icon={<GlobeIcon />} label="Travel rules" onClick={() => { closeSubScreens(); setShowTravelReview(true); }} />}
           </div>
         </div>
         {avatarCropModal}
@@ -1039,6 +1044,10 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
         onSwitchTab={onSwitchTab}
       />
     );
+  }
+
+  if (showTravelReview) {
+    return renderSplit(<TravelReviewScreen onClose={() => setShowTravelReview(false)} />);
   }
 
   if (showEditProfile) {
