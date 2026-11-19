@@ -10,7 +10,9 @@ import apiService from '../services/api';
  */
 
 // One switch for the panel, the passport field and the review page.
-export const TRAVEL_ENABLED = true;
+// Off since 2026-11-19 (parked by the founder); the server check is off too
+// (TRAVEL_WATCH_ENABLED on Railway). Turn both back on together.
+export const TRAVEL_ENABLED = false;
 
 const day = (d) => (d ? `${d}T00:00:00Z` : null);
 let state = {
