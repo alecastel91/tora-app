@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import apiService from '../../services/api';
 import { genresList, zones, countriesByZone, citiesByCountry } from '../../data/profiles';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -33,7 +33,7 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin, initialCode = '' }) =>
     if (!code || code.length < 5) {
       setInvitationData(null);
       setCodeError('');
-      return;
+      return null;
     }
     setValidatingCode(true);
     setCodeError('');
@@ -47,16 +47,24 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin, initialCode = '' }) =>
           ...prev,
           email: data.email || prev.email
         }));
-      } else {
-        setInvitationData(null);
-        setCodeError(data.error || t('signup.invalidCode'));
+        return data;
       }
+      setInvitationData(null);
+      setCodeError(data.error || t('signup.invalidCode'));
     } catch (err) {
       setCodeError(t('signup.couldNotValidate'));
     } finally {
       setValidatingCode(false);
     }
+    return null;
   };
+
+  // A code from the invitation link (?code=) is checked as soon as the screen
+  // opens, so the account it pre-created is claimed instead of re-asking for
+  // the profile.
+  useEffect(() => {
+    if (initialCode) validateCode(initialCode);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e) => {
     setFormData({
@@ -133,8 +141,14 @@ const SignupScreen = ({ onSignupSuccess, onSwitchToLogin, initialCode = '' }) =>
       return;
     }
 
+    // A code typed without leaving the field (Enter) has not been checked yet:
+    // check it now. With a code entered we never fall through to Step 2.
+    const invitation = invitationData
+      || (invitationCode.trim() ? await validateCode(invitationCode.trim()) : null);
+    if (invitationCode.trim() && !invitation) return;
+
     // If invitation code is present, skip Step 2 — profile already exists
-    if (invitationData) {
+    if (invitation) {
       setLoading(true);
       try {
         const signupData = {
