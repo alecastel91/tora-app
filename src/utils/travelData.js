@@ -9,11 +9,6 @@ import apiService from '../services/api';
  * until it answers (or when it can't).
  */
 
-// One switch for the panel, the passport field and the review page.
-// Off since 2026-11-19 (parked by the founder); the server check is off too
-// (TRAVEL_WATCH_ENABLED on Railway). Turn both back on together.
-export const TRAVEL_ENABLED = false;
-
 const day = (d) => (d ? `${d}T00:00:00Z` : null);
 let state = {
   entry: ENTRY,
@@ -37,7 +32,8 @@ export function loadTravelData() {
         state = { entry: r.entry, permits: r.permits, dates: r.dates, changes: r.changes || [] };
         listeners.forEach((fn) => fn());
       })
-      .catch(() => { loading = null; });
+      // Unreachable: keep the bundled rules for this session, no retry on every mount.
+      .catch(() => {});
   }
   return loading;
 }

@@ -7,7 +7,7 @@ import Modal from '../common/Modal';
 import { profileEmbeds } from '../../utils/mediaLinks';
 import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, ListIcon, GlobeIcon, LinkIcon, StarIcon } from '../../utils/icons';
 import TravelReviewScreen from './TravelReviewScreen';
-import { TRAVEL_ENABLED } from '../../utils/travelData';
+import { TRAVEL_ENABLED } from '../../utils/travelFlag';
 import EditProfileScreen from './EditProfileScreen';
 import PhotoFocusModal, { FocusIcon } from '../common/PhotoFocusModal';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';

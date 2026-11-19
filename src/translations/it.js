@@ -2900,13 +2900,11 @@ const it = {
     tax: "Tasse:",
     lowConfidence: "Qui dipende dal caso: verifica con l'ambasciata.",
     sources: "Fonti:",
-    disclaimer: "Solo indicativo, verificato il {{date}}. Le regole cambiano: conferma con la fonte ufficiale prima di partire.",
     passportLabel: "Passaporto",
     choosePassport: "Scegli il paese del passaporto",
     secondPassport: "Aggiungi un secondo passaporto",
     passportHint: "Privato. Serve solo per le indicazioni su visti e permessi dei tuoi booking, visibili anche a chi ti ingaggia.",
     workHeading: "Suonare a pagamento",
-    disclaimerStale: "Solo indicativo, ultima verifica il {{date}}: potrebbe non essere aggiornato. Conferma con la fonte ufficiale prima di partire.",
   },
   travel: {
     changedOn: "Modificato il {{date}}:",

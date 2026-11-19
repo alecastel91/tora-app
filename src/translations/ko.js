@@ -2900,13 +2900,11 @@ const ko = {
     tax: "세금:",
     lowConfidence: "이곳의 규정은 경우에 따라 다릅니다: 대사관에 확인하세요.",
     sources: "출처:",
-    disclaimer: "참고용 안내이며 {{date}}에 확인했습니다. 규정은 바뀔 수 있으니 출국 전 공식 출처로 확인하세요.",
     passportLabel: "여권",
     choosePassport: "여권 국가 선택",
     secondPassport: "두 번째 여권 추가",
     passportHint: "비공개. 부킹의 비자·취업 허가 안내에만 쓰이며, 부킹 상대도 볼 수 있습니다.",
     workHeading: "유료 공연",
-    disclaimerStale: "참고용 안내이며 마지막 확인일은 {{date}}입니다. 최신 정보가 아닐 수 있으니 출국 전 공식 출처로 확인하세요.",
   },
   travel: {
     changedOn: "{{date}} 변경:",

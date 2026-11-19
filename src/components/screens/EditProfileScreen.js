@@ -4,8 +4,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import RoomGearEditor from '../common/RoomGearEditor';
 import { roomsFromCount, roomsHaveContent } from '../../utils/venueRooms';
 import { genresList, getZoneFromCountry, countriesByZone } from '../../data/profiles';
-
-const ALL_COUNTRIES = Object.values(countriesByZone).flat().sort((a, b) => a.localeCompare(b));
 import { CloseIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import CitySearch from '../common/CitySearch';
@@ -18,7 +16,9 @@ import GenreOrder from '../common/GenreOrder';
 import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
 import FillWithClaudeSheet, { fileForClaude } from '../common/FillWithClaude';
-import { TRAVEL_ENABLED } from '../../utils/travelData';
+import { TRAVEL_ENABLED } from '../../utils/travelFlag';
+
+const ALL_COUNTRIES = Object.values(countriesByZone).flat().sort((a, b) => a.localeCompare(b));
 
 const PLAY_STYLES = ['DJ_SET', 'VINYL', 'HYBRID', 'LIVE'];
 

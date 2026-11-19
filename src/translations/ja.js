@@ -2900,13 +2900,11 @@ const ja = {
     tax: "税金：",
     lowConfidence: "ケースによって異なります。大使館に確認してください。",
     sources: "情報源：",
-    disclaimer: "参考情報です（{{date}}確認）。ルールは変わるため、渡航前に公式情報で確認してください。",
     passportLabel: "パスポート",
     choosePassport: "パスポートの国を選択",
     secondPassport: "2つ目のパスポートを追加",
     passportHint: "非公開です。ブッキングのビザ・就労許可ガイドにのみ使われ、ブッキング相手にも表示されます。",
     workHeading: "有償での出演",
-    disclaimerStale: "参考情報です（最終確認 {{date}}）。古くなっている可能性があります。渡航前に公式情報で確認してください。",
   },
   travel: {
     changedOn: "{{date}}に変更：",

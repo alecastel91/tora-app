@@ -2900,13 +2900,11 @@ const zh = {
     tax: "税务：",
     lowConfidence: "此处规定因情况而异：请向大使馆确认。",
     sources: "来源：",
-    disclaimer: "仅供参考，核实于 {{date}}。规定会变化：出行前请以官方来源为准。",
     passportLabel: "护照",
     choosePassport: "选择护照国家",
     secondPassport: "添加第二本护照",
     passportHint: "不公开。仅用于你的预约中的签证与工作许可指引，预约方也能看到。",
     workHeading: "有偿演出",
-    disclaimerStale: "仅供参考，最后核实于 {{date}}，可能已过时。出行前请以官方来源为准。",
   },
   travel: {
     changedOn: "{{date}} 更新：",

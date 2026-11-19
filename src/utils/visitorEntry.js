@@ -31,9 +31,10 @@ const inList = (list, passport) => list === '*' || (Array.isArray(list) && list.
 
 // A dated rule (a trial, a policy ending, a temporary exemption) counts only
 // when it still runs on the show date.
-const runsOn = (until, on) => !until || new Date(`${until}T23:59:59`) >= on;
+// Rule dates are calendar days in UTC, like the show date.
+const runsOn = (until, on) => !until || new Date(`${until}T23:59:59Z`) >= on;
 // An upcoming form counts from its start date, when it has one.
-const liveOn = (a, on) => a.status !== 'upcoming' || (!!a.startsOn && new Date(`${a.startsOn}T00:00:00`) <= on);
+const liveOn = (a, on) => a.status !== 'upcoming' || (!!a.startsOn && new Date(`${a.startsOn}T00:00:00Z`) <= on);
 
 function bestTier(rule, passport, on) {
   return (rule.tiers || [])

@@ -2909,13 +2909,11 @@ const en = {
     tax: "Tax:",
     lowConfidence: "Rules here vary case by case: confirm with the embassy.",
     sources: "Sources:",
-    disclaimer: "Guidance only, checked {{date}}. Rules change: confirm with the official source before travelling.",
     passportLabel: "Passport",
     choosePassport: "Choose your passport country",
     secondPassport: "Add a second passport",
     passportHint: "Private. Only used for the visa and work-permit guidance on your bookings, which the booker also sees.",
     workHeading: "Performing for a fee",
-    disclaimerStale: "Guidance only, last checked {{date}}: this may be out of date. Confirm with the official source before travelling.",
   },
   travel: {
     changedOn: "Changed on {{date}}:",

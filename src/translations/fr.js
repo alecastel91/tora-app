@@ -2900,13 +2900,11 @@ const fr = {
     tax: "Impôts :",
     lowConfidence: "Ici, tout dépend du cas : vérifiez auprès de l'ambassade.",
     sources: "Sources :",
-    disclaimer: "À titre indicatif, vérifié le {{date}}. Les règles changent : confirmez auprès de la source officielle avant de voyager.",
     passportLabel: "Passeport",
     choosePassport: "Choisissez le pays de votre passeport",
     secondPassport: "Ajouter un deuxième passeport",
     passportHint: "Privé. Sert uniquement aux indications visa et permis de vos bookings, que l'organisateur voit aussi.",
     workHeading: "Jouer contre cachet",
-    disclaimerStale: "À titre indicatif, vérifié pour la dernière fois le {{date}} : ce n'est peut-être plus à jour. Confirmez auprès de la source officielle avant de voyager.",
   },
   travel: {
     changedOn: "Modifié le {{date}} :",

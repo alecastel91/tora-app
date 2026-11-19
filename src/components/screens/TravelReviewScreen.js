@@ -51,8 +51,6 @@ const TravelReviewScreen = ({ onClose }) => {
     }
   };
 
-  const runNow = () => act('run', 'run');
-
   return (
     <div className="screen active travel-review">
       <div className="settings-header">
@@ -171,7 +169,7 @@ const TravelReviewScreen = ({ onClose }) => {
           )}
 
           <div className="travel-review-actions">
-            <button type="button" className="btn btn-secondary" disabled={!!busy} onClick={runNow}>{busy === 'run' ? 'Checking… (about a minute)' : 'Run the check now'}</button>
+            <button type="button" className="btn btn-secondary" disabled={!!busy} onClick={() => act('run', 'run')}>{busy === 'run' ? 'Checking… (about a minute)' : 'Run the check now'}</button>
           </div>
         </div>
       )}
