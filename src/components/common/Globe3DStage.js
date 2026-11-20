@@ -1,4 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { cityLabel } from '../../data/placeNames';
 import Globe from 'globe.gl';
 import { MeshPhongMaterial, Color } from 'three';
 import { geoDistance } from 'd3-geo';
@@ -24,6 +26,7 @@ const pinAlt = (count) => 0.003 + Math.min(count, 20) * 0.0015;
 const COARSE = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
 const Globe3DStage = forwardRef(({ land, cities, zones, lockedHubs, travelling, selectedKey, selectedFeature, initialCoord, onCity, onCountry, onZone, onLocked }, ref) => {
+  const { language } = useLanguage();
   const elRef = useRef(null);
   const gRef = useRef(null);
   const hoverRef = useRef(null);
@@ -80,7 +83,7 @@ const Globe3DStage = forwardRef(({ land, cities, zones, lockedHubs, travelling, 
       .pointAltitude((p) => (p.locked ? 0.002 : pinAlt(p.count)))
       .pointRadius((p) => (p.locked ? 0.2 : 0.3 + Math.min(p.count, 20) * 0.015))
       .onPointClick((p) => (p.locked ? handlers.current.onLocked?.(p.name) : handlers.current.onCity?.(p.ref)))
-      .pointLabel((p) => `<div style="padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.12);font:600 11px Inter,sans-serif;color:#fff">${esc(p.name)} <span style="color:rgba(255,255,255,.5)">· ${p.locked ? 'Premium' : p.count}</span></div>`)
+      .pointLabel((p) => `<div style="padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.12);font:600 11px Inter,sans-serif;color:#fff">${esc(p.label)} <span style="color:rgba(255,255,255,.5)">· ${p.locked ? 'Premium' : p.count}</span></div>`)
       // Names are HTML, not 3D text: crisp and the same size at any zoom.
       .htmlLat((l) => l.coord[1]).htmlLng((l) => l.coord[0]).htmlAltitude((l) => l.alt)
       .htmlElement((l) => {
@@ -162,16 +165,16 @@ const Globe3DStage = forwardRef(({ land, cities, zones, lockedHubs, travelling, 
     const g = gRef.current; if (!g) return;
     const live = cities.filter((ct) => ct._cnt > 0);
     g.pointsData([
-      ...live.map((ct) => ({ ref: ct, name: ct.name, coord: ct.coord, count: ct._cnt })),
-      ...lockedHubs.map((h) => ({ ref: h, name: h.name, coord: h.coord, locked: true })),
+      ...live.map((ct) => ({ ref: ct, name: ct.name, label: cityLabel(ct.name, language), coord: ct.coord, count: ct._cnt })),
+      ...lockedHubs.map((h) => ({ ref: h, name: h.name, label: cityLabel(h.name, language), coord: h.coord, locked: true })),
     ]);
     const top = [...live].sort((a, b) => b._cnt - a._cnt).slice(0, 14);
     g.htmlElementsData([
-      ...top.map((ct) => ({ ref: ct, coord: ct.coord, text: ct.name, alt: pinAlt(ct._cnt) + 0.004 })),
+      ...top.map((ct) => ({ ref: ct, coord: ct.coord, text: cityLabel(ct.name, language), alt: pinAlt(ct._cnt) + 0.004 })),
       ...zones.filter((z) => z._cnt > 0).map((z) => ({ ref: z, zone: true, coord: z.coord, text: `${z.name} · ${z._cnt}`, alt: 0.02 })),
     ]);
     wakeRef.current();
-  }, [cities, zones, lockedHubs]);
+  }, [cities, zones, lockedHubs, language]);
 
   // Travelling: an arc from each member's home city to their destination.
   useEffect(() => {

@@ -6,6 +6,7 @@ import { coordsForCity, normalizeCity, atlasCountryName, FEATURED_HUBS, CITY_COO
 import { countriesByZone } from '../../data/profiles';
 import { getAvatarClass, ROLE_COLOR } from '../../utils/roles';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { cityLabel, countryLabel } from '../../data/placeNames';
 import LoadingGlobe from './LoadingGlobe';
 import PhotoCard from './PhotoCard';
 import { useAppContext } from '../../contexts/AppContext';
@@ -139,10 +140,12 @@ const globe3dOn = () => {
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
 const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false, panelTopInset }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   // Read by the draw loop, which outlives renders: a ref keeps the language current.
   const zoneCountText = useRef(null);
   zoneCountText.current = (n) => t('globe.zoneCount', { count: n });
+  const placeLabel = useRef(null);
+  placeLabel.current = (name) => cityLabel(name, language);
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const [use3D] = useState(globe3dOn);
@@ -262,6 +265,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
 
   useEffect(() => { roleOnRef.current = roleOn; }, [roleOn]);
   useEffect(() => { lockedHubsRef.current = lockedHubs; }, [lockedHubs]);
+  useEffect(() => { lastSigRef.current = null; }, [language]); // labels changed language: redraw
   // Visible-member counts change only when the data or the role toggles do —
   // precompute them here instead of reducing per pin per animation frame.
   // Cities are sorted by count so bigger cities win the label space, and
@@ -531,9 +535,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         const wanted = isSel || isHov || labelAll || (c._major && labelMajors);
         if (!wanted) continue;
         const lx = c._xy[0] + (3 + Math.min(c._count, 8) * 0.7) + 6, ly = c._xy[1] + 4;
-        if (!claimLabel(lx, ly, c.name, isSel || isHov)) continue;
+        const label = placeLabel.current(c.name);
+        if (!claimLabel(lx, ly, label, isSel || isHov)) continue;
         ctx.fillStyle = isSel ? '#fff' : 'rgba(255,255,255,0.82)';
-        ctx.strokeText(c.name, lx, ly); ctx.fillText(c.name, lx, ly);
+        ctx.strokeText(label, lx, ly); ctx.fillText(label, lx, ly);
       }
       // zone labels — a pill at the zone's middle: "Asia · 3 travelling"
       for (const z of zonesRef.current) {
@@ -559,9 +564,10 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
         const isHov = hoveredKey.current === hub.key;
         if (!(labelMajors || isHov)) continue;
         const lx = hub._xy[0] + 8, ly = hub._xy[1] + 4;
-        if (!claimLabel(lx, ly, hub.name, isHov)) continue;
+        const label = placeLabel.current(hub.name);
+        if (!claimLabel(lx, ly, label, isHov)) continue;
         ctx.fillStyle = 'rgba(255,255,255,0.38)';
-        ctx.strokeText(hub.name, lx, ly); ctx.fillText(hub.name, lx, ly);
+        ctx.strokeText(label, lx, ly); ctx.fillText(label, lx, ly);
       }
       raf = requestAnimationFrame(frame);
     }
@@ -1018,7 +1024,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[140%] whitespace-nowrap rounded-lg border border-white/10 bg-black/80 px-2 py-1 text-[11px] text-white/90 backdrop-blur-sm"
           style={{ left: tip.x, top: tip.y }}
         >
-          <b>{tip.name}</b>{' '}
+          <b>{cityLabel(tip.name, language)}</b>{' '}
           <span className="text-white/50">· {tip.locked ? 'Premium' : tip.count}</span>
         </div>
       )}
@@ -1088,7 +1094,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             <div className="flex shrink-0 items-start justify-between px-5 pb-3">
               <div>
                 <div className="text-[10px] font-tech uppercase tracking-[0.2em] text-infrared">{t(travelling ? 'globe.travellingHere' : 'search.globeOnNetwork')}</div>
-                <h2 className="mt-0.5 text-xl font-semibold text-white">{place.name}</h2>
+                <h2 className="mt-0.5 text-xl font-semibold text-white">{selectedCountry ? (selectedCountry.zone ? place.name : countryLabel(place.name, language)) : cityLabel(place.name, language)}</h2>
                 <div className="mt-0.5 text-xs text-white/45">
                   {t(panelProfiles.length === 1 ? 'search.globeMember' : 'search.globeMembers', { count: panelProfiles.length })}
                   {selectedCountry?.zone
@@ -1131,7 +1137,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
               {panelProfiles.length === 0 && (
                 <p className="py-8 text-center text-sm text-white/40">
                   {selectedCountry && selectedCountry.profiles.length === 0
-                    ? t('search.globeCountryEmpty', { country: selectedCountry.name })
+                    ? t('search.globeCountryEmpty', { country: countryLabel(selectedCountry.name, language) })
                     : t('search.globeNoMatchingRoles')}
                 </p>
               )}
