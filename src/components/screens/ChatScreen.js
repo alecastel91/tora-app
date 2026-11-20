@@ -944,15 +944,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
     } else if (msgDate.toDateString() === yesterday.toDateString()) {
       return t('messages.yesterday');
     } else {
-      // Get localized day and month names
-      const weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-      const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
-
-      const weekday = t(`dateFormat.${weekdays[msgDate.getDay()]}`);
-      const month = t(`dateFormat.${months[msgDate.getMonth()]}`);
-      const day = msgDate.getDate();
-
-      return `${weekday}, ${month} ${day}`;
+      // The locale orders it (ja: 10月15日木曜日, en: Thursday, October 15).
+      return msgDate.toLocaleDateString(t('dateFormat.locale'), { weekday: 'long', month: 'long', day: 'numeric' });
     }
   };
 
@@ -1596,6 +1589,14 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
             ) : msg.isSystem && msg.dealId && msg.text && msg.text.startsWith('💰') ? (
               (() => {
                 const isFull = msg.text.includes('Full payment');
+                // The stored text is English; rebuild the amounts line in the viewer's language.
+                const deposits = /Total deposits to date: (\S+) (\w+)(?: of (\S+))?/.exec(msg.text);
+                const full = /Amount: (\S+) (\w+)/.exec(msg.text);
+                const amountsLine = deposits
+                  ? (deposits[3]
+                    ? t('chat.depositsToDateOf', { paid: deposits[1], total: deposits[3], currency: deposits[2] })
+                    : t('chat.depositsToDate', { paid: deposits[1], currency: deposits[2] }))
+                  : full ? `${full[1]} ${full[2]}` : null;
                 return (
                   <div className={`message-with-timestamp ${msg.isMe ? "card-sent" : "card-received"}`}>
                     <div className="offer-card-message">
@@ -1609,7 +1610,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                         <div className="offer-card-text">
                           <p className="offer-card-name">{msg.isMe ? t('chat.you') : user.name}</p>
                           <p className="offer-card-action">{isFull ? t('chat.recordedFullPayment') : t('chat.recordedDepositPayment')}</p>
-                          <p style={{ margin: '3px 0 0', fontSize: '10px', color: 'rgba(255,255,255,0.45)' }}>{msg.previewText || (msg.text.split('\n').pop() || '')}</p>
+                          <p style={{ margin: '3px 0 0', fontSize: '10px', color: 'rgba(255,255,255,0.45)' }}>{amountsLine || msg.previewText || (msg.text.split('\n').pop() || '')}</p>
                         </div>
                       </div>
                     </div>

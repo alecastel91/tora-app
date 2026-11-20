@@ -586,7 +586,7 @@ const ManageProfileScreen = ({ onClose, onSwitchTab = () => {}, onOpenPremium = 
                       {localized.title}
                       {item.urgent && <span className="action-urgent-chip">{t('manage.overdue')}</span>}
                     </div>
-                    {item.subtitle && <div className="action-subtitle">{item.subtitle}</div>}
+                    {localized.subtitle && <div className="action-subtitle">{localized.subtitle}</div>}
                   </div>
                   <button className="btn btn-sm btn-primary" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
                     {localized.actionLabel}

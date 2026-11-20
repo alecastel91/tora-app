@@ -179,7 +179,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
             {data.actions.length === 0 ? <Empty text={t('desktop.allClear')} /> : (
               <ul className="flex flex-col">
                 {data.actions.slice(0, ACTION_ROWS).map((item) => {
-                  const { title, actionLabel } = localizeActionItem(item, t);
+                  const { title, subtitle, actionLabel } = localizeActionItem(item, t);
                   const Icon = getActionIcon(item.type);
                   return (
                     <li key={item.id || title}>
@@ -192,7 +192,7 @@ const DashboardScreen = ({ onOpenChat, onSwitchTab, isActive = true }) => {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[13.5px] text-white">{title}</span>
-                          {item.subtitle && <span className="block truncate text-[12px] text-white/45">{item.subtitle}</span>}
+                          {subtitle && <span className="block truncate text-[12px] text-white/45">{subtitle}</span>}
                         </span>
                         <span className="d3-dash-cta">{actionLabel}</span>
                       </button>

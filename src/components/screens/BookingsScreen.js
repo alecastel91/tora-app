@@ -591,7 +591,7 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
 
     filteredDeals.forEach(deal => {
       const date = new Date(deal.date);
-      const monthYear = `${date.toLocaleString(t('dateFormat.locale'), { month: 'long' })} ${date.getFullYear()}`;
+      const monthYear = date.toLocaleString(t('dateFormat.locale'), { month: 'long', year: 'numeric' });
 
       if (!clusters[monthYear]) {
         clusters[monthYear] = {

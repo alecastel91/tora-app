@@ -70,8 +70,18 @@ const ACTION_TYPE_KEYS = {
   representation_request_received: 'manage.actionRepresentationRequest',
 };
 
+// The fee stays as sent; a tour hint becomes "via <Zone> Tour" in the
+// viewer's language.
+function localizeSubtitle(item, t) {
+  const p = item.subtitleParams;
+  if (!p) return item.subtitle;
+  const tour = p.tour ? t('manage.viaTour', { tour: t('tour.tourTitle', { location: p.tour }) }) : null;
+  return [p.fee, tour].filter(Boolean).join(' · ');
+}
+
 export function localizeActionItem(item, t) {
   let title = item.title;
+  const subtitle = localizeSubtitle(item, t);
   // Preferred path: the API ships typed params (titleParams) so no string
   // parsing is needed and backend copy changes can't break localization.
   if (item.titleParams) {
@@ -83,7 +93,7 @@ export function localizeActionItem(item, t) {
       title = t(ACTION_TYPE_KEYS[item.type], item.titleParams);
     }
     const labelKey = ACTION_LABEL_KEYS[item.actionLabel];
-    return { title, actionLabel: labelKey ? t(labelKey) : item.actionLabel };
+    return { title, subtitle, actionLabel: labelKey ? t(labelKey) : item.actionLabel };
   }
   // Legacy fallback: regex-extract from the English template.
   if (item.type === 'payment_to_confirm_received') {
@@ -99,5 +109,5 @@ export function localizeActionItem(item, t) {
     if (m) title = t(key, { name: m[1] });
   }
   const labelKey = ACTION_LABEL_KEYS[item.actionLabel];
-  return { title, actionLabel: labelKey ? t(labelKey) : item.actionLabel };
+  return { title, subtitle, actionLabel: labelKey ? t(labelKey) : item.actionLabel };
 }

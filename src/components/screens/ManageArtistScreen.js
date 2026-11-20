@@ -548,7 +548,7 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
                   <div className="action-icon"><Icon /></div>
                   <div className="action-content">
                     <div className="action-title">{localized.title}</div>
-                    {item.subtitle && <div className="action-description">{item.subtitle}</div>}
+                    {localized.subtitle && <div className="action-description">{localized.subtitle}</div>}
                   </div>
                   <button className="btn btn-outline btn-sm" onClick={() => handleActionTarget(item.target, { onSwitchTab, onClose })}>
                     {localized.actionLabel}

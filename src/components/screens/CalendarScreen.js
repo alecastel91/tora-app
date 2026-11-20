@@ -236,12 +236,8 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
   // on a cell; the desktop rail is the only thing that reads it.
   const [focusedDay, setFocusedDay] = useState(null);
 
-  const monthNames = [
-    t('dateFormat.january'), t('dateFormat.february'), t('dateFormat.march'),
-    t('dateFormat.april'), t('dateFormat.may'), t('dateFormat.june'),
-    t('dateFormat.july'), t('dateFormat.august'), t('dateFormat.september'),
-    t('dateFormat.october'), t('dateFormat.november'), t('dateFormat.december')
-  ];
+  // "November 2026" / "2026年11月": the locale decides the order.
+  const monthTitle = new Date(currentYear, currentMonth, 1).toLocaleDateString(t('dateFormat.locale'), { month: 'long', year: 'numeric' });
 
   // Determine what roles current user can look for based on their role
 
@@ -1138,7 +1134,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
           </svg>
         </button>
         <div className="calendar-month-info">
-          <h4>{monthNames[currentMonth]} {currentYear}</h4>
+          <h4>{monthTitle}</h4>
           <p className="calendar-instructions">{t('calendar.markInstructions')}</p>
         </div>
         {(currentMonth !== todayDate.getMonth() || currentYear !== todayDate.getFullYear()) && (
@@ -1256,7 +1252,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                     </svg>
                   </button>
                   <div className="calendar-month-info">
-                    <h4>{monthNames[currentMonth]} {currentYear}</h4>
+                    <h4>{monthTitle}</h4>
                     <p className="calendar-instructions">
                       {t('calendar.markInstructions')}
                     </p>
@@ -1429,7 +1425,7 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
                     </svg>
                   </button>
                   <div className="calendar-month-info">
-                    <h4>{monthNames[currentMonth]} {currentYear}</h4>
+                    <h4>{monthTitle}</h4>
                     <p className="calendar-instructions">
                       {t('calendar.markInstructions')}
                     </p>
