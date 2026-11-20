@@ -15,7 +15,7 @@ import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
 import GenreOrder from '../common/GenreOrder';
 import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
-import FillWithClaudeSheet, { fileForClaude } from '../common/FillWithClaude';
+import FillWithClaudeSheet from '../common/FillWithClaude';
 import { TRAVEL_ENABLED } from '../../utils/travelFlag';
 
 const ALL_COUNTRIES = Object.values(countriesByZone).flat().sort((a, b) => a.localeCompare(b));
@@ -43,7 +43,7 @@ const highlightRowBlank = (h) =>
 // Mirrors the server's grandfather signature (raw values, all fields).
 const highlightSignature = (h) => JSON.stringify([
   String(h?.venue || ''), String(h?.city || ''), String(h?.artist || ''),
-  String(h?.year || ''), String(h?.raUrl || ''),
+  String(h?.year || ''), String(h?.raUrl || ''), String(h?.country || ''),
 ]);
 // null | 'incomplete' | 'year' | 'raUrl' — blank rows never block
 const highlightRowIssue = (h, role) => {
@@ -115,15 +115,13 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [showFill, setShowFill] = useState(false);
-  const [readingHighlight, setReadingHighlight] = useState(null); // row index, or 'new'
-  const flyerRef = useRef(null);
 
   // "Fill with Claude": the ticked fields go into the form; Save still decides.
   const applyFill = (f) => {
     setEditedUser((prev) => {
       const next = { ...prev };
       for (const k of ['bio', 'bioLong', 'pronouns', 'soundcloud', 'spotify', 'bandcamp', 'residentAdvisor', 'instagram', 'website']) if (f[k]) next[k] = f[k];
-      if (f.city) Object.assign(next, { city: f.city, country: f.country || next.country, zone: getZoneFromCountry(f.country || next.country) || next.zone });
+      if (f.city) Object.assign(next, { city: f.city, country: f.country, zone: f.zone || getZoneFromCountry(f.country) || '' });
       if (f.highlights?.length) {
         const have = new Set((prev.pastHighlights || []).map(highlightSignature));
         const added = f.highlights.filter((h) => !have.has(highlightSignature(h)));
@@ -131,30 +129,10 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
       }
       return next;
     });
-    if (f.genres?.length) setSelectedGenres((prev) => new Set([...prev, ...f.genres]));
+    // Ticking genres means "use these": they replace the list, not add to it.
+    if (f.genres?.length) setSelectedGenres(new Set(f.genres));
   };
 
-  // One highlight read by Claude: into row `i` (only its empty fields), or a new row.
-  const readHighlight = async (i, body) => {
-    setReadingHighlight(i);
-    try {
-      const { highlight } = await apiService.fillHighlight(user.id, body);
-      // RA refuses automated reads (403): a pasted RA link stays as the row's link, quietly.
-      if (!highlight) { if (!body.link) appAlert(t('fill.highlightNotFound')); return; }
-      setEditedUser((prev) => {
-        const list = [...(prev.pastHighlights || [])];
-        if (i === 'new') {
-          if (list.length < HIGHLIGHT_MAX) list.push(highlight);
-        } else {
-          const row = list[i] || {};
-          list[i] = Object.fromEntries(['venue', 'city', 'artist', 'year', 'raUrl'].map((k) => [k, row[k] || highlight[k] || '']));
-        }
-        return { ...prev, pastHighlights: list };
-      });
-    } catch (err) {
-      appAlert(err.message || t('common.error'));
-    } finally { setReadingHighlight(null); }
-  };
   // Role-specific gallery (VENUE: venue photos, PROMOTER: past flyers).
   // Existing entries are Storage URLs; new ones are data URLs until save.
   const [photos, setPhotos] = useState(Array.isArray(user?.photos) ? user.photos : []);
@@ -920,19 +898,35 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                       setEditedUser({ ...editedUser, pastHighlights: next });
                     }}
                   />
-                  {/* middle field: artists log the city, promoters/venues the artist */}
-                  <input
-                    type="text"
-                    className="form-input flex-[2]"
-                    placeholder={user?.role === 'ARTIST' ? t('editProfile.city') : t('search.roleArtist')}
-                    value={(user?.role === 'ARTIST' ? h.city : h.artist) || ''}
-                    onChange={(e) => {
-                      const field = user?.role === 'ARTIST' ? 'city' : 'artist';
-                      const next = [...editedUser.pastHighlights];
-                      next[i] = { ...next[i], [field]: e.target.value };
-                      setEditedUser({ ...editedUser, pastHighlights: next });
-                    }}
-                  />
+                  {/* middle field: artists log the city (from the city database, so the
+                      country comes with it), promoters/venues the artist */}
+                  {user?.role === 'ARTIST' ? (
+                    <div className="min-w-0 flex-[2]">
+                      <CitySearch
+                        city={h.city || ''}
+                        country={h.country || ''}
+                        zone=""
+                        compact
+                        onSelect={(city, country) => {
+                          const next = [...editedUser.pastHighlights];
+                          next[i] = { ...next[i], city, country };
+                          setEditedUser({ ...editedUser, pastHighlights: next });
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      className="form-input flex-[2]"
+                      placeholder={t('search.roleArtist')}
+                      value={h.artist || ''}
+                      onChange={(e) => {
+                        const next = [...editedUser.pastHighlights];
+                        next[i] = { ...next[i], artist: e.target.value };
+                        setEditedUser({ ...editedUser, pastHighlights: next });
+                      }}
+                    />
+                  )}
                   <input
                     type="text"
                     inputMode="numeric"
@@ -970,13 +964,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                       next[i] = { ...next[i], raUrl: e.target.value.trim() };
                       setEditedUser({ ...editedUser, pastHighlights: next });
                     }}
-                    // A pasted RA event link fills an empty row: Claude reads the event page.
-                    onBlur={(e) => {
-                      const link = e.target.value.trim();
-                      if (RA_URL_RE.test(link) && (!h.venue || !h.year) && readingHighlight === null) readHighlight(i, { link });
-                    }}
                   />
-                  {readingHighlight === i && <span className="shrink-0 text-[11px] text-white/50">{t('fill.readingShort')}</span>}
                   <MoveButtons
                     index={i}
                     count={editedUser.pastHighlights.length}
@@ -1010,25 +998,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                   + {t('editProfile.addHighlight')} ({(editedUser.pastHighlights || []).length}/{HIGHLIGHT_MAX})
                 </button>
               ) : null}
-              {(editedUser.pastHighlights || []).length < HIGHLIGHT_MAX ? (
-                <>
-                  <button type="button" className="btn btn-outline" disabled={readingHighlight !== null} onClick={() => flyerRef.current?.click()}>
-                    ✦ {readingHighlight === 'new' ? t('fill.readingShort') : t('fill.fromFlyer')}
-                  </button>
-                  <input
-                    ref={flyerRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp,application/pdf"
-                    hidden
-                    onChange={async (e) => {
-                      const file = e.target.files[0];
-                      e.target.value = '';
-                      if (!file) return;
-                      try { readHighlight('new', { files: [await fileForClaude(file)] }); } catch (err) { appAlert(err.message); }
-                    }}
-                  />
-                </>
-              ) : (
+              {(editedUser.pastHighlights || []).length >= HIGHLIGHT_MAX && (
                 <p className="m-0 text-xs text-white/40">{t('editProfile.highlightsFull', { max: HIGHLIGHT_MAX })}</p>
               )}
             </div>

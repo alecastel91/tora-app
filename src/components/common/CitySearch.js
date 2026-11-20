@@ -16,8 +16,10 @@ const COUNTRY_ZONES = Object.entries(countriesByZone).flatMap(([zone, countries]
  *
  * onSelect(city, country, zone) — empty strings while the pick is incomplete,
  * so callers can gate their Next button on all three being set.
+ * `compact` (a field inside a row, e.g. a past show): just the search box,
+ * no confirmation line and no manual fallback.
  */
-const CitySearch = ({ city, country, zone, onSelect, preferCountry = null }) => {
+const CitySearch = ({ city, country, zone, onSelect, preferCountry = null, compact = false }) => {
   const { t } = useLanguage();
   const [query, setQuery] = useState(city && country ? `${city}, ${country}` : city || '');
   const [results, setResults] = useState([]);
@@ -29,6 +31,12 @@ const CitySearch = ({ city, country, zone, onSelect, preferCountry = null }) => 
   const debounceRef = useRef(null);
   const abortRef = useRef(null);
   const boxRef = useRef(null);
+
+  // A place set from outside (Fill with Claude) shows in the box. While the
+  // member types, the parent holds empty strings, so typing is never overwritten.
+  useEffect(() => {
+    if (city && country) setQuery(`${city}, ${country}`);
+  }, [city, country]);
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -129,11 +137,11 @@ const CitySearch = ({ city, country, zone, onSelect, preferCountry = null }) => 
         value={query}
         onChange={(e) => runSearch(e.target.value)}
         onFocus={() => { if (results.length) setOpen(true); }}
-        placeholder={t('editProfile.searchCityPlaceholder')}
+        placeholder={compact ? t('editProfile.city') : t('editProfile.searchCityPlaceholder')}
         autoComplete="off"
       />
       {open && (
-        <div className="absolute z-30 mt-1 w-full rounded-xl border border-white/10 bg-[#0f0f11] max-h-64 overflow-y-auto text-left shadow-xl">
+        <div className={`absolute z-30 mt-1 w-full ${compact ? "min-w-[240px]" : ""} rounded-xl border border-white/10 bg-[#0f0f11] max-h-64 overflow-y-auto text-left shadow-xl`}>
           {loading && <div className="px-4 py-3 text-sm text-white/40">…</div>}
           {!loading && results.length === 0 && query.trim().length >= 2 && (
             <div className="px-4 py-3 text-sm text-white/40">{t('editProfile.cityNotFound')}</div>
@@ -151,18 +159,18 @@ const CitySearch = ({ city, country, zone, onSelect, preferCountry = null }) => 
           ))}
         </div>
       )}
-      {city && country && zone && (
+      {!compact && city && country && zone && (
         <p className="m-0 mt-2 text-[10px] uppercase tracking-[0.15em] text-infrared/80 font-tech">
           ✓ {country} · {zone}
         </p>
       )}
-      <button
+      {!compact && <button
         type="button"
         onClick={() => { setManual(true); setOpen(false); onSelect('', '', ''); }}
         className="mt-3 bg-transparent border-none p-0 text-xs text-white/40 hover:text-infrared cursor-pointer font-tech transition-colors"
       >
         {t('editProfile.cityNotFound')}
-      </button>
+      </button>}
     </div>
   );
 };

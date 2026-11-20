@@ -19,7 +19,7 @@ const LINK_KEYS = ['soundcloud', 'spotify', 'bandcamp', 'residentAdvisor', 'inst
 const LINK_LABEL = { soundcloud: 'SoundCloud', spotify: 'Spotify', bandcamp: 'Bandcamp', residentAdvisor: 'Resident Advisor', instagram: 'Instagram', website: 'Website' };
 
 /** A picked file as a data URL Claude can read: images downscaled, PDFs as they are. */
-export async function fileForClaude(file) {
+async function fileForClaude(file) {
   if (file.type.startsWith('image/')) return { dataUrl: await downscaleImageToDataUrl(file, { maxDimension: 1600, quality: 0.85 }) };
   if (file.type !== 'application/pdf') throw new Error('PDF, PNG, JPG or WebP');
   return { dataUrl: await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }) };
@@ -82,7 +82,7 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
     const fields = {};
     for (const row of picked) {
       if (row.highlight) (fields.highlights ||= []).push(row.highlight);
-      else if (row.key === 'location') Object.assign(fields, { city: d.city, country: d.country });
+      else if (row.key === 'location') Object.assign(fields, { city: d.city, country: d.country, zone: d.zone });
       else fields[row.key] = d[row.key];
     }
     onApply(fields);
