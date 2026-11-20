@@ -14,7 +14,7 @@ import { useNativeDesktop } from '../../utils/desktopV2';
 import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
 import GenreOrder from '../common/GenreOrder';
 import useFitScreenHeight from '../../hooks/useFitScreenHeight';
-import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move } from '../common/ProfileMediaEditors';
+import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move, MEDIA_CAPS } from '../common/ProfileMediaEditors';
 import FillWithClaudeSheet from '../common/FillWithClaude';
 import { TRAVEL_ENABLED } from '../../utils/travelFlag';
 
@@ -129,6 +129,15 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
       }
       return next;
     });
+    // Sets and releases go to the top of their lists; a link already there is skipped.
+    if (f.sets?.length || f.releases?.length) {
+      setEditedUser((prev) => {
+        const have = new Set([...(prev.sets || []).map((m) => m.url), ...(prev.releases || []).flatMap((r) => (r.links || []).map((l) => l.url))]);
+        const sets = (f.sets || []).filter((m) => !have.has(m.url));
+        const releases = (f.releases || []).filter((r) => !r.links.some((l) => have.has(l.url)));
+        return { ...prev, sets: [...sets, ...(prev.sets || [])].slice(0, MEDIA_CAPS.sets), releases: [...releases, ...(prev.releases || [])].slice(0, MEDIA_CAPS.releases) };
+      });
+    }
     // Ticking genres means "use these": they replace the list, not add to it.
     if (f.genres?.length) setSelectedGenres(new Set(f.genres));
   };

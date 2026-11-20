@@ -57,6 +57,8 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
       out.push({ key: k, label: LINK_LABEL[k], value: draft[k] });
     }
     (draft.highlights || []).forEach((h, i) => out.push({ key: `h${i}`, label: t('fill.highlight'), value: [h.venue, h.city || h.artist, h.year].filter(Boolean).join(' · '), highlight: h }));
+    (draft.sets || []).forEach((m, i) => out.push({ key: `s${i}`, label: t('artistPage.sets'), value: m.title || m.url, set: m }));
+    (draft.releases || []).forEach((r, i) => out.push({ key: `r${i}`, label: t('artistPage.releases'), value: [r.title, r.type, r.label, r.year].filter(Boolean).join(' · '), release: r }));
     return out;
   };
 
@@ -69,7 +71,10 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
       });
       // Untouched fields start ticked; a field the member already filled waits for their tick.
       const filled = (key) => (key === 'location' ? current.city : key === 'genres' ? current.genres?.length : current[key]);
-      setKeep(Object.fromEntries(rows(r.draft).map((row) => [row.key, row.highlight ? true : !filled(row.key)])));
+      // List items (shows, sets, releases) are added, never replace: ticked unless already on the profile.
+      const haveUrls = new Set([...(current.sets || []).map((m) => m.url), ...(current.releases || []).flatMap((x) => (x.links || []).map((l) => l.url))]);
+      const fresh = (row) => (row.set ? !haveUrls.has(row.set.url) : row.release ? !row.release.links.some((l) => haveUrls.has(l.url)) : true);
+      setKeep(Object.fromEntries(rows(r.draft).map((row) => [row.key, row.highlight || row.set || row.release ? fresh(row) : !filled(row.key)])));
       setResult(r);
     } catch (err) {
       appAlert(err.message || t('common.error'));
@@ -82,6 +87,8 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
     const fields = {};
     for (const row of picked) {
       if (row.highlight) (fields.highlights ||= []).push(row.highlight);
+      else if (row.set) (fields.sets ||= []).push(row.set);
+      else if (row.release) (fields.releases ||= []).push(row.release);
       else if (row.key === 'location') Object.assign(fields, { city: d.city, country: d.country, zone: d.zone });
       else fields[row.key] = d[row.key];
     }
@@ -103,7 +110,7 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
                 <p className="form-hint" style={{ marginTop: 0 }}>{t('fill.intro')}</p>
                 <div className="form-group">
                   <label>{t('fill.links')}</label>
-                  <textarea rows={3} value={links} onChange={(e) => setLinks(e.target.value)} placeholder="https://soundcloud.com/…&#10;https://yourwebsite.com" />
+                  <textarea rows={3} value={links} onChange={(e) => setLinks(e.target.value)} placeholder="https://soundcloud.com/…&#10;https://yourwebsite.com&#10;https://www.dropbox.com/… · https://drive.google.com/…" />
                   <small className="form-hint">{t('fill.linksHint')}</small>
                 </div>
                 <div className="form-group">
