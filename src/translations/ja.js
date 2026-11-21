@@ -1521,6 +1521,8 @@ const ja = {
   },
 
   editProfile: {
+    profilePhoto: 'プロフィール写真',
+    profilePhotoHint: 'プロフィール、公開ページ、検索に表示されるメインの写真です。',
     roleFixed: 'ロールはプロフィール作成時に決まります。別のロールが必要な場合は、プロフィール写真のメニューから新しいプロフィールを追加してください。',
     venueRooms: 'フロア / ステージ数',
     venueRoomsPlaceholder: '例: 2',

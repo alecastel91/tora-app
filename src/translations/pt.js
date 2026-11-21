@@ -1521,6 +1521,8 @@ const pt = {
   },
 
   editProfile: {
+    profilePhoto: 'Foto do perfil',
+    profilePhotoHint: 'A foto principal do seu perfil, da sua página pública e das buscas.',
     roleFixed: 'O papel é definido ao criar o perfil. Para outro papel, adicione outro perfil a partir do menu da sua foto de perfil.',
     venueRooms: 'Salas / Palcos',
     venueRoomsPlaceholder: 'ex. 2',

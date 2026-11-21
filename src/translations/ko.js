@@ -1521,6 +1521,8 @@ const ko = {
   },
 
   editProfile: {
+    profilePhoto: '프로필 사진',
+    profilePhotoHint: '프로필, 공개 페이지, 검색에 표시되는 대표 사진이에요.',
     roleFixed: '역할은 프로필을 만들 때 정해집니다. 다른 역할이 필요하면 프로필 사진 메뉴에서 새 프로필을 추가하세요.',
     venueRooms: '룸 / 스테이지',
     venueRoomsPlaceholder: '예: 2',

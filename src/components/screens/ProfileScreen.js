@@ -9,7 +9,8 @@ import { UploadIcon, SwitchIcon, AddIcon, TrashIcon, HandshakeIcon, EditIcon, Li
 import TravelReviewScreen from './TravelReviewScreen';
 import { TRAVEL_ENABLED } from '../../utils/travelFlag';
 import EditProfileScreen from './EditProfileScreen';
-import PhotoFocusModal, { FocusIcon } from '../common/PhotoFocusModal';
+import { FocusIcon } from '../common/PhotoFocusModal';
+import useProfilePhoto from '../../hooks/useProfilePhoto';
 import RepresentedArtistsScreen from './RepresentedArtistsScreen';
 import AddProfileScreen from './AddProfileScreen';
 import ManageArtistScreen from './ManageArtistScreen';
@@ -29,10 +30,8 @@ import PhotoGallery from '../common/PhotoGallery';
 import ArtistRosterGrid from '../common/ArtistRosterGrid';
 import ProfileMiniGrid from '../common/ProfileMiniGrid';
 import BubbleStrip from '../common/BubbleStrip';
-import AvatarCropModal from '../common/AvatarCropModal';
 import PosterHero from '../common/PosterHero';
 import JumpTabs from '../common/JumpTabs';
-import { downscaleImageToBlob } from '../../utils/image';
 import HighlightsList from '../common/HighlightsList';
 import { ArtistMediaTop, ArtistMediaBottom, PlayLine, NightsList, MiniPlayer, usePlayer, SectionTitle } from '../common/ArtistMedia';
 import PublicPageCard from '../common/PublicPageCard';
@@ -101,7 +100,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showTravelReview, setShowTravelReview] = useState(false);
   const [editFocus, setEditFocus] = useState(null); // section the editor opens at (the "+" buttons)
-  const [showPhotoFocus, setShowPhotoFocus] = useState(false);
+  const { onPick: handleImageUpload, setFocusOpen: setShowPhotoFocus, modals: avatarCropModal } = useProfilePhoto();
   const [showManageProfile, setShowManageProfile] = useState(false);
   const [showRepresentedArtists, setShowRepresentedArtists] = useState(false);
   const [showFindAgent, setShowFindAgent] = useState(false);
@@ -306,59 +305,7 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     }
   }, [user?.id, likedProfilesList.length, likerProfilesList.length, connectionsList.length]);
 
-  // Picking a file opens the adjust step (pan/zoom/round mask); the cropped
-  // square then flows through the existing downscale + multipart upload path.
-  const [avatarCropFile, setAvatarCropFile] = useState(null);
   const posterPageRef = useRef(null);
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    event.target.value = '';
-    if (!file || !user?.id) return;
-    setAvatarCropFile(file);
-  };
-
-  // One element, referenced from both profile-body branches (regular +
-  // official) — a portal, so placement inside either branch is equivalent.
-  const handleAvatarCropped = async (croppedBlob) => {
-    // The crop is already the server's 512px avatar size — upload as-is
-    // (the backend re-encodes to webp regardless; the old downscale pass
-    // decoded + re-encoded the same pixels a second time for nothing).
-    // Errors propagate to the crop modal's inline error display.
-    // The uncropped photo goes too, larger: it fills the top of the profile.
-    const largeBlob = await downscaleImageToBlob(avatarCropFile, { maxDimension: 1600, quality: 0.85 }).catch(() => null);
-    const response = await apiService.uploadAvatar(user.id, croppedBlob, largeBlob);
-    // The multipart endpoint wraps the row: { profile } — updateUser needs
-    // the bare profile object (it keys on userData.id).
-    const updatedProfile = response.profile || response;
-    updateUser(updatedProfile);
-    setAvatarCropFile(null);
-    // Then choose what the wider crops (header, banner, cards) keep in frame.
-    setShowPhotoFocus(true);
-  };
-
-  const savePhotoFocus = async (avatarFocus) => {
-    const res = await apiService.updateProfile(user.id, { avatarFocus });
-    updateUser(res.profile || res);
-    setShowPhotoFocus(false);
-  };
-
-  const avatarCropModal = (
-    <>
-      <AvatarCropModal
-        file={avatarCropFile}
-        onCancel={() => setAvatarCropFile(null)}
-        onApply={handleAvatarCropped}
-      />
-      <PhotoFocusModal
-        open={showPhotoFocus}
-        src={user?.avatarLarge || user?.avatar}
-        focus={user?.avatarFocus}
-        onCancel={() => setShowPhotoFocus(false)}
-        onSave={savePhotoFocus}
-      />
-    </>
-  );
 
   const getInitial = (name) => {
     return name ? name.charAt(0).toUpperCase() : 'A';

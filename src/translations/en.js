@@ -1521,6 +1521,8 @@ const en = {
   
   // Edit Profile
   editProfile: {
+    profilePhoto: 'Profile photo',
+    profilePhotoHint: 'The main photo on your profile, your public page and in search.',
     roleFixed: 'Your role is set when the profile is created. For a different role, add another profile from your profile picture menu.',
     venueRooms: 'Rooms / Stages',
     venueRoomsPlaceholder: 'e.g. 2',

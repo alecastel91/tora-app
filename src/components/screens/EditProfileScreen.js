@@ -4,7 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import RoomGearEditor from '../common/RoomGearEditor';
 import { roomsFromCount, roomsHaveContent } from '../../utils/venueRooms';
 import { genresList, getZoneFromCountry, countriesByZone } from '../../data/profiles';
-import { CloseIcon } from '../../utils/icons';
+import { CloseIcon, UploadIcon } from '../../utils/icons';
 import apiService from '../../services/api';
 import CitySearch from '../common/CitySearch';
 import { downscaleImageToDataUrl } from '../../utils/image';
@@ -17,6 +17,8 @@ import useFitScreenHeight from '../../hooks/useFitScreenHeight';
 import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move, MEDIA_CAPS } from '../common/ProfileMediaEditors';
 import FillWithClaudeSheet from '../common/FillWithClaude';
 import { TRAVEL_ENABLED } from '../../utils/travelFlag';
+import useProfilePhoto from '../../hooks/useProfilePhoto';
+import { FocusIcon } from '../common/PhotoFocusModal';
 
 const ALL_COUNTRIES = Object.values(countriesByZone).flat().sort((a, b) => a.localeCompare(b));
 
@@ -61,6 +63,9 @@ const highlightRowIssue = (h, role) => {
 const EditProfileScreen = ({ onClose, focus = null }) => {
   const { user, updateUser } = useAppContext();
   const { t } = useLanguage();
+  // The main photo saves on its own (upload, then framing), not with the form.
+  const { onPick: onPickPhoto, setFocusOpen: openPhotoFocus, modals: photoModals } = useProfilePhoto();
+  const avatarInputRef = useRef(null);
   // Desktop v3 wraps the SAME form in editor chrome (components/desktop/
   // EditShell): sticky header with the actions, a section index, a live
   // preview. The fields below are untouched; the phone renders as before.
@@ -295,9 +300,11 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
         delete updatedProfile.country;
         delete updatedProfile.zone;
       }
-      // This screen never edits the avatar — don't echo it back. Avatar
-      // uploads go through ProfileScreen, which sends only { avatar }.
+      // The photo and its framing save on their own (useProfilePhoto) —
+      // echoing the loaded values back would undo a change made here.
       delete updatedProfile.avatar;
+      delete updatedProfile.avatarLarge;
+      delete updatedProfile.avatarFocus;
 
       // Photo gallery only exists for venues/promoters; other roles must not
       // echo (or wipe) the stored value.
@@ -417,6 +424,33 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
         {/* Basic Info Section */}
         <div className="edit-section">
           <h3>{t('editProfile.basicInformation')}</h3>
+
+          <div className="form-group" data-edit-section="avatar">
+            <label>{t('editProfile.profilePhoto')}</label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                aria-label={user?.avatar ? t('profile.changePhoto') : t('editProfile.addPhoto')}
+                className="flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-dashed border-white/25 bg-white/[0.04] p-0 text-white/60 [&>svg]:h-6 [&>svg]:w-6"
+              >
+                {user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : <UploadIcon />}
+              </button>
+              <div className="flex min-w-0 flex-col items-start gap-1.5">
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => avatarInputRef.current?.click()}>
+                  {user?.avatar ? t('profile.changePhoto') : t('editProfile.addPhoto')}
+                </button>
+                {user?.avatar && (
+                  <button type="button" className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-xs text-white/60 hover:text-white [&>svg]:h-3.5 [&>svg]:w-3.5" onClick={() => openPhotoFocus(true)}>
+                    <FocusIcon /> {t('profile.positionPhoto')}
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="form-hint">{t('editProfile.profilePhotoHint')}</p>
+            <input ref={avatarInputRef} type="file" accept="image/*" onChange={onPickPhoto} style={{ display: 'none' }} />
+            {photoModals}
+          </div>
           
           <div className="form-group">
             <label>{t('editProfile.name')}</label>
@@ -828,7 +862,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
               {photos.length < MAX_PROFILE_PHOTOS && (
                 <button
                   type="button"
-                  onClick={() => photoInputRef.current?.click()}
+                  onClick={() => avatarInputRef.current?.click()}
                   className="aspect-square rounded-xl border border-dashed border-white/20 bg-transparent
                              flex flex-col items-center justify-center gap-1 text-white/50 cursor-pointer
                              hover:border-infrared/50 hover:text-infrared transition-colors"

@@ -1521,6 +1521,8 @@ const fr = {
   },
 
   editProfile: {
+    profilePhoto: 'Photo de profil',
+    profilePhotoHint: 'La photo principale de votre profil, de votre page publique et des recherches.',
     roleFixed: 'Le rôle est fixé à la création du profil. Pour un autre rôle, ajoutez un second profil depuis le menu de votre photo de profil.',
     venueRooms: 'Salles / Scènes',
     venueRoomsPlaceholder: 'ex. 2',
