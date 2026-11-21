@@ -14,7 +14,7 @@ import { useNativeDesktop } from '../../utils/desktopV2';
 import { EditHeader, EditIndex, EditPreview } from '../desktop/EditShell';
 import GenreOrder from '../common/GenreOrder';
 import useFitScreenHeight from '../../hooks/useFitScreenHeight';
-import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move, MEDIA_CAPS } from '../common/ProfileMediaEditors';
+import { MediaLinksEditor, ReleasesEditor, PressPhotosEditor, NightsEditor, PublicPageSettings, MoveButtons, move, MEDIA_CAPS, mediaUrls, isNewMedia } from '../common/ProfileMediaEditors';
 import FillWithClaudeSheet from '../common/FillWithClaude';
 import { TRAVEL_ENABLED } from '../../utils/travelFlag';
 import useProfilePhoto from '../../hooks/useProfilePhoto';
@@ -47,6 +47,7 @@ const highlightSignature = (h) => JSON.stringify([
   String(h?.venue || ''), String(h?.city || ''), String(h?.artist || ''),
   String(h?.year || ''), String(h?.raUrl || ''), String(h?.country || ''),
 ]);
+const sameShow = (h) => [h?.venue, h?.city, h?.artist, h?.year].map((v) => String(v || '').trim().toLowerCase()).join('|');
 // null | 'incomplete' | 'year' | 'raUrl' — blank rows never block
 const highlightRowIssue = (h, role) => {
   if (!h || highlightRowBlank(h)) return null;
@@ -121,6 +122,11 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
   const [error, setError] = useState(null);
   const [showFill, setShowFill] = useState(false);
 
+  // One field of one past-show row.
+  const patchHighlight = (i, patch) => setEditedUser((p) => ({
+    ...p, pastHighlights: p.pastHighlights.map((h, j) => (j === i ? { ...h, ...patch } : h)),
+  }));
+
   // "Fill with Claude": the ticked fields go into the form; Save still decides.
   const applyFill = (f) => {
     setEditedUser((prev) => {
@@ -128,21 +134,23 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
       for (const k of ['bio', 'bioLong', 'pronouns', 'soundcloud', 'spotify', 'bandcamp', 'residentAdvisor', 'instagram', 'website']) if (f[k]) next[k] = f[k];
       if (f.city) Object.assign(next, { city: f.city, country: f.country, zone: f.zone || getZoneFromCountry(f.country) || '' });
       if (f.highlights?.length) {
-        const have = new Set((prev.pastHighlights || []).map(highlightSignature));
-        const added = f.highlights.filter((h) => !have.has(highlightSignature(h)));
+        // Same show = same venue, place and year; country and the RA link
+        // may be new on Fill's copy (older rows were saved without them).
+        const have = new Set((prev.pastHighlights || []).map(sameShow));
+        const added = f.highlights.filter((h) => !have.has(sameShow(h)));
         next.pastHighlights = [...(prev.pastHighlights || []), ...added].slice(0, Math.max(HIGHLIGHT_MAX, (prev.pastHighlights || []).length));
+      }
+      // Sets and releases go to the top of their lists; a link already there
+      // is skipped, and only as many as the list has room for — Fill never
+      // pushes the member's own items out.
+      if (f.sets?.length || f.releases?.length) {
+        const have = mediaUrls(prev);
+        const withRoom = (fresh, old, cap) => [...fresh.filter((m) => isNewMedia(m, have)).slice(0, Math.max(0, cap - old.length)), ...old];
+        next.sets = withRoom(f.sets || [], prev.sets || [], MEDIA_CAPS.sets);
+        next.releases = withRoom(f.releases || [], prev.releases || [], MEDIA_CAPS.releases);
       }
       return next;
     });
-    // Sets and releases go to the top of their lists; a link already there is skipped.
-    if (f.sets?.length || f.releases?.length) {
-      setEditedUser((prev) => {
-        const have = new Set([...(prev.sets || []).map((m) => m.url), ...(prev.releases || []).flatMap((r) => (r.links || []).map((l) => l.url))]);
-        const sets = (f.sets || []).filter((m) => !have.has(m.url));
-        const releases = (f.releases || []).filter((r) => !r.links.some((l) => have.has(l.url)));
-        return { ...prev, sets: [...sets, ...(prev.sets || [])].slice(0, MEDIA_CAPS.sets), releases: [...releases, ...(prev.releases || [])].slice(0, MEDIA_CAPS.releases) };
-      });
-    }
     // Ticking genres means "use these": they replace the list, not add to it.
     if (f.genres?.length) setSelectedGenres(new Set(f.genres));
   };
@@ -862,7 +870,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
               {photos.length < MAX_PROFILE_PHOTOS && (
                 <button
                   type="button"
-                  onClick={() => avatarInputRef.current?.click()}
+                  onClick={() => photoInputRef.current?.click()}
                   className="aspect-square rounded-xl border border-dashed border-white/20 bg-transparent
                              flex flex-col items-center justify-center gap-1 text-white/50 cursor-pointer
                              hover:border-infrared/50 hover:text-infrared transition-colors"
@@ -935,11 +943,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                     className="form-input flex-[2]"
                     placeholder={user?.role === 'VENUE' ? t('offer.eventName') : t('editProfile.venuePlaceholder')}
                     value={h.venue || ''}
-                    onChange={(e) => {
-                      const next = [...editedUser.pastHighlights];
-                      next[i] = { ...next[i], venue: e.target.value };
-                      setEditedUser({ ...editedUser, pastHighlights: next });
-                    }}
+                    onChange={(e) => patchHighlight(i, { venue: e.target.value })}
                   />
                   {/* middle field: artists log the city (from the city database, so the
                       country comes with it), promoters/venues the artist */}
@@ -950,11 +954,8 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                         country={h.country || ''}
                         zone=""
                         compact
-                        onSelect={(city, country) => {
-                          const next = [...editedUser.pastHighlights];
-                          next[i] = { ...next[i], city, country };
-                          setEditedUser({ ...editedUser, pastHighlights: next });
-                        }}
+                        freeText
+                        onSelect={(city, country) => patchHighlight(i, { city, country })}
                       />
                     </div>
                   ) : (
@@ -963,11 +964,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                       className="form-input flex-[2]"
                       placeholder={t('search.roleArtist')}
                       value={h.artist || ''}
-                      onChange={(e) => {
-                        const next = [...editedUser.pastHighlights];
-                        next[i] = { ...next[i], artist: e.target.value };
-                        setEditedUser({ ...editedUser, pastHighlights: next });
-                      }}
+                      onChange={(e) => patchHighlight(i, { artist: e.target.value })}
                     />
                   )}
                   <input
@@ -977,20 +974,13 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                     placeholder={t('editProfile.yearPlaceholder')}
                     maxLength={4}
                     value={h.year || ''}
-                    onChange={(e) => {
-                      const next = [...editedUser.pastHighlights];
-                      next[i] = { ...next[i], year: e.target.value.replace(/[^0-9]/g, '') };
-                      setEditedUser({ ...editedUser, pastHighlights: next });
-                    }}
+                    onChange={(e) => patchHighlight(i, { year: e.target.value.replace(/[^0-9]/g, '') })}
                   />
                   <button
                     type="button"
                     aria-label={t('common.delete')}
                     className="shrink-0 w-8 h-8 rounded-full border border-white/15 bg-transparent text-white/50 hover:text-role-venue hover:border-role-venue/50 cursor-pointer"
-                    onClick={() => {
-                      const next = editedUser.pastHighlights.filter((_, j) => j !== i);
-                      setEditedUser({ ...editedUser, pastHighlights: next });
-                    }}
+                    onClick={() => setEditedUser((p) => ({ ...p, pastHighlights: p.pastHighlights.filter((_, j) => j !== i) }))}
                   >
                     ×
                   </button>
@@ -1002,16 +992,12 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                     className="form-input min-w-0 flex-1 !text-xs !py-2"
                     placeholder={t('editProfile.raEventLink')}
                     value={h.raUrl || ''}
-                    onChange={(e) => {
-                      const next = [...editedUser.pastHighlights];
-                      next[i] = { ...next[i], raUrl: e.target.value.trim() };
-                      setEditedUser({ ...editedUser, pastHighlights: next });
-                    }}
+                    onChange={(e) => patchHighlight(i, { raUrl: e.target.value.trim() })}
                   />
                   <MoveButtons
                     index={i}
                     count={editedUser.pastHighlights.length}
-                    onMove={(from, to) => setEditedUser({ ...editedUser, pastHighlights: move(editedUser.pastHighlights, from, to) })}
+                    onMove={(from, to) => setEditedUser((p) => ({ ...p, pastHighlights: move(p.pastHighlights, from, to) }))}
                   />
                 </div>
                 {(() => {
@@ -1040,8 +1026,7 @@ const EditProfileScreen = ({ onClose, focus = null }) => {
                 >
                   + {t('editProfile.addHighlight')} ({(editedUser.pastHighlights || []).length}/{HIGHLIGHT_MAX})
                 </button>
-              ) : null}
-              {(editedUser.pastHighlights || []).length >= HIGHLIGHT_MAX && (
+              ) : (
                 <p className="m-0 text-xs text-white/40">{t('editProfile.highlightsFull', { max: HIGHLIGHT_MAX })}</p>
               )}
             </div>

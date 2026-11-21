@@ -91,7 +91,7 @@ const ActionCard = ({ icon, label, onClick, dot, primary, strong }) => {
 const fmtStat = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K` : `${n ?? 0}`);
 
 const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitchTab }) => {
-  const { user, updateUser, userProfiles, switchProfile, addProfile, deleteProfile, likedProfiles, likedProfilesData, connectedUsers, connectedUsersData, likerProfilesData, refreshAccountUser } = useAppContext();
+  const { user, userProfiles, switchProfile, addProfile, deleteProfile, likedProfiles, likedProfilesData, connectedUsers, connectedUsersData, likerProfilesData, refreshAccountUser } = useAppContext();
   const { t } = useLanguage();
   // Desktop v3 renders the main body through a page designed for a desk
   // (components/desktop/OwnProfilePage). The phone body below is unchanged,

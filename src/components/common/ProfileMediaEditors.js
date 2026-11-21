@@ -11,6 +11,10 @@ import { publicPageUrl } from './PublicPageCard';
    reorders or removes. Caps mirror tora-backend utils/profileMedia.js. */
 
 export const MEDIA_CAPS = { sets: 6, releases: 12, videos: 4, pressPhotos: 8, nights: 6 };
+// Every set and release link already on a profile, and whether a set
+// ({url}) or a release ({links}) brings one that is not there yet.
+export const mediaUrls = (p) => new Set([...(p?.sets || []).map((m) => m.url), ...(p?.releases || []).flatMap((r) => (r.links || []).map((l) => l.url))]);
+export const isNewMedia = (item, urls) => (item.links ? !item.links.some((l) => urls.has(l.url)) : !urls.has(item.url));
 const PROVIDER_LABEL = { soundcloud: 'SoundCloud', mixcloud: 'Mixcloud', youtube: 'YouTube', vimeo: 'Vimeo', bandcamp: 'Bandcamp', spotify: 'Spotify', beatport: 'Beatport' };
 const NIGHT_FREQUENCIES = ['WEEKLY', 'BIWEEKLY', 'MONTHLY', 'QUARTERLY', 'OCCASIONAL'];
 

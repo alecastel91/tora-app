@@ -17,9 +17,10 @@ const COUNTRY_ZONES = Object.entries(countriesByZone).flatMap(([zone, countries]
  * onSelect(city, country, zone) — empty strings while the pick is incomplete,
  * so callers can gate their Next button on all three being set.
  * `compact` (a field inside a row, e.g. a past show): just the search box,
- * no confirmation line and no manual fallback.
+ * no confirmation line and no manual fallback. `freeText`: what is typed is
+ * reported as the city until a suggestion is picked (rows with no fallback).
  */
-const CitySearch = ({ city, country, zone, onSelect, preferCountry = null, compact = false }) => {
+const CitySearch = ({ city, country, zone, onSelect, preferCountry = null, compact = false, freeText = false }) => {
   const { t } = useLanguage();
   const [query, setQuery] = useState(city && country ? `${city}, ${country}` : city || '');
   const [results, setResults] = useState([]);
@@ -33,10 +34,13 @@ const CitySearch = ({ city, country, zone, onSelect, preferCountry = null, compa
   const boxRef = useRef(null);
 
   // A place set from outside (Fill with Claude) shows in the box. While the
-  // member types, the parent holds empty strings, so typing is never overwritten.
+  // member types, the parent holds empty strings (or, compact, the typed text
+  // itself), so typing is never overwritten. Free-text boxes sit in list rows
+  // that can shift under them, so they always mirror the row's value.
   useEffect(() => {
     if (city && country) setQuery(`${city}, ${country}`);
-  }, [city, country]);
+    else if (freeText) setQuery(city || '');
+  }, [city, country, freeText]);
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -48,7 +52,11 @@ const CitySearch = ({ city, country, zone, onSelect, preferCountry = null, compa
 
   const runSearch = (v) => {
     setQuery(v);
-    onSelect('', '', ''); // typing invalidates any prior pick
+    // Typing invalidates any prior pick. With `freeText` what is typed stays
+    // as the city: a town missing from the database (or an older row) is
+    // never wiped.
+    if (freeText) onSelect(v, '', '');
+    else onSelect('', '', '');
     if (debounceRef.current) clearTimeout(debounceRef.current);
     abortRef.current?.abort();
     const term = v.trim();

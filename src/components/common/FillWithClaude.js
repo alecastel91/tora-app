@@ -6,6 +6,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { appAlert } from '../../utils/dialogs';
 import { downscaleImageToDataUrl } from '../../utils/image';
 import { genresList } from '../../data/profiles';
+import { mediaUrls, isNewMedia } from './ProfileMediaEditors';
 
 /**
  * "Fill with Claude": the member hands over links, text, a press-kit PDF or
@@ -72,8 +73,8 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
       // Untouched fields start ticked; a field the member already filled waits for their tick.
       const filled = (key) => (key === 'location' ? current.city : key === 'genres' ? current.genres?.length : current[key]);
       // List items (shows, sets, releases) are added, never replace: ticked unless already on the profile.
-      const haveUrls = new Set([...(current.sets || []).map((m) => m.url), ...(current.releases || []).flatMap((x) => (x.links || []).map((l) => l.url))]);
-      const fresh = (row) => (row.set ? !haveUrls.has(row.set.url) : row.release ? !row.release.links.some((l) => haveUrls.has(l.url)) : true);
+      const have = mediaUrls(current);
+      const fresh = (row) => (row.set || row.release ? isNewMedia(row.set || row.release, have) : true);
       setKeep(Object.fromEntries(rows(r.draft).map((row) => [row.key, row.highlight || row.set || row.release ? fresh(row) : !filled(row.key)])));
       setResult(r);
     } catch (err) {
