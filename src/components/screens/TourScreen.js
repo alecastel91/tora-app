@@ -394,7 +394,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showMakeOfferModal, setShowMakeOfferModal] = useState(false);
   const [offerTour, setOfferTour] = useState(null);
   const [offerDate, setOfferDate] = useState(null);
-  const [offerDraft, setOfferDraft] = useState(null);
 
   // Portaled sub-panes escape the hidden keep-mounted panel — close them when
   // this tab deactivates. MUST live above every early return (viewingProfile
@@ -669,14 +668,13 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     return (match?.rawDates || []).map(normalizeDate).filter((d) => d && d >= today).sort()[0] || null;
   };
 
-  // Make an offer from a match (desktop panel and phone card alike): on the
-  // first shared night, with the connection request, if one is needed first,
-  // pre-written from the match.
+  // Make an offer from a match (desktop panel and phone card alike), on the
+  // first shared night. Only offered once connected: before that the card's
+  // one action is Connect.
   const openMatchOffer = (prof, match) => {
     setSelectedTourArtist(prof);
     setOfferCountry(prof.country || null);
     setOfferDate(match ? firstSharedDate(match) : null);
-    setOfferDraft(match ? t('tour.matchDraft', { name: prof.name, dates: match.dates }) : null);
     setShowMakeOfferModal(true);
   };
 
@@ -686,7 +684,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     setOfferCountry(null);
     setOfferTour(null);
     setOfferDate(null);
-    setOfferDraft(null);
   };
 
   const handleMessage = (profile, draft = null) => {
@@ -944,12 +941,10 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         )}
 
         <div className="d3-mat-actions">
-          {/* A promoter or venue looking at an artist is here to book them, so
-              the offer leads and the relationship control follows it. Everyone
-              else gets Message when connected and Connect when not — messaging
-              is connection-gated, so a lead you have no relationship with can
-              only be connected to. */}
-          {canOffer(prof) && (
+          {/* Not connected: Connect is the one action (offers and messages are
+              connection-gated). Connected: a promoter or venue looking at an
+              artist is here to book, so Make an offer leads and Message follows. */}
+          {isConnected && canOffer(prof) && (
             <button className="btn btn-primary" onClick={() => openMatchOffer(prof, pickedMatch.kind === 'match' ? pickedMatch.match : null)}>
               {t('tour.makeAnOffer')}
             </button>
@@ -962,7 +957,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               {t('search.message')}
             </button>
           ) : (
-            <button className={`btn ${isRequested ? 'btn-disabled' : canOffer(prof) ? '' : 'btn-primary'}`}
+            <button className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
               onClick={() => handleConnect(prof, pickedMatch.kind === 'match'
                 ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
                 : '')} disabled={isRequested}>
@@ -1066,9 +1061,9 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       onOpen={() => handleProfileClick(profileId)}
                       actions={(
                         <>
-                          {/* Same order as the desktop panel: a promoter or venue
-                              looking at an artist is here to book, so the offer leads. */}
-                          {offer && (
+                          {/* Same rule as the desktop panel: Connect until connected,
+                              then Make an offer (when booking an artist) and Message. */}
+                          {isConnected && offer && (
                             <button className="btn btn-primary" onClick={() => openMatchOffer(match.profile, match)}>
                               {t('tour.makeAnOffer')}
                             </button>
@@ -1079,7 +1074,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                             </button>
                           ) : (
                             <button
-                              className={`btn ${isRequested ? 'btn-disabled' : offer ? 'btn-outline' : 'btn-primary'}`}
+                              className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
                               onClick={() => handleConnect(match.profile, draft)}
                               disabled={isRequested}
                             >
@@ -1278,7 +1273,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const handleMakeOffer = (tour) => {
     setSelectedTour(tour);
     setOfferTour(tour); // the offer form pre-fills from it (dates, country, currency, fee hint)
-    setOfferDraft(null); // a tour offer's connection request uses the plain draft
     setSelectedTourArtist(tour.artist); // Set the artist profile for MakeOfferModal
     setShowMakeOfferModal(true);
   };
@@ -2403,7 +2397,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         preferCountry={offerCountry || selectedTour?.country || null}
         tour={offerTour}
         suggestedDate={offerDate}
-        connectDraft={offerDraft}
         onSuccess={() => {
           closeOffer();
           // Navigate to Messages tab to see the offer
