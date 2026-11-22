@@ -26,6 +26,7 @@ import { PlaneIcon } from '../../utils/icons';
 import { roleLabel, getAvatarClass } from '../../utils/roles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { dealDeadlines } from '../../utils/paymentSummary';
+import { setLength } from '../../utils/setLength';
 
 // Hoisted out of renderTranslateAffordance so we don't rebuild these objects
 // for every text bubble on every render.
@@ -640,6 +641,13 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
     setShowReviewModal(true);
   };
 
+  // A history entry's set length; what the entry leaves out is the deal's.
+  const entrySetLength = (e) => setLength({
+    setStartTime: e.setStartTime ?? counterOfferDeal?.setStartTime,
+    setEndTime: e.setEndTime ?? counterOfferDeal?.setEndTime,
+    setDuration: e.setDuration ?? counterOfferDeal?.setDuration,
+  });
+
   // Which fields did the latest counter change vs the previous offer?
   // Drives the yellow highlight in the counter-offer details modal.
   const isCounterChanged = (field) => {
@@ -651,6 +659,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
     if (field === 'extras') {
       const norm = (e) => JSON.stringify(e.additionalTerms ?? e.extras ?? null);
       return norm(last) !== norm(prev);
+    }
+    // The set length is compared as shown (from the times when both are set),
+    // so a counter that only moves the times still reads as a new length.
+    if (field === 'setDuration') {
+      if (['setStartTime', 'setEndTime', 'setDuration'].every((f) => last[f] == null)) return false;
+      return entrySetLength(last) !== entrySetLength(prev);
     }
     // Counters omit untouched fields (null) — absence is not a change.
     if (last[field] === null || last[field] === undefined) return false;
@@ -2230,8 +2244,8 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                     <span className="detail-label">{t('chat.setTimeLabel')}</span>
                     <span className="detail-value">
                       <div>{selectedOffer.setStartTime} - {selectedOffer.setEndTime}</div>
-                      {selectedOffer.setDuration && (
-                        <div className="detail-subtext">{t('chat.durationMinutes', { n: selectedOffer.setDuration })}</div>
+                      {setLength(selectedOffer) && (
+                        <div className="detail-subtext">{t('chat.durationMinutes', { n: setLength(selectedOffer) })}</div>
                       )}
                     </span>
                   </div>
@@ -2753,6 +2767,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   const entry = history[history.length - 1] || {};
                   const deal = counterOfferDeal;
                   const dateFmt = (d) => new Date(d + 'T00:00:00Z').toLocaleDateString(t('dateFormat.locale'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+                  const setMins = entrySetLength(entry);
                   const anyChanged = ['fee', 'performanceType', 'setDuration', 'depositDeadline', 'finalPaymentDeadline', 'technicalRequirements', 'notes', 'extras'].some((f) => isCounterChanged(f));
                   return (
                     <>
@@ -2775,10 +2790,10 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                           <span className="detail-value" style={counterHighlight('performanceType')}>{entry.performanceType || deal.performanceType}</span>
                         </div>
                       )}
-                      {(entry.setDuration || deal?.setDuration) && (
+                      {setMins && (
                         <div className="offer-detail-row">
                           <span className="detail-label">{t('offer.setDuration')}</span>
-                          <span className="detail-value" style={counterHighlight('setDuration')}>{t('offer.durationMinutes', { n: entry.setDuration || deal.setDuration })}</span>
+                          <span className="detail-value" style={counterHighlight('setDuration')}>{t('offer.durationMinutes', { n: setMins })}</span>
                         </div>
                       )}
                       <div className="offer-detail-row">
