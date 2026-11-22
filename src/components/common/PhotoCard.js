@@ -2,11 +2,12 @@ import React from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { roleLabel } from '../../utils/roles';
 import VerifiedBadge from './VerifiedBadge';
+import GenrePills from './GenrePills';
 import { HeartIcon } from '../../utils/icons';
 
 /* A person as a photo: Search results, Matches and the roster all draw this.
-   The whole card opens the profile; `actions` and `topRight` stay their own
-   controls. `variant` sets the proportions: row (Search), match, tile (roster).
+   The whole card opens the profile; `actions`, `topRight` and the genres'
+   "+N" stay their own controls. `variant` sets the proportions: row (Search), match, tile (roster).
    No photo: the role colour and the initial, as on the profile page. */
 const PhotoCard = ({ profile, variant = 'row', place, chip = null, note = null, topRight = null, actions = null, hideRole = false, dim = false, onOpen }) => {
   const { t } = useLanguage();
@@ -32,6 +33,7 @@ const PhotoCard = ({ profile, variant = 'row', place, chip = null, note = null, 
             {place}
             {!hideRole && <>{place ? ' · ' : ''}<span className="poster-role">{roleLabel(role, t)}</span></>}
           </p>
+          <GenrePills genres={profile?.genres} shown={3} fit className="photo-card-genres" />
           {note && <p className="photo-card-note">{note}</p>}
         </div>
         {actions && <div className="photo-card-actions">{actions}</div>}

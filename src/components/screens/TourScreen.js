@@ -1038,7 +1038,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   const profileId = match.profile.id;
                   const isRequested = sentRequests.has(profileId);
                   const isConnected = connectedUsers.has(profileId);
-                  const genres = match.profile.genres || [];
                   return (
                     <PhotoCard
                       key={`${profileId}-${index}`}
@@ -1046,7 +1045,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       profile={match.profile}
                       place={match.profile.location}
                       chip={match.forArtist ? `${t('bookings.forArtist', { name: match.forArtist.name })} · ${match.dates}` : match.dates}
-                      note={genres.length > 0 ? genres.slice(0, 3).join(', ') : null}
                       onOpen={() => handleProfileClick(profileId)}
                       actions={isConnected ? (
                         <button
