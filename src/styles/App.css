@@ -13014,6 +13014,7 @@ div.poster-stat { cursor: default; }
 .photo-card-actions .btn-outline { background: rgba(4,4,7,0.5); border-color: rgba(255,255,255,0.34); color: #fff; font-weight: 600; letter-spacing: 0; }
 .photo-card--tile .photo-card-actions .btn { width: 100%; }
 .photo-card--row .photo-card-actions { display: flex; gap: 6px; }
+.photo-card--match .photo-card-actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
 .photo-card-like { position: absolute; right: -2px; top: 10px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.22); background: rgba(4,4,7,0.55); color: #fff; cursor: pointer; }
 .photo-card-like svg { width: 18px; height: 18px; }
 .photo-card-like span { display: none; }

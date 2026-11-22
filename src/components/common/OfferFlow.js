@@ -16,7 +16,7 @@ import apiService from '../../services/api';
    different agents elsewhere, so the booker chooses. Offers only go between
    connected members, so anyone not yet connected gets a connection request
    first (the server refuses the offer otherwise). */
-const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, onOpenPremium, dockAsDrawer = false, preferCountry = null, tour = null, suggestedDate = null }) => {
+const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, onOpenPremium, dockAsDrawer = false, preferCountry = null, tour = null, suggestedDate = null, connectDraft = null }) => {
   const { t } = useLanguage();
   const { connectedUsers, sentRequests, receivedRequests, sendConnectionRequest } = useAppContext();
   const [agents, setAgents] = useState(null);
@@ -37,9 +37,11 @@ const OfferFlow = ({ isOpen, onClose, recipientProfile, onSuccess, onOpenPremium
       if (closeIfPending) onClose();
     } else {
       // The request says why: an offer is what the booker came here to send.
+      // A caller's own draft (a match's shared dates) replaces the plain one
+      // when the request goes to the artist themselves.
       setMessage(artist
         ? t('offerRoute.connectDraftFor', { name: profile.name, artist: artist.name })
-        : t('offerRoute.connectDraft', { name: profile.name }));
+        : connectDraft || t('offerRoute.connectDraft', { name: profile.name }));
       setConnectTo(profile);
     }
   };

@@ -394,6 +394,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const [showMakeOfferModal, setShowMakeOfferModal] = useState(false);
   const [offerTour, setOfferTour] = useState(null);
   const [offerDate, setOfferDate] = useState(null);
+  const [offerDraft, setOfferDraft] = useState(null);
 
   // Portaled sub-panes escape the hidden keep-mounted panel — close them when
   // this tab deactivates. MUST live above every early return (viewingProfile
@@ -668,6 +669,26 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     return (match?.rawDates || []).map(normalizeDate).filter((d) => d && d >= today).sort()[0] || null;
   };
 
+  // Make an offer from a match (desktop panel and phone card alike): on the
+  // first shared night, with the connection request, if one is needed first,
+  // pre-written from the match.
+  const openMatchOffer = (prof, match) => {
+    setSelectedTourArtist(prof);
+    setOfferCountry(prof.country || null);
+    setOfferDate(match ? firstSharedDate(match) : null);
+    setOfferDraft(match ? t('tour.matchDraft', { name: prof.name, dates: match.dates }) : null);
+    setShowMakeOfferModal(true);
+  };
+
+  const closeOffer = () => {
+    setShowMakeOfferModal(false);
+    setSelectedTourArtist(null);
+    setOfferCountry(null);
+    setOfferTour(null);
+    setOfferDate(null);
+    setOfferDraft(null);
+  };
+
   const handleMessage = (profile, draft = null) => {
     // onOpenChat lands on the Messages tab itself. Calling
     // onNavigateToMessages as well used to undo it — tab navigation closes
@@ -929,12 +950,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               is connection-gated, so a lead you have no relationship with can
               only be connected to. */}
           {canOffer(prof) && (
-            <button className="btn btn-primary" onClick={() => {
-              setSelectedTourArtist(prof);
-              setOfferCountry(prof.country || null);
-              setOfferDate(pickedMatch.kind === 'match' ? firstSharedDate(pickedMatch.match) : null);
-              setShowMakeOfferModal(true);
-            }}>
+            <button className="btn btn-primary" onClick={() => openMatchOffer(prof, pickedMatch.kind === 'match' ? pickedMatch.match : null)}>
               {t('tour.makeAnOffer')}
             </button>
           )}
@@ -1038,6 +1054,8 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                   const profileId = match.profile.id;
                   const isRequested = sentRequests.has(profileId);
                   const isConnected = connectedUsers.has(profileId);
+                  const draft = t('tour.matchDraft', { name: match.profile.name, dates: match.dates });
+                  const offer = canOffer(match.profile);
                   return (
                     <PhotoCard
                       key={`${profileId}-${index}`}
@@ -1046,21 +1064,29 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       place={match.profile.location}
                       chip={match.forArtist ? `${t('bookings.forArtist', { name: match.forArtist.name })} · ${match.dates}` : match.dates}
                       onOpen={() => handleProfileClick(profileId)}
-                      actions={isConnected ? (
-                        <button
-                          className="btn btn-outline"
-                          onClick={() => handleMessage(match.profile, t('tour.matchDraft', { name: match.profile.name, dates: match.dates }))}
-                        >
-                          {t('search.message')}
-                        </button>
-                      ) : (
-                        <button
-                          className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
-                          onClick={() => handleConnect(match.profile, t('tour.matchDraft', { name: match.profile.name, dates: match.dates }))}
-                          disabled={isRequested}
-                        >
-                          {isRequested ? t('search.requested') : t('search.connect')}
-                        </button>
+                      actions={(
+                        <>
+                          {/* Same order as the desktop panel: a promoter or venue
+                              looking at an artist is here to book, so the offer leads. */}
+                          {offer && (
+                            <button className="btn btn-primary" onClick={() => openMatchOffer(match.profile, match)}>
+                              {t('tour.makeAnOffer')}
+                            </button>
+                          )}
+                          {isConnected ? (
+                            <button className="btn btn-outline" onClick={() => handleMessage(match.profile, draft)}>
+                              {t('search.message')}
+                            </button>
+                          ) : (
+                            <button
+                              className={`btn ${isRequested ? 'btn-disabled' : offer ? 'btn-outline' : 'btn-primary'}`}
+                              onClick={() => handleConnect(match.profile, draft)}
+                              disabled={isRequested}
+                            >
+                              {isRequested ? t('search.requested') : t('search.connect')}
+                            </button>
+                          )}
+                        </>
                       )}
                     />
                   );
@@ -1252,6 +1278,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
   const handleMakeOffer = (tour) => {
     setSelectedTour(tour);
     setOfferTour(tour); // the offer form pre-fills from it (dates, country, currency, fee hint)
+    setOfferDraft(null); // a tour offer's connection request uses the plain draft
     setSelectedTourArtist(tour.artist); // Set the artist profile for MakeOfferModal
     setShowMakeOfferModal(true);
   };
@@ -2371,23 +2398,14 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         onOpenPremium={onOpenPremium}
         isOpen={showMakeOfferModal}
         dockAsDrawer
-        onClose={() => {
-          setShowMakeOfferModal(false);
-          setSelectedTourArtist(null);
-          setOfferCountry(null);
-          setOfferTour(null);
-          setOfferDate(null);
-        }}
+        onClose={closeOffer}
         recipientProfile={selectedTourArtist}
         preferCountry={offerCountry || selectedTour?.country || null}
         tour={offerTour}
         suggestedDate={offerDate}
+        connectDraft={offerDraft}
         onSuccess={() => {
-          setShowMakeOfferModal(false);
-          setSelectedTourArtist(null);
-          setOfferCountry(null);
-          setOfferTour(null);
-          setOfferDate(null);
+          closeOffer();
           // Navigate to Messages tab to see the offer
           onNavigateToMessages();
         }}
