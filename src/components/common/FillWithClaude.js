@@ -78,7 +78,10 @@ const FillWithClaudeSheet = ({ profileId, current, onApply, onClose }) => {
       setKeep(Object.fromEntries(rows(r.draft).map((row) => [row.key, row.highlight || row.set || row.release ? fresh(row) : !filled(row.key)])));
       setResult(r);
     } catch (err) {
-      appAlert(err.message || t('common.error'));
+      // The plan limits (server: utils/fillAllowance.js) in the member's language.
+      const limit = err.code === 'FILL_LIMIT' && err.response?.data;
+      const key = limit && { free: 'fill.limitFree', day: 'fill.limitDay', month: 'fill.limitMonth' }[limit.scope];
+      appAlert(key ? t(key, { n: limit.limit }) : err.message || t('common.error'));
     } finally { setBusy(false); }
   };
 

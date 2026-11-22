@@ -23,6 +23,7 @@ export function premiumFeatureRows(user, t) {
     artistSide && { key: 'aiInvoices', free: NO, monthly: NO, yearly: CHECK },
     artistSide && { key: 'aiContracts', free: NO, monthly: NO, yearly: CHECK },
     { key: 'messaging', free: CHECK, monthly: CHECK, yearly: CHECK },
+    { key: 'fillWithClaude', free: t('premium.perProfile', { n: 3 }), monthly: t('premium.perDayMonthCap', { d: 3, m: 30 }), yearly: t('premium.unlimited') },
     { key: 'prioritySearch', free: NO, monthly: NO, yearly: CHECK },
     { key: 'sendLikes', free: '2 x day', monthly: '5 x day', yearly: t('premium.unlimited') },
     { key: 'sendOffers', free: t('premium.perMonth', { n: 3 }), monthly: t('premium.unlimited'), yearly: t('premium.unlimited') },
