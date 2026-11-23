@@ -660,12 +660,6 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
       const norm = (e) => JSON.stringify(e.additionalTerms ?? e.extras ?? null);
       return norm(last) !== norm(prev);
     }
-    // The set length is compared as shown (from the times when both are set),
-    // so a counter that only moves the times still reads as a new length.
-    if (field === 'setDuration') {
-      if (['setStartTime', 'setEndTime', 'setDuration'].every((f) => last[f] == null)) return false;
-      return entrySetLength(last) !== entrySetLength(prev);
-    }
     // Counters omit untouched fields (null) — absence is not a change.
     if (last[field] === null || last[field] === undefined) return false;
     return JSON.stringify(last[field]) !== JSON.stringify(prev[field] ?? null);

@@ -1,4 +1,5 @@
 import { clampDateRange, formatEventDate } from '../../utils/dates';
+import { setLength } from '../../utils/setLength';
 import React, { useState, useEffect, useRef } from 'react';
 import { CURRENCY_OPTIONS } from './CurrencyOptions';
 import ReactDOM from 'react-dom';
@@ -261,25 +262,8 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
 
   // Cascading dropdown handlers for location
 
-  // Calculate set duration in minutes based on start and end time
-  const calculateSetDuration = () => {
-    if (!formData.setStartTime || !formData.setEndTime) return 0;
-
-    const [startHour, startMin] = formData.setStartTime.split(':').map(Number);
-    const [endHour, endMin] = formData.setEndTime.split(':').map(Number);
-
-    const startTotalMin = startHour * 60 + startMin;
-    let endTotalMin = endHour * 60 + endMin;
-
-    // Handle case where end time is past midnight
-    if (endTotalMin < startTotalMin) {
-      endTotalMin += 24 * 60;
-    }
-
-    return endTotalMin - startTotalMin;
-  };
-
-  const setDuration = calculateSetDuration();
+  // From the times only (23:00–01:00 = 120); equal or partial times give 0.
+  const setDuration = setLength({ setStartTime: formData.setStartTime, setEndTime: formData.setEndTime }) || 0;
 
   // A missing field used to only set the error at the TOP of a long form,
   // while Send sits at the bottom, so the tap seemed to do nothing. The error

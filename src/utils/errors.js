@@ -15,3 +15,9 @@ export function connectionLimitOf(error) {
     ? { limit: data.limit, tier: data.tier }
     : null;
 }
+
+// A Fill with Claude plan limit (server: utils/fillAllowance.js) → { scope: 'free'|'day'|'month', limit }, else null.
+export function fillLimitOf(error) {
+  const data = error?.response?.data;
+  return data?.code === 'FILL_LIMIT' ? { scope: data.scope, limit: data.limit } : null;
+}

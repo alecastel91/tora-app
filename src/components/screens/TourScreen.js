@@ -22,7 +22,7 @@ import PremiumGate from '../common/PremiumGate';
 import { countriesByZone, genresList, zones } from '../../data/profiles';
 import { appAlert, appConfirm } from '../../utils/dialogs';
 import { isPremiumViewer, isYearlyViewer } from '../../utils/subscription';
-import { rosterEntryId } from '../../utils/representation';
+import { rosterEntryId, toRepEntries, repEntryId } from '../../utils/representation';
 import { activeRosterIds } from '../../utils/agentTiers';
 import { counterpartRoles, normalizeDate } from '../../utils/calendarMatch';
 import { goProfileThen } from '../../utils/navigation';
@@ -865,12 +865,44 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
     );
   };
 
+  // One rule for the phone card and the desktop panel: Connect until connected
+  // (offers and messages are connection-gated, request pre-written with the
+  // shared dates); then a promoter or venue looking at an artist leads with
+  // Make an offer, and Message follows. A booker already connected to one of
+  // the artist's agents can make the offer at once (OfferFlow lets them pick
+  // the agent) and still has Connect for the artist.
+  const matchActions = (prof, match, messageClass) => {
+    const draft = () => (match ? t('tour.matchDraft', { name: prof.name, dates: match.dates }) : '');
+    const offer = canOffer(prof);
+    const connected = connectedUsers.has(prof.id);
+    const viaAgent = offer && !connected && toRepEntries(prof.representedBy).some((a) => connectedUsers.has(repEntryId(a)));
+    const offerBtn = (offer && (connected || viaAgent)) && (
+      <button className="btn btn-primary" onClick={() => openMatchOffer(prof, match)}>{t('tour.makeAnOffer')}</button>
+    );
+    if (!connected) {
+      const isRequested = sentRequests.has(prof.id);
+      return (
+        <>
+          {offerBtn}
+          <button className={`btn ${isRequested ? 'btn-disabled' : viaAgent ? messageClass : 'btn-primary'}`} onClick={() => handleConnect(prof, draft())} disabled={isRequested}>
+            {isRequested ? t('search.requested') : t('search.connect')}
+          </button>
+        </>
+      );
+    }
+    return (
+      <>
+        {offerBtn}
+        <button className={`btn ${offer ? messageClass : 'btn-message'}`} onClick={() => handleMessage(prof, draft())}>{t('search.message')}</button>
+      </>
+    );
+  };
+
   const desktopMatchDetail = () => {
     if (!pickedMatch) return <p className="d3-mat-blank">{t('desktop.matPick')}</p>;
 
     const prof = pickedMatch.kind === 'match' ? pickedMatch.match.profile : pickedMatch.group.profile;
     const heroPhoto = prof.avatarLarge || prof.avatar;
-    const isRequested = sentRequests.has(prof.id);
     const isConnected = connectedUsers.has(prof.id);
     const marks = dayMarks(pickedMatch);
     const months = monthsToDraw(marks);
@@ -941,29 +973,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
         )}
 
         <div className="d3-mat-actions">
-          {/* Not connected: Connect is the one action (offers and messages are
-              connection-gated). Connected: a promoter or venue looking at an
-              artist is here to book, so Make an offer leads and Message follows. */}
-          {isConnected && canOffer(prof) && (
-            <button className="btn btn-primary" onClick={() => openMatchOffer(prof, pickedMatch.kind === 'match' ? pickedMatch.match : null)}>
-              {t('tour.makeAnOffer')}
-            </button>
-          )}
-          {isConnected ? (
-            <button className={`btn ${canOffer(prof) ? '' : 'btn-message'}`}
-              onClick={() => handleMessage(prof, pickedMatch.kind === 'match'
-                ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
-                : '')}>
-              {t('search.message')}
-            </button>
-          ) : (
-            <button className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
-              onClick={() => handleConnect(prof, pickedMatch.kind === 'match'
-                ? t('tour.matchDraft', { name: prof.name, dates: pickedMatch.match.dates })
-                : '')} disabled={isRequested}>
-              {isRequested ? t('search.requested') : t('search.connect')}
-            </button>
-          )}
+          {matchActions(prof, pickedMatch.kind === 'match' ? pickedMatch.match : null, '')}
           <button className="btn" onClick={() => handleProfileClick(prof.id)}>{t('desktop.view')}</button>
         </div>
         </div>
@@ -1047,10 +1057,6 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
               <div className="matches-results">
                 {matches.map((match, index) => {
                   const profileId = match.profile.id;
-                  const isRequested = sentRequests.has(profileId);
-                  const isConnected = connectedUsers.has(profileId);
-                  const draft = t('tour.matchDraft', { name: match.profile.name, dates: match.dates });
-                  const offer = canOffer(match.profile);
                   return (
                     <PhotoCard
                       key={`${profileId}-${index}`}
@@ -1059,30 +1065,7 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                       place={match.profile.location}
                       chip={match.forArtist ? `${t('bookings.forArtist', { name: match.forArtist.name })} · ${match.dates}` : match.dates}
                       onOpen={() => handleProfileClick(profileId)}
-                      actions={(
-                        <>
-                          {/* Same rule as the desktop panel: Connect until connected,
-                              then Make an offer (when booking an artist) and Message. */}
-                          {isConnected && offer && (
-                            <button className="btn btn-primary" onClick={() => openMatchOffer(match.profile, match)}>
-                              {t('tour.makeAnOffer')}
-                            </button>
-                          )}
-                          {isConnected ? (
-                            <button className="btn btn-outline" onClick={() => handleMessage(match.profile, draft)}>
-                              {t('search.message')}
-                            </button>
-                          ) : (
-                            <button
-                              className={`btn ${isRequested ? 'btn-disabled' : 'btn-primary'}`}
-                              onClick={() => handleConnect(match.profile, draft)}
-                              disabled={isRequested}
-                            >
-                              {isRequested ? t('search.requested') : t('search.connect')}
-                            </button>
-                          )}
-                        </>
-                      )}
+                      actions={matchActions(match.profile, match, 'btn-outline')}
                     />
                   );
                 })}

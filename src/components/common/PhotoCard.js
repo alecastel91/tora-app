@@ -9,7 +9,7 @@ import { HeartIcon } from '../../utils/icons';
    The whole card opens the profile; `actions`, `topRight` and the genres'
    "+N" stay their own controls. `variant` sets the proportions: row (Search), match, tile (roster).
    No photo: the role colour and the initial, as on the profile page. */
-const PhotoCard = ({ profile, variant = 'row', place, chip = null, note = null, topRight = null, actions = null, hideRole = false, dim = false, onOpen }) => {
+const PhotoCard = ({ profile, variant = 'row', place, chip = null, topRight = null, actions = null, hideRole = false, dim = false, onOpen }) => {
   const { t } = useLanguage();
   const src = profile?.avatarLarge || profile?.avatar || null;
   const role = String(profile?.role || 'ARTIST').toUpperCase();
@@ -34,7 +34,6 @@ const PhotoCard = ({ profile, variant = 'row', place, chip = null, note = null, 
             {!hideRole && <>{place ? ' · ' : ''}<span className="poster-role">{roleLabel(role, t)}</span></>}
           </p>
           <GenrePills genres={profile?.genres} shown={3} fit className="photo-card-genres" />
-          {note && <p className="photo-card-note">{note}</p>}
         </div>
         {actions && <div className="photo-card-actions">{actions}</div>}
       </div>

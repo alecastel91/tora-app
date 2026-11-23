@@ -3,10 +3,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import OverlayPortal from './OverlayPortal';
 import { isStandalone, isIos, canPromptInstall, promptInstall, onInstallAvailabilityChange } from '../../services/install';
 
-const DISMISS_KEY = 'tora-install-dismissed';
-const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // "Not now" hides for a week, not forever
-const OPEN_EVENT = 'tora:open-install'; // Settings row reopens the sheet on demand
-
 // The iOS Share glyph (box with arrow out the top), inline with the step text.
 const ShareGlyph = () => (
   <svg
@@ -26,50 +22,25 @@ const ICON = (import.meta.env.VITE_API_URL || '').includes('-2424')
   ? '/pwa-beta-192.png' : '/pwa-192.png';
 
 /**
- * "Get the TORA app" bottom sheet — mounted on the auth screens (after the
- * intro splash) AND in the app shell, while the user is in the browser.
- * Android/desktop Chromium gets the REAL one-tap native install (captured
- * beforeinstallprompt); iOS gets the two-step Add-to-Home-Screen
- * instructions Apple mandates. Never shown in the installed app; "Not now"
- * snoozes it for a week rather than hiding it forever.
+ * "Get the TORA app" bottom sheet, opened from Settings → TORA App only (it no
+ * longer pops up by itself). Android/desktop Chromium gets the REAL one-tap
+ * native install (captured beforeinstallprompt); iOS gets the two-step
+ * Add-to-Home-Screen instructions Apple mandates.
  */
-const InstallSheet = ({ delay = 900 }) => {
+const InstallSheet = ({ onClose }) => {
   const { t } = useLanguage();
-  const [visible, setVisible] = useState(false);
   const [nativeReady, setNativeReady] = useState(canPromptInstall());
 
-  useEffect(() => {
-    const snoozedAt = Number(localStorage.getItem(DISMISS_KEY) || 0);
-    if (isStandalone() || Date.now() - snoozedAt < SNOOZE_MS) return undefined;
-    // Small beat so the screen paints first — the sheet should feel like a
-    // welcome, not a roadblock. Auth screens pass a longer delay to let the
-    // intro splash finish.
-    const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  useEffect(() => {
-    // Registered regardless of snooze — the Settings "Get the app" row must
-    // always be able to reopen the sheet.
-    const onOpen = () => { if (!isStandalone()) setVisible(true); };
-    window.addEventListener(OPEN_EVENT, onOpen);
-    const off = onInstallAvailabilityChange(() => setNativeReady(canPromptInstall()));
-    return () => { window.removeEventListener(OPEN_EVENT, onOpen); off(); };
-  }, []);
-
-  if (!visible) return null;
-
-  const dismiss = () => { localStorage.setItem(DISMISS_KEY, String(Date.now())); setVisible(false); };
+  useEffect(() => onInstallAvailabilityChange(() => setNativeReady(canPromptInstall())), []);
 
   const install = async () => {
-    const accepted = await promptInstall();
-    if (accepted) setVisible(false); // appinstalled follows; no dismiss flag —
-    else dismiss();                  // declining the native dialog = not now
+    await promptInstall();
+    onClose();
   };
 
   return (
     <OverlayPortal>
-      <div className="message-modal-overlay" onClick={dismiss}>
+      <div className="message-modal-overlay" onClick={onClose}>
         <div className="message-modal-bottom" onClick={(e) => e.stopPropagation()}>
           <img src={ICON} alt="" className="mx-auto mb-3 h-14 w-14 rounded-[14px]" />
           <h2 className="message-modal-title">{t('install.title')}</h2>
@@ -98,7 +69,7 @@ const InstallSheet = ({ delay = 900 }) => {
             </div>
           )}
 
-          <button className="btn btn-secondary btn-full" onClick={dismiss}>
+          <button className="btn btn-secondary btn-full" onClick={onClose}>
             {t('install.later')}
           </button>
         </div>
@@ -107,12 +78,10 @@ const InstallSheet = ({ delay = 900 }) => {
   );
 };
 
-/**
- * Settings section: reopens the install sheet on demand, or confirms the app
- * is already installed when running standalone.
- */
+/** Settings section: opens the install sheet, or confirms the app is installed when running standalone. */
 export const InstallSettingsSection = () => {
   const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
   return (
     <div className="settings-item">
       {isStandalone() ? (
@@ -120,17 +89,12 @@ export const InstallSettingsSection = () => {
       ) : (
         <>
           <p className="m-0 mb-2 text-xs leading-relaxed text-white/50">{t('install.settingsBody')}</p>
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}
-          >
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => setOpen(true)}>
             {t('install.settingsCta')}
           </button>
+          {open && <InstallSheet onClose={() => setOpen(false)} />}
         </>
       )}
     </div>
   );
 };
-
-export default InstallSheet;

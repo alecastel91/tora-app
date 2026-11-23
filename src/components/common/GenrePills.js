@@ -10,37 +10,36 @@ export const GENRE_SHOWN = 5;
 const GenrePills = ({ genres, shown = GENRE_SHOWN, fit = false, className = '' }) => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [fitted, setFitted] = useState(shown);
+  const [width, setWidth] = useState(0);
   const ref = useRef(null);
   const list = Array.isArray(genres) ? genres.filter(Boolean) : [];
   const key = list.join('|');
-  const lead = fit ? Math.min(fitted, shown) : shown;
+  // Pills kept on the closed row, counted down while it overflows; 0 = one pill
+  // that may shrink (ellipsis) so "+N" stays visible. A new list, `shown` or
+  // card width starts again from `shown` (derived, no reset effect).
+  const sig = `${shown}|${key}|${width}`;
+  const [fitState, setFitState] = useState({ sig, n: shown });
+  const fitted = fitState.sig === sig ? fitState.n : shown;
+  const lead = fit ? Math.max(fitted, 1) : shown;
 
-  // A new list or a resized card starts again from `shown`. The parent is
-  // watched, not the row: the row's own width moves as pills drop.
+  // The parent is watched, not the row: the row's own width moves as pills drop.
   useLayoutEffect(() => {
-    if (!fit) return undefined;
-    setFitted(shown);
     const box = ref.current?.parentElement;
-    if (!box || typeof ResizeObserver === 'undefined') return undefined;
-    let width = box.clientWidth;
-    const ro = new ResizeObserver(() => {
-      if (box.clientWidth !== width) { width = box.clientWidth; setFitted(shown); }
-    });
+    if (!fit || !box || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(([entry]) => setWidth(Math.round(entry.contentRect.width)));
     ro.observe(box);
     return () => ro.disconnect();
-  }, [fit, shown, key]);
+  }, [fit, key]);
 
-  // One pill fewer per pass while the closed row overflows; the last one stays.
   useLayoutEffect(() => {
     const el = ref.current;
-    if (fit && !open && el && lead > 1 && el.scrollWidth > el.clientWidth + 1) setFitted(lead - 1);
-  });
+    if (fit && !open && el && fitted > 0 && el.scrollWidth > el.clientWidth + 1) setFitState({ sig, n: fitted - 1 });
+  }, [fit, open, sig, fitted]);
 
   if (!list.length) return null;
   const extra = list.length - lead;
   return (
-    <ul ref={ref} className={`genre-pills${fit ? ' genre-pills--fit' : ''}${open ? ' is-open' : ''} ${className}`}>
+    <ul ref={ref} className={`genre-pills${fit && fitted === 0 && !open ? ' is-tight' : ''}${open ? ' is-open' : ''} ${className}`}>
       {(open ? list : list.slice(0, lead)).map((g) => <li key={g}>{g}</li>)}
       {(open || extra > 0) && (
         <li className="genre-pills-more">

@@ -13006,10 +13006,10 @@ div.poster-stat { cursor: default; }
 /* Genres on a card: one row closed (GenrePills `fit` drops what does not fit), wraps once "+N" opens it. */
 .photo-card-genres.genre-pills { margin: 2px 0 0; flex-wrap: nowrap; overflow: hidden; gap: 5px; }
 .photo-card-genres.genre-pills.is-open { flex-wrap: wrap; }
+.photo-card-genres.genre-pills.is-tight li:first-child { flex: 0 1 auto; min-width: 0; }
 .photo-card-genres.genre-pills li { flex: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 3px 9px; font-size: 11px; border-color: rgba(255,255,255,0.22); background: rgba(4,4,7,0.5); color: rgba(255,255,255,0.88); }
 .photo-card-genres.genre-pills li.genre-pills-more { padding: 0; background: transparent; border-color: transparent; overflow: visible; }
 .photo-card-genres .genre-pills-more button { pointer-events: auto; padding: 3px 9px; font-size: 11px; border-color: rgba(255,255,255,0.3); background: rgba(4,4,7,0.5); color: #fff; }
-.photo-card-note { margin: 0; font-size: 12px; color: rgba(255,255,255,0.68); }
 .photo-card-actions { flex: none; pointer-events: auto; }
 .photo-card-actions .btn { min-height: var(--btn-h-sm); height: var(--btn-h-sm); padding: 0 14px; border-radius: 8px; font-size: 12px; letter-spacing: 0.1em; white-space: nowrap; }
 .photo-card-actions .btn-outline { background: rgba(4,4,7,0.5); border-color: rgba(255,255,255,0.34); color: #fff; font-weight: 600; letter-spacing: 0; }
