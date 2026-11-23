@@ -7,7 +7,7 @@ const DISMISS_KEY = 'tora-push-nudge-dismissed';
 /**
  * Soft-ask card for notifications: shown once, never fires the native
  * permission prompt without a tap. Only rendered where push can actually be
- * enabled ('ready') — while still uninstalled on iOS, InstallSheet owns the
+ * enabled ('ready') — while still uninstalled on iOS, Settings → TORA App owns the
  * Add-to-Home-Screen education instead.
  */
 const PushNudge = () => {
