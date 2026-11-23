@@ -57,7 +57,7 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
     }
   };
   // Pink dot on Manage CTA when the represented artist has pending action
-  // items (same pattern as ProfileScreen — fetch per-artist in one burst).
+  // items (read from the agent's own summary, like ProfileScreen).
   const [artistActionsMap, setArtistActionsMap] = useState({});
   // The representingArtists JSONB snapshot doesn't carry an avatar, so the card
   // fell back to an initial. Enrich each artist with its live profile avatar.
@@ -87,21 +87,21 @@ const RepresentedArtistsScreen = ({ onClose, onSwitchTab }) => {
   useEffect(() => {
     if (!user?.id || user.role !== 'AGENT' || representedArtists.length === 0) return undefined;
     let cancelled = false;
-    Promise.all(
-      representedArtists.map((a) => {
-        const artistId = a.profileId || a.id;
-        return apiService.getActionSummary(user.id, { artistProfileId: artistId })
-          .then((d) => ({ artistId, d }))
-          .catch(() => ({ artistId, d: null }));
-      })
-    ).then((results) => {
-      if (cancelled) return;
-      const map = {};
-      for (const r of results) {
-        map[r.artistId] = Array.isArray(r.d?.items) && r.d.items.length > 0;
-      }
-      setArtistActionsMap(map);
-    });
+    // The agent's own summary tags every roster item with its artistId: one
+    // call for the whole roster instead of one per artist.
+    apiService.getActionSummary(user.id)
+      .catch(() => null)
+      .then((d) => {
+        if (cancelled) return;
+        const items = Array.isArray(d?.items) ? d.items : [];
+        const withItems = new Set(items.map((i) => i.artistId).filter(Boolean));
+        const map = {};
+        for (const a of representedArtists) {
+          const artistId = a.profileId || a.id;
+          map[artistId] = withItems.has(artistId);
+        }
+        setArtistActionsMap(map);
+      });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, user?.role, representedArtists.length, refreshKey]);

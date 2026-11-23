@@ -219,9 +219,9 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
     console.log('🔍 [ProfileScreen] userProfiles:', userProfiles);
   }, [userProfiles]);
 
-  // Action-required dots: fetch own + each represented artist in one
-  // round-trip burst. Sequential awaiting would block on the rate limiter
-  // for agents with many artists.
+  // Action-required dots. One call: an agent's own summary already holds
+  // every roster artist's items, each tagged with its artistId — a call per
+  // artist was a set of queries per artist on every visit.
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
@@ -229,25 +229,16 @@ const ProfileScreen = ({ onOpenPremium, onOpenAchievements, accountUser, onSwitc
       const artists = user.role === 'AGENT' && Array.isArray(user.representingArtists)
         ? user.representingArtists.filter((a) => a.profileId || a.id)
         : [];
-      const tasks = [
-        apiService.getActionSummary(user.id).then((d) => ({ kind: 'own', d })).catch(() => ({ kind: 'own', d: null })),
-        ...artists.map((a) => {
-          const artistId = a.profileId || a.id;
-          return apiService.getActionSummary(user.id, { artistProfileId: artistId })
-            .then((d) => ({ kind: 'artist', artistId, d }))
-            .catch(() => ({ kind: 'artist', artistId, d: null }));
-        }),
-      ];
-      const results = await Promise.all(tasks);
+      const d = await apiService.getActionSummary(user.id).catch(() => null);
       if (cancelled) return;
+      const items = Array.isArray(d?.items) ? d.items : [];
+      const withItems = new Set(items.map((i) => i.artistId).filter(Boolean));
       const map = {};
-      let own = false;
-      for (const r of results) {
-        const has = Array.isArray(r.d?.items) && r.d.items.length > 0;
-        if (r.kind === 'own') own = has;
-        else map[r.artistId] = has;
+      for (const a of artists) {
+        const artistId = a.profileId || a.id;
+        map[artistId] = withItems.has(artistId);
       }
-      setOwnHasActions(own);
+      setOwnHasActions(items.length > 0);
       setArtistActionsMap(map);
     };
     loadActionFlags();

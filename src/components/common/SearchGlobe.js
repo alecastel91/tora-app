@@ -16,6 +16,8 @@ import { formatEventDate, localIsoDay } from '../../utils/dates';
 // Country geometry is decoded once at module load (shared across mounts).
 const LAND = feature(worldData, worldData.objects.countries);
 const BORDERS = mesh(worldData, worldData.objects.countries, (a, b) => a !== b);
+// Every border and coastline once, for the 3D globe's line layer.
+const LINES = mesh(worldData, worldData.objects.countries).coordinates;
 const featureName = (f) => (f.properties?.name || '').toLowerCase();
 // lower-cased atlas name → its 1:110m feature (first one wins, as a find would)
 const LAND_BY_NAME = new Map();
@@ -314,7 +316,11 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
       const r = el.getBoundingClientRect();
       if (r.width < 10 || r.height < 10) { hiddenRef.current = true; return; } // hidden tab panel
       hiddenRef.current = false;
-      setDims({ w: Math.round(r.width), h: Math.round(r.height) });
+      const next = { w: Math.round(r.width), h: Math.round(r.height) };
+      // Recorded here, not only by the 2D draw loop: the 3D globe never runs
+      // that loop, and the phone's member sheet opened 0 px tall there.
+      dimsRef.current = { ...dimsRef.current, ...next };
+      setDims(next);
     };
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -935,6 +941,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
           <Globe3DStage
             ref={globe3D}
             land={LAND.features}
+            lines={LINES}
             cities={counted.cities}
             zones={counted.zones}
             lockedHubs={lockedHubs}
