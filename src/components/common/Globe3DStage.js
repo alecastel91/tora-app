@@ -33,6 +33,9 @@ const FACING = (70 * Math.PI) / 180; // a city name shows within ~70° of the vi
 const LAND_ALT = 0.006;
 const LINE_ALT = 0.0075; // borders sit just above the land, never in it
 const DOT_ALT = 0.009;
+// OrbitControls turns 2π × rotateSpeed per screen height; a screen height
+// shows 2 × alt × tan(fov/2) radians of surface, so this keeps it 1:1 (fov 50°).
+const GRAB = Math.tan((25 * Math.PI) / 180) / Math.PI;
 const MIN_ALT = 0.035; // closest camera: ~200 km across, so neighbouring cities separate
 const DETAIL_ALT = 0.6; // closer than this, the 1:50m atlas
 const DETAIL_REACH = (35 * Math.PI) / 180; // …for the countries within this of the view centre
@@ -148,15 +151,14 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, trave
           b.style.cssText = 'pointer-events:auto;cursor:pointer;transform:translate(-50%,-50%);padding:4px 11px;border-radius:12px;border:1px solid rgba(255,51,102,.85);background:rgba(7,7,9,.88);color:#fff;font:700 11px Inter,sans-serif;white-space:nowrap';
           b.onclick = (e) => { e.stopPropagation(); handlers.current.onZone?.(l.ref); };
         } else {
-          const size = l.members.length > 1 ? Math.max(18, dotSize(l.count)) : dotSize(l.count);
+          const size = dotSize(l.count);
           // The button is a finger-sized target around a small dot.
           const hit = Math.max(size, COARSE ? 36 : 24);
-          b.title = `${l.text} · ${l.locked ? 'Premium' : l.count}`;
+          b.title = l.locked ? `${l.text} · Premium` : l.text;
           b.style.cssText = `pointer-events:auto;cursor:pointer;position:relative;width:${hit}px;height:${hit}px;padding:0;border:0;background:none;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent`;
           b.dataset.dot = '1';
           const dot = document.createElement('span');
           dot.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 10px Inter,sans-serif;color:#fff;border:1.5px solid rgba(4,4,9,.85);box-shadow:0 0 0 3px rgba(255,51,102,.18);pointer-events:none`;
-          if (l.members.length > 1) dot.textContent = l.count;
           b.appendChild(dot);
           if (l.showName) {
             const n = document.createElement('span');
@@ -266,10 +268,21 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, trave
       idleTimer = setTimeout(() => { if (!c.autoRotate && !arcsOnRef.current) g.pauseAnimation(); }, ms + IDLE_MS);
     };
     wakeRef.current = wake;
-    c.autoRotate = !initialCoord; c.autoRotateSpeed = 0.35; c.enableDamping = true; c.dampingFactor = 0.08;
+    c.autoRotate = !initialCoord; c.autoRotateSpeed = 0.35;
+    // Move like the 2D globe: the place under the finger follows the finger
+    // and the globe stops when it's let go (no fling).
+    c.enableDamping = false;
+    c.minDistance = g.getGlobeRadius() * (1 + MIN_ALT);
+    c.maxDistance = g.getGlobeRadius() * (1 + 4);
+    const calibrate = () => {
+      const alt = g.pointOfView().altitude;
+      c.rotateSpeed = alt * GRAB; // the library sets alt × 0.3, about twice too fast
+      c.zoomSpeed = Math.min(1, Math.sqrt(alt) * 0.6);
+    };
+    calibrate();
     c.addEventListener('start', () => { c.autoRotate = false; wake(); });
     c.addEventListener('end', () => { wake(); reclusterRef.current(); });
-    c.addEventListener('change', () => { povRef.current = g.pointOfView(); });
+    c.addEventListener('change', () => { calibrate(); povRef.current = g.pointOfView(); });
     el.addEventListener('pointermove', () => wake()); // hover highlights need frames
 
     // Narrow phone screens need the camera further back to show the sphere's edge.
