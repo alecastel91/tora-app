@@ -2714,6 +2714,8 @@ const ko = {
     profilesLabel: "프로필",
     allRoles: "모든 역할",
     preview: "미리보기",
+    nextTravel: "다음 이동 일정",
+    openProfile: "프로필 열기",
     selectTour: "투어를 선택하면 상세 정보가 표시됩니다",
     dates: "일정",
     calSelected: "선택됨",

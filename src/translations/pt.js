@@ -2714,6 +2714,8 @@ const pt = {
     profilesLabel: "Perfis",
     allRoles: "Todas as funções",
     preview: "Pré-visualização",
+    nextTravel: "Próxima viagem",
+    openProfile: "Abrir perfil",
     selectTour: "Selecione uma turnê para ver todos os detalhes",
     dates: "Datas",
     calSelected: "Selecionado",

@@ -2723,6 +2723,8 @@ const en = {
     profilesLabel: "Profiles",
     allRoles: "All roles",
     preview: "Preview",
+    nextTravel: "Next travel",
+    openProfile: "Open profile",
     selectTour: "Select a tour to see everything about it",
     dates: "Dates",
     calSelected: "Selected",

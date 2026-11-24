@@ -2714,6 +2714,8 @@ const it = {
     profilesLabel: "Profili",
     allRoles: "Tutti i ruoli",
     preview: "Anteprima",
+    nextTravel: "Prossimo viaggio",
+    openProfile: "Apri profilo",
     selectTour: "Seleziona un tour per vederne tutti i dettagli",
     dates: "Date",
     calSelected: "Selezionato",

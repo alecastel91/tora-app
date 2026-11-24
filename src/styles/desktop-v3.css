@@ -1587,6 +1587,52 @@
   html.desktop-v3 .d3-ws > .d3-panel:first-child > :first-child { padding: 0 0 8px; border: 0; }
   html.desktop-v3 .d3-ws > .d3-panel:first-child > .text-white\/45 { padding: 0 0 8px; }
   html.desktop-v3 .d3-ws-list { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Search list: thin rows on the left, the selected row previewed where the globe was */
+  html.desktop-v3 .d3-ws--list { grid-template-columns: minmax(0, 1fr) 380px; }
+  html.desktop-v3 .d3-ws--list .d3-ws-list { gap: 2px; padding-right: 4px; }
+  html.desktop-v3 .d3-sr { position: relative; flex: none; display: grid; grid-template-columns: 36px minmax(0, 1fr) minmax(0, 0.8fr) auto; align-items: center; gap: 14px; height: 58px; padding: 0 12px; border: 1px solid transparent; border-radius: 10px; }
+  html.desktop-v3 .d3-sr:hover { background: rgba(255, 255, 255, 0.035); }
+  html.desktop-v3 .d3-sr.is-selected { background: rgba(255, 51, 102, 0.07); border-color: rgba(255, 51, 102, 0.32); }
+  html.desktop-v3 .d3-sr-hit { position: absolute; inset: 0; z-index: 0; margin: 0; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
+  html.desktop-v3 .d3-sr-hit:focus-visible { outline: 2px solid rgba(255, 51, 102, 0.6); outline-offset: -2px; }
+  /* everything but the actions and the genres' "+N" lets the click reach the row */
+  html.desktop-v3 .d3-sr > :not(.d3-sr-hit) { position: relative; z-index: 1; pointer-events: none; }
+  html.desktop-v3 .d3-sr > .d3-sr-actions, html.desktop-v3 .d3-sr .genre-pills-more button { pointer-events: auto; }
+  html.desktop-v3 .d3-sr-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; font-size: 14px; font-weight: 700; color: #fff; background: #16161c; }
+  html.desktop-v3 .d3-sr-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  html.desktop-v3 .d3-sr-id { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  html.desktop-v3 .d3-sr-name { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 14.5px; font-weight: 600; color: #fff; }
+  html.desktop-v3 .d3-sr-meta { font-size: 12px; color: rgba(255, 255, 255, 0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html.desktop-v3 .d3-sr .poster-role, html.desktop-v3 .d3-sp-meta .poster-role { font-size: 10px; letter-spacing: 0.12em; }
+  html.desktop-v3 .d3-sr-genres.genre-pills { margin: 0; flex-wrap: nowrap; overflow: hidden; gap: 5px; }
+  html.desktop-v3 .d3-sr-genres.genre-pills.is-open { flex-wrap: wrap; }
+  html.desktop-v3 .d3-sr-genres.genre-pills li { flex: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 2px 9px; font-size: 11px; border-color: rgba(255, 255, 255, 0.14); color: rgba(255, 255, 255, 0.75); }
+  html.desktop-v3 .d3-sr-genres.genre-pills.is-tight li:first-child { flex: 0 1 auto; min-width: 0; }
+  html.desktop-v3 .d3-sr-genres.genre-pills li.genre-pills-more { padding: 0; border-color: transparent; overflow: visible; }
+  html.desktop-v3 .d3-sr-genres .genre-pills-more button { padding: 2px 9px; font-size: 11px; }
+  html.desktop-v3 .d3-sr-actions, html.desktop-v3 .d3-sp-actions { display: flex; align-items: center; gap: 8px; }
+  html.desktop-v3 .d3-sr-actions .btn { min-height: 32px; height: 32px; padding: 0 14px; font-size: 11px; }
+  html.desktop-v3 .d3-sr-like { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.12); background: none; color: rgba(255, 255, 255, 0.55); cursor: pointer; transition: color .15s, border-color .15s; }
+  html.desktop-v3 .d3-sr-like:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+  html.desktop-v3 .d3-sr-like.is-on { color: #FF3366; border-color: rgba(255, 51, 102, 0.45); }
+  html.desktop-v3 .d3-sr-like svg { width: 15px; height: 15px; }
+
+  html.desktop-v3 .d3-sp { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; padding: 16px; border: 1px solid var(--d2-line); border-radius: var(--d2-r-card); background: var(--d2-surface); }
+  html.desktop-v3 .d3-sp-cover { flex: none; position: relative; height: 240px; border-radius: 12px; overflow: hidden; display: grid; place-items: center; background: #101014; }
+  html.desktop-v3 .d3-sp-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  html.desktop-v3 .d3-sp-cover span { font-size: 84px; font-weight: 700; color: rgba(255, 255, 255, 0.35); }
+  html.desktop-v3 .d3-sp-body { display: flex; flex-direction: column; gap: 14px; padding: 0 4px; }
+  html.desktop-v3 .d3-sp-body .genre-pills { margin: 0; }
+  html.desktop-v3 .d3-sp-name { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 26px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; text-transform: uppercase; }
+  html.desktop-v3 .d3-sp-meta { margin: 6px 0 0; font-size: 13.5px; color: rgba(255, 255, 255, 0.65); }
+  html.desktop-v3 .d3-sp-bio { margin: 0; font-size: 13.5px; line-height: 1.6; color: rgba(255, 255, 255, 0.7); white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+  html.desktop-v3 .d3-sp-trip { display: flex; flex-direction: column; gap: 5px; padding: 11px 13px; border: 1px solid rgba(255, 184, 0, 0.28); border-radius: 10px; background: rgba(255, 184, 0, 0.05); font-size: 13.5px; }
+  html.desktop-v3 .d3-sp-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #FFB800; }
+  html.desktop-v3 .d3-sp-actions { margin-top: auto; padding: 0 4px 2px; flex-wrap: wrap; }
+  html.desktop-v3 .d3-sp-actions .btn { min-height: 40px; height: 40px; }
+  html.desktop-v3 .d3-sp-actions > :not(.d3-sr-like) { flex: 1 1 auto; }
+  html.desktop-v3 .d3-sp-actions .d3-sr-like { width: 40px; height: 40px; }
   html.desktop-v3 .photo-card--row { height: 158px; }
   /* Desk-size names for list cards; tiles size their own (roster, map panel). */
   html.desktop-v3 .photo-card:not(.photo-card--tile) .photo-card-name { font-size: 26px; line-height: 1; font-weight: 700; letter-spacing: -0.01em; }

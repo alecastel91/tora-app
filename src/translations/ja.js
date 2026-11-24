@@ -2714,6 +2714,8 @@ const ja = {
     profilesLabel: "プロフィール",
     allRoles: "すべての役割",
     preview: "プレビュー",
+    nextTravel: "次の渡航",
+    openProfile: "プロフィールを開く",
     selectTour: "ツアーを選択すると詳細が表示されます",
     dates: "日程",
     calSelected: "選択中",

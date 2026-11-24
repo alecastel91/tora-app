@@ -2714,6 +2714,8 @@ const zh = {
     profilesLabel: "档案",
     allRoles: "所有角色",
     preview: "预览",
+    nextTravel: "下次出行",
+    openProfile: "打开主页",
     selectTour: "选择一个巡演以查看全部详情",
     dates: "日期",
     calSelected: "已选择",
