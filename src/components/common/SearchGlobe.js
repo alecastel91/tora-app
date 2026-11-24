@@ -961,7 +961,6 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             cities={counted.cities}
             zones={counted.zones}
             lockedHubs={lockedHubs}
-            travelling={travelling}
             selectedKey={selectedCity?.key || null}
             selectedFeature={selectedCountry?.feature || null}
             initialCoord={restoreCoord || coordsForCity(userCity)}

@@ -5,15 +5,14 @@ import Globe from 'globe.gl';
 import { MeshPhongMaterial, Color } from 'three';
 import { geoDistance, geoCentroid } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
-import { coordsForCity, normalizeCity } from '../../data/cityCoords';
 
 /**
  * The search globe drawn in WebGL (test: ?globe=3d). It only draws and reports
  * clicks: SearchGlobe keeps every state, panel and control, and calls the
  * handle below to fly or zoom. TORA's look, not a copy: solid countries with
  * fine borders (hover lifts one, the selection turns crimson), low crimson
- * member pins sized by how many members a city has, and in Travelling an arc
- * from each member's home to where they go.
+ * member pins sized by how many members a city has. Travelling shows the
+ * destinations as the same dots — no route lines, which turn to noise at scale.
  *
  * Like the 2D globe it only draws while something moves: idle, the render
  * loop pauses (phones keep their battery and their touch responsiveness).
@@ -75,7 +74,7 @@ const loadDetailAtlas = () => (detailAtlas ? Promise.resolve(detailAtlas)
   }));
 const COARSE = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
-const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, travelling, selectedKey, selectedFeature, initialCoord, onCity, onCountry, onZone, onLocked }, ref) => {
+const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, selectedKey, selectedFeature, initialCoord, onCity, onCountry, onZone, onLocked }, ref) => {
   const { language } = useLanguage();
   const elRef = useRef(null);
   const gRef = useRef(null);
@@ -84,7 +83,6 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, trave
   // in the coarse and the detailed atlas.
   const selRef = useRef({ key: selectedKey, names: new Set() });
   const povRef = useRef({ lat: 0, lng: 0 });
-  const arcsOnRef = useRef(false);
   const itemsRef = useRef([]); // cities + locked hubs, before clustering
   const altRef = useRef(null); // altitude the dots were last clustered at
   const reclusterRef = useRef(() => {});
@@ -206,14 +204,7 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, trave
         const { lat, lng } = povRef.current;
         b.style.visibility = inFront && geoDistance(b.__coord, [lng, lat]) < FACING ? 'visible' : 'hidden';
       })
-      .htmlTransitionDuration(0)
-      .arcStartLat((a) => a.from[1]).arcStartLng((a) => a.from[0])
-      .arcEndLat((a) => a.to[1]).arcEndLng((a) => a.to[0])
-      .arcColor(() => ['rgba(255,51,102,0.08)', 'rgba(255,51,102,0.9)'])
-      .arcStroke(0.32)
-      .arcAltitudeAutoScale(0.38)
-      .arcDashLength(0.45).arcDashGap(0.2).arcDashInitialGap(() => Math.random())
-      .arcDashAnimateTime(2600);
+      .htmlTransitionDuration(0);
     g.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, COARSE ? 1.5 : 2));
 
     // Land colours: graphite, a lighter hover, crimson for the selection.
@@ -265,7 +256,7 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, trave
       if (hidden) return;
       g.resumeAnimation();
       clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => { if (!c.autoRotate && !arcsOnRef.current) g.pauseAnimation(); }, ms + IDLE_MS);
+      idleTimer = setTimeout(() => { if (!c.autoRotate) g.pauseAnimation(); }, ms + IDLE_MS);
     };
     wakeRef.current = wake;
     c.autoRotate = !initialCoord; c.autoRotateSpeed = 0.35;
@@ -340,24 +331,6 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, trave
     buildDots();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cities, zones, lockedHubs, language]);
-
-  // Travelling: an arc from each member's home city to their destination.
-  useEffect(() => {
-    const g = gRef.current; if (!g) return;
-    const arcs = [];
-    if (travelling) {
-      for (const ct of cities) {
-        if (!ct._cnt) continue;
-        for (const p of ct.profiles) {
-          const home = p._trip?.home && coordsForCity(p._trip.home);
-          if (home && normalizeCity(p._trip.home) !== ct.cityKey) arcs.push({ from: home, to: ct.coord });
-        }
-      }
-    }
-    g.arcsData(arcs.slice(0, 400));
-    arcsOnRef.current = arcs.length > 0; // animated dashes keep the loop running
-    wakeRef.current();
-  }, [cities, travelling]);
 
   // Selection: the city's pin turns white, the country (or a zone's countries)
   // crimson. Only the colours are refreshed, not the pins or names.
