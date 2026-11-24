@@ -141,7 +141,7 @@ const globe3dOn = () => {
 // Fills its positioned parent. The parent (SearchScreen) overlays the search
 // bar on top and the List/Globe toggle at the bottom; topInset/bottomInset
 // tell this component how much of its own chrome those overlays cover.
-const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false, panelTopInset }) => {
+const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '', userCountry = '', onLockedCity, onLockedTravel, controlsLeft = 12, loading = false, onSelectionChange, onRolesChange, topInset = 68, bottomInset = 52, listTakesOver = false, panelTopInset, restoreSelection = null }) => {
   const { t, language } = useLanguage();
   // Read by the draw loop, which outlives renders: a ref keeps the language current.
   const zoneCountText = useRef(null);
@@ -729,6 +729,22 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
     setSelectedCity(null);
     openPanel(z.coord);
   };
+  // Back from the list with a place filter: reopen that place's list, so
+  // closing it is how the filter comes off.
+  const restoreCoord = restoreSelection?.city ? coordsForCity(restoreSelection.city) : null;
+  const restored = useRef(!restoreSelection);
+  useEffect(() => {
+    if (restored.current || !dims.h) return;
+    if (restoreSelection.city) {
+      const key = normalizeCity(restoreSelection.city);
+      const c = cities.find((x) => x.cityKey === key || normalizeCity(x.name) === key);
+      if (c) { restored.current = true; openCity(c); }
+    } else if (restoreSelection.country) {
+      const f = LAND_BY_NAME.get(atlasCountryName(restoreSelection.country));
+      if (f) { restored.current = true; openCountry(f); }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cities, dims.h]);
   const closeCity = () => { setSelectedCity(null); setSelectedCountry(null); setSheetPx(0); focusing.current = false; onSelectionChange?.(null); };
 
   // ---- pointer interaction on the canvas ----
@@ -948,7 +964,7 @@ const SearchGlobe = ({ profiles, onSelectProfile, locked = false, userCity = '',
             travelling={travelling}
             selectedKey={selectedCity?.key || null}
             selectedFeature={selectedCountry?.feature || null}
-            initialCoord={coordsForCity(userCity)}
+            initialCoord={restoreCoord || coordsForCity(userCity)}
             onCity={openCity}
             onCountry={openCountry}
             onZone={openZone}

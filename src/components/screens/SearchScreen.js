@@ -36,6 +36,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
   // What the globe has open (a city or a country); carried into the list
   // filters when the view switches so the selection is not lost.
   const [globeSelection, setGlobeSelection] = useState(null);
+  const [globeRestore, setGlobeRestore] = useState(null); // place to reopen when back from the list
   const [viewMode, setViewMode] = useState('globe'); // 'globe' | 'list' — the globe IS the search landing
   // "Suggested for you" — complementary-role recommendations shown on the
   // list view's empty state (no query, no filters).
@@ -172,7 +173,18 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
       setFilters(next);
       handleSearch(next);
     }
-    setGlobeSelection(null);
+    // List → globe with one city or country as the filter: the globe reopens
+    // that place (closing its list clears the filter) and shows everyone again.
+    let restore = null;
+    if (key === 'globe' && viewMode === 'list' && !filters.zones.length
+      && filters.cities.length + filters.countries.length === 1) {
+      restore = filters.cities.length ? { city: filters.cities[0] } : { country: filters.countries[0] };
+      const next = { ...filters, cities: [], countries: [] };
+      setFilters(next);
+      handleSearch(next);
+    }
+    setGlobeRestore(restore);
+    setGlobeSelection(restore);
     setViewMode(key);
   };
 
@@ -614,6 +626,7 @@ const SearchScreen = ({ onOpenChat, onNavigateToMessages, onOpenPremium, account
               profiles={searchResults}
               loading={loading}
               onSelectionChange={setGlobeSelection}
+              restoreSelection={globeRestore}
               onSelectProfile={handleProfileClick}
               locked={!hasGlobalSearch()}
               userCity={user?.city}
