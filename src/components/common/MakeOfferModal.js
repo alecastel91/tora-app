@@ -10,10 +10,14 @@ import apiService from '../../services/api';
 import CitySearch from './CitySearch';
 import TimeField from './TimeField';
 import VenueSearch from './VenueSearch';
+import { countriesByZone } from '../../data/profiles';
 import EventPhotoPicker from './EventPhotoPicker';
 import { useNativeDesktop } from '../../utils/desktopV2';
 import { CloseIcon } from '../../utils/icons';
 import { useLanguage } from '../../contexts/LanguageContext';
+
+// Many profiles carry a country but no zone; the offer needs both.
+const zoneOf = (country) => Object.keys(countriesByZone).find((z) => countriesByZone[z].includes(country)) || '';
 
 // The final payment can never be due before the deposit.
 const DEADLINE_KEYS = { start: 'depositDeadline', end: 'finalPaymentDeadline' };
@@ -165,7 +169,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
       } else if (!next.city && !next.country && currentUser.city && currentUser.country) {
         next.city = currentUser.city;
         next.country = currentUser.country;
-        next.zone = currentUser.zone || '';
+        next.zone = currentUser.zone || zoneOf(currentUser.country);
       }
       // A one-day tour has its date; any tour has its currency (the artist's,
       // the one their minimum is in). Otherwise the member's own currency.
@@ -289,7 +293,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
       failOn('venueName', t('offer.venueRequired'));
       return;
     }
-    if (!formData.city || !formData.country || !formData.zone) {
+    if (!formData.city || !formData.country || !(formData.zone || zoneOf(formData.country))) {
       failOn('city', t('offer.cityRequired'));
       return;
     }
@@ -342,12 +346,15 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
 
       const eventStartTotalMin = eventStartHour * 60 + eventStartMin;
       let eventEndTotalMin = eventEndHour * 60 + eventEndMin;
-      const setStartTotalMin = setStartHour * 60 + setStartMin;
+      let setStartTotalMin = setStartHour * 60 + setStartMin;
       let setEndTotalMin = setEndHour * 60 + setEndMin;
 
-      // Handle case where end time is past midnight
+      // Overnight event (22:00–05:00): put the set on the same timeline, so a
+      // 01:00 set reads as after midnight rather than before the doors open.
       if (eventEndTotalMin < eventStartTotalMin) {
         eventEndTotalMin += 24 * 60;
+        if (setStartTotalMin < eventStartTotalMin) setStartTotalMin += 24 * 60;
+        if (setEndTotalMin < eventStartTotalMin) setEndTotalMin += 24 * 60;
       }
       if (setEndTotalMin < setStartTotalMin) {
         setEndTotalMin += 24 * 60;
@@ -381,7 +388,7 @@ const MakeOfferModal = ({ isOpen, onClose, recipientProfile, presetArtist = null
         eventName: formData.eventName,
         eventImage: eventImage || undefined,
         venueName: formData.venueName || recipientProfile.name,
-        zone: formData.zone,
+        zone: formData.zone || zoneOf(formData.country),
         country: formData.country,
         city: formData.city,
         date: formData.date,

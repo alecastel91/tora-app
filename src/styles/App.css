@@ -11935,25 +11935,31 @@ textarea.form-textarea:focus {
    ============================================================ */
 
 .beta-fab {
+  /* A slim tab on the right edge, half way down: the round button that sat
+     above the tab bar covered Search filters, card actions and the bottom
+     row of buttons on several screens. Still draggable. */
   position: fixed;
-  right: 16px;
-  bottom: calc(92px + env(safe-area-inset-bottom)); /* clears the tab bar incl. iPhone safe area */
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   touch-action: none; /* hold-and-drag repositioning must not scroll the page */
   z-index: var(--z-fab);
-  /* The header's round icon button, one size up so it reads as a floating control. */
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  width: 30px;
+  height: 52px;
+  border-radius: 12px 0 0 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  background: #111117;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(17, 17, 23, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 0;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.45);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
+.beta-fab svg { width: 18px; height: 18px; }
+.beta-fab.is-moved { border-radius: 12px; border-right: 1px solid rgba(255, 255, 255, 0.1); transform: none; }
 .beta-fab:hover { border-color: rgba(255, 51, 102, 0.4); background: #1a1a22; }
 
 .beta-sheet-header { padding-top: calc(env(safe-area-inset-top) + 34px); }
@@ -13872,3 +13878,19 @@ input[type="radio"] {
 .permit-panel-forms { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
 .permit-panel-forms a, .permit-panel-text a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
 .permit-panel-form-name { display: block; color: #fff; font-weight: 600; }
+
+/* Optimistic chat send: faded until the server has it; a failed one offers a retry */
+.message-pending .message-bubble { opacity: 0.6; }
+.message-failed .message-bubble { box-shadow: inset 0 0 0 1px rgba(255, 87, 87, 0.6); }
+.message-retry {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: #ff5757;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: right;
+  width: 100%;
+}

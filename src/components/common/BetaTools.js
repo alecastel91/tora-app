@@ -22,12 +22,12 @@ const BetaTools = () => {
       .catch(() => {});
   }, []);
 
-  // Draggable FAB: hold and move to reposition (it was colliding with the
-  // taller safe-area tab bar and the Search filters). Position persists.
+  // Draggable edge tab: hold and move to reposition. Position persists
+  // (under a new key, so the old round button's saved spot is not reused).
   const fabRef = useRef(null);
   const dragMovedRef = useRef(false);
   const [fabPos, setFabPos] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('tora-beta-fab-pos')) || null; }
+    try { return JSON.parse(localStorage.getItem('tora-beta-tab-pos')) || null; }
     catch { return null; }
   });
   const lastPosRef = useRef(null);
@@ -54,7 +54,7 @@ const BetaTools = () => {
       window.removeEventListener('pointerup', onEnd);
       window.removeEventListener('pointercancel', onEnd);
       if (dragMovedRef.current && lastPosRef.current) {
-        localStorage.setItem('tora-beta-fab-pos', JSON.stringify(lastPosRef.current));
+        localStorage.setItem('tora-beta-tab-pos', JSON.stringify(lastPosRef.current));
       }
     };
     window.addEventListener('pointermove', onMove);
@@ -69,13 +69,13 @@ const BetaTools = () => {
       {!open && (
       <button
         type="button"
-        className="beta-fab"
+        className={`beta-fab${fabPos ? ' is-moved' : ''}`}
         ref={fabRef}
         style={fabPos ? {
           // Clamp to the CURRENT viewport — a position saved on desktop
           // could otherwise park the FAB off-screen on a phone, unrecoverable.
-          left: Math.min(Math.max(4, fabPos.x), (typeof window !== 'undefined' ? window.innerWidth : 9999) - 52),
-          top: Math.min(Math.max(4, fabPos.y), (typeof window !== 'undefined' ? window.innerHeight : 9999) - 52),
+          left: Math.min(Math.max(4, fabPos.x), (typeof window !== 'undefined' ? window.innerWidth : 9999) - 34),
+          top: Math.min(Math.max(4, fabPos.y), (typeof window !== 'undefined' ? window.innerHeight : 9999) - 56),
           right: 'auto', bottom: 'auto',
         } : undefined}
         onPointerDown={onFabPointerDown}

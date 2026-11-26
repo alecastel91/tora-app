@@ -16,6 +16,7 @@ import CalendarReviewSheet from '../common/CalendarReviewSheet';
 import CalendarDaySheet from '../common/CalendarDaySheet';
 import useCalendarSettings from '../../hooks/useCalendarSettings';
 import useExternalEvents, { announceEventsChanged } from '../../hooks/useExternalEvents';
+import useLiveDeals from '../../hooks/useLiveDeals';
 
 /**
  * Own availability + travel schedule. With `targetProfile` (an agent editing a
@@ -144,9 +145,9 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
     }
   }, [profile?.travelSchedule]);
 
-  // Fetch upcoming events (all roles — counterparty differs per side)
-  useEffect(() => {
-    const fetchUpcomingEvents = async () => {
+  // Fetch upcoming events (all roles — counterparty differs per side), and
+  // again whenever a booking changes (realtime, foreground, slow poll).
+  const fetchUpcomingEvents = async () => {
       if (!profile?.id || preview) return;
 
       try {
@@ -163,10 +164,12 @@ const CalendarScreen = ({ onClose, embedded = false, onSeeMatches = null, target
       } catch (error) {
         console.error('[CalendarScreen] Error fetching upcoming events:', error);
       }
-    };
-
+  };
+  useEffect(() => {
     fetchUpcomingEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.id]);
+  useLiveDeals(preview ? null : user?.id, fetchUpcomingEvents);
 
   const [scheduleForm, setScheduleForm] = useState({
     zone: '',

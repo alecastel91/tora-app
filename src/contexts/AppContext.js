@@ -209,6 +209,9 @@ export const AppProvider = ({ children }) => {
   };
 
   const switchProfile = (profileId) => {
+    // Re-picking the active profile is not a switch: clearing its graph here
+    // would never be refilled (the user?.id reload does not fire).
+    if (profileId === user?.id) return;
     const newProfile = userProfiles.find(p => p.id === profileId);
     if (newProfile) {
       // Clear the previous profile's graph immediately so its like/connection/

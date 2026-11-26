@@ -113,7 +113,8 @@
     background: rgba(255, 51, 102, 0.12);
   }
 
-  .tab-item span {
+  /* Tab labels only — the desktop account chip lays out its own spans. */
+  .tab-item span:not(.d3-chip):not(.d3-chip span) {
     display: block;
     font-size: 11px;
   }

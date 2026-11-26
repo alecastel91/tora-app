@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { fromMySide } from '../../utils/systemMessage';
+import { renderSystemText } from '../../utils/systemMessage';
 import apiService from '../../services/api';
 import { subscribeToInbox } from '../../services/realtime';
 import LoadingGlobe from '../common/LoadingGlobe';
@@ -260,7 +260,9 @@ const MessagesScreen = ({ onOpenChat, onCloseChat, chatOpen = false, isActive = 
                       )}
                       <p className={`text-xs truncate ${unread ? 'text-white/80 font-semibold' : 'text-white/50'}
                                      ${isDeleted ? 'text-white/40' : ''}`}>
-                        {fromMySide(conv.lastMessage.text, conv.lastMessage.isSystemMessage && (conv.lastMessage.fromProfileId ?? conv.lastMessage.from?.id) === user?.id ? user?.name : null, t)}
+                        {conv.lastMessage.isSystemMessage
+                          ? renderSystemText(conv.lastMessage.text, t, (conv.lastMessage.fromProfileId ?? conv.lastMessage.from?.id) === user?.id ? user?.name : null)
+                          : conv.lastMessage.text}
                       </p>
                     </div>
                   </div>

@@ -19,7 +19,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { localizeActionItem, getActionIcon, handleActionTarget } from '../../utils/actionItems';
 import { getAuthedBackendUrl, isBackendFileUrl } from '../../utils/urls';
 import { appAlert, appConfirm } from '../../utils/dialogs';
-import { raProfileUrl } from '../../utils/urls';
+import { raProfileUrl, safeHttpUrl } from '../../utils/urls';
 
 const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
   const { user, preferredCurrency, reloadProfileData } = useAppContext();
@@ -844,9 +844,9 @@ const ManageArtistScreen = ({ artist, onClose, onSwitchTab = () => {} }) => {
               <span>{t('manageArtist.instagram')}</span>
             </a>
           )}
-          {artistProfile?.website && (
+          {safeHttpUrl(artistProfile?.website) && (
             <a
-              href={artistProfile.website}
+              href={safeHttpUrl(artistProfile.website)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline"

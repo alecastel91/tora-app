@@ -20,7 +20,7 @@ import { toRepEntries, repEntryId, repEntryName, findRepEntry } from '../../util
 import { DOC_CATEGORIES, categoryStatus, documentsStillDue } from '../../utils/documentCategories';
 import { summarizeDealPayment, dealDeadlines } from '../../utils/paymentSummary';
 import { getAuthedBackendUrl, buildPaymentProofUrl, contractFileUrl, hasContractFile, isPdfFile } from '../../utils/urls';
-import { subscribeToDeals } from '../../services/realtime';
+import useLiveDeals from '../../hooks/useLiveDeals';
 import { OFF_STATUSES, formatFee, isConsentOnlyFor } from '../../utils/dealStatus';
 import { setLength } from '../../utils/setLength';
 import { bookingStatusLine, bookingStepsDone, isArtistViaAgent } from '../../utils/bookingStatus';
@@ -215,15 +215,9 @@ const BookingsScreen = ({ onOpenChat, onNavigateToMessages, isActive = true, onA
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
-  useEffect(() => {
-    if (!currentUser?.id) return;
-    const unsubscribe = subscribeToDeals(currentUser.id, () => {
-      if (isActiveRef.current) fetchDeals();
-      // hidden tab: the unconditional refetch-on-activation covers it
-    });
-    return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser?.id]);
+  // Live: realtime deal updates, back-to-foreground and a slow poll while
+  // this tab is shown (a hidden tab refetches on activation above).
+  useLiveDeals(currentUser?.id, () => fetchDeals(), { active: isActive });
 
   useEffect(() => {
     if (showContractModal || showDocumentModal) {

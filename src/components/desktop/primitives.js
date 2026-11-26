@@ -82,10 +82,10 @@ const SpotifyGlyph = () => (
 
 /** The profile's outbound links as {key, href, icon, label}, only the ones set. */
 export const profileLinks = (p, t) => [
-  p?.website && { key: 'web', href: p.website, icon: <GlobeIcon />, label: t('profile.officialWebsite') },
+  safeHttpUrl(p?.website) && { key: 'web', href: safeHttpUrl(p.website), icon: <GlobeIcon />, label: t('profile.officialWebsite') },
   p?.instagram && { key: 'ig', href: `https://instagram.com/${p.instagram.replace('@', '')}`, icon: <InstagramGlyph />, label: 'Instagram' },
   p?.residentAdvisor && { key: 'ra', href: raProfileUrl(p.residentAdvisor), icon: <img src={RA_LOGO_WHITE} alt="RA" className="h-auto w-[16px]" />, label: t('editProfile.residentAdvisorLabel') },
-  p?.linkedin && { key: 'li', href: p.linkedin, icon: <LinkIcon />, label: 'LinkedIn' },
+  safeHttpUrl(p?.linkedin) && { key: 'li', href: safeHttpUrl(p.linkedin), icon: <LinkIcon />, label: 'LinkedIn' },
   safeHttpUrl(p?.soundcloud) && { key: 'sc', href: safeHttpUrl(p.soundcloud), icon: <SoundCloudGlyph />, label: 'SoundCloud' },
   safeHttpUrl(p?.bandcamp) && { key: 'bc', href: safeHttpUrl(p.bandcamp), icon: <BandcampGlyph />, label: 'Bandcamp' },
   safeHttpUrl(p?.spotify) && { key: 'sp', href: safeHttpUrl(p.spotify), icon: <SpotifyGlyph />, label: 'Spotify' },

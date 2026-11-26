@@ -186,7 +186,11 @@ class ApiService {
       body: JSON.stringify({ currentPassword, newPassword })
     });
 
-    return this.handleResponse(response);
+    // A password change signs out every other session; this one carries on
+    // with the fresh token the server returns.
+    const data = await this.handleResponse(response);
+    if (data?.token) this.setToken(data.token);
+    return data;
   }
 
   async forgotPassword(email) {

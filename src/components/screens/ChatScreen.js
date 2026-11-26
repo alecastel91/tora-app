@@ -3,7 +3,7 @@ import OverlayPortal from '../common/OverlayPortal';
 import { CURRENCY_OPTIONS } from '../common/CurrencyOptions';
 import { useAppContext } from '../../contexts/AppContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { fromMySide } from '../../utils/systemMessage';
+import { renderSystemText } from '../../utils/systemMessage';
 import { formatEventDate, clampDateRange } from '../../utils/dates';
 import apiService from '../../services/api';
 import { celebrateMoment, MOMENT } from '../../utils/celebrations';
@@ -143,6 +143,32 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   // session. Used to unlock the sign modal immediately without waiting for
   // the async trackContractView round-trip to land in the DB.
   const [locallyViewedDealIds, setLocallyViewedDealIds] = useState(() => new Set());
+
+  // Every Sign button in the thread opens the full signing flow (name,
+  // consent, certificate, emails) — never a one-tap signature.
+  const openSignModal = async (msg) => {
+    // Pre-check whether this profile has already viewed
+    // the contract anywhere — if so, the sign modal
+    // unlocks immediately without forcing a re-open.
+    // Trust the local "opened in this session" flag
+    // first so the trackContractView race can't strand
+    // a user who just clicked Open seconds ago.
+    let initiallyViewed = locallyViewedDealIds.has(msg.dealId);
+    if (!initiallyViewed) {
+      try {
+        const deal = await apiService.getDeal(msg.dealId, currentUser.id);
+        const viewedBy = deal?.contract?.viewedBy || [];
+        initiallyViewed = viewedBy.some((v) => v.profile === currentUser.id);
+      } catch (_) { /* default to false */ }
+    }
+    setSelectedContractData({
+      dealId: msg.dealId,
+      contractUrl: msg.documentAttachment.url,
+      senderName: user.name,
+      initiallyViewed,
+    });
+    setShowSignContractModal(true);
+  };
   // Share-documents modal state — opened from the fully-signed contract
   // card so the artist side can pick docs without leaving the chat.
   const [shareDocsDeal, setShareDocsDeal] = useState(null);
@@ -241,6 +267,20 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
   // translated text (when toggled on) plus a muted link that cycles
   // Translate → Show original. Hidden entirely when the feature is
   // unavailable or the bubble has no translatable text.
+  // Time under a text bubble; a faded "Sending…" while it is on its way, and
+  // a retry when it did not go through.
+  const renderSendState = (msg) => {
+    if (msg.failed) {
+      return (
+        <button type="button" className="message-retry" onClick={() => retryMessage(msg)}>
+          {t('chat.notSentRetry')}
+        </button>
+      );
+    }
+    if (msg.pending) return <span className="message-time">{t('chat.sending')}</span>;
+    return <span className="message-time">{formatMessageTime(msg.timestamp)}</span>;
+  };
+
   const renderTranslateAffordance = (msg) => {
     if (translateUnavailable) return null;
     if (!msg.text || !msg.text.trim()) return null;
@@ -340,7 +380,12 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
           ? prev.filter(m => m.id && !transformedMessages.some(n => n.id === m.id)
               && new Date(m.timestamp) < new Date(pageOldest.timestamp))
           : [];
-        const next = [...olderLoaded, ...transformedMessages];
+        // Messages still on their way (or failed) stay at the end until sent.
+        // (one the server already returned — the realtime ping can beat the
+        // send's own response — is dropped here, not shown twice)
+        const unsent = prev.filter(m => (m.pending || m.failed) && !transformedMessages.some(n => n.isMe
+          && n.text === m.text && new Date(n.timestamp) >= new Date(m.timestamp) - 60000));
+        const next = [...olderLoaded, ...transformedMessages, ...unsent];
         if (prev.length === next.length) {
           const lastPrev = prev[prev.length - 1];
           const lastNew = next[next.length - 1];
@@ -449,19 +494,40 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSend = async () => {
-    if (actionBusy) return;
-    if (!inputMessage.trim()) return;
-    setActionBusy(true);
-    try {
-      await sendMessage(user.id, inputMessage);
-      setInputMessage('');
-      await fetchMessages();
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setActionBusy(false);
-    }
+  // Optimistic send: the message shows at once (faded until the server has
+  // it), sends go out one after another so they keep their order, and a
+  // failed one stays in the thread with a retry instead of vanishing.
+  const sendQueueRef = useRef(Promise.resolve());
+  const deliverMessage = (localId, text) => {
+    sendQueueRef.current = sendQueueRef.current.then(async () => {
+      try {
+        const saved = await sendMessage(user.id, text);
+        setUserMessages(prev => prev.map(m => (m.id === localId
+          ? { ...m, id: saved?.id || localId, timestamp: saved?.createdAt || m.timestamp, pending: false, failed: false }
+          : m)));
+        fetchMessages(true);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        setUserMessages(prev => prev.map(m => (m.id === localId ? { ...m, pending: false, failed: true } : m)));
+      }
+    });
+  };
+
+  const handleSend = () => {
+    const text = inputMessage.trim();
+    if (!text) return;
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setUserMessages(prev => [...prev, {
+      id: localId, text, timestamp: new Date().toISOString(), isMe: true, isSystem: false,
+      dealId: null, deal: null, data: null, connectionRequestId: null, documentAttachment: null, pending: true,
+    }]);
+    setInputMessage('');
+    deliverMessage(localId, text);
+  };
+
+  const retryMessage = (msg) => {
+    setUserMessages(prev => prev.map(m => (m.id === msg.id ? { ...m, pending: true, failed: false } : m)));
+    deliverMessage(msg.id, msg.text);
   };
 
   const handleKeyPress = (e) => {
@@ -1428,29 +1494,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                         <button
                           className="btn btn-primary btn-card-action"
                           style={{ flex: 1 }}
-                          onClick={async () => {
-                            // Pre-check whether this profile has already viewed
-                            // the contract anywhere — if so, the sign modal
-                            // unlocks immediately without forcing a re-open.
-                            // Trust the local "opened in this session" flag
-                            // first so the trackContractView race can't strand
-                            // a user who just clicked Open seconds ago.
-                            let initiallyViewed = locallyViewedDealIds.has(msg.dealId);
-                            if (!initiallyViewed) {
-                              try {
-                                const deal = await apiService.getDeal(msg.dealId, currentUser.id);
-                                const viewedBy = deal?.contract?.viewedBy || [];
-                                initiallyViewed = viewedBy.some((v) => v.profile === currentUser.id);
-                              } catch (_) { /* default to false */ }
-                            }
-                            setSelectedContractData({
-                              dealId: msg.dealId,
-                              contractUrl: msg.documentAttachment.url,
-                              senderName: user.name,
-                              initiallyViewed,
-                            });
-                            setShowSignContractModal(true);
-                          }}
+                          onClick={() => openSignModal(msg)}
                         >
                           {t('chat.sign')}
                         </button>
@@ -1818,7 +1862,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
               })()
             ) : msg.isSystem ? (
               <div className="message-system">
-                <p>{fromMySide(msg.text, msg.isMe ? currentUser?.name : null, t)}</p>
+                <p>{renderSystemText(msg.text, t, msg.isMe ? currentUser?.name : null)}</p>
               </div>
             ) : msg.documentAttachment ? (
               <div className={`message ${msg.isMe ? 'message-sent' : 'message-received'}`}>
@@ -1867,18 +1911,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                               fontWeight: '600',
                               fontSize: '13px'
                             }}
-                            onClick={async () => {
-                              try {
-                                await apiService.signContract(msg.dealId, currentUser.id);
-                                appAlert(t('chat.contractSignedSuccess'));
-                                // Refresh messages
-                                const response = await apiService.getMessageThread(currentUser.id, user.id);
-                                const transformedMessages = (response.messages || []).map(transformThreadMessage);
-                                setUserMessages(transformedMessages);
-                              } catch (err) {
-                                appAlert(err.message || t('chat.failedToSignContract'));
-                              }
-                            }}
+                            onClick={() => openSignModal(msg)}
                           >
                             {t('chat.signContract')}
                           </button>
@@ -1971,18 +2004,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                             fontWeight: '600',
                             fontSize: '13px'
                           }}
-                          onClick={async () => {
-                            try {
-                              await apiService.signContract(msg.dealId, currentUser.id);
-                              appAlert(t('chat.contractSignedSuccess'));
-                              // Refresh messages
-                              const response = await apiService.getMessageThread(currentUser.id, user.id);
-                              const transformedMessages = (response.messages || []).map(transformThreadMessage);
-                              setUserMessages(transformedMessages);
-                            } catch (err) {
-                              appAlert(err.message || t('chat.failedToSignContract'));
-                            }
-                          }}
+                          onClick={() => openSignModal(msg)}
                         >
                           {t('chat.signContract')}
                         </button>
@@ -2038,20 +2060,20 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                 )}
               </div>
             ) : (
-              <div className={`message ${msg.isMe ? 'message-sent' : 'message-received'}`}>
+              <div className={`message ${msg.isMe ? 'message-sent' : 'message-received'}${msg.pending ? ' message-pending' : ''}${msg.failed ? ' message-failed' : ''}`}>
                 {(!msg.isMe && index === 0) || (index > 0 && userMessages[index - 1].isMe !== msg.isMe) ? (
                   <div className="message-group">
                     <div className="message-bubble">
                       <p>{msg.text}</p>
                       {renderTranslateAffordance(msg)}
-                      <span className="message-time">{formatMessageTime(msg.timestamp)}</span>
+                      {renderSendState(msg)}
                     </div>
                   </div>
                 ) : (
                   <div className="message-bubble">
                     <p>{msg.text}</p>
                     {renderTranslateAffordance(msg)}
-                    <span className="message-time">{formatMessageTime(msg.timestamp)}</span>
+                    {renderSendState(msg)}
                   </div>
                 )}
               </div>
@@ -2138,7 +2160,7 @@ const ChatScreen = ({ user, onClose, onOpenProfile, openDeal = null, onOpenDealH
                   <button
                     className="send-btn"
                     onClick={handleSend}
-                    disabled={!inputMessage.trim() || actionBusy}
+                    disabled={!inputMessage.trim()}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
