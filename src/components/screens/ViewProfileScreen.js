@@ -726,7 +726,7 @@ const ViewProfileScreen = ({ profile: passedProfile, onClose, onOpenChat, onNavi
                           : ''}
                       </p>
                     </div>
-                    {(currentUser?.role === 'PROMOTER' || currentUser?.role === 'VENUE') && (
+                    {(currentUser?.role === 'PROMOTER' || currentUser?.role === 'VENUE') && !tour.ownTour && (
                       <div className="flex items-center gap-1.5 shrink-0">
                         {/* Lightweight appetite signal — free, precedes an offer */}
                         <button

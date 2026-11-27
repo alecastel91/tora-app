@@ -1298,6 +1298,7 @@ const en = {
     inviteToOffer: 'Invite to offer',
     invited: 'Invited',
     interestFailed: "Couldn't update interest — try again",
+    ownTour: "Your own tour",
     inviteFailed: "Couldn't send the invitation — try again",
     loadInterestsFailed: "Couldn't load the interested list",
     artist: 'Artist',

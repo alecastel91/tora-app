@@ -1298,6 +1298,7 @@ const pt = {
     inviteToOffer: 'Convidar a fazer proposta',
     invited: 'Convidado',
     interestFailed: 'Não foi possível atualizar o interesse — tente novamente',
+    ownTour: 'Sua própria turnê',
     inviteFailed: 'Não foi possível enviar o convite — tente novamente',
     loadInterestsFailed: 'Não foi possível carregar os interessados',
     artist: 'Artista',

@@ -2126,6 +2126,12 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                            tour.myProposal.status === 'DECLINED' ? t('tour.proposalDeclined') :
                            t('tour.viewSentProposal')}
                         </button>
+                      ) : tour.ownTour ? (
+                        // A tour of another profile on this same account:
+                        // the server refuses offers and interest on it.
+                        <button className="btn btn-secondary btn-small" disabled>
+                          {t('tour.ownTour')}
+                        </button>
                       ) : tour.closedToOffers ? (
                         // Full: the artist side stopped taking offers. The tour
                         // stays listed and interest stays open, so a promoter
@@ -2143,13 +2149,15 @@ const TourScreen = ({ onOpenChat, onNavigateToMessages, onUnreadProposalsChange,
                         </button>
                       )}
                       {/* Lightweight appetite signal — free, precedes an offer */}
-                      <button
-                        className={`btn btn-small ${tour.myInterest ? 'btn-liked' : 'btn-outline'}`}
-                        onClick={() => handleToggleInterest(tour)}
-                      >
-                        <HeartIcon filled={!!tour.myInterest} />{' '}
-                        {tour.myInterest ? t('tour.interested') : t('tour.imInterested')}
-                      </button>
+                      {!tour.ownTour && (
+                        <button
+                          className={`btn btn-small ${tour.myInterest ? 'btn-liked' : 'btn-outline'}`}
+                          onClick={() => handleToggleInterest(tour)}
+                        >
+                          <HeartIcon filled={!!tour.myInterest} />{' '}
+                          {tour.myInterest ? t('tour.interested') : t('tour.imInterested')}
+                        </button>
+                      )}
                     </div>
                     {tour.artist?.id && connectedUsers?.has(tour.artist.id) && (
                       <div className="tour-quiet">

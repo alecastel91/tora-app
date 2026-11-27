@@ -1298,6 +1298,7 @@ const zh = {
     inviteToOffer: '邀请报价',
     invited: '已邀请',
     interestFailed: '无法更新兴趣 — 请重试',
+    ownTour: '你自己的巡演',
     inviteFailed: '无法发送邀请 — 请重试',
     loadInterestsFailed: '无法加载感兴趣列表',
     artist: '艺人',

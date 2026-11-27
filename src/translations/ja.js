@@ -1298,6 +1298,7 @@ const ja = {
     inviteToOffer: 'オファーを依頼',
     invited: '招待済み',
     interestFailed: '興味の更新に失敗しました — もう一度お試しください',
+    ownTour: 'あなた自身のツアー',
     inviteFailed: '招待の送信に失敗しました — もう一度お試しください',
     loadInterestsFailed: '興味リストを読み込めませんでした',
     artist: 'アーティスト',

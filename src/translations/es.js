@@ -1298,6 +1298,7 @@ const es = {
     inviteToOffer: 'Invitar a ofertar',
     invited: 'Invitado',
     interestFailed: 'No se pudo actualizar el interés — inténtalo de nuevo',
+    ownTour: 'Tu propia gira',
     inviteFailed: 'No se pudo enviar la invitación — inténtalo de nuevo',
     loadInterestsFailed: 'No se pudieron cargar los interesados',
     artist: 'Artista',

@@ -1298,6 +1298,7 @@ const fr = {
     inviteToOffer: 'Inviter à faire une offre',
     invited: 'Invité',
     interestFailed: "Impossible de mettre à jour l'intérêt — réessayez",
+    ownTour: 'Votre propre tournée',
     inviteFailed: "Impossible d'envoyer l'invitation — réessayez",
     loadInterestsFailed: 'Impossible de charger les intéressés',
     artist: 'Artiste',

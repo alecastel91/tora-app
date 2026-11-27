@@ -210,12 +210,12 @@ const ProfilePage = ({
                             {meta.map((m, i) => <span key={i}>{i > 0 && <span className="mr-2 text-white/25">·</span>}{m}</span>)}
                           </p>
                         </div>
-                        <div className="flex shrink-0 items-center gap-1.5">
+                        {!tour.ownTour && <div className="flex shrink-0 items-center gap-1.5">
                           <button type="button" className={`btn btn-small ${tour.myInterest ? 'btn-liked' : 'btn-outline'}`} onClick={(e) => { e.stopPropagation(); onToggleTourInterest(tour); }}>
                             <HeartIcon filled={!!tour.myInterest} />
                           </button>
                           <button type="button" className="btn btn-primary btn-small" onClick={(e) => { e.stopPropagation(); onTourOffer(); }}>{t('tour.makeAnOffer')}</button>
-                        </div>
+                        </div>}
                       </div>
                     );
                   })}

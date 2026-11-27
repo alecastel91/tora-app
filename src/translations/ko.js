@@ -1298,6 +1298,7 @@ const ko = {
     inviteToOffer: '오퍼 요청하기',
     invited: '초대됨',
     interestFailed: '관심을 업데이트하지 못했습니다 — 다시 시도해 주세요',
+    ownTour: '내 투어',
     inviteFailed: '초대를 보내지 못했습니다 — 다시 시도해 주세요',
     loadInterestsFailed: '관심 목록을 불러오지 못했습니다',
     artist: '아티스트',
