@@ -132,7 +132,10 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, selec
       .pathColor(() => 'rgba(255,255,255,0.2)')
       .pathStroke(null)
       .pathTransitionDuration(0)
-      .onPolygonHover((f) => {
+      // Touch: no hover colour (a passing finger tinted every country it
+      // crossed); only the tapped one turns crimson. Also spares a raycast
+      // on every move while dragging.
+      .onPolygonHover(COARSE ? null : (f) => {
         if ((f || null) === hoverRef.current) return;
         hoverRef.current = f || null;
         el.style.cursor = f ? 'pointer' : 'grab';
@@ -275,6 +278,11 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, selec
     c.addEventListener('end', () => { wake(); reclusterRef.current(); });
     c.addEventListener('change', () => { calibrate(); povRef.current = g.pointOfView(); });
     el.addEventListener('pointermove', () => wake()); // hover highlights need frames
+    // iOS Safari ignores user-scalable=no: a pinch that starts on a dot or a
+    // name zoomed the whole page (search bar gone, no easy way back).
+    const noPageZoom = (e) => e.preventDefault();
+    el.addEventListener('gesturestart', noPageZoom);
+    el.addEventListener('gesturechange', noPageZoom);
 
     // Narrow phone screens need the camera further back to show the sphere's edge.
     const near = el.clientWidth < 600 ? 2.2 : 1.5;
@@ -342,7 +350,7 @@ const Globe3DStage = forwardRef(({ land, lines, cities, zones, lockedHubs, selec
     wakeRef.current();
   }, [selectedKey, selectedFeature]);
 
-  return <div ref={elRef} className="absolute inset-0" style={{ cursor: 'grab' }} />;
+  return <div ref={elRef} className="absolute inset-0 touch-none" style={{ cursor: 'grab' }} />;
 });
 
 Globe3DStage.displayName = 'Globe3DStage';
